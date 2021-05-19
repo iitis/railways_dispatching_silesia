@@ -1,0 +1,40 @@
+STATION (ST) DICTIONARY: 
+KO - Katowice
+CB - Chorzów Batory
+
+
+BRANCH JUNCTIONS:
+KTC - Katowice Towarowa
+Gt - Gottwald
+
+
+STATION BLOCKS - how to decode:
+"Station symbol", "Type", Track Number; "(Platform number)"
+For example:
+"KO", "ST", 6, "(N/A)" ==> "Katowice", "Station", Track 6,"(No platform)"
+"KO", "ST", 9, "(1)" ==> "Katowice", "Station", Track 9,"(at Platform 1)"
+
+
+LINE BLOCKS:
+"Previous Post Symbol - Subsequent Post Symbol - Track Number"; "Type of line block"; Track Number; "Number of block in sequence"; "(Total number of blocks between blocks)"
+"KO-KTC-1", "SBL", 1, "1", "(2)" ==> "Default traffic from Katowice station to Katowice Towarowa branch junction  sequenced one; "automated line block"; track 1; "block sequenced 1 counting from Katowice"; "(there are 2 blocks in total between KO and KTC)"
+"CB-KTC-1", "SBL", 2, "1", "(2)" ==> "Default traffic from Chorzów Batory station to Katowice Towarowa branch junction sequenced 1; "automated line block"; track 1; "block sequenced 1 counting from Chorzów Batory"; "(there are 2 blocks in total between CB and KTC)"
+
+
+Exemplary real-world sequence towrds Chorzów Batory
+"KO", "ST", 3, "(2)"
+"KO-KTC-1", "SBL", 1, "1", "(2)"
+"KO-KTC-2", "SBL+POGP", 1, "2", "(2)"
+"KTC-CB-1", "SBL", 1, "1", "(2)"
+"KTC-CB-2", "SBL+Sem(ST)", 1, "2", "(2)"
+"CB", "ST", 1, "(1)"
+
+
+"CB", "ST", 2, "(1)"
+"CB-KTC-1", "SBL", 2, "1", "(2)"
+"CB-KTC-2", "SBL+Sem(PODG)", 2, "2", "(2)"
+"KTC-KO-1", "SBL+PO(Załęże)", 2, "1", "(2)"
+"KTC-KO-2", "SBL+Sem(ST)", 2, "2", "(2)"
+"KO", "ST", 2, "(3)"
+
+
