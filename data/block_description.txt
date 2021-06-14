@@ -38,3 +38,17 @@ Exemplary real-world sequence towrds Chorzów Batory
 "KO", "ST", 2, "(3)"
 
 
+Columns G-J in KZ-KO-KL-CB_paths.ods
+
+time_inter_city: 
+	everything starting with IC (e.g., IC - IC; IC - TLK; IC - EIC; IC - EIP)
+	AND
+	KS - OsP
+
+time_regional_train
+	everything else than abovementioned time_inter_city (e.g., KS - Os; PR - R)
+
+
+
+
+
