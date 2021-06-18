@@ -4,7 +4,7 @@ import numpy as np
 data = pd.read_csv("data/train_schedule.csv", sep = ";")
 
 train_dict = {}
-for i in range(40):
+for i in range(len(data['Unnamed: 0'])):
     if data['Unnamed: 0'][i].isnumeric():
         info = []
         train = data['Unnamed: 0'][i]
@@ -18,6 +18,6 @@ for i in range(40):
         while tt_item[0:2] not in ['to','te']:
             pa+=1
             tt_item = data['Unnamed: 0'][i+pa]
-        train_data = data.iloc[tt_init:pa-1+tt_init]
+        train_data = data.iloc[tt_init:pa-1+tt_init].reset_index(drop=True).rename(columns={'Unnamed: 0': 'path'})
         info += [data['Unnamed: 0'][pa-1+tt_init]]
         train_dict[train] = [info,train_data]
