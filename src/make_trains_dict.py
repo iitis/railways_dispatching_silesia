@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-data = pd.read_csv("data/train_schedule.csv", sep = ";")
+data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
 def get_indexes(dfObj, value):
     ''' Get index positions of value in dataframe i.e. dfObj.'''
@@ -19,7 +19,7 @@ def get_indexes(dfObj, value):
     # Return a list of tuples indicating the positions of value in the dataframe
     return listOfPos
 
-
+# convert csv to dictionary
 train_dict = {}
 for i in range(len(data['Unnamed: 0'])):
     if data['Unnamed: 0'][i].isnumeric():
@@ -37,6 +37,6 @@ for i in range(len(data['Unnamed: 0'])):
             tt_item = data['Unnamed: 0'][i+pa]
         train_data = data.iloc[tt_init:pa-1+tt_init].reset_index(drop=True).rename(columns={'Unnamed: 0': 'path'})
         info += [data['Unnamed: 0'][pa-1+tt_init]]
-    train_dict[train] = [info,train_data]
-
-path_check_data = pd.read_excel("data/KZ-KO-KL-CB_paths.ods", engine="odf")
+        train_dict[train] = [info,train_data]
+print(train_dict)
+path_check_data = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
