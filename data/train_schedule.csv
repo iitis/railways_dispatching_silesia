@@ -1,21 +1,6 @@
 ;Arr;Dep;Label;Shunting
 ####;;;;
 KS - Os;;;;
-40673;;;;
-S1;;;;
-from Czestochowa;;;;
-"""KZ"", ""ST"", 1, ""(1)""";15:55;15:55;Katowice Zawodzie;
-"""KZ-KO"", ""SBL+Sem(ST)"", 1, ""1"", ""(1)""";;;;
-"""KO"", ""ST"", 113, ""(N/A)""";;;;
-"""KO"", ""ST"", 3, ""(2)""";15:59;16:03;Katowice;
-"""KO-KTC-1"", ""SBL"", 1, ""1"", ""(2)""";;;;
-"""KO-KTC-2"", ""SBL+POGP"", 1, ""2"", ""(2)""";16:06;16:06;Katowice Załęże;
-"""KTC-CB-1"", ""SBL"", 1, ""1"", ""(2)""";;;;
-"""KTC-CB-2"", ""SBL+Sem(ST)"", 1, ""2"", ""(2)""";;;;
-"""CB"", ""ST"", 1, ""(1)""";16:10;16:10;Chorzów Batory;
-to Gliwice;;;;
-####;;;;
-KS - Os;;;;
 94766;;;;
 S5;;;;
 from Zwardoń;;;;
