@@ -38,7 +38,10 @@ def timetable_to_train_dict():
             train_data = data.iloc[tt_init:pa-1+tt_init].reset_index(drop=True).rename(columns={'Unnamed: 0': 'path'})
             info += [data['Unnamed: 0'][pa-1+tt_init]]
             train_dict[train] = [info,train_data]
+    
+    #print(train_dict)
     return train_dict
 
-# print(train_dict)
+
 path_check_data = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
+timetable_to_train_dict()
