@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 
+# TODO make a function that parse the station block with a platform and read the platform number e.g.
+# "KO", "ST", 3, "(2)" => 2
+# "CB", "ST", 2, "(1)" => 1
+
 # get indexes in dataframe
 def get_indexes(dfObj, value):
     ''' Get index positions of value in dataframe i.e. dfObj.'''
@@ -91,6 +95,7 @@ def check_path_time(train, scheme = 'complete'):
                 print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
         total_time += time_passed
+        # TODO if Shunting time * 2
         times += [[time_table['path'][i]+' to '+ time_table['path'][i+1],time_passed]]
     return total_time,times
 
@@ -103,7 +108,9 @@ if __name__ == "__main__":
 
     print("The trains are:", *list(train_dict.keys()))
     print()
-    for train in list(train_dict.keys()):
-        total_time,times = check_path_time(train)
-        print("Total time is:",total_time)
-    #print("For each path",times)
+
+    train = 34319
+    #for train in list(train_dict.keys()):
+    total_time,times = check_path_time(train)
+    print("Total time is:",total_time)
+    print("For each path",times)
