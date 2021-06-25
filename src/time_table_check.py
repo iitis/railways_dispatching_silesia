@@ -83,7 +83,12 @@ def check_path_time(train, scheme = 'complete'):
                 # print("The block direction is", block_dir)
         path_column  = get_path_type_colunm(path_type,block_dir)
         if data_path_check.iloc[position][get_default_dir(path_column)] == 'N':
-            print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!")
+            if  train_dict[train][1]['Shunting'][i+1] == 'Y':
+                print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
+            elif train_dict[train][1]['Shunting'][i] == 'Y':
+                    print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
+            else:
+                print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
         total_time += time_passed
         times += [[time_table['path'][i]+' to '+ time_table['path'][i+1],time_passed]]
@@ -91,14 +96,14 @@ def check_path_time(train, scheme = 'complete'):
 
 if __name__ == "__main__":
 
+    train = 94766
+
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     train_dict = timetable_to_train_dict(data)
-    print(train_dict)
-    print()
+
     print("The trains are:", *list(train_dict.keys()))
     print()
-
-    train = 94766
-    total_time,times = check_path_time(train)
-    print("Total time is:",total_time)
-    print("For each path",times)
+    for train in list(train_dict.keys()):
+        total_time,times = check_path_time(train)
+        print("Total time is:",total_time)
+    #print("For each path",times)
