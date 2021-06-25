@@ -101,16 +101,20 @@ def check_path_time(train, scheme = 'complete'):
 
 if __name__ == "__main__":
 
-    train = 94766
-
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     train_dict = timetable_to_train_dict(data)
 
     print("The trains are:", *list(train_dict.keys()))
     print()
 
-    train = 34319
-    #for train in list(train_dict.keys()):
-    total_time,times = check_path_time(train)
-    print("Total time is:",total_time)
-    print("For each path",times)
+    if True:
+        train = 34319
+        total_time,times = check_path_time(train)
+        print("Total time is:",total_time)
+        print("For each path",times)
+
+    if False:
+        for train in list(train_dict.keys()):
+            total_time,times = check_path_time(train)
+            print("Total time is:",total_time)
+            print("For each path",times)
