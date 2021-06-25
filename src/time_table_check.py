@@ -4,6 +4,7 @@ import numpy as np
 # TODO make a function that parse the station block with a platform and read the platform number e.g.
 # "KO", "ST", 3, "(2)" => 2
 # "CB", "ST", 2, "(1)" => 1
+# "KO", "ST", 120, "(5)" => 5
 
 # get indexes in dataframe
 def get_indexes(dfObj, value):
