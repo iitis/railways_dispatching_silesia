@@ -90,11 +90,15 @@ def toy_problem_variables(trains_inds, no_station, d_max):
 
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
-    y = pus.LpVariable('y', upBound = 5, cat='Integer')
+    y = []
+
+    for i in range(3):
+
+        y.append(pus.LpVariable('y'+str(i), upBound = 5, cat='Integer'))
 
     secondary_delays_var = pus.LpVariable.dicts("Delays", (trains_inds, no_station), 0, d_max, cat='Integer')
 
-    print(secondary_delays_var)
+    print(y)
 
 
 toy_problem_variables([0,1,2],[0,1],10)
