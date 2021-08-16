@@ -79,11 +79,11 @@ not_considered_stations = {
     3: 1
 }
 
-print(tau('pass', 1, 1, 2))
+# print(tau('pass', 1, 1, 2))
 
-print(train_sets["Jswitch"])
+# print(train_sets["Jswitch"])
 
-print(not_considered_stations[3])
+# print(not_considered_stations[3])
 
 
 def toy_problem_variables(trains_inds, no_station, d_max):
@@ -100,8 +100,48 @@ def toy_problem_variables(trains_inds, no_station, d_max):
 
     print(y)
 
+    for key, value in secondary_delays_var.items():
+        if key == 2:
+            del value[0]
 
-toy_problem_variables([0,1,2],[0,1],10)
+    print(secondary_delays_var)
+    
+    train1 = []
+    train2 = []
+    
+    # this will be the order variable
+    for j1 in trains_inds:
+
+            train1.append(j1)
+
+
+    print(train1)
+
+    order_the_same_dir = pus.LpVariable.dicts(
+        "y", (train1, train2, no_station), 0, 1, cat='Integer')
+
+
+    print(order_the_same_dir)
+
+
+    # for j1 in trains_inds:
+    #     for j2 in trains_inds:
+    #         if VS[j1]["direction"] == VS[j2]["direction"] and j1 != j2:
+    #             for k in range(np.size(no_station)):
+    #                 prob += order_the_same_dir[j1][j2][k] + \
+    #                         order_the_same_dir[j2][j1][k] == 1
+
+    # for j1 in trains_inds:
+    #     for j2 in trains_inds:
+    #         for k in range(np.size(no_station)):
+    #             prob += min_span_delay[j1][j2[k] + mu*
+    
+    print(prob)
+
+    # minimum_span_var = pus.LpVariables.dict("Min_Span", ())
+
+
+toy_problem_variables([0, 1, 2],[0,1], 10)
 
 # def minimum_span_condition():
 #     # offset = []
