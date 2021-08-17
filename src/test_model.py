@@ -109,33 +109,55 @@ def toy_problem_variables(trains_inds, no_station, d_max):
         if not_considered_stations[key] != None:
             v = not_considered_stations[key]
 
-            del value[v]
+    #         del value[v]
 
     print(secondary_delays_var)
 
 
+    for j1 in trains_inds:
+        for j2 in trains_inds:
+            for k in range(np.size(no_station)):
+                if j1 != j2:
+                    prob += secondary_delays_var[j1][k] - secondary_delays_var[j2][k] >=  1 + tau('pass', j1, 0, 1)
 
     order_the_same_dir = dict()
 
     # this will be the order variable
+
     for js in train_sets["Jd"]:
         train1 = []
         train2 = []
         no_station = []
         for pair in itertools.combinations(js, 2):
-
             train1.append(pair[0])
             train2.append(pair[1])
+            
             no_station = common_path(S, pair[0], pair[1])
-
             if len(js) > 1:
-
                 order_the_same_dir.update(pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
+                
+                        # order_the_same_dir.update(pus.LpVariable.dicts("y", (train1+[1], train2+[1], no_station, no_station), 0, 1, cat='Integer'))
+
+    order_the_reroute_dir = dict()
+    for js in [[1,2]]:
+        train3 = []
+        train4 = []
+        no_station = []
+        for pair in itertools.combinations(js, 2):
+            train3.append(pair[0])
+            train4.append(pair[1])
+            
+            no_station = common_path(S, pair[0], pair[1])
+            if len(js) > 1:
+                order_the_reroute_dir.update(pus.LpVariable.dicts("y", (train3, train4, [0], [1]), 0, 1, cat='Integer'))
+
+    
+    #inequalities
 
 
-    print(order_the_same_dir)
 
 
+    #train in opposite direction
     # for j1 in trains_inds:
     #     for j2 in trains_inds:
     #         if VS[j1]["direction"] == VS[j2]["direction"] and j1 != j2:
