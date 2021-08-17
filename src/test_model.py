@@ -113,13 +113,15 @@ def toy_problem_variables(trains_inds, no_station, d_max):
 
     print(secondary_delays_var)
 
-    train1 = []
-    train2 = []
-    no_station = []
+
+
     order_the_same_dir = dict()
 
     # this will be the order variable
     for js in train_sets["Jd"]:
+        train1 = []
+        train2 = []
+        no_station = []
         for pair in itertools.combinations(js, 2):
 
             train1.append(pair[0])
