@@ -111,14 +111,14 @@ def toy_problem_variables(trains_inds, no_station, d_max):
 
     #         del value[v]
 
-    print(secondary_delays_var)
+    # print(secondary_delays_var)
 
 
-    for j1 in trains_inds:
-        for j2 in trains_inds:
-            for k in range(np.size(no_station)):
-                if j1 != j2:
-                    prob += secondary_delays_var[j1][k] - secondary_delays_var[j2][k] >=  1 + tau('pass', j1, 0, 1)
+    # for j1 in trains_inds:
+    #     for j2 in trains_inds:
+    #         for k in range(np.size(no_station)):
+    #             if j1 != j2:
+    #                 prob += secondary_delays_var[j1][k] - secondary_delays_var[j2][k] >=  1 + tau('pass', j1, 0, 1)
 
     order_the_same_dir = dict()
 
@@ -135,21 +135,35 @@ def toy_problem_variables(trains_inds, no_station, d_max):
             no_station = common_path(S, pair[0], pair[1])
             if len(js) > 1:
                 order_the_same_dir.update(pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
-                
+    
+    # for js in train_sets["Jd"]:
+    #     train1 = []
+    #     train2 = []
+    #     no_station = []
+    #     for pair in itertools.combinations(js, 2):
+    #         train1.append(pair[0])
+    #         train2.append(pair[1])
+    #         no_station = common_path(S, pair[0], pair[1])
+            
+    prob += secondary_delays_var[1][0] + 30*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
+    prob += secondary_delays_var[1][0] + 30*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
+
                         # order_the_same_dir.update(pus.LpVariable.dicts("y", (train1+[1], train2+[1], no_station, no_station), 0, 1, cat='Integer'))
 
-    order_the_reroute_dir = dict()
-    for js in [[1,2]]:
-        train3 = []
-        train4 = []
-        no_station = []
-        for pair in itertools.combinations(js, 2):
-            train3.append(pair[0])
-            train4.append(pair[1])
+    # order_the_reroute_dir = dict()
+    # for js in [[1,2]]:
+    #     train3 = []
+    #     train4 = []
+    #     no_station = []
+    #     for pair in itertools.combinations(js, 2):
+    #         train3.append(pair[0])
+    #         train4.append(pair[1])
             
-            no_station = common_path(S, pair[0], pair[1])
-            if len(js) > 1:
-                order_the_reroute_dir.update(pus.LpVariable.dicts("y", (train3, train4, [0], [1]), 0, 1, cat='Integer'))
+    #         no_station = common_path(S, pair[0], pair[1])
+    #         if len(js) > 1:
+    #             order_the_reroute_dir.update(pus.LpVariable.dicts("y", (train3, train4, [0], [1]), 0, 1, cat='Integer'))
+
+    
 
     
     #inequalities
