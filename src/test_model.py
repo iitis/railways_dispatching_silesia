@@ -126,7 +126,9 @@ def toy_problem_variables(trains_inds, no_station, d_max):
             train2.append(pair[1])
             no_station = common_path(S, pair[0], pair[1])
 
-    order_the_same_dir = pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer')
+            if len(js) > 1:
+
+                order_the_same_dir.update(pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
 
 
     print(order_the_same_dir)
