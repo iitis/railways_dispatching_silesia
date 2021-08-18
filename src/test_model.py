@@ -33,7 +33,7 @@ def tau(x = None, train = None, first_station = None, second_station = None):
         t = 2
     elif x == 'blocks' and train == 1 and first_station == 0 and second_station == 1:
         t = 2
-    elif x == 'stop' and train == 0 and first_station == 0:
+    elif x == 'stop' and train == 0 and first_station == 1:
         t = 1
     elif x == 'stop' and train == 1 and first_station == 1:
         t = 1
@@ -88,6 +88,16 @@ not_considered_stations = {
     2: 0
 }
 
+#####   functions ####
+
+
+def occurs_as_pair(a,b, vecofvec):
+    for v in vecofvec:
+        if (a in v and b in v):
+            return True
+    return False
+
+
 
 def subsequent_station(S, j, s):
     path = S[j]
@@ -118,8 +128,20 @@ def earliest_dep_time(train = None, station = None):
         return earliest_dep_time(train, s) + tau('pass', train, s, station) + tau('stop', train, station)
 
 
+
 def common_path(S, j, jp):
     return [s for s in S[j] if s in S[jp]]
+
+def update_dictofdicts(d1, d2):
+    k1 = d1.keys()
+    k2 = d2.keys()
+    for k in k2:
+        if k in k1:
+            update_dictofdicts(d1[k], d2[k])
+        else:
+            d1.update(d2)
+    return d1
+
 
 
 def minimal_span(problem, delay_var, y, S, train_sets, μ):
@@ -140,24 +162,22 @@ def minimal_span(problem, delay_var, y, S, train_sets, μ):
                     >= tau('blocks', jp, s, s_next) + max(0, tau('pass', jp, s, s_next) - tau('pass', j, s, s_next))
 
 
-def sinele_line(problem, delay_var, y, S, train_sets, μ):
+def single_line(problem, delay_var, y, S, train_sets, μ):
     "minimum span condition"
     for js in train_sets["Josingle"]:
         for (j,jp) in itertools.combinations(js, 2):
-            for s in common_path(S, j, jp):
+            for s in common_path(S, j, jp)[0:-1]:
 
                 s_previous = previous_station(S, j, s)
                 s_previousp = previous_station(S, jp, s)
 
-                if s_previous != None:
-
-                    problem += delay_var[jp][s] + earliest_dep_time(jp, s) + μ*(1-y[j][jp][s])  \
-                     >= delay_var[j][s_previous] + earliest_dep_time(j, s_previous) + tau('pass', j, s_previous , s)
-
                 if s_previousp != None:
 
-                    problem += delay_var[j][s] + earliest_dep_time(j, s) + μ*y[j][jp][s] \
+                    problem += delay_var[j][s] + earliest_dep_time(j, s) + μ*(1-y[j][jp][s])  \
                      >= delay_var[jp][s_previousp] + earliest_dep_time(jp, s_previousp) + tau('pass', jp, s_previousp , s)
+
+                    problem += delay_var[jp][s_previousp] + earliest_dep_time(jp, s_previousp) + μ*y[j][jp][s] \
+                     >= delay_var[j][s] + earliest_dep_time(j, s) + tau('pass', j, s, s_previousp)
 
 
 def minimal_stay(problem, delay_var, S, train_sets):
@@ -181,8 +201,8 @@ def track_occuparion(problem, delay_var, y, S, train_sets, μ):
             s_previous = previous_station(S, j, s)
             s_previousp = previous_station(S, jp, s)
 
-            # the last is ugly and must be corrected
-            if (s_previous == s_previousp and s_previous != None and [j, jp] in train_sets["Jd"]):
+            # the last condition is to keep an order if trains are folowwing one another
+            if (s_previous == s_previousp and s_previous != None and occurs_as_pair(j, jp, train_sets["Jd"])):
 
                 problem += y[j][jp][s] == y[j][jp][s_previous]
 
@@ -235,29 +255,27 @@ def toy_problem_variables(train_sets, S, d_max, μ = 30.):
             train2.append(pair[1])
 
             no_station = common_path(S, pair[0], pair[1])[0:-1]
-            if len(js) > 1:
+        if len(js) > 1:
 
-                y.update( pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
+            y1 = pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer')
 
-    print(y)
+            update_dictofdicts(y, y1)
+
     for s in train_sets["Jtrack"].keys():
-        print(s)
+
         for pair in itertools.combinations(train_sets["Jtrack"][s], 2):
 
-            print(pair)
+            y1 = pus.LpVariable.dicts("y", ([pair[0]], [pair[1]], [s]), 0, 1, cat='Integer')
 
-            print(y)
+            update_dictofdicts(y, y1)
 
-            y.update(pus.LpVariable.dicts("y", ([pair[0]], [pair[1]], [s]), 0, 1, cat='Integer'))
-
-            print(y)
-
-    print(y)
 
     minimal_span(prob, secondary_delays_var, y, S, train_sets, μ)
     minimal_stay(prob, secondary_delays_var, S, train_sets)
+    single_line(prob, secondary_delays_var, y, S, train_sets, μ)
+
     track_occuparion(prob, secondary_delays_var, y, S, train_sets, μ)
-    sinele_line(prob, secondary_delays_var, y, S, train_sets, μ)
+
     objective(prob, secondary_delays_var, S, train_sets, d_max)
     print(prob)
     print(prob.solve())
@@ -276,4 +294,4 @@ train_sets = {
   "Jswitch": dict()
 }
 
-#toy_problem_variables(train_sets, S, 10)
+toy_problem_variables(train_sets, S, 10)
