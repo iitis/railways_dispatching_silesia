@@ -70,14 +70,14 @@ S = {
     2: [1,0]
 }
 
-### this two cona be changed during rerouting
+### this only will be changed during rerouting
 
 train_sets = {
   "J": [0,1,2],
   "Jd": [[0,1], [2]],
   "Josingle": [],
   "Jround": dict(),
-  "Jtrack": dict(),
+  "Jtrack": {1: [0,1]},
   "Jswitch": dict()
 }
 
@@ -140,6 +140,25 @@ def minimal_span(problem, delay_var, y, S, train_sets, μ):
                     >= tau('blocks', jp, s, s_next) + max(0, tau('pass', jp, s, s_next) - tau('pass', j, s, s_next))
 
 
+def sinele_line(problem, delay_var, y, S, train_sets, μ):
+    "minimum span condition"
+    for js in train_sets["Josingle"]:
+        for (j,jp) in itertools.combinations(js, 2):
+            for s in common_path(S, j, jp):
+
+                s_previous = previous_station(S, j, s)
+                s_previousp = previous_station(S, jp, s)
+
+                if s_previous != None:
+
+                    problem += delay_var[jp][s] + earliest_dep_time(jp, s) + μ*(1-y[j][jp][s])  \
+                     >= delay_var[j][s_previous] + earliest_dep_time(j, s_previous) + tau('pass', j, s_previous , s)
+
+                if s_previousp != None:
+
+                    problem += delay_var[j][s] + earliest_dep_time(j, s) + μ*y[j][jp][s] \
+                     >= delay_var[jp][s_previousp] + earliest_dep_time(jp, s_previousp) + tau('pass', jp, s_previousp , s)
+
 
 def minimal_stay(problem, delay_var, S, train_sets):
     "minimum stay condition"
@@ -152,27 +171,62 @@ def minimal_stay(problem, delay_var, S, train_sets):
                 problem += delay_var[j][s]  >= delay_var[j][s_previous]
 
 
+
+def track_occuparion(problem, delay_var, y, S, train_sets, μ):
+    "track occupation"
+    for s in train_sets["Jtrack"].keys():
+        js = train_sets["Jtrack"][s]
+        for (j,jp) in itertools.combinations(js, 2):
+
+            s_previous = previous_station(S, j, s)
+            s_previousp = previous_station(S, jp, s)
+
+            # the last is ugly and must be corrected
+            if (s_previous == s_previousp and s_previous != None and [j, jp] in train_sets["Jd"]):
+
+                problem += y[j][jp][s] == y[j][jp][s_previous]
+
+            if s_previousp != None:
+
+                problem += delay_var[jp][s_previousp] + earliest_dep_time(jp, s_previousp)  + tau("pass", jp, s_previousp, s) + μ*(1-y[j][jp][s]) >= \
+                 delay_var[j][s] + earliest_dep_time(j, s) + tau('res')
+
+            if s_previous != None:
+
+                problem += delay_var[j][s_previous] + earliest_dep_time(j, s_previous) + tau("pass", j, s_previous, s) + μ*y[j][jp][s] >= \
+                     delay_var[jp][s] + earliest_dep_time(jp, s) + tau('res')
+
+
+
 def objective(problem, delay_var, S, train_sets, d_max):
     "objective function"
-    problem += pus.lpSum([delay_var[i][j] * penalty_weights(i, j)/d_max for i in train_sets["J"] for j in S[0] if penalty_weights(i,j) !=0])
+    problem += pus.lpSum([delay_var[i][j] * penalty_weights(i, j)/d_max for i in train_sets["J"] for j in S[i] if penalty_weights(i,j) !=0])
 
 
-def toy_problem_variables(trains_inds, no_station, d_max):
+def toy_problem_variables(train_sets, S, d_max, μ = 30.):
 
-    μ = 30.
+    trains_inds = train_sets["J"]
+
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
-    secondary_delays_var = pus.LpVariable.dicts("Delays", (trains_inds, no_station), 0, d_max, cat='Integer')
-    
+    secondary_delays_var = dict()
+
+    for train in train_sets["J"]:
+
+        secondary_delays_var.update(pus.LpVariable.dicts("Delays", ([train], S[train]), 0, d_max, cat='Integer'))
+
     for key, value in secondary_delays_var.items():
 
         if not_considered_stations[key] != None:
             v = not_considered_stations[key]
 
 
-    order_the_same_dir = dict()
+    y = dict()
 
-    for js in train_sets["Jd"]:
+    all_trains = np.concatenate([train_sets["Josingle"], train_sets["Jd"]])
+
+
+    for js in all_trains:
         train1 = []
         train2 = []
         no_station = []
@@ -180,16 +234,46 @@ def toy_problem_variables(trains_inds, no_station, d_max):
             train1.append(pair[0])
             train2.append(pair[1])
 
-            no_station = common_path(S, pair[0], pair[1])
+            no_station = common_path(S, pair[0], pair[1])[0:-1]
             if len(js) > 1:
 
-                order_the_same_dir.update(pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
+                y.update( pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
 
-    minimal_span(prob, secondary_delays_var, order_the_same_dir, S, train_sets, μ)
+    print(y)
+    for s in train_sets["Jtrack"].keys():
+        print(s)
+        for pair in itertools.combinations(train_sets["Jtrack"][s], 2):
+
+            print(pair)
+
+            print(y)
+
+            y.update(pus.LpVariable.dicts("y", ([pair[0]], [pair[1]], [s]), 0, 1, cat='Integer'))
+
+            print(y)
+
+    print(y)
+
+    minimal_span(prob, secondary_delays_var, y, S, train_sets, μ)
     minimal_stay(prob, secondary_delays_var, S, train_sets)
+    track_occuparion(prob, secondary_delays_var, y, S, train_sets, μ)
+    sinele_line(prob, secondary_delays_var, y, S, train_sets, μ)
     objective(prob, secondary_delays_var, S, train_sets, d_max)
     print(prob)
+    print(prob.solve())
 
 
 
-toy_problem_variables([0, 1, 2],[0,1], 10)
+toy_problem_variables(train_sets, S, 10)
+
+### rerouting ####
+train_sets = {
+  "J": [0,1,2],
+  "Jd": [],
+  "Josingle": [[1,2], []],
+  "Jround": dict(),
+  "Jtrack": {1: [0,1]},
+  "Jswitch": dict()
+}
+
+#toy_problem_variables(train_sets, S, 10)
