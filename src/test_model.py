@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+from string import printable
 import sys
 import os
 from argparse import ArgumentParser
+from typing import Protocol
 # import datetime as dt
 # from copy import deepcopy
 import numpy as np
@@ -52,7 +54,6 @@ def initial_conditions(train = None, station = None):
 
 
 def penalty_weights(train = None, station = None):
-    print(train, station)
     w = 0.
     if train == 0 and station == 0:
         w = 2.
@@ -79,6 +80,7 @@ train_sets = {
   "Jtrack": dict(),
   "Jswitch": dict()
 }
+
 
 not_considered_stations = {
     0: None,
@@ -120,8 +122,8 @@ def common_path(S, j, jp):
     return [s for s in S[j] if s in S[jp]]
 
 
-
 def minimal_span(problem, delay_var, y, S, train_sets, μ):
+    "minimum span condition"
     for js in train_sets["Jd"]:
         for (j,jp) in itertools.combinations(js, 2):
             for s in common_path(S, j, jp):
@@ -131,7 +133,6 @@ def minimal_span(problem, delay_var, y, S, train_sets, μ):
 
                 if (s_next != None and s_next == s_nextp):
 
-
                     problem += delay_var[jp][s] + earliest_dep_time(jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(j, s) \
                      >= tau('blocks', j, s, s_next) + max(0, tau('pass', j, s, s_next) - tau('pass', jp, s, s_next))
 
@@ -139,58 +140,37 @@ def minimal_span(problem, delay_var, y, S, train_sets, μ):
                     >= tau('blocks', jp, s, s_next) + max(0, tau('pass', jp, s, s_next) - tau('pass', j, s, s_next))
 
 
+
 def minimal_stay(problem, delay_var, S, train_sets):
+    "minimum stay condition"
     for j in train_sets["J"]:
         for s in S[j]:
 
             s_previous = previous_station(S, j, s)
 
             if (s_previous != None and s != not_considered_stations[j]):
-
-                #problem += delay_var[j][s] + earliest_dep_time(j, s) >= \
-                #delay_var[j][s_previous] + earliest_dep_time(j, s_previous) + tau('pass', j, s_previous, s) +tau('stop', j, s)
-
-                # eqivalently
-
                 problem += delay_var[j][s]  >= delay_var[j][s_previous]
 
 
-# print(tau('pass', 1, 1, 2))
-
-# print(train_sets["Jswitch"])
-
-# print(not_considered_stations[3])
+def objective(problem, delay_var, S, train_sets, d_max):
+    "objective function"
+    problem += pus.lpSum([delay_var[i][j] * penalty_weights(i, j)/d_max for i in train_sets["J"] for j in S[0] if penalty_weights(i,j) !=0])
 
 
 def toy_problem_variables(trains_inds, no_station, d_max):
 
     μ = 30.
-
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
-
     secondary_delays_var = pus.LpVariable.dicts("Delays", (trains_inds, no_station), 0, d_max, cat='Integer')
-
-
+    
     for key, value in secondary_delays_var.items():
 
         if not_considered_stations[key] != None:
             v = not_considered_stations[key]
 
-    #         del value[v]
-
-    # print(secondary_delays_var)
-
-
-    # for j1 in trains_inds:
-    #     for j2 in trains_inds:
-    #         for k in range(np.size(no_station)):
-    #             if j1 != j2:
-    #                 prob += secondary_delays_var[j1][k] - secondary_delays_var[j2][k] >=  1 + tau('pass', j1, 0, 1)
 
     order_the_same_dir = dict()
-
-    # this will be the order variable
 
     for js in train_sets["Jd"]:
         train1 = []
@@ -205,81 +185,11 @@ def toy_problem_variables(trains_inds, no_station, d_max):
 
                 order_the_same_dir.update(pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
 
-    # for js in train_sets["Jd"]:
-    #     train1 = []
-    #     train2 = []
-    #     no_station = []
-    #     for pair in itertools.combinations(js, 2):
-    #         train1.append(pair[0])
-    #         train2.append(pair[1])
-    #         no_station = common_path(S, pair[0], pair[1])
-
     minimal_span(prob, secondary_delays_var, order_the_same_dir, S, train_sets, μ)
-
     minimal_stay(prob, secondary_delays_var, S, train_sets)
-
-    #prob += secondary_delays_var[1][0] + μ*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
-    #prob += secondary_delays_var[1][0] + μ*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
-
-                        # order_the_same_dir.update(pus.LpVariable.dicts("y", (train1+[1], train2+[1], no_station, no_station), 0, 1, cat='Integer'))
-
-    # order_the_reroute_dir = dict()
-    # for js in [[1,2]]:
-    #     train3 = []
-    #     train4 = []
-    #     no_station = []
-    #     for pair in itertools.combinations(js, 2):
-    #         train3.append(pair[0])
-    #         train4.append(pair[1])
-
-    #         no_station = common_path(S, pair[0], pair[1])
-    #         if len(js) > 1:
-    #             order_the_reroute_dir.update(pus.LpVariable.dicts("y", (train3, train4, [0], [1]), 0, 1, cat='Integer'))
-
-
-
-
-    #inequalities
-
-
-
-
-    #train in opposite direction
-    # for j1 in trains_inds:
-    #     for j2 in trains_inds:
-    #         if VS[j1]["direction"] == VS[j2]["direction"] and j1 != j2:
-    #             for k in range(np.size(no_station)):
-    #                 prob += order_the_same_dir[j1][j2][k] + \
-    #                         order_the_same_dir[j2][j1][k] == 1
-
-    # for j1 in trains_inds:
-    #     for j2 in trains_inds:
-    #         for k in range(np.size(no_station)):
-    #             prob += min_span_delay[j1][j2[k] + mu*
-
+    objective(prob, secondary_delays_var, S, train_sets, d_max)
     print(prob)
 
-    # minimum_span_var = pus.LpVariables.dict("Min_Span", ())
 
 
 toy_problem_variables([0, 1, 2],[0,1], 10)
-
-# def minimum_span_condition():
-#     # offset = []
-#     tau_ms1 = tau('blocks', 1, 1, 2)
-#     con1 = max(0, tau('pass', 1, 1, 2) - tau('pass', 2, 1, 2))
-#     tau_ms2 = tau('blocks', 2, 1, 2)
-#     con2 = max(0, tau('pass', 2, 1, 2) - tau('pass', 1, 1, 2))
-#     return tau_ms1+con1, tau_ms2+con2
-
-# print(minimum_span_condition())
-
-
-# for j1 in [1,2,3]:
-    # for j2 in [1,2,3]:
-        # if j1 != j2:
-            # print(j1,j2)
-# for s1 in [1,2]:
-#         for s2 in [1,2]:
-#             if s1 != s2:
-#                 print(s1,s2)
