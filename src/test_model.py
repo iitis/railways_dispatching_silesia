@@ -16,8 +16,10 @@ import itertools
 
 # proposed renumbering trains j_1 -> 0, j_2 -> 1, j_3 -> 2; stations s_1 -> 0, s_2 -> 1
 
+#######  these are input ##########
+
 def tau(x = None, train = None, first_station = None, second_station = None):
-    print(x, train, first_station, second_station)
+    #print(x, train, first_station, second_station)
     t = -1
     if x == 'pass' and train == 0 and first_station == 0 and second_station == 1:
         t = 4
@@ -38,8 +40,7 @@ def tau(x = None, train = None, first_station = None, second_station = None):
     return t
 
 
-def earliest_dep_time(train = None, station = None):
-    print(train, station)
+def initial_conditions(train = None, station = None):
     t = -1
     if train == 0 and station == 0:
         t = 4
@@ -48,6 +49,7 @@ def earliest_dep_time(train = None, station = None):
     elif train == 2 and station == 1:
         t = 8
     return t
+
 
 def penalty_weights(train = None, station = None):
     print(train, station)
@@ -61,6 +63,14 @@ def penalty_weights(train = None, station = None):
     return w
 
 
+S = {
+    0: [0,1],
+    1: [0,1],
+    2: [1,0]
+}
+
+### this two cona be changed during rerouting
+
 train_sets = {
   "J": [0,1,2],
   "Jd": [[0,1], [2]],
@@ -70,12 +80,6 @@ train_sets = {
   "Jswitch": dict()
 }
 
-S = {
-    0: [0,1],
-    1: [0,1],
-    2: [1,0]
-}
-
 not_considered_stations = {
     0: None,
     1: None,
@@ -83,11 +87,73 @@ not_considered_stations = {
 }
 
 
-def common_path(S, j, jp):
+def subsequent_station(S, j, s):
+    path = S[j]
+    k = path.index(s)
+    if k == len(path)-1:
+        return None
+    else:
+        return path[k+1]
 
-    Sjjp = [s for s in S[j] if s in S[jp]]
-    # without the last element
-    return Sjjp
+def previous_station(S, j, s):
+    path = S[j]
+
+    k = path.index(s)
+
+    if k == 0:
+        return None
+    else:
+        return path[k-1]
+
+
+def earliest_dep_time(train = None, station = None):
+
+    t = initial_conditions(train, station)
+    if t >= 0:
+        return t
+    else:
+        s = previous_station(S, train, station)
+        return earliest_dep_time(train, s) + tau('pass', train, s, station) + tau('stop', train, station)
+
+
+def common_path(S, j, jp):
+    return [s for s in S[j] if s in S[jp]]
+
+
+
+def minimal_span(problem, delay_var, y, S, train_sets, μ):
+    for js in train_sets["Jd"]:
+        for (j,jp) in itertools.combinations(js, 2):
+            for s in common_path(S, j, jp):
+
+                s_next = subsequent_station(S, j, s)
+                s_nextp = subsequent_station(S, jp, s)
+
+                if (s_next != None and s_next == s_nextp):
+
+
+                    problem += delay_var[jp][s] + earliest_dep_time(jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(j, s) \
+                     >= tau('blocks', j, s, s_next) + max(0, tau('pass', j, s, s_next) - tau('pass', jp, s, s_next))
+
+                    problem += delay_var[j][s] + earliest_dep_time(j, s) + μ*y[j][jp][s] - delay_var[jp][s] - earliest_dep_time(jp, s) \
+                    >= tau('blocks', jp, s, s_next) + max(0, tau('pass', jp, s, s_next) - tau('pass', j, s, s_next))
+
+
+def minimal_stay(problem, delay_var, S, train_sets):
+    for j in train_sets["J"]:
+        for s in S[j]:
+
+            s_previous = previous_station(S, j, s)
+
+            if (s_previous != None and s != not_considered_stations[j]):
+
+                #problem += delay_var[j][s] + earliest_dep_time(j, s) >= \
+                #delay_var[j][s_previous] + earliest_dep_time(j, s_previous) + tau('pass', j, s_previous, s) +tau('stop', j, s)
+
+                # eqivalently
+
+                problem += delay_var[j][s]  >= delay_var[j][s_previous]
+
 
 # print(tau('pass', 1, 1, 2))
 
@@ -97,6 +163,8 @@ def common_path(S, j, jp):
 
 
 def toy_problem_variables(trains_inds, no_station, d_max):
+
+    μ = 30.
 
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
@@ -131,11 +199,12 @@ def toy_problem_variables(trains_inds, no_station, d_max):
         for pair in itertools.combinations(js, 2):
             train1.append(pair[0])
             train2.append(pair[1])
-            
+
             no_station = common_path(S, pair[0], pair[1])
             if len(js) > 1:
+
                 order_the_same_dir.update(pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer'))
-    
+
     # for js in train_sets["Jd"]:
     #     train1 = []
     #     train2 = []
@@ -144,9 +213,13 @@ def toy_problem_variables(trains_inds, no_station, d_max):
     #         train1.append(pair[0])
     #         train2.append(pair[1])
     #         no_station = common_path(S, pair[0], pair[1])
-            
-    prob += secondary_delays_var[1][0] + 30*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
-    prob += secondary_delays_var[1][0] + 30*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
+
+    minimal_span(prob, secondary_delays_var, order_the_same_dir, S, train_sets, μ)
+
+    minimal_stay(prob, secondary_delays_var, S, train_sets)
+
+    #prob += secondary_delays_var[1][0] + μ*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
+    #prob += secondary_delays_var[1][0] + μ*(1-order_the_same_dir[0][1][1]) - secondary_delays_var[0][0] >= tau('blocks', 0, 0, 1) + max(0, tau('pass', 1, 0, 1) - tau('pass', 1, 0, 1))
 
                         # order_the_same_dir.update(pus.LpVariable.dicts("y", (train1+[1], train2+[1], no_station, no_station), 0, 1, cat='Integer'))
 
@@ -158,14 +231,14 @@ def toy_problem_variables(trains_inds, no_station, d_max):
     #     for pair in itertools.combinations(js, 2):
     #         train3.append(pair[0])
     #         train4.append(pair[1])
-            
+
     #         no_station = common_path(S, pair[0], pair[1])
     #         if len(js) > 1:
     #             order_the_reroute_dir.update(pus.LpVariable.dicts("y", (train3, train4, [0], [1]), 0, 1, cat='Integer'))
 
-    
 
-    
+
+
     #inequalities
 
 
