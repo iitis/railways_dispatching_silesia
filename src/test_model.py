@@ -339,6 +339,18 @@ if True:
 
 
 #####   QUBO implementation #########
+
+##### again default setting #####
+train_sets = {
+  "J": [0,1,2],
+  "Jd": [[0,1], [2]],
+  "Josingle": [],
+  "Jround": dict(),
+  "Jtrack": {1: [0,1]},
+  "Jswitch": dict()
+}
+
+
 def indexing4qubo(train_sets, S, d_max):
     inds = []
     for j in train_sets["J"]:
@@ -361,5 +373,86 @@ def Psum(k, k1, inds):
             return 1.0
     return 0.
 
-def Pspan():
-    0.
+def Pspan(k, k1, inds, train_sets, S):
+    j = inds[k]["j"]
+    j1 = inds[k1]["j"]
+    if occurs_as_pair(j, j1, train_sets["Jd"]):
+        s = inds[k]["s"]
+        s1 = inds[k1]["s"]
+
+
+        s_next = subsequent_station(S, j, s)
+        s_nextp = subsequent_station(S, j1, s1)
+
+        if (s == s1 and s_next != None and s_next == s_nextp):
+
+            t = inds[k]["d"] + earliest_dep_time(j, s)
+            t1 = inds[k1]["d"] + earliest_dep_time(j1, s)
+
+            A =  - tau('blocks', j1, s, s_next) - max(0, tau('pass', j1, s, s_next) - tau('pass', j, s, s_next))
+
+            B =  tau('blocks', j, s, s_next) + max(0, tau('pass', j, s, s_next) - tau('pass', j1, s, s_next))
+
+
+            if A < t1-t < B:
+                return 1.
+    return 0.
+
+
+
+
+### should be zero
+print(inds[3])
+print(inds[22])
+print(Pspan(3, 22, inds, train_sets, S))
+
+print(Pspan(22, 3, inds, train_sets, S))
+
+
+### should be one
+print(inds[2])
+print(inds[22])
+print(Pspan(2, 22, inds, train_sets, S))
+
+print(Pspan(22, 2, inds, train_sets, S))
+
+
+
+def Pstay(k, k1, inds, train_sets, S):
+    j = inds[k]["j"]
+    j1 = inds[k1]["j"]
+    if j == j1:
+        s = inds[k]["s"]
+        s1 = inds[k1]["s"]
+
+        if s1 == subsequent_station(S, j, s):
+            if inds[k]["d"] > inds[k1]["d"]:
+                return 1.0
+
+        if s == subsequent_station(S, j, s1):
+            if inds[k1]["d"] > inds[k]["d"]:
+                return 1.0
+
+    return 0.
+
+
+print(Pstay(0, 0, inds, train_sets, S))
+
+
+### should be one ###
+print(inds[2])
+print(inds[11])
+
+
+print(Pstay(2, 11, inds, train_sets, S))
+print(Pstay(11, 2, inds, train_sets, S))
+
+
+
+### should be zero ###
+print(inds[1])
+print(inds[12])
+
+
+print(Pstay(1, 12, inds, train_sets, S))
+print(Pstay(12, 1, inds, train_sets, S))
