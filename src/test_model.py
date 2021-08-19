@@ -320,16 +320,46 @@ def toy_problem_variables(train_sets, S, d_max, μ = 30.):
     print("impact to objective t_3", impact_to_objective(prob, 2,1, d_max))
 
 
-toy_problem_variables(train_sets, S, 10)
 
-### rerouting ####
-train_sets = {
-  "J": [0,1,2],
-  "Jd": [],
-  "Josingle": [[1,2], []],
-  "Jround": dict(),
-  "Jtrack": {1: [0,1]},
-  "Jswitch": dict()
-}
 
-toy_problem_variables(train_sets, S, 10)
+if True:
+    toy_problem_variables(train_sets, S, 10)
+
+    ### rerouting ####
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [],
+      "Josingle": [[1,2], []],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    toy_problem_variables(train_sets, S, 10)
+
+
+#####   QUBO implementation #########
+def indexing4qubo(train_sets, S, d_max):
+    inds = []
+    for j in train_sets["J"]:
+        for s in S[j]:
+            if s != not_considered_station[j]:
+                for d in range(d_max+1):
+                    inds.append({"j":j,"s":s,"d":d})
+    return inds, len(inds)
+
+
+inds, q_bits = indexing4qubo(train_sets, S, 10)
+#print(inds[0])
+
+
+def Psum(k, k1, inds):
+    if inds[k]["j"] == inds[k1]["j"] and inds[k]["s"] == inds[k1]["s"]:
+        if inds[k]["d"] == inds[k1]["d"]:
+            return - 1.0
+        else:
+            return 1.0
+    return 0.
+
+def Pspan():
+    0.
