@@ -82,10 +82,10 @@ train_sets = {
 }
 
 
-not_considered_stations = {
+not_considered_station = {
     0: None,
     1: None,
-    2: 0
+    2: 0,
 }
 
 #####   functions ####
@@ -187,7 +187,7 @@ def minimal_stay(problem, delay_var, S, train_sets):
 
             s_previous = previous_station(S, j, s)
 
-            if (s_previous != None and s != not_considered_stations[j]):
+            if (s_previous != None and s != not_considered_station[j]):
                 problem += delay_var[j][s]  >= delay_var[j][s_previous]
 
 
@@ -223,22 +223,33 @@ def objective(problem, delay_var, S, train_sets, d_max):
     problem += pus.lpSum([delay_var[i][j] * penalty_weights(i, j)/d_max for i in train_sets["J"] for j in S[i] if penalty_weights(i,j) !=0])
 
 
-def toy_problem_variables(train_sets, S, d_max, μ = 30.):
+def return_delay_time(prob, j, s):
+
+    for v in prob.variables():
+        if v.name == "Delays_"+str(j)+"_"+str(s):
+            delay = v.varValue
+            time = v.varValue + earliest_dep_time(j, s)
+            return delay, time
+    return 0, 0
+
+def impact_to_objective(prob, j,s, d_max):
+    for v in prob.variables():
+        if v.name == "Delays_"+str(j)+"_"+str(s):
+            return penalty_weights(j,s)/d_max*v.varValue
+    return 0.
+
+
+
+
+def linear_varibles(train_sets, S, d_max):
 
     trains_inds = train_sets["J"]
-
-    prob = pus.LpProblem("Trains", pus.LpMinimize)
 
     secondary_delays_var = dict()
 
     for train in train_sets["J"]:
 
         secondary_delays_var.update(pus.LpVariable.dicts("Delays", ([train], S[train]), 0, d_max, cat='Integer'))
-
-    for key, value in secondary_delays_var.items():
-
-        if not_considered_stations[key] != None:
-            v = not_considered_stations[key]
 
 
     y = dict()
@@ -269,6 +280,16 @@ def toy_problem_variables(train_sets, S, d_max, μ = 30.):
 
             update_dictofdicts(y, y1)
 
+    return secondary_delays_var, y
+
+
+
+def solve_linear_problem(train_sets, S, d_max, μ):
+
+    prob = pus.LpProblem("Trains", pus.LpMinimize)
+
+    secondary_delays_var, y = linear_varibles(train_sets, S, d_max)
+
 
     minimal_span(prob, secondary_delays_var, y, S, train_sets, μ)
     minimal_stay(prob, secondary_delays_var, S, train_sets)
@@ -277,9 +298,26 @@ def toy_problem_variables(train_sets, S, d_max, μ = 30.):
     track_occuparion(prob, secondary_delays_var, y, S, train_sets, μ)
 
     objective(prob, secondary_delays_var, S, train_sets, d_max)
-    print(prob)
-    print(prob.solve())
 
+    prob.solve()
+
+    return prob
+
+
+def toy_problem_variables(train_sets, S, d_max, μ = 30.):
+
+    prob = solve_linear_problem(train_sets, S, d_max, μ)
+
+    print("d_1, t_1", return_delay_time(prob, 0,0))
+    print("d_2, t_2", return_delay_time(prob, 1,0))
+    print("d_3, 3_3", return_delay_time(prob, 2,1))
+
+    print("d_1', t_1'", return_delay_time(prob, 0,1))
+
+
+    print("impact to objective t_1", impact_to_objective(prob, 0,0, d_max))
+    print("impact to objective t_2", impact_to_objective(prob, 1,0, d_max))
+    print("impact to objective t_3", impact_to_objective(prob, 2,1, d_max))
 
 
 toy_problem_variables(train_sets, S, 10)
