@@ -505,6 +505,12 @@ print(inds[44])
 print(P1track(28, 44, inds, train_sets, S))
 print(P1track(44, 28, inds, train_sets, S))
 
+print(inds[32])
+print(inds[44])
+
+print(P1track(32, 44, inds, train_sets, S))
+print(P1track(44, 32, inds, train_sets, S))
+
 
 ### should be 0  ####
 
@@ -513,3 +519,10 @@ print(inds[46])
 
 print(P1track(23, 46, inds, train_sets, S))
 print(P1track(46, 23, inds, train_sets, S))
+
+
+print(inds[22])
+print(inds[45])
+
+print(P1track(22, 45, inds, train_sets, S))
+print(P1track(45, 22, inds, train_sets, S))
