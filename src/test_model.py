@@ -489,40 +489,104 @@ train_sets = {
 }
 
 
-print(".....  1 track  ......")
+def z_indices(train_sets, S, d_max):
+    inds = []
+    for s in train_sets["Jtrack"].keys():
+        for (j, j1) in itertools.combinations(train_sets["Jtrack"][s], 2):
 
-print(inds[22])
-print(inds[44])
+            for d in range(d_max+1):
+                for d1 in range(d_max+1):
+                    inds.append({"j":j,"j1":j1,"s":s,"d":d, "d1":d1})
+    return inds, len(inds)
 
-### should be 1  ####
-print(P1track(22, 44, inds, train_sets, S))
-print(P1track(44, 22, inds, train_sets, S))
+inds_z, l = z_indices(train_sets, S, 10)
 
-
-print(inds[28])
-print(inds[44])
-
-print(P1track(28, 44, inds, train_sets, S))
-print(P1track(44, 28, inds, train_sets, S))
-
-print(inds[32])
-print(inds[44])
-
-print(P1track(32, 44, inds, train_sets, S))
-print(P1track(44, 32, inds, train_sets, S))
+print(l == 121)
 
 
-### should be 0  ####
+inds1 = np.concatenate([inds, inds_z])
+print(len(inds1) == 176)
 
-print(inds[23])
-print(inds[46])
+def P1qubic(k, k1, inds1, train_sets, S):
+    # x with z
+    if len(inds1[k].keys()) == 3 and len(inds1[k1].keys()) == 5:
+        jx = inds[k]["j"]
+        # this train is analysed on the corrent and pervous station
+        if jx == inds1[k1]["j"]:
+            jz = inds1[k1]["j1"]
+            s = previous_station(S, jx, inds1[k]["s"])
+            if inds1[k]["s"] == inds1[k1]["s"]:
+                s1 = inds1[k]["s"]
+                if occurs_as_pair(jx, jz, train_sets["Jtrack"][s1]):
+                    # t, t' t'' according to Eq 32
+                    tx = inds1[k]["d"] + earliest_dep_time(jx, s)
+                    tz1 = inds1[k1]["d"] + earliest_dep_time(jz, s1)
+                    tz2 = inds1[k1]["d1"] + earliest_dep_time(jz, s1)
 
-print(P1track(23, 46, inds, train_sets, S))
-print(P1track(46, 23, inds, train_sets, S))
+                    if tx + tau("pass", jx, s, s1) + tau("res", jx, jz) < tz1 < tz1:
+                        return 1.
 
 
-print(inds[22])
-print(inds[45])
 
-print(P1track(22, 45, inds, train_sets, S))
-print(P1track(45, 22, inds, train_sets, S))
+    if len(inds1[k].keys()) == 5 and len(inds1[k1].keys()) == 3:
+        jx = inds[k1]["j"]
+        # this train is analysed on the corrent and pervous station
+        if jx == inds1[k]["j"]:
+            jz = inds1[k]["j1"]
+            s = previous_station(S, jx, inds1[k1]["s"])
+            if  inds1[k1]["s"] == inds1[k]["s"]:
+                s1 = inds1[k]["s"]
+                if occurs_as_pair(jx, jz, train_sets["Jtrack"][s1]):
+                    tx = inds1[k1]["d"] + earliest_dep_time(jx, s)
+                    tz1 = inds1[k]["d"] + earliest_dep_time(jz, s1)
+                    tz2 = inds1[k]["d1"] + earliest_dep_time(jz, s1)
+
+                    if tx + tau("pass", jx, s, s1) + tau("res", jx, jz) < tz1 < tz1:
+                        return 1.
+    return 0.
+
+
+print(inds1[1])
+print(inds1[100])
+print(P1qubic(1, 100, inds1, train_sets, S))
+
+
+if False:
+
+    print(".....  1 track  ......")
+
+    print(inds[22])
+    print(inds[44])
+
+    ### should be 1  ####
+    print(P1track(22, 44, inds, train_sets, S))
+    print(P1track(44, 22, inds, train_sets, S))
+
+
+    print(inds[28])
+    print(inds[44])
+
+    print(P1track(28, 44, inds, train_sets, S))
+    print(P1track(44, 28, inds, train_sets, S))
+
+    print(inds[32])
+    print(inds[44])
+
+    print(P1track(32, 44, inds, train_sets, S))
+    print(P1track(44, 32, inds, train_sets, S))
+
+
+    ### should be 0  ####
+
+    print(inds[23])
+    print(inds[46])
+
+    print(P1track(23, 46, inds, train_sets, S))
+    print(P1track(46, 23, inds, train_sets, S))
+
+
+    print(inds[22])
+    print(inds[45])
+
+    print(P1track(22, 45, inds, train_sets, S))
+    print(P1track(45, 22, inds, train_sets, S))
