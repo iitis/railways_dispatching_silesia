@@ -400,24 +400,6 @@ def Pspan(k, k1, inds, train_sets, S):
 
 
 
-
-### should be zero
-print(inds[3])
-print(inds[22])
-print(Pspan(3, 22, inds, train_sets, S))
-
-print(Pspan(22, 3, inds, train_sets, S))
-
-
-### should be one
-print(inds[2])
-print(inds[22])
-print(Pspan(2, 22, inds, train_sets, S))
-
-print(Pspan(22, 2, inds, train_sets, S))
-
-
-
 def Pstay(k, k1, inds, train_sets, S):
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
@@ -434,6 +416,43 @@ def Pstay(k, k1, inds, train_sets, S):
                 return 1.0
 
     return 0.
+
+
+def P1track(k, k1, inds, train_sets, S):
+    j = inds[k]["j"]
+    j1 = inds[k1]["j"]
+
+    if occurs_as_pair(j, j1, train_sets["Josingle"]):
+        s = inds[k]["s"]
+        s1 = inds[k1]["s"]
+
+        t = inds[k]["d"] + earliest_dep_time(j, s)
+        t1 = inds[k1]["d"] + earliest_dep_time(j1, s1)
+
+        if s1 == subsequent_station(S, j, s):
+
+            if - tau('pass', j1, s1 , s) < t1 - t < tau('pass', j, s , s1):
+
+                    return 1.0
+
+    return 0.
+
+
+
+### should be zero
+print(inds[3])
+print(inds[22])
+print(Pspan(3, 22, inds, train_sets, S))
+
+print(Pspan(22, 3, inds, train_sets, S))
+
+
+### should be one
+print(inds[2])
+print(inds[22])
+print(Pspan(2, 22, inds, train_sets, S))
+
+print(Pspan(22, 2, inds, train_sets, S))
 
 
 print(Pstay(0, 0, inds, train_sets, S))
@@ -456,3 +475,41 @@ print(inds[12])
 
 print(Pstay(1, 12, inds, train_sets, S))
 print(Pstay(12, 1, inds, train_sets, S))
+
+
+
+### rerouting ####
+train_sets = {
+  "J": [0,1,2],
+  "Jd": [],
+  "Josingle": [[1,2], []],
+  "Jround": dict(),
+  "Jtrack": {1: [0,1]},
+  "Jswitch": dict()
+}
+
+
+print(".....  1 track  ......")
+
+print(inds[22])
+print(inds[44])
+
+### should be 1  ####
+print(P1track(22, 44, inds, train_sets, S))
+print(P1track(44, 22, inds, train_sets, S))
+
+
+print(inds[28])
+print(inds[44])
+
+print(P1track(28, 44, inds, train_sets, S))
+print(P1track(44, 28, inds, train_sets, S))
+
+
+### should be 0  ####
+
+print(inds[23])
+print(inds[46])
+
+print(P1track(23, 46, inds, train_sets, S))
+print(P1track(46, 23, inds, train_sets, S))
