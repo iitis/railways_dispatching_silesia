@@ -648,8 +648,9 @@ def P2qubic(k, k1, inds1, train_sets, S):
             j = inds1[k]["j"]
             j1 = inds1[k]["j"]
             sz = subsequent_station(S, j, s)
-            if  occurs_as_pair(j, j1, [train_sets["Jtrack"][sz]]):
-                return 0.5
+            if sz != None and sz in train_sets["Jtrack"].keys():
+                if occurs_as_pair(j, j1, [train_sets["Jtrack"][sz]]):
+                    return 0.5
 
     return 0.
 
@@ -667,10 +668,10 @@ def get_coupling(k, k1, train_sets, S, inds, p_sum, p_pair):
 def get_z_coupling(k, k1, train_sets, S, inds, p_pair, p_qubic):
 
     J = p_pair*P1qubic(k, k1, inds, train_sets, S)
-    J += P1qubic(k, k1, inds, train_sets, S)
+    J += p_qubic*P2qubic(k, k1, inds, train_sets, S)
     return J
 
-def make_Q(train_sets, S, d_max, p_sum, p_pair, p_qubic):
+def make_Q(train_sets, S, d_max, p_sum, p_pair, p_pair_q, p_qubic):
     inds, q_bits = indexing4qubo(train_sets, S, d_max)
     inds_z, q_bits_z = z_indices(train_sets, S, 10)
 
@@ -679,7 +680,7 @@ def make_Q(train_sets, S, d_max, p_sum, p_pair, p_qubic):
     l = q_bits
     l1 = q_bits+q_bits_z
 
-    Q = [[0. for _ in range(l)] for _ in range(l)]
+    Q = [[0. for _ in range(l1)] for _ in range(l1)]
 
     for k in range(l):
         Q[k][k] += penalty(k, inds, d_max)
@@ -688,9 +689,9 @@ def make_Q(train_sets, S, d_max, p_sum, p_pair, p_qubic):
         for k1 in range(l):
             Q[k][k1] += get_coupling(k, k1, train_sets, S, inds, p_sum, p_pair)
 
-    #for k in range(l1):
-    #    for k1 in range(l1):
-    #        Q[k][k1] += get_z_coupling(k, k1, train_sets, S, inds1, p_pair, p_qubic)
+    for k in range(l1):
+        for k1 in range(l1):
+            Q[k][k1] += get_z_coupling(k, k1, train_sets, S, inds1, p_pair_q, p_qubic)
 
     return Q
 
@@ -704,7 +705,7 @@ if True:
       "Jswitch": dict()
     }
 
-    Q = make_Q(train_sets, S, 10, 4., 2.5, 2.1)
+    Q = make_Q(train_sets, S, 10, 6.5, 2.5, 1.5, 1.5)
 
     print(np.sqrt(np.size(Q)))
 
@@ -737,7 +738,7 @@ if True:
       "Jswitch": dict()
     }
 
-    Q = make_Q(train_sets, S, 10, 4., 2.5, 2.1)
+    Q = make_Q(train_sets, S, 10, 6.5, 2.5, 1.5, 1.5)
 
     np.savez("Qfile_r.npz", Q=Q)
 
