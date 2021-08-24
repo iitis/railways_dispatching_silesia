@@ -322,7 +322,7 @@ def toy_problem_variables(train_sets, S, d_max, μ = 30.):
 
 
 
-if True:
+if False:
     toy_problem_variables(train_sets, S, 10)
 
     ### rerouting ####
@@ -656,7 +656,7 @@ def P2qubic(k, k1, inds1, train_sets, S):
 
 
 def get_coupling(k, k1, train_sets, S, inds, p_sum, p_pair):
-    # add penalities
+
     J = p_sum*Psum(k, k1, inds)
     J += p_pair*Pspan(k, k1, inds, train_sets, S)
     J += p_pair*Pstay(k, k1, inds, train_sets, S)
@@ -678,8 +678,8 @@ def make_Q(train_sets, S, d_max, p_sum, p_pair, p_qubic):
 
     l = q_bits
     l1 = q_bits+q_bits_z
-    print(l1)
-    Q = [[0. for _ in range(l1)] for _ in range(l1)]
+
+    Q = [[0. for _ in range(l)] for _ in range(l)]
 
     for k in range(l):
         Q[k][k] += penalty(k, inds, d_max)
@@ -688,33 +688,74 @@ def make_Q(train_sets, S, d_max, p_sum, p_pair, p_qubic):
         for k1 in range(l):
             Q[k][k1] += get_coupling(k, k1, train_sets, S, inds, p_sum, p_pair)
 
-    for k in range(l1):
-        for k1 in range(l1):
-            Q[k][k1] += get_z_coupling(k, k1, train_sets, S, inds1, p_pair, p_qubic)
+    #for k in range(l1):
+    #    for k1 in range(l1):
+    #        Q[k][k1] += get_z_coupling(k, k1, train_sets, S, inds1, p_pair, p_qubic)
 
     return Q
 
+if True:
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [[0,1], [2]],
+      "Josingle": [],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    Q = make_Q(train_sets, S, 10, 4., 2.5, 2.1)
+
+    print(np.sqrt(np.size(Q)))
+
+    np.savez("Qfile.npz", Q=Q)
+
+    solution = np.load("solution.npz")
 
 
-Q = make_Q(train_sets, S, 10, 2.5, 2.5, 1.5)
+    inds, q_bits = indexing4qubo(train_sets, S, 10)
+    l = q_bits
 
-#np.savez("Qfile.npz", Q=Q)
+    #print(solution[0:l-1])
 
-solution = np.load("solution.npz")
-
-
-
-
-inds, q_bits = indexing4qubo(train_sets, S, 10)
-l = q_bits
-
-
-print(solution[0:l-1])
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
 
 
-for i in range(l):
-    if solution[i] == 1:
-        print(inds[i])
+if True:
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [],
+      "Josingle": [[1,2], []],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    Q = make_Q(train_sets, S, 10, 4., 2.5, 2.1)
+
+    np.savez("Qfile_r.npz", Q=Q)
+
+    solution = np.load("solution_r.npz")
+
+
+    inds, q_bits = indexing4qubo(train_sets, S, 10)
+    l = q_bits
+
+    print(" ... rerouting ....")
+
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
 
 
 if False:
