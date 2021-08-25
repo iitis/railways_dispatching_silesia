@@ -13,8 +13,8 @@ eval(Expr(:toplevel, :(@everywhere using SpinGlassMetropolisHastings)))
 
 p = MH_parameters(2.)
 
-Qs = ["Qfile.npz", "Qfile_r.npz"]
-solutions = ["solution.npz", "solution_r.npz"]
+Qs = ["files/Qfile.npz", "files/Qfile_r.npz"]
+solutions = ["files/solution.npz", "files/solution_r.npz"]
 
 for i in 1:2
     x = npzread(Qs[i]);
@@ -28,7 +28,7 @@ for i in 1:2
     JJ = Mat_qubo2ising(Q);
     ig = M2graph(JJ; sgn = -1)
 
-    t = 200
+    t = 300
 
     @time sol = mh_solve(ig, p, t, sort = true);
 

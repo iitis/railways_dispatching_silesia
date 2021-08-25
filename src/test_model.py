@@ -99,9 +99,9 @@ if True:
 
     print(np.sqrt(np.size(Q)))
 
-    np.savez("Qfile.npz", Q=Q)
+    np.savez("files/Qfile.npz", Q=Q)
 
-    solution = np.load("solution.npz")
+    solution = np.load("files/solution.npz")
 
 
     inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
@@ -130,9 +130,9 @@ if True:
 
     Q = make_Q(train_sets, S, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
-    np.savez("Qfile_r.npz", Q=Q)
+    np.savez("files/Qfile_r.npz", Q=Q)
 
-    solution = np.load("solution_r.npz")
+    solution = np.load("files/solution_r.npz")
 
 
     inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
