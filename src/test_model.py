@@ -38,7 +38,7 @@ def toy_problem_variables(train_sets, S, d_max, not_considered_station, μ = 30.
 
     print("d_1, t_1", return_delay_time(S, prob, 0,0))
     print("d_2, t_2", return_delay_time(S, prob, 1,0))
-    print("d_3, 3_3", return_delay_time(S, prob, 2,1))
+    print("d_3, t_3", return_delay_time(S, prob, 2,1))
 
     print("d_1', t_1'", return_delay_time(S, prob, 0,1))
 
@@ -143,6 +143,9 @@ if True:
     inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
     l = q_bits
 
+    print("x vars", l)
+    print("all var", np.size(Q[0]))
+
     #print(solution[0:l-1])
 
     for i in range(l):
@@ -188,7 +191,7 @@ if True:
     print("       done      Metropols Hastings  ")
 
 
-if True:
+if False:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -208,6 +211,8 @@ if True:
 
     inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
     l = q_bits
+
+
 
     #print(solution[0:l-1])
 
