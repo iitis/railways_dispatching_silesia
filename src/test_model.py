@@ -9,6 +9,7 @@ from typing import Protocol
 import numpy as np
 import pulp as pus
 import itertools
+import pickle as pk
 
 from helpers_functions import *
 from input_data import *
@@ -122,7 +123,7 @@ if False:
 
 
 
-if True:
+if False:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -256,3 +257,89 @@ if False:
 
 
     print("       done      DW simulator  ")
+
+
+
+if True:
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [[0,1], [2]],
+      "Josingle": [],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    for i in [3, 3.5, 4, 4.5]:
+      file = open("files/dwave_data/Qfile_samples_sol_real-anneal_numread3996_antime250_chainst"+str(i),'rb')
+
+      print("css", i)
+
+      x = pk.load(file)
+
+      solution = x[0][0]
+
+      print(x[0][1])
+
+      Q = np.load("files/Qfile.npz")["Q"]
+
+      print("ground energy", energy(solution, Q))
+
+
+      inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+      l = q_bits
+
+
+
+      #print(solution[0:l-1])
+
+      for i in range(l):
+          if solution[i] == 1:
+              j = inds[i]["j"]
+              s = inds[i]["s"]
+              d = inds[i]["d"]
+              t = d + earliest_dep_time(S, j,s)
+              print("train", j, "station", s, "delay", d, "time", t)
+
+if False:
+
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [],
+      "Josingle": [[1,2], []],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    for i in [3, 3.5, 4, 4.5]:
+      file = open("files/dwave_data/Qfile_samples_sol_real-anneal_numread3996_antime250_chainst"+str(i),'rb')
+
+      print("css", i)
+
+      x = pk.load(file)
+
+      solution = x[0][0]
+
+      print(x[0][1])
+
+      Q = np.load("files/Qfile_r.npz")["Q"]
+
+      print("ground energy", energy(solution, Q))
+
+
+      inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+      l = q_bits
+
+      print(" ... rerouting ....")
+
+      for i in range(l):
+          if solution[i] == 1:
+              j = inds[i]["j"]
+              s = inds[i]["s"]
+              d = inds[i]["d"]
+              t = d + earliest_dep_time(S, j,s)
+              print("train", j, "station", s, "delay", d, "time", t)
+
+
+    print("  done  DW  results ")
