@@ -301,7 +301,7 @@ if True:
               t = d + earliest_dep_time(S, j,s)
               print("train", j, "station", s, "delay", d, "time", t)
 
-if False:
+if True:
 
     train_sets = {
       "J": [0,1,2],
@@ -313,7 +313,7 @@ if False:
     }
 
     for i in [3, 3.5, 4, 4.5]:
-      file = open("files/dwave_data/Qfile_samples_sol_real-anneal_numread3996_antime250_chainst"+str(i),'rb')
+      file = open("files/dwave_data/Qfile_samples_sol_real-anneal_numread3996_antime250_chainst"+str(i)+"_r",'rb')
 
       print("css", i)
 
