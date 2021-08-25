@@ -78,7 +78,12 @@ if False:
 
 #####   QUBO implementation #########
 
-
+def energy(v, Q):
+    if -1 in v:
+        v = [(y+1)/2 for y in v]
+    X = np.matrix(Q)
+    V = np.matrix(v)
+    return V*X*V.transpose()
 
 if False:
     train_sets = {
@@ -101,22 +106,6 @@ if False:
 
     np.savez("files/Qfile.npz", Q=Q)
 
-    solution = np.load("files/solution.npz")
-
-
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
-    l = q_bits
-
-    #print(solution[0:l-1])
-
-    for i in range(l):
-        if solution[i] == 1:
-            j = inds[i]["j"]
-            s = inds[i]["s"]
-            d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
-            print("train", j, "station", s, "delay", d, "time", t)
-
 
     train_sets = {
       "J": [0,1,2],
@@ -131,21 +120,6 @@ if False:
 
     np.savez("files/Qfile_r.npz", Q=Q)
 
-    solution = np.load("files/solution_r.npz")
-
-
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
-    l = q_bits
-
-    print(" ... rerouting ....")
-
-    for i in range(l):
-        if solution[i] == 1:
-            j = inds[i]["j"]
-            s = inds[i]["s"]
-            d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
-            print("train", j, "station", s, "delay", d, "time", t)
 
 
 if True:
@@ -159,7 +133,11 @@ if True:
     }
 
 
-    solution = np.load("files/Qfsolution.npz")
+    solution = np.load("files/solution.npz")
+
+    Q = np.load("files/Qfile.npz")["Q"]
+
+    print("ground energy", energy(solution, Q))
 
 
     inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
@@ -185,7 +163,77 @@ if True:
       "Jswitch": dict()
     }
 
-    solution = np.load("files/Qfsolution_r.npz")
+    print(" ... rerouting ....")
+
+    solution = np.load("files/solution_r.npz")
+
+    Q = np.load("files/Qfile_r.npz")["Q"]
+
+
+    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    l = q_bits
+
+
+    print("ground energy", energy(solution, Q))
+
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(S, j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
+
+
+    print("       done      Metropols Hastings  ")
+
+
+if True:
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [[0,1], [2]],
+      "Josingle": [],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+
+    solution = np.load("files/Qfile_sol_sim-anneal.npz")["arr_0"]
+
+    Q = np.load("files/Qfile.npz")["Q"]
+
+    print("ground energy", energy(solution, Q))
+
+
+    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    l = q_bits
+
+    #print(solution[0:l-1])
+
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(S, j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
+
+
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [],
+      "Josingle": [[1,2], []],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    solution = np.load("files/Qfile_sol_sim-anneal_r.npz")["arr_0"]
+
+    Q = np.load("files/Qfile_r.npz")["Q"]
+
+    print("ground energy", energy(solution, Q))
 
 
     inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
@@ -200,3 +248,6 @@ if True:
             d = inds[i]["d"]
             t = d + earliest_dep_time(S, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
+
+
+    print("       done      DW simulator  ")
