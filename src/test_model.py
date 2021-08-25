@@ -80,7 +80,7 @@ if False:
 
 
 
-if True:
+if False:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -118,7 +118,6 @@ if True:
             print("train", j, "station", s, "delay", d, "time", t)
 
 
-if True:
     train_sets = {
       "J": [0,1,2],
       "Jd": [],
@@ -133,6 +132,60 @@ if True:
     np.savez("files/Qfile_r.npz", Q=Q)
 
     solution = np.load("files/solution_r.npz")
+
+
+    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    l = q_bits
+
+    print(" ... rerouting ....")
+
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(S, j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
+
+
+if True:
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [[0,1], [2]],
+      "Josingle": [],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+
+    solution = np.load("files/Qfsolution.npz")
+
+
+    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    l = q_bits
+
+    #print(solution[0:l-1])
+
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(S, j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
+
+
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [],
+      "Josingle": [[1,2], []],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    solution = np.load("files/Qfsolution_r.npz")
 
 
     inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
