@@ -11,7 +11,7 @@ addprocs(19)
 println("number of workers = ", nworkers())
 eval(Expr(:toplevel, :(@everywhere using SpinGlassMetropolisHastings)))
 
-p = MH_parameters(2.5)
+p = MH_parameters(2.)
 
 Qs = ["Qfile.npz", "Qfile_r.npz"]
 solutions = ["solution.npz", "solution_r.npz"]
@@ -23,14 +23,12 @@ for i in 1:2
 
     Q = x["Q"]
 
-    #display(Q[1:4, 1:4])
-
     println("Q mat size", size(Q))
 
     JJ = Mat_qubo2ising(Q);
     ig = M2graph(JJ; sgn = -1)
 
-    t = 10_000
+    t = 15_000
 
     @time sol = mh_solve(ig, p, t, sort = true);
 

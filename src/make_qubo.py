@@ -209,17 +209,17 @@ def P2qubic(k, k1, inds1, train_sets, S):
         jx = inds1[k]["j"]
         sx = inds1[k]["s"]
         sz = inds1[k1]["s"]
-        if sz == subsequent_station(S, jx, sx):
+        if sz == sx:
 
             jz = inds1[k1]["j"]
             jz1 = inds1[k1]["j1"]
 
             # -1 because of the symmetrisation
 
-            if (jx == jz) and occurs_as_pair(jx, jz1, [train_sets["Jtrack"][sz]]):
+            if jx == jz:
                 if inds1[k]["d"] == inds1[k1]["d"]:
                     return -1.
-            if (jx == jz1) and occurs_as_pair(jx, jz, [train_sets["Jtrack"][sz]]):
+            if jx == jz1:
                 if inds1[k]["d"] == inds1[k1]["d1"]:
                     return -1.
 
@@ -228,16 +228,16 @@ def P2qubic(k, k1, inds1, train_sets, S):
         jx = inds1[k1]["j"]
         sx = inds1[k1]["s"]
         sz = inds1[k]["s"]
-        if sz == subsequent_station(S, jx, sx):
+        if sz == sx:
 
             jz = inds1[k]["j"]
             jz1 = inds1[k]["j1"]
 
-            if (jx == jz) and occurs_as_pair(jx, jz1, [train_sets["Jtrack"][sz]]):
+            if jx == jz:
                 if inds1[k1]["d"] == inds1[k]["d"]:
                     return -1.
 
-            if (jx == jz1) and occurs_as_pair(jx, jz, [train_sets["Jtrack"][sz]]):
+            if jx == jz1:
                 if inds1[k1]["d"] == inds1[k]["d1"]:
                     return -1.
     # x vs x
@@ -245,10 +245,10 @@ def P2qubic(k, k1, inds1, train_sets, S):
         s = inds1[k]["s"]
         if s == inds1[k1]["s"]:
             j = inds1[k]["j"]
-            j1 = inds1[k]["j"]
+            j1 = inds1[k1]["j"]
             sz = subsequent_station(S, j, s)
-            if sz != None and sz in train_sets["Jtrack"].keys():
-                if occurs_as_pair(j, j1, [train_sets["Jtrack"][sz]]):
+            if s in train_sets["Jtrack"].keys():
+                if occurs_as_pair(j, j1, [train_sets["Jtrack"][s]]):
                     return 0.5
 
     return 0.

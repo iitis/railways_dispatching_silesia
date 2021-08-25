@@ -90,7 +90,12 @@ if True:
       "Jswitch": dict()
     }
 
-    Q = make_Q(train_sets, S, not_considered_station, 10, 4., 2.5, .0, 2.5)
+    p_sum = 3.5
+    p_pair = 1.2
+    p_pair_qubic = 1.2
+    p_qubic = 2.5
+
+    Q = make_Q(train_sets, S, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     print(np.sqrt(np.size(Q)))
 
@@ -123,7 +128,7 @@ if True:
       "Jswitch": dict()
     }
 
-    Q = make_Q(train_sets, S, not_considered_station, 10, 4., 2.5, .0, 2.5)
+    Q = make_Q(train_sets, S, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     np.savez("Qfile_r.npz", Q=Q)
 
