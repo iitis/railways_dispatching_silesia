@@ -48,9 +48,9 @@ def toy_problem_variables(train_sets, S, d_max, not_considered_station, μ = 30.
     print("impact to objective t_3", impact_to_objective(prob, 2,1, d_max))
 
 
+# linear solver
 
-
-if True:
+if False:
     # this will be changed while rerouting
     train_sets = {
       "J": [0,1,2],
