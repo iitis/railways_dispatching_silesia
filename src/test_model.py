@@ -90,10 +90,10 @@ if True:
       "Jswitch": dict()
     }
 
-    p_sum = 3.5
-    p_pair = 1.2
-    p_pair_qubic = 1.2
-    p_qubic = 2.5
+    p_sum = 2.5
+    p_pair = 1.25
+    p_pair_qubic = 1.25
+    p_qubic = 2.1
 
     Q = make_Q(train_sets, S, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
