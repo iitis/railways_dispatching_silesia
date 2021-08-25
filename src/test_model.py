@@ -343,3 +343,84 @@ if True:
 
 
     print("  done  DW  results ")
+
+
+if True:
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [[0,1], [2]],
+      "Josingle": [],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+
+    file = open("files/hybrid_solver/Qfile_samples_sol_hybrid-anneal",'rb')
+
+    x = pk.load(file)
+
+    solution = x[0][0]
+
+    print(x[0][1])
+
+    Q = np.load("files/Qfile.npz")["Q"]
+
+    print("ground energy", energy(solution, Q))
+
+
+    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    l = q_bits
+
+
+
+      #print(solution[0:l-1])
+
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(S, j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
+
+if True:
+
+    train_sets = {
+      "J": [0,1,2],
+      "Jd": [],
+      "Josingle": [[1,2], []],
+      "Jround": dict(),
+      "Jtrack": {1: [0,1]},
+      "Jswitch": dict()
+    }
+
+    file = open("files/hybrid_solver/Qfile_samples_sol_hybrid-anneal_r",'rb')
+
+
+    x = pk.load(file)
+
+    solution = x[0][0]
+
+    print(x[0][1])
+
+    Q = np.load("files/Qfile_r.npz")["Q"]
+
+    print("ground energy", energy(solution, Q))
+
+
+    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    l = q_bits
+
+    print(" ... rerouting ....")
+
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(S, j,s)
+            print("train", j, "station", s, "delay", d, "time", t)
+
+
+    print("  done  Hybrid  results ")
