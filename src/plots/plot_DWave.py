@@ -6,7 +6,7 @@ import numpy as np
 def plotD_Wave(f, title, non_feasible_css, non_feasible_ens, feasible_css, feasible_ens, ground):
 
     plt.plot(non_feasible_css, non_feasible_ens, 'ro', label = "not feasible DWave solution")
-    plt.plot(feasible_css, feasible_ens, 'go',  label = "feasible DWave solution")
+    plt.plot(feasible_css, feasible_ens, 'go',  label = "feasible and optimal DWave solution")
     plt.axhline(ground, color = "green", label = "ground state and hybrid solver")
     plt.ylabel('minimal energy')
     plt.xlabel('coupling strength')
