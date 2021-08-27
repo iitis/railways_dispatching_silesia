@@ -32,6 +32,8 @@ def Pspan(k, k1, inds, train_sets, S):
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
     if occurs_as_pair(j, j1, train_sets["Jd"]):
+
+        #print(j, j1)
         s = inds[k]["s"]
         s1 = inds[k1]["s"]
 
@@ -271,6 +273,7 @@ def get_z_coupling(k, k1, train_sets, S, inds, p_pair, p_qubic):
     return J
 
 def make_Q(train_sets, S, not_considered_station, d_max, p_sum, p_pair, p_pair_q, p_qubic):
+
     inds, q_bits = indexing4qubo(train_sets, S, d_max, not_considered_station)
     inds_z, q_bits_z = z_indices(train_sets, S, 10)
 
@@ -291,5 +294,6 @@ def make_Q(train_sets, S, not_considered_station, d_max, p_sum, p_pair, p_pair_q
     for k in range(l1):
         for k1 in range(l1):
             Q[k][k1] += get_z_coupling(k, k1, train_sets, S, inds1, p_pair_q, p_qubic)
+
 
     return Q

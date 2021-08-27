@@ -5,7 +5,7 @@ from input_data import initial_conditions, tau
 
 def occurs_as_pair(a,b, vecofvec):
     for v in vecofvec:
-        if (a in v and b in v):
+        if (a in v and b in v) and a != b:
             return True
     return False
 

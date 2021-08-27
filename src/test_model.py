@@ -86,7 +86,7 @@ def energy(v, Q):
     V = np.matrix(v)
     return V*X*V.transpose()
 
-if False:
+if True:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -100,6 +100,7 @@ if False:
     p_pair = 1.25
     p_pair_qubic = 1.25
     p_qubic = 2.1
+
 
     Q = make_Q(train_sets, S, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
@@ -123,7 +124,7 @@ if False:
 
 
 
-if False:
+if True:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -260,7 +261,7 @@ if False:
 
 
 
-if True:
+if False:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -301,7 +302,7 @@ if True:
               t = d + earliest_dep_time(S, j,s)
               print("train", j, "station", s, "delay", d, "time", t)
 
-if True:
+if False:
 
     train_sets = {
       "J": [0,1,2],
@@ -345,7 +346,7 @@ if True:
     print("  done  DW  results ")
 
 
-if True:
+if False:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -384,7 +385,7 @@ if True:
             t = d + earliest_dep_time(S, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
-if True:
+if False:
 
     train_sets = {
       "J": [0,1,2],
