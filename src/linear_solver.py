@@ -34,10 +34,10 @@ def single_line(problem, delay_var, y, S, train_sets, μ):
                 if s_previousp != None:
 
                     problem += delay_var[j][s] + earliest_dep_time(S, j, s) + μ*(1-y[j][jp][s])  \
-                     >= delay_var[jp][s_previousp] + earliest_dep_time(S, jp, s_previousp) + tau('pass', jp, s_previousp , s)
+                     >= delay_var[jp][s_previousp] + earliest_dep_time(S, jp, s_previousp) + tau('pass', jp, s_previousp , s) + tau('res', jp, j , s)
 
                     problem += delay_var[jp][s_previousp] + earliest_dep_time(S, jp, s_previousp) + μ*y[j][jp][s] \
-                     >= delay_var[j][s] + earliest_dep_time(S, j, s) + tau('pass', j, s, s_previousp)
+                     >= delay_var[j][s] + earliest_dep_time(S, j, s) + tau('pass', j, s, s_previousp) + tau('res', j, jp , s)
 
 
 def minimal_stay(problem, delay_var, S, train_sets, not_considered_station):

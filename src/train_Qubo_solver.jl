@@ -28,7 +28,7 @@ for i in 1:2
     JJ = Mat_qubo2ising(Q);
     ig = M2graph(JJ; sgn = -1)
 
-    t = 300
+    t = 500
 
     @time sol = mh_solve(ig, p, t, sort = true);
 

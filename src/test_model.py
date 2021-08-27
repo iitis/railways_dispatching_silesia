@@ -51,7 +51,7 @@ def toy_problem_variables(train_sets, S, d_max, not_considered_station, μ = 30.
 
 # linear solver
 
-if False:
+if True:
     # this will be changed while rerouting
     train_sets = {
       "J": [0,1,2],

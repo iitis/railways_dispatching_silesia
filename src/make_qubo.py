@@ -33,7 +33,6 @@ def Pspan(k, k1, inds, train_sets, S):
     j1 = inds[k1]["j"]
     if occurs_as_pair(j, j1, train_sets["Jd"]):
 
-        #print(j, j1)
         s = inds[k]["s"]
         s1 = inds[k1]["s"]
 
@@ -88,13 +87,13 @@ def P1track(k, k1, inds, train_sets, S):
 
         if s1 == subsequent_station(S, j, s):
 
-            if - tau('pass', j1, s1 , s) < t1 - t < tau('pass', j, s , s1):
+            if - tau('pass', j1, s1 , s) < t1 - t < tau('pass', j, s , s1) + tau('res', j, j1 , s):
 
                     return 1.0
 
         if s == subsequent_station(S, j1, s1):
 
-            if - tau('pass', j, s , s1) < t - t1 < tau('pass', j1, s1 , s):
+            if - tau('pass', j, s , s1) < t - t1 < tau('pass', j1, s1 , s) + tau('res', j1, j , s):
 
                     return 1.0
 
