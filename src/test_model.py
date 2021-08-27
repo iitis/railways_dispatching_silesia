@@ -51,7 +51,7 @@ def toy_problem_variables(train_sets, S, d_max, not_considered_station, μ = 30.
 
 # linear solver
 
-if True:
+if False:
     # this will be changed while rerouting
     train_sets = {
       "J": [0,1,2],
@@ -86,7 +86,7 @@ def energy(v, Q):
     V = np.matrix(v)
     return V*X*V.transpose()
 
-if True:
+if False:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -124,7 +124,7 @@ if True:
 
 
 
-if True:
+if False:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -261,7 +261,7 @@ if False:
 
 
 
-if False:
+if True:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -302,7 +302,7 @@ if False:
               t = d + earliest_dep_time(S, j,s)
               print("train", j, "station", s, "delay", d, "time", t)
 
-if False:
+if True:
 
     train_sets = {
       "J": [0,1,2],
@@ -357,7 +357,7 @@ if False:
     }
 
 
-    file = open("files/hybrid_solver/Qfile_samples_sol_hybrid-anneal",'rb')
+    file = open("files/hybrid_data/Qfile_samples_sol_hybrid-anneal",'rb')
 
     x = pk.load(file)
 
@@ -396,7 +396,7 @@ if False:
       "Jswitch": dict()
     }
 
-    file = open("files/hybrid_solver/Qfile_samples_sol_hybrid-anneal_r",'rb')
+    file = open("files/hybrid_data/Qfile_samples_sol_hybrid-anneal_r",'rb')
 
 
     x = pk.load(file)
