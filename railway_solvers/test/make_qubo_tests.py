@@ -7,7 +7,6 @@ from make_qubo import *
 
 
 
-
 ### testing particular QUBO element cration
 
 
@@ -215,6 +214,60 @@ def test_qubic(S, not_considered_station):
 
 
 
+def test_performing_small_Qmat():
+    #####   dispatching problem that was solved on D-Wave   ########
+
+    S = {
+        0: [0,1],
+        1: [0,1]
+    }
+
+
+    not_considered_station = {
+        0: None,
+        1: None,
+    }
+
+    train_sets = {
+    "J": [0,1],
+    "Jd": [[0,1]],
+    "Josingle": [],
+    "Jround": dict(),
+    "Jtrack": dict(),
+    "Jswitch": dict()
+    }
+
+    p_sum = 2
+    p_pair = 1.
+    p_pair_qubic = 1.
+    p_qubic = 2.
+
+
+    Q = make_Q(train_sets, S, not_considered_station, 5, p_sum, p_pair, p_pair_qubic, p_qubic)
+
+    assert np.shape(Q) == (6*2*2, 6*2*2)
+
+    M = np.matrix(Q)
+
+    assert np.array_equal(np.transpose(M), M)
+
+    # diagonal, delay penalties and linear tem penalties
+    # J0 leaves S0
+    assert Q[0][0] == -2
+    assert Q[1][1] == -1.6
+    assert Q[2][2] == -1.2
+
+    # J1 leaves S0
+    assert Q[12][12] == -2
+    assert Q[13][13] == -1.8
+
+    # J1 and J0 leaves to close to each other
+    assert Q[12][0] == 1.
+    assert Q[12][1] == 1.
+    assert Q[12][2] == 1.
+    assert Q[13][0] == 1.
+
+
 def test_performing_Qmat():
     #####   dispatching problem that was solved on D-Wave   ########
 
@@ -263,6 +316,8 @@ def test_performing_Qmat():
 
     assert np.array_equal(Q_r, np.load("files/Qfile_r.npz")["Q"])
 
+
+test_performing_small_Qmat()
 
 test_pspan_pstay_p1track(S, not_considered_station)
 
