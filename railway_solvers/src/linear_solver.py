@@ -44,7 +44,9 @@ def single_line(problem, delay_var, y, train_sets, μ):
                      >= delay_var[j][s] + earliest_dep_time(S, j, s) + tau('pass', j, s, s_previousp) + tau('res', j, jp , s)
 
 
-def minimal_stay(problem, delay_var, train_sets, not_considered_station):
+def minimal_stay(problem, delay_var, train_sets):
+
+    not_considered_station = train_sets["Snotconsi"]
 
     S = train_sets["Paths"]
     "minimum stay condition"
@@ -156,7 +158,7 @@ def linear_varibles(train_sets, d_max):
 
 
 
-def solve_linear_problem(train_sets, d_max, μ, not_considered_station):
+def solve_linear_problem(train_sets, d_max, μ):
 
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
@@ -164,7 +166,7 @@ def solve_linear_problem(train_sets, d_max, μ, not_considered_station):
 
 
     minimal_span(prob, secondary_delays_var, y, train_sets, μ)
-    minimal_stay(prob, secondary_delays_var, train_sets, not_considered_station)
+    minimal_stay(prob, secondary_delays_var, train_sets)
     single_line(prob, secondary_delays_var, y, train_sets, μ)
 
     track_occuparion(prob, secondary_delays_var, y, train_sets, μ)
@@ -174,3 +176,27 @@ def solve_linear_problem(train_sets, d_max, μ, not_considered_station):
     prob.solve()
 
     return prob
+
+
+if __name__ == "__main__":
+    d_max = 10
+    μ = 30
+
+
+
+    train_sets = {
+    "Snotconsi": {
+        0: [None],
+        1: [None],
+        2: [0],
+    },
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
+    "J": [0,1,2],
+    "Jd": [[0,1], [2]],
+    "Josingle": [],
+    "Jround": dict(),
+    "Jtrack": {1: [0,1]},
+    "Jswitch": dict()
+    }
+    
+    solve_linear_problem(train_sets, d_max, μ)
