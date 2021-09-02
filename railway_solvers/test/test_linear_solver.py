@@ -10,10 +10,8 @@ def test_linear_solver():
     d_max = 10
     μ = 30
 
-
-
     train_sets = {
-    "Snotconsi": {
+    "skip_station": {
         0: [None],
         1: [None],
         2: [0],
@@ -26,8 +24,6 @@ def test_linear_solver():
     "Jtrack": {1: [0,1]},
     "Jswitch": dict()
     }
-
-    # print(train_sets["Paths"])
 
     prob = solve_linear_problem(train_sets, d_max, μ)
 
@@ -49,7 +45,7 @@ def test_linear_solver():
 
     ### rerouting ####
     train_sets = {
-    "Snotconsi": {
+    "skip_station": {
         0: [None],
         1: [None],
         2: [0],

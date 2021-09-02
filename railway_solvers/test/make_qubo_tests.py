@@ -11,28 +11,26 @@ from make_qubo import *
 
 
 
-not_considered_station = {
-    0: None,
-    1: None,
-    2: 0,
-}
-
-
-def test_pspan_pstay_p1track(not_considered_station):
+def test_pspan_pstay_p1track():
 
     # default
 
     train_sets = {
-      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
-      "J": [0,1,2],
-      "Jd": [[0,1], [2]],
-      "Josingle": [],
-      "Jround": dict(),
-      "Jtrack": {1: [0,1]},
-      "Jswitch": dict()
+    "skip_station":{
+    0: None,
+    1: None,
+    2: 0,
+    },
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
+    "J": [0,1,2],
+    "Jd": [[0,1], [2]],
+    "Josingle": [],
+    "Jround": dict(),
+    "Jtrack": {1: [0,1]},
+    "Jswitch": dict()
     }
 
-    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10)
 
 
     k = inds.index({'j': 0, 's': 0, 'd': 3})
@@ -67,13 +65,18 @@ def test_pspan_pstay_p1track(not_considered_station):
 
     ### rerouting ####
     train_sets = {
-     "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
-      "J": [0,1,2],
-      "Jd": [],
-      "Josingle": [[1,2], []],
-      "Jround": dict(),
-      "Jtrack": {1: [0,1]},
-      "Jswitch": dict()
+    "skip_station":{
+    0: None,
+    1: None,
+    2: 0,
+    },
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
+    "J": [0,1,2],
+    "Jd": [],
+    "Josingle": [[1,2], []],
+    "Jround": dict(),
+    "Jtrack": {1: [0,1]},
+    "Jswitch": dict()
     }
 
     ### .....  1 track  ......
@@ -116,22 +119,27 @@ def test_pspan_pstay_p1track(not_considered_station):
 
 
 
-def test_qubic(not_considered_station):
+def test_qubic():
 
     ### rerouting ####
     train_sets = {
-     "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
-      "J": [0,1,2],
-      "Jd": [],
-      "Josingle": [[1,2], []],
-      "Jround": dict(),
-      "Jtrack": {1: [0,1]},
-      "Jswitch": dict()
+    "skip_station":{
+    0: None,
+    1: None,
+    2: 0,
+    },
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
+    "J": [0,1,2],
+    "Jd": [],
+    "Josingle": [[1,2], []],
+    "Jround": dict(),
+    "Jtrack": {1: [0,1]},
+    "Jswitch": dict()
     }
 
 
 
-    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10)
     inds_z, l = z_indices(train_sets, 10)
 
     assert l == 121
@@ -215,12 +223,13 @@ def test_performing_small_Qmat():
     #####   dispatching problem that was solved on D-Wave   ########
 
 
-    not_considered_station = {
-        0: None,
-        1: None,
-    }
+    
 
     train_sets = {
+    "skip_station" : {
+        0: None,
+        1: None,
+    },
     "Paths": {0: [0,1], 1: [0,1]},
     "J": [0,1],
     "Jd": [[0,1]],
@@ -236,7 +245,7 @@ def test_performing_small_Qmat():
     p_qubic = 2.
 
 
-    Q = make_Q(train_sets, not_considered_station, 5, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q = make_Q(train_sets, 5, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     assert np.shape(Q) == (6*2*2, 6*2*2)
 
@@ -265,13 +274,13 @@ def test_performing_Qmat():
     #####   dispatching problem that was solved on D-Wave   ########
 
 
-    not_considered_station = {
-        0: None,
-        1: None,
-        2: 0,
-    }
-
+    
     train_sets = {
+    "skip_station":{
+    0: None,
+    1: None,
+    2: 0,
+    },
     "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
     "J": [0,1,2],
     "Jd": [[0,1], [2]],
@@ -287,11 +296,16 @@ def test_performing_Qmat():
     p_qubic = 2.1
 
 
-    Q = make_Q(train_sets, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q = make_Q(train_sets, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     assert np.array_equal(Q, np.load("files/Qfile.npz")["Q"])
 
     train_sets = {
+    "skip_station":{
+    0: None,
+    1: None,
+    2: 0,
+    },
     "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
     "J": [0,1,2],
     "Jd": [],
@@ -301,15 +315,15 @@ def test_performing_Qmat():
     "Jswitch": dict()
     }
 
-    Q_r = make_Q(train_sets, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q_r = make_Q(train_sets, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     assert np.array_equal(Q_r, np.load("files/Qfile_r.npz")["Q"])
 
 
 test_performing_small_Qmat()
 
-test_pspan_pstay_p1track(not_considered_station)
+test_pspan_pstay_p1track()
 
-test_qubic(not_considered_station)
+test_qubic()
 
 test_performing_Qmat()
