@@ -46,7 +46,7 @@ def single_line(problem, delay_var, y, train_sets, μ):
 
 def minimal_stay(problem, delay_var, train_sets):
 
-    not_considered_station = train_sets["Snotconsi"]
+    not_considered_station = train_sets["skip_station"]
 
     S = train_sets["Paths"]
     "minimum stay condition"
@@ -182,8 +182,6 @@ if __name__ == "__main__":
     d_max = 10
     μ = 30
 
-
-
     train_sets = {
     "Snotconsi": {
         0: [None],
@@ -198,5 +196,5 @@ if __name__ == "__main__":
     "Jtrack": {1: [0,1]},
     "Jswitch": dict()
     }
-    
+
     solve_linear_problem(train_sets, d_max, μ)

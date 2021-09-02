@@ -3,7 +3,9 @@ import itertools
 import numpy as np
 from helpers_functions import *
 
-def indexing4qubo(train_sets, d_max, not_considered_station):
+def indexing4qubo(train_sets, d_max):
+
+    not_considered_station = train_sets["skip_station"]
 
     S = train_sets["Paths"]
     inds = []
@@ -289,9 +291,10 @@ def get_z_coupling(k, k1, train_sets, inds, p_pair, p_qubic):
     J += p_qubic*P2qubic(k, k1, inds, train_sets)
     return J
 
-def make_Q(train_sets, not_considered_station, d_max, p_sum, p_pair, p_pair_q, p_qubic):
+def make_Q(train_sets, d_max, p_sum, p_pair, p_pair_q, p_qubic):
 
-    inds, q_bits = indexing4qubo(train_sets, d_max, not_considered_station)
+    # not_considered_station = train_sets["skip_station"]
+    inds, q_bits = indexing4qubo(train_sets, d_max)#, not_considered_station)
     inds_z, q_bits_z = z_indices(train_sets, d_max)
 
     inds1 = np.concatenate([inds, inds_z])
