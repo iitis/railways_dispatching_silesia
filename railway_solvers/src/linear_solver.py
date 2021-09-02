@@ -4,7 +4,7 @@ import itertools
 from input_data import penalty_weights
 from helpers_functions import *
 
-def minimal_span(problem, delay_var, y, train_sets, μ):
+def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
     "minimum span condition"
 
     S = train_sets["Paths"]
@@ -17,14 +17,14 @@ def minimal_span(problem, delay_var, y, train_sets, μ):
 
                 if (s_next != None and s_next == s_nextp):
 
-                    problem += delay_var[jp][s] + earliest_dep_time(S, jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(S, j, s) \
+                    problem += delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(S, timetable, j, s) \
                      >= tau('blocks', j, s, s_next) + max(0, tau('pass', j, s, s_next) - tau('pass', jp, s, s_next))
 
-                    problem += delay_var[j][s] + earliest_dep_time(S, j, s) + μ*y[j][jp][s] - delay_var[jp][s] - earliest_dep_time(S, jp, s) \
+                    problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*y[j][jp][s] - delay_var[jp][s] - earliest_dep_time(S, timetable, jp, s) \
                     >= tau('blocks', jp, s, s_next) + max(0, tau('pass', jp, s, s_next) - tau('pass', j, s, s_next))
 
 
-def single_line(problem, delay_var, y, train_sets, μ):
+def single_line(problem, timetable, delay_var, y, train_sets, μ):
     "minimum span condition"
 
     S = train_sets["Paths"]
@@ -37,14 +37,14 @@ def single_line(problem, delay_var, y, train_sets, μ):
 
                 if s_previousp != None:
 
-                    problem += delay_var[j][s] + earliest_dep_time(S, j, s) + μ*(1-y[j][jp][s])  \
-                     >= delay_var[jp][s_previousp] + earliest_dep_time(S, jp, s_previousp) + tau('pass', jp, s_previousp , s) + tau('res', jp, j , s)
+                    problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*(1-y[j][jp][s])  \
+                     >= delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) + tau('pass', jp, s_previousp , s) + tau('res')
 
-                    problem += delay_var[jp][s_previousp] + earliest_dep_time(S, jp, s_previousp) + μ*y[j][jp][s] \
-                     >= delay_var[j][s] + earliest_dep_time(S, j, s) + tau('pass', j, s, s_previousp) + tau('res', j, jp , s)
+                    problem += delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) + μ*y[j][jp][s] \
+                     >= delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + tau('pass', j, s, s_previousp) + tau('res')
 
 
-def minimal_stay(problem, delay_var, train_sets):
+def minimal_stay(problem, timetable, delay_var, train_sets):
 
     not_considered_station = train_sets["skip_station"]
 
@@ -60,7 +60,7 @@ def minimal_stay(problem, delay_var, train_sets):
 
 
 
-def track_occuparion(problem, delay_var, y, train_sets, μ):
+def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
     "track occupation"
 
     S = train_sets["Paths"]
@@ -78,33 +78,33 @@ def track_occuparion(problem, delay_var, y, train_sets, μ):
 
             if s_previousp != None:
 
-                problem += delay_var[jp][s_previousp] + earliest_dep_time(S, jp, s_previousp)  + tau("pass", jp, s_previousp, s) + μ*(1-y[j][jp][s]) >= \
-                 delay_var[j][s] + earliest_dep_time(S, j, s) + tau('res')
+                problem += delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp)  + tau("pass", jp, s_previousp, s) + μ*(1-y[j][jp][s]) >= \
+                 delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + tau('res')
 
             if s_previous != None:
 
-                problem += delay_var[j][s_previous] + earliest_dep_time(S, j, s_previous) + tau("pass", j, s_previous, s) + μ*y[j][jp][s] >= \
-                     delay_var[jp][s] + earliest_dep_time(S, jp, s) + tau('res')
+                problem += delay_var[j][s_previous] + earliest_dep_time(S, timetable, j, s_previous) + tau("pass", j, s_previous, s) + μ*y[j][jp][s] >= \
+                     delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + tau('res')
 
 
 
-def objective(problem, delay_var, train_sets, d_max):
+def objective(problem, timetable, delay_var, train_sets, d_max):
     "objective function"
 
     S = train_sets["Paths"]
     problem += pus.lpSum([delay_var[i][j] * penalty_weights(i, j)/d_max for i in train_sets["J"] for j in S[i] if penalty_weights(i,j) !=0])
 
 
-def return_delay_time(S, prob, j, s):
+def return_delay_time(S, timetable, prob, j, s):
 
     for v in prob.variables():
         if v.name == "Delays_"+str(j)+"_"+str(s):
             delay = v.varValue
-            time = v.varValue + earliest_dep_time(S, j, s)
+            time = v.varValue + earliest_dep_time(S, timetable, j, s)
             return delay, time
     return 0, 0
 
-def impact_to_objective(prob, j,s, d_max):
+def impact_to_objective(prob, timetable, j,s, d_max):
     for v in prob.variables():
         if v.name == "Delays_"+str(j)+"_"+str(s):
             return penalty_weights(j,s)/d_max*v.varValue
@@ -158,20 +158,20 @@ def linear_varibles(train_sets, d_max):
 
 
 
-def solve_linear_problem(train_sets, d_max, μ):
+def solve_linear_problem(train_sets, timetable_input, d_max, μ):
 
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
     secondary_delays_var, y = linear_varibles(train_sets, d_max)
 
 
-    minimal_span(prob, secondary_delays_var, y, train_sets, μ)
-    minimal_stay(prob, secondary_delays_var, train_sets)
-    single_line(prob, secondary_delays_var, y, train_sets, μ)
+    minimal_span(prob, timetable_input, secondary_delays_var, y, train_sets, μ)
+    minimal_stay(prob, timetable_input, secondary_delays_var, train_sets)
+    single_line(prob, timetable_input, secondary_delays_var, y, train_sets, μ)
 
-    track_occuparion(prob, secondary_delays_var, y, train_sets, μ)
+    track_occuparion(prob, timetable_input, secondary_delays_var, y, train_sets, μ)
 
-    objective(prob, secondary_delays_var, train_sets, d_max)
+    objective(prob, timetable_input, secondary_delays_var, train_sets, d_max)
 
     prob.solve()
 
@@ -182,8 +182,10 @@ if __name__ == "__main__":
     d_max = 10
     μ = 30
 
+    timetable_input = small_timetable()
+
     train_sets = {
-    "Snotconsi": {
+    "skip_station": {
         0: [None],
         1: [None],
         2: [0],
@@ -197,4 +199,4 @@ if __name__ == "__main__":
     "Jswitch": dict()
     }
 
-    solve_linear_problem(train_sets, d_max, μ)
+    solve_linear_problem(train_sets, timetable_input, d_max, μ)

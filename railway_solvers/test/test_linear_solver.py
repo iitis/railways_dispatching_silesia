@@ -4,8 +4,11 @@ sys.path.append('../src')
 
 
 from linear_solver import *
+from input_data import small_timetable
 
 def test_linear_solver():
+
+    timetable = small_timetable()
 
     d_max = 10
     μ = 30
@@ -25,7 +28,7 @@ def test_linear_solver():
     "Jswitch": dict()
     }
 
-    prob = solve_linear_problem(train_sets, d_max, μ)
+    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -60,7 +63,7 @@ def test_linear_solver():
     }
 
 
-    prob = solve_linear_problem(train_sets, d_max, μ)
+    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":

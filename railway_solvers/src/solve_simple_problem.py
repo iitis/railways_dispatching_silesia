@@ -20,27 +20,32 @@ from make_qubo import *
 
 
 
-def toy_problem_variables(train_sets, d_max, μ = 30.):
+def toy_problem_variables(train_sets, timetable, d_max, μ = 30.):
 
-    prob = solve_linear_problem(train_sets, d_max, μ)
+    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
 
     S = train_sets["Paths"]
 
-    print("d_1, t_1", return_delay_time(S, prob, 0,0))
-    print("d_2, t_2", return_delay_time(S, prob, 1,0))
-    print("d_3, t_3", return_delay_time(S, prob, 2,1))
+    print("d_1, t_1", return_delay_time(S, timetable, prob, 0,0))
+    print("d_2, t_2", return_delay_time(S, timetable, prob, 1,0))
+    print("d_3, t_3", return_delay_time(S, timetable, prob, 2,1))
 
-    print("d_1', t_1'", return_delay_time(S, prob, 0,1))
+    print("d_1', t_1'", return_delay_time(S, timetable, prob, 0,1))
 
 
-    print("impact to objective t_1", impact_to_objective(prob, 0,0, d_max))
-    print("impact to objective t_2", impact_to_objective(prob, 1,0, d_max))
-    print("impact to objective t_3", impact_to_objective(prob, 2,1, d_max))
+    print("impact to objective t_1", impact_to_objective(prob, timetable, 0,0, d_max))
+    print("impact to objective t_2", impact_to_objective(prob, timetable, 1,0, d_max))
+    print("impact to objective t_3", impact_to_objective(prob, timetable, 2,1, d_max))
 
 
 # linear solver
 
 if True:
+
+    timetable = small_timetable()
+
+    d_max = 10
+
     # this will be changed while rerouting
     train_sets = {
       "skip_station":{
@@ -57,7 +62,7 @@ if True:
       "Jswitch": dict()
     }
 
-    toy_problem_variables(train_sets, 10)
+    toy_problem_variables(train_sets, timetable, d_max)
 
     ### rerouting ####
     train_sets = {
@@ -75,7 +80,7 @@ if True:
       "Jswitch": dict()
     }
 
-    toy_problem_variables(train_sets, 10)
+    toy_problem_variables(train_sets, timetable, d_max)
 
     print("   ############   Done linear solver  #########")
 
@@ -90,6 +95,10 @@ def energy(v, Q):
     return V*X*V.transpose()
 
 if False:
+
+    timetable = small_timetable()
+
+
     train_sets = {
       "skip_station":{
         0: None,
@@ -111,7 +120,7 @@ if False:
     p_qubic = 2.1
 
 
-    Q = make_Q(train_sets, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q = make_Q(train_sets, timetable, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     print(np.sqrt(np.size(Q)))
 
@@ -133,13 +142,16 @@ if False:
       "Jswitch": dict()
     }
 
-    Q = make_Q(train_sets, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q = make_Q(train_sets, timetable, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     np.savez("files/Qfile_r.npz", Q=Q)
 
 
 
 if False:
+
+    timetable = small_timetable()
+
     train_sets = {
       "skip_station":{
       0: None,
@@ -176,7 +188,7 @@ if False:
             j = inds[i]["j"]
             s = inds[i]["s"]
             d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
+            t = d + earliest_dep_time(S, timetable, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
 
@@ -213,7 +225,7 @@ if False:
             j = inds[i]["j"]
             s = inds[i]["s"]
             d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
+            t = d + earliest_dep_time(S, timetable, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
 
@@ -221,6 +233,9 @@ if False:
 
 
 if False:
+
+    timetable = small_timetable()
+
     train_sets = {
       "skip_station":{
       0: None,
@@ -256,7 +271,7 @@ if False:
             j = inds[i]["j"]
             s = inds[i]["s"]
             d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
+            t = d + earliest_dep_time(S, timetable, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
 
@@ -292,7 +307,7 @@ if False:
             j = inds[i]["j"]
             s = inds[i]["s"]
             d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
+            t = d + earliest_dep_time(S, timetable, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
 
@@ -301,6 +316,9 @@ if False:
 
 
 if True:
+
+    timetable = small_timetable()
+
     train_sets = {
       "skip_station":{
       0: None,
@@ -343,10 +361,12 @@ if True:
               j = inds[i]["j"]
               s = inds[i]["s"]
               d = inds[i]["d"]
-              t = d + earliest_dep_time(S, j,s)
+              t = d + earliest_dep_time(S, timetable, j,s)
               print("train", j, "station", s, "delay", d, "time", t)
 
 if True:
+
+    timetable = small_timetable()
 
     train_sets = {
     "skip_station":{
@@ -391,7 +411,7 @@ if True:
               j = inds[i]["j"]
               s = inds[i]["s"]
               d = inds[i]["d"]
-              t = d + earliest_dep_time(S, j,s)
+              t = d + earliest_dep_time(S, timetable, j,s)
               print("train", j, "station", s, "delay", d, "time", t)
 
 
@@ -399,6 +419,10 @@ if True:
 
 
 if True:
+
+    timetable = small_timetable()
+
+
     train_sets = {
      "skip_station":{
       0: None,
@@ -440,10 +464,12 @@ if True:
             j = inds[i]["j"]
             s = inds[i]["s"]
             d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
+            t = d + earliest_dep_time(S, timetable, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
 if True:
+
+    timetable = small_timetable()
 
     train_sets = {
      "skip_station":{
@@ -486,7 +512,7 @@ if True:
             j = inds[i]["j"]
             s = inds[i]["s"]
             d = inds[i]["d"]
-            t = d + earliest_dep_time(S, j,s)
+            t = d + earliest_dep_time(S, timetable, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
 

@@ -44,11 +44,13 @@ def update_dictofdicts(d1, d2):
     return d1
 
 
-def earliest_dep_time(S, train = None, station = None):
+def earliest_dep_time(S, timetable, train = None, station = None):
 
     t = initial_conditions(train, station)
     if t >= 0:
         return t
     else:
         s = previous_station(S, train, station)
-        return earliest_dep_time(S, train, s) + tau('pass', train, s, station) + tau('stop', train, station)
+        tau_pass = timetable["tau"]["pass"][str(train)+"_"+str(s)+"_"+str(station)]
+        tau_stop = timetable["tau"]["stop"][str(train)+"_"+str(station)+"_none"]
+        return earliest_dep_time(S, timetable, train, s) + tau_pass  + tau_stop

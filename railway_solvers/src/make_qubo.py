@@ -17,7 +17,7 @@ def indexing4qubo(train_sets, d_max):
     return inds, len(inds)
 
 
-def penalty(k, inds, d_max):
+def penalty(timetable, k, inds, d_max):
     j = inds[k]["j"]
     s = inds[k]["s"]
     w = penalty_weights(j, s)/d_max
@@ -32,7 +32,7 @@ def Psum(k, k1, inds):
             return 1.0
     return 0.
 
-def Pspan(k, k1, inds, train_sets):
+def Pspan(timetable, k, k1, inds, train_sets):
 
     S = train_sets["Paths"]
 
@@ -49,8 +49,8 @@ def Pspan(k, k1, inds, train_sets):
 
         if (s == s1 and s_next != None and s_next == s_nextp):
 
-            t = inds[k]["d"] + earliest_dep_time(S, j, s)
-            t1 = inds[k1]["d"] + earliest_dep_time(S, j1, s)
+            t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+            t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s)
 
             A =  - tau('blocks', j1, s, s_next) - max(0, tau('pass', j1, s, s_next) - tau('pass', j, s, s_next))
 
@@ -63,7 +63,7 @@ def Pspan(k, k1, inds, train_sets):
 
 
 
-def Pstay(k, k1, inds, train_sets):
+def Pstay(timetable, k, k1, inds, train_sets):
 
     S = train_sets["Paths"]
 
@@ -84,7 +84,7 @@ def Pstay(k, k1, inds, train_sets):
     return 0.
 
 
-def P1track(k, k1, inds, train_sets):
+def P1track(timetable, k, k1, inds, train_sets):
 
     S = train_sets["Paths"]
 
@@ -96,18 +96,18 @@ def P1track(k, k1, inds, train_sets):
         s = inds[k]["s"]
         s1 = inds[k1]["s"]
 
-        t = inds[k]["d"] + earliest_dep_time(S, j, s)
-        t1 = inds[k1]["d"] + earliest_dep_time(S, j1, s1)
+        t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+        t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
         if s1 == subsequent_station(S, j, s):
 
-            if - tau('res', j, j1 , s) - tau('pass', j1, s1 , s) < t1 - t < tau('pass', j, s , s1) + tau('res', j, j1 , s1):
+            if - tau('res') - tau('pass', j1, s1 , s) < t1 - t < tau('pass', j, s , s1) + tau('res'):
 
                     return 1.0
 
         if s == subsequent_station(S, j1, s1):
 
-            if - tau('res', j, j1 , s) - tau('pass', j, s , s1) < t - t1 < tau('pass', j1, s1 , s) + tau('res', j1, j , s1):
+            if - tau('res') - tau('pass', j, s , s1) < t - t1 < tau('pass', j1, s1 , s) + tau('res'):
 
                     return 1.0
 
@@ -128,7 +128,7 @@ def z_indices(train_sets, d_max):
 
 
 
-def P1qubic(k, k1, inds1, train_sets):
+def P1qubic(timetable, k, k1, inds1, train_sets):
 
     S = train_sets["Paths"]
     # x with z
@@ -149,12 +149,12 @@ def P1qubic(k, k1, inds1, train_sets):
                 # tz, tz1, tx => t', t,  t'' according to Eq 32
                 # sx, sz -> s', s
 
-                tx = inds1[k]["d"] + earliest_dep_time(S, jx, sx)
-                tz = inds1[k1]["d"] + earliest_dep_time(S, jz, sz)
-                tz1 = inds1[k1]["d1"] + earliest_dep_time(S, jz1, sz)
+                tx = inds1[k]["d"] + earliest_dep_time(S, timetable, jx, sx)
+                tz = inds1[k1]["d"] + earliest_dep_time(S, timetable, jz, sz)
+                tz1 = inds1[k1]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
 
-                if tx + tau("pass", jx, sx, sz) - tau("res", jz1, jz, sz) < tz1 <= tz:
+                if tx + tau("pass", jx, sx, sz) - tau("res") < tz1 <= tz:
                     return 1.
 
 
@@ -165,12 +165,12 @@ def P1qubic(k, k1, inds1, train_sets):
                 # tz1, tz, tx => t', t,  t'' according to Eq 32
                 # sx, sz -> s', s
 
-                tx = inds1[k]["d"] + earliest_dep_time(S, jx, sx)
-                tz = inds1[k1]["d"] + earliest_dep_time(S, jz, sz)
-                tz1 = inds1[k1]["d1"] + earliest_dep_time(S, jz1, sz)
+                tx = inds1[k]["d"] + earliest_dep_time(S, timetable, jx, sx)
+                tz = inds1[k1]["d"] + earliest_dep_time(S, timetable, jz, sz)
+                tz1 = inds1[k1]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
 
-                if tx + tau("pass", jx, sx, sz) - tau("res", jz, jz1, sz) < tz <= tz1:
+                if tx + tau("pass", jx, sx, sz) - tau("res") < tz <= tz1:
                     return 1.
 
 
@@ -189,22 +189,22 @@ def P1qubic(k, k1, inds1, train_sets):
             if (jx == jz) and occurs_as_pair(jx, jz1, [train_sets["Jtrack"][sz]]):
 
 
-                tx = inds1[k1]["d"] + earliest_dep_time(S, jx, sx)
-                tz = inds1[k]["d"] + earliest_dep_time(S, jz, sz)
-                tz1 = inds1[k]["d1"] + earliest_dep_time(S, jz1, sz)
+                tx = inds1[k1]["d"] + earliest_dep_time(S, timetable, jx, sx)
+                tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
+                tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau("pass", jx, sx, sz) - tau("res", jz1, jz, sz) < tz1 <= tz:
+                if tx + tau("pass", jx, sx, sz) - tau("res") < tz1 <= tz:
                     return 1.
 
 
             if (jx == jz1) and occurs_as_pair(jx, jz, [train_sets["Jtrack"][sz]]):
 
 
-                tx = inds1[k1]["d"] + earliest_dep_time(S, jx, sx)
-                tz = inds1[k]["d"] + earliest_dep_time(S, jz, sz)
-                tz1 = inds1[k]["d1"] + earliest_dep_time(S, jz1, sz)
+                tx = inds1[k1]["d"] + earliest_dep_time(S, timetable, jx, sx)
+                tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
+                tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau("pass", jx, sx, sz) - tau("res", jz, jz1, sz) < tz <= tz1:
+                if tx + tau("pass", jx, sx, sz) - tau("res") < tz <= tz1:
                     return 1.
 
     return 0.
@@ -276,22 +276,22 @@ def P2qubic(k, k1, inds1, train_sets):
 
 
 
-def get_coupling(k, k1, train_sets, inds, p_sum, p_pair):
+def get_coupling(timetable, k, k1, train_sets, inds, p_sum, p_pair):
 
     J = p_sum*Psum(k, k1, inds)
-    J += p_pair*Pspan(k, k1, inds, train_sets)
-    J += p_pair*Pstay(k, k1, inds, train_sets)
-    J += p_pair*P1track(k, k1, inds, train_sets)
+    J += p_pair*Pspan(timetable, k, k1, inds, train_sets)
+    J += p_pair*Pstay(timetable, k, k1, inds, train_sets)
+    J += p_pair*P1track(timetable, k, k1, inds, train_sets)
     return J
 
 
-def get_z_coupling(k, k1, train_sets, inds, p_pair, p_qubic):
+def get_z_coupling(timetable, k, k1, train_sets, inds, p_pair, p_qubic):
 
-    J = p_pair*P1qubic(k, k1, inds, train_sets)
+    J = p_pair*P1qubic(timetable, k, k1, inds, train_sets)
     J += p_qubic*P2qubic(k, k1, inds, train_sets)
     return J
 
-def make_Q(train_sets, d_max, p_sum, p_pair, p_pair_q, p_qubic):
+def make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_q, p_qubic):
 
     # not_considered_station = train_sets["skip_station"]
     inds, q_bits = indexing4qubo(train_sets, d_max)#, not_considered_station)
@@ -305,15 +305,15 @@ def make_Q(train_sets, d_max, p_sum, p_pair, p_pair_q, p_qubic):
     Q = [[0. for _ in range(l1)] for _ in range(l1)]
 
     for k in range(l):
-        Q[k][k] += penalty(k, inds, d_max)
+        Q[k][k] += penalty(timetable, k, inds, d_max)
 
     for k in range(l):
         for k1 in range(l):
-            Q[k][k1] += get_coupling(k, k1, train_sets, inds, p_sum, p_pair)
+            Q[k][k1] += get_coupling(timetable, k, k1, train_sets, inds, p_sum, p_pair)
 
     for k in range(l1):
         for k1 in range(l1):
-            Q[k][k1] += get_z_coupling(k, k1, train_sets, inds1, p_pair_q, p_qubic)
+            Q[k][k1] += get_z_coupling(timetable, k, k1, train_sets, inds1, p_pair_q, p_qubic)
 
 
     return Q
