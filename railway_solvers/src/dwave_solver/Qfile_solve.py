@@ -12,13 +12,12 @@ import pickle
 # from ilp_helpers import *
 
 
-
 def anneal_solutuon(method):
 
     if method == 'reroute':
-        Q_init = np.load('files/Qfile_r.npz')
+        Q_init = np.load('../files/Qfile_r.npz')
     elif method == 'default':
-        Q_init = np.load('files/Qfile.npz')
+        Q_init = np.load('../files/Qfile.npz')
     
     Q = Q_init['Q'].astype(np.float32)
     model = dimod.BinaryQuadraticModel.from_numpy_matrix(Q)
@@ -64,9 +63,9 @@ def annealing_outcome(method, annealing, num_reads = None, annealing_time = None
 
         sdf = sampleset.to_serializable()
 
-        with open("files/Qfile_complete_sol_sim-anneal_{}".format(method), 'wb') as handle:
+        with open("../files/Qfile_complete_sol_sim-anneal_{}".format(method), 'wb') as handle:
             pickle.dump(sdf, handle)
-        with open("files/Qfile_samples_sol_sim-anneal_{}".format(method), 'wb') as handle:
+        with open("../files/Qfile_samples_sol_sim-anneal_{}".format(method), 'wb') as handle:
             pickle.dump(results, handle)
         
         print('Simulated solver energy {}'.format(results[0]))
@@ -105,9 +104,9 @@ def annealing_outcome(method, annealing, num_reads = None, annealing_time = None
 
             sdf = sampleset.to_serializable()
 
-            with open("files/dwave_data/Qfile_complete_sol_real-anneal_numread{}_antime{}_chainst{}_{}".format(num_reads, annealing_time,chain_strength,method), 'wb') as handle:
+            with open("../src/files/dwave_data/Qfile_complete_sol_real-anneal_numread{}_antime{}_chainst{}_{}".format(num_reads, annealing_time,chain_strength,method), 'wb') as handle:
                 pickle.dump(sdf, handle)
-            with open("files/dwave_data/Qfile_samples_sol_real-anneal_numread{}_antime{}_chainst{}_{}".format(num_reads, annealing_time,chain_strength, method), 'wb') as handle:
+            with open("../src/files/dwave_data/Qfile_samples_sol_real-anneal_numread{}_antime{}_chainst{}_{}".format(num_reads, annealing_time,chain_strength, method), 'wb') as handle:
                 pickle.dump(results, handle)
         
 
@@ -119,4 +118,3 @@ if __name__ == "__main__":
     import sys
 
     sys.path.append('../files')
-    print(annealing_outcome('reroute','simulated'))
