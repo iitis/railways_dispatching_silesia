@@ -8,26 +8,26 @@
 #######  these are input ##########
 
 
-def tau(x = None, train = None, first_station = None, second_station = None):
-    #print(x, train, first_station, second_station)
-    t = -1
-    if x == 'pass' and train == 0 and first_station == 0 and second_station == 1:
-        t = 4
-    elif x == 'pass' and train == 1 and first_station == 0 and second_station == 1:
-        t = 8
-    elif x == 'pass' and train == 2 and first_station == 1 and second_station == 0:
-        t = 8
-    elif x == 'blocks' and train == 0 and first_station == 0 and second_station == 1:
-        t = 2
-    elif x == 'blocks' and train == 1 and first_station == 0 and second_station == 1:
-        t = 2
-    elif x == 'stop' and train == 0 and first_station == 1:
-        t = 1
-    elif x == 'stop' and train == 1 and first_station == 1:
-        t = 1
-    elif x == 'res':
-        t = 1
-    return t
+# def tau(x = None, train = None, first_station = None, second_station = None):
+#     #print(x, train, first_station, second_station)
+#     t = -1
+#     if x == 'pass' and train == 0 and first_station == 0 and second_station == 1:
+#         t = 4
+#     elif x == 'pass' and train == 1 and first_station == 0 and second_station == 1:
+#         t = 8
+#     elif x == 'pass' and train == 2 and first_station == 1 and second_station == 0:
+#         t = 8
+#     elif x == 'blocks' and train == 0 and first_station == 0 and second_station == 1:
+#         t = 2
+#     elif x == 'blocks' and train == 1 and first_station == 0 and second_station == 1:
+#         t = 2
+#     elif x == 'stop' and train == 0 and first_station == 1:
+#         t = 1
+#     elif x == 'stop' and train == 1 and first_station == 1:
+#         t = 1
+#     elif x == 'res':
+#         t = 1
+#     return t
 
 
 def initial_conditions(train = None, station = None):
@@ -67,10 +67,10 @@ def small_timetable():
 
 # print(input_data["tau"]["pass"]["0_0_1"])
 
-input_data = small_timetable()
+# input_data = small_timetable()
 
-for t in [0,1,2]:
-    for s1 in [0,1]:
-        for s2 in [0,1]:
-            if s1 != s2 and t + s2 != 0 and t + s1 != 2 and t + s2 != 3:
-                print(t,s1,s2)
+# for t in [0,1,2]:
+#     for s1 in [0,1]:
+#         for s2 in [0,1]:
+#             if s1 != s2 and t + s2 != 0 and t + s1 != 2 and t + s2 != 3:
+#                 print(t,s1,s2)

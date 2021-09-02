@@ -1,11 +1,12 @@
 import numpy as np
 import pulp as pus
 import itertools
-from input_data import penalty_weights
+from input_data import *
 from helpers_functions import *
 
 def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
     "minimum span condition"
+
 
     S = train_sets["Paths"]
     for js in train_sets["Jd"]:
@@ -18,10 +19,12 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
                 if (s_next != None and s_next == s_nextp):
 
                     problem += delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(S, timetable, j, s) \
-                     >= tau('blocks', j, s, s_next) + max(0, tau('pass', j, s, s_next) - tau('pass', jp, s, s_next))
+                     >= timetable["tau"]["blocks"][str(j)+"_"+str(s)+"_"+str(s_next)] +\
+                        max(0, timetable["tau"]["pass"][str(j)+"_"+str(s)+"_"+str(s_next)] - timetable["tau"]["pass"][str(jp)+"_"+str(s)+"_"+str(s_next)])
 
                     problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*y[j][jp][s] - delay_var[jp][s] - earliest_dep_time(S, timetable, jp, s) \
-                    >= tau('blocks', jp, s, s_next) + max(0, tau('pass', jp, s, s_next) - tau('pass', j, s, s_next))
+                    >= timetable["tau"]["blocks"][str(jp)+"_"+str(s)+"_"+str(s_next)] +\
+                     max(0, timetable["tau"]["pass"][str(jp)+"_"+str(s)+"_"+str(s_next)] - timetable["tau"]["pass"][str(j)+"_"+str(s)+"_"+str(s_next)])
 
 
 def single_line(problem, timetable, delay_var, y, train_sets, μ):
@@ -36,12 +39,14 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
                 s_previousp = previous_station(S, jp, s)
 
                 if s_previousp != None:
-
+                    print(jp, s, s_previousp)
                     problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*(1-y[j][jp][s])  \
-                     >= delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) + tau('pass', jp, s_previousp , s) + tau('res')
+                     >= delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) +\
+                    timetable["tau"]["pass"][str(jp)+"_"+str(s_previousp)+"_"+str(s)] + timetable["tau"]["res"]
 
                     problem += delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) + μ*y[j][jp][s] \
-                     >= delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + tau('pass', j, s, s_previousp) + tau('res')
+                     >= delay_var[j][s] + earliest_dep_time(S, timetable, j, s) +\
+                    timetable["tau"]["pass"][str(j)+"_"+str(s)+"_"+str(s_previousp)] + timetable["tau"]["res"]
 
 
 def minimal_stay(problem, timetable, delay_var, train_sets):
@@ -78,13 +83,15 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
 
             if s_previousp != None:
 
-                problem += delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp)  + tau("pass", jp, s_previousp, s) + μ*(1-y[j][jp][s]) >= \
-                 delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + tau('res')
+                problem += delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp)+ \
+                    timetable["tau"]["pass"][str(jp)+"_"+str(s_previousp)+"_"+str(s)] + μ*(1-y[j][jp][s]) >= \
+                    delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + timetable["tau"]["res"]
 
             if s_previous != None:
 
-                problem += delay_var[j][s_previous] + earliest_dep_time(S, timetable, j, s_previous) + tau("pass", j, s_previous, s) + μ*y[j][jp][s] >= \
-                     delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + tau('res')
+                problem += delay_var[j][s_previous] + earliest_dep_time(S, timetable, j, s_previous) +\
+                    timetable["tau"]["pass"][str(j)+"_"+str(s_previous)+"_"+str(s)] + μ*y[j][jp][s] >= \
+                    delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + timetable["tau"]["res"]
 
 
 
@@ -192,11 +199,13 @@ if __name__ == "__main__":
     },
     "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
     "J": [0,1,2],
-    "Jd": [[0,1], [2]],
-    "Josingle": [],
+    "Jd": [],
+    "Josingle": [[1,2], []],
     "Jround": dict(),
     "Jtrack": {1: [0,1]},
     "Jswitch": dict()
     }
+
+
 
     solve_linear_problem(train_sets, timetable_input, d_max, μ)
