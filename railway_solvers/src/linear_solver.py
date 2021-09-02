@@ -4,8 +4,10 @@ import itertools
 from input_data import penalty_weights
 from helpers_functions import *
 
-def minimal_span(problem, delay_var, y, S, train_sets, μ):
+def minimal_span(problem, delay_var, y, train_sets, μ):
     "minimum span condition"
+
+    S = train_sets["Paths"]
     for js in train_sets["Jd"]:
         for (j,jp) in itertools.combinations(js, 2):
             for s in common_path(S, j, jp):
@@ -22,8 +24,10 @@ def minimal_span(problem, delay_var, y, S, train_sets, μ):
                     >= tau('blocks', jp, s, s_next) + max(0, tau('pass', jp, s, s_next) - tau('pass', j, s, s_next))
 
 
-def single_line(problem, delay_var, y, S, train_sets, μ):
+def single_line(problem, delay_var, y, train_sets, μ):
     "minimum span condition"
+
+    S = train_sets["Paths"]
     for js in train_sets["Josingle"]:
         for (j,jp) in itertools.combinations(js, 2):
             for s in common_path(S, j, jp)[0:-1]:
@@ -40,7 +44,9 @@ def single_line(problem, delay_var, y, S, train_sets, μ):
                      >= delay_var[j][s] + earliest_dep_time(S, j, s) + tau('pass', j, s, s_previousp) + tau('res', j, jp , s)
 
 
-def minimal_stay(problem, delay_var, S, train_sets, not_considered_station):
+def minimal_stay(problem, delay_var, train_sets, not_considered_station):
+
+    S = train_sets["Paths"]
     "minimum stay condition"
     for j in train_sets["J"]:
         for s in S[j]:
@@ -52,8 +58,10 @@ def minimal_stay(problem, delay_var, S, train_sets, not_considered_station):
 
 
 
-def track_occuparion(problem, delay_var, y, S, train_sets, μ):
+def track_occuparion(problem, delay_var, y, train_sets, μ):
     "track occupation"
+
+    S = train_sets["Paths"]
     for s in train_sets["Jtrack"].keys():
         js = train_sets["Jtrack"][s]
         for (j,jp) in itertools.combinations(js, 2):
@@ -78,8 +86,10 @@ def track_occuparion(problem, delay_var, y, S, train_sets, μ):
 
 
 
-def objective(problem, delay_var, S, train_sets, d_max):
+def objective(problem, delay_var, train_sets, d_max):
     "objective function"
+
+    S = train_sets["Paths"]
     problem += pus.lpSum([delay_var[i][j] * penalty_weights(i, j)/d_max for i in train_sets["J"] for j in S[i] if penalty_weights(i,j) !=0])
 
 
@@ -101,7 +111,9 @@ def impact_to_objective(prob, j,s, d_max):
 
 
 
-def linear_varibles(train_sets, S, d_max):
+def linear_varibles(train_sets, d_max):
+
+    S = train_sets["Paths"]
 
     trains_inds = train_sets["J"]
 
@@ -144,20 +156,20 @@ def linear_varibles(train_sets, S, d_max):
 
 
 
-def solve_linear_problem(train_sets, S, d_max, μ, not_considered_station):
+def solve_linear_problem(train_sets, d_max, μ, not_considered_station):
 
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
-    secondary_delays_var, y = linear_varibles(train_sets, S, d_max)
+    secondary_delays_var, y = linear_varibles(train_sets, d_max)
 
 
-    minimal_span(prob, secondary_delays_var, y, S, train_sets, μ)
-    minimal_stay(prob, secondary_delays_var, S, train_sets, not_considered_station)
-    single_line(prob, secondary_delays_var, y, S, train_sets, μ)
+    minimal_span(prob, secondary_delays_var, y, train_sets, μ)
+    minimal_stay(prob, secondary_delays_var, train_sets, not_considered_station)
+    single_line(prob, secondary_delays_var, y, train_sets, μ)
 
-    track_occuparion(prob, secondary_delays_var, y, S, train_sets, μ)
+    track_occuparion(prob, secondary_delays_var, y, train_sets, μ)
 
-    objective(prob, secondary_delays_var, S, train_sets, d_max)
+    objective(prob, secondary_delays_var, train_sets, d_max)
 
     prob.solve()
 

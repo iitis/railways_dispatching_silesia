@@ -11,12 +11,6 @@ def test_linear_solver():
     μ = 30
 
 
-    S = {
-        0: [0,1],
-        1: [0,1],
-        2: [1,0]
-    }
-
 
     not_considered_station = {
         0: None,
@@ -25,6 +19,7 @@ def test_linear_solver():
     }
 
     train_sets = {
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
     "J": [0,1,2],
     "Jd": [[0,1], [2]],
     "Josingle": [],
@@ -34,7 +29,7 @@ def test_linear_solver():
     }
 
 
-    prob = solve_linear_problem(train_sets, S, d_max, μ, not_considered_station)
+    prob = solve_linear_problem(train_sets, d_max, μ, not_considered_station)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -51,6 +46,7 @@ def test_linear_solver():
 
     ### rerouting ####
     train_sets = {
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
     "J": [0,1,2],
     "Jd": [],
     "Josingle": [[1,2], []],
@@ -60,7 +56,7 @@ def test_linear_solver():
     }
 
 
-    prob = solve_linear_problem(train_sets, S, d_max, μ, not_considered_station)
+    prob = solve_linear_problem(train_sets, d_max, μ, not_considered_station)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":

@@ -3,7 +3,9 @@ import itertools
 import numpy as np
 from helpers_functions import *
 
-def indexing4qubo(train_sets, S, d_max, not_considered_station):
+def indexing4qubo(train_sets, d_max, not_considered_station):
+
+    S = train_sets["Paths"]
     inds = []
     for j in train_sets["J"]:
         for s in S[j]:
@@ -28,7 +30,10 @@ def Psum(k, k1, inds):
             return 1.0
     return 0.
 
-def Pspan(k, k1, inds, train_sets, S):
+def Pspan(k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
     if occurs_as_pair(j, j1, train_sets["Jd"]):
@@ -56,7 +61,10 @@ def Pspan(k, k1, inds, train_sets, S):
 
 
 
-def Pstay(k, k1, inds, train_sets, S):
+def Pstay(k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
     if j == j1:
@@ -74,7 +82,11 @@ def Pstay(k, k1, inds, train_sets, S):
     return 0.
 
 
-def P1track(k, k1, inds, train_sets, S):
+def P1track(k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+
+
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
 
@@ -102,7 +114,7 @@ def P1track(k, k1, inds, train_sets, S):
 
 
 
-def z_indices(train_sets, S, d_max):
+def z_indices(train_sets, d_max):
     inds = []
     for s in train_sets["Jtrack"].keys():
         for (j, j1) in itertools.combinations(train_sets["Jtrack"][s], 2):
@@ -114,7 +126,9 @@ def z_indices(train_sets, S, d_max):
 
 
 
-def P1qubic(k, k1, inds1, train_sets, S):
+def P1qubic(k, k1, inds1, train_sets):
+
+    S = train_sets["Paths"]
     # x with z
     if len(inds1[k].keys()) == 3 and len(inds1[k1].keys()) == 5:
 
@@ -194,11 +208,15 @@ def P1qubic(k, k1, inds1, train_sets, S):
     return 0.
 
 
-def h(x,y,z):
-    return 3*z**2+ x * y - 2 *x * z - 2 * y * z
+#def h(x,y,z):
+#    return 3*z**2+ x * y - 2 *x * z - 2 * y * z
 
 
-def P2qubic(k, k1, inds1, train_sets, S):
+def P2qubic(k, k1, inds1, train_sets):
+
+    S = train_sets["Paths"]
+
+
     # diagonal for z-ts
     if len(inds1[k].keys()) == len(inds1[k1].keys()) == 5:
         if k == k1:
@@ -256,25 +274,25 @@ def P2qubic(k, k1, inds1, train_sets, S):
 
 
 
-def get_coupling(k, k1, train_sets, S, inds, p_sum, p_pair):
+def get_coupling(k, k1, train_sets, inds, p_sum, p_pair):
 
     J = p_sum*Psum(k, k1, inds)
-    J += p_pair*Pspan(k, k1, inds, train_sets, S)
-    J += p_pair*Pstay(k, k1, inds, train_sets, S)
-    J += p_pair*P1track(k, k1, inds, train_sets, S)
+    J += p_pair*Pspan(k, k1, inds, train_sets)
+    J += p_pair*Pstay(k, k1, inds, train_sets)
+    J += p_pair*P1track(k, k1, inds, train_sets)
     return J
 
 
-def get_z_coupling(k, k1, train_sets, S, inds, p_pair, p_qubic):
+def get_z_coupling(k, k1, train_sets, inds, p_pair, p_qubic):
 
-    J = p_pair*P1qubic(k, k1, inds, train_sets, S)
-    J += p_qubic*P2qubic(k, k1, inds, train_sets, S)
+    J = p_pair*P1qubic(k, k1, inds, train_sets)
+    J += p_qubic*P2qubic(k, k1, inds, train_sets)
     return J
 
-def make_Q(train_sets, S, not_considered_station, d_max, p_sum, p_pair, p_pair_q, p_qubic):
+def make_Q(train_sets, not_considered_station, d_max, p_sum, p_pair, p_pair_q, p_qubic):
 
-    inds, q_bits = indexing4qubo(train_sets, S, d_max, not_considered_station)
-    inds_z, q_bits_z = z_indices(train_sets, S, 10)
+    inds, q_bits = indexing4qubo(train_sets, d_max, not_considered_station)
+    inds_z, q_bits_z = z_indices(train_sets, d_max)
 
     inds1 = np.concatenate([inds, inds_z])
 
@@ -288,11 +306,11 @@ def make_Q(train_sets, S, not_considered_station, d_max, p_sum, p_pair, p_pair_q
 
     for k in range(l):
         for k1 in range(l):
-            Q[k][k1] += get_coupling(k, k1, train_sets, S, inds, p_sum, p_pair)
+            Q[k][k1] += get_coupling(k, k1, train_sets, inds, p_sum, p_pair)
 
     for k in range(l1):
         for k1 in range(l1):
-            Q[k][k1] += get_z_coupling(k, k1, train_sets, S, inds1, p_pair_q, p_qubic)
+            Q[k][k1] += get_z_coupling(k, k1, train_sets, inds1, p_pair_q, p_qubic)
 
 
     return Q

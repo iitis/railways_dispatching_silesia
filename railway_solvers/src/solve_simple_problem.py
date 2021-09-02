@@ -18,11 +18,6 @@ from linear_solver import *
 from make_qubo import *
 
 
-S = {
-    0: [0,1],
-    1: [0,1],
-    2: [1,0]
-}
 
 
 not_considered_station = {
@@ -33,9 +28,11 @@ not_considered_station = {
 
 
 
-def toy_problem_variables(train_sets, S, d_max, not_considered_station, μ = 30.):
+def toy_problem_variables(train_sets, d_max, not_considered_station, μ = 30.):
 
-    prob = solve_linear_problem(train_sets, S, d_max, μ, not_considered_station)
+    prob = solve_linear_problem(train_sets, d_max, μ, not_considered_station)
+
+    S = train_sets["Paths"]
 
     print("d_1, t_1", return_delay_time(S, prob, 0,0))
     print("d_2, t_2", return_delay_time(S, prob, 1,0))
@@ -54,6 +51,7 @@ def toy_problem_variables(train_sets, S, d_max, not_considered_station, μ = 30.
 if True:
     # this will be changed while rerouting
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
       "Josingle": [],
@@ -62,10 +60,11 @@ if True:
       "Jswitch": dict()
     }
 
-    toy_problem_variables(train_sets, S, 10, not_considered_station)
+    toy_problem_variables(train_sets, 10, not_considered_station)
 
     ### rerouting ####
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [],
       "Josingle": [[1,2], []],
@@ -74,7 +73,7 @@ if True:
       "Jswitch": dict()
     }
 
-    toy_problem_variables(train_sets, S, 10, not_considered_station)
+    toy_problem_variables(train_sets, 10, not_considered_station)
 
     print("   ############   Done linear solver  #########")
 
@@ -90,6 +89,7 @@ def energy(v, Q):
 
 if False:
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
       "Josingle": [],
@@ -104,7 +104,7 @@ if False:
     p_qubic = 2.1
 
 
-    Q = make_Q(train_sets, S, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q = make_Q(train_sets, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     print(np.sqrt(np.size(Q)))
 
@@ -112,6 +112,7 @@ if False:
 
 
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [],
       "Josingle": [[1,2], []],
@@ -120,7 +121,7 @@ if False:
       "Jswitch": dict()
     }
 
-    Q = make_Q(train_sets, S, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q = make_Q(train_sets, not_considered_station, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     np.savez("files/Qfile_r.npz", Q=Q)
 
@@ -128,6 +129,7 @@ if False:
 
 if False:
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
       "Josingle": [],
@@ -144,7 +146,7 @@ if False:
     print("ground energy", energy(solution, Q))
 
 
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
     l = q_bits
 
     print("x vars", l)
@@ -162,6 +164,7 @@ if False:
 
 
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [],
       "Josingle": [[1,2], []],
@@ -177,7 +180,7 @@ if False:
     Q = np.load("files/Qfile_r.npz")["Q"]
 
 
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
     l = q_bits
 
 
@@ -197,6 +200,7 @@ if False:
 
 if False:
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
       "Josingle": [],
@@ -213,7 +217,7 @@ if False:
     print("ground energy", energy(solution, Q))
 
 
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
     l = q_bits
 
 
@@ -230,6 +234,7 @@ if False:
 
 
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [],
       "Josingle": [[1,2], []],
@@ -245,7 +250,7 @@ if False:
     print("ground energy", energy(solution, Q))
 
 
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
     l = q_bits
 
     print(" ... rerouting ....")
@@ -265,6 +270,7 @@ if False:
 
 if True:
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
       "Josingle": [],
@@ -289,12 +295,11 @@ if True:
       print("ground energy", energy(solution, Q))
 
 
-      inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+      inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
       l = q_bits
 
 
-
-      #print(solution[0:l-1])
+      S = train_sets["Paths"]
 
       for i in range(l):
           if solution[i] == 1:
@@ -307,6 +312,7 @@ if True:
 if True:
 
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [],
       "Josingle": [[1,2], []],
@@ -331,10 +337,12 @@ if True:
       print("ground energy", energy(solution, Q))
 
 
-      inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+      inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
       l = q_bits
 
       print(" ... rerouting ....")
+
+      S = train_sets["Paths"]
 
       for i in range(l):
           if solution[i] == 1:
@@ -350,6 +358,7 @@ if True:
 
 if True:
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
       "Josingle": [],
@@ -372,12 +381,12 @@ if True:
     print("ground energy", energy(solution, Q))
 
 
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
     l = q_bits
 
 
 
-      #print(solution[0:l-1])
+    S = train_sets["Paths"]
 
     for i in range(l):
         if solution[i] == 1:
@@ -390,6 +399,7 @@ if True:
 if True:
 
     train_sets = {
+      "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
       "J": [0,1,2],
       "Jd": [],
       "Josingle": [[1,2], []],
@@ -412,10 +422,12 @@ if True:
     print("ground energy", energy(solution, Q))
 
 
-    inds, q_bits = indexing4qubo(train_sets, S, 10, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, 10, not_considered_station)
     l = q_bits
 
     print(" ... rerouting ....")
+
+    S = train_sets["Paths"]
 
     for i in range(l):
         if solution[i] == 1:
