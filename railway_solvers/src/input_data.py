@@ -50,3 +50,18 @@ def penalty_weights(train = None, station = None):
     elif train == 2 and station == 1:
         w = 1.
     return w
+
+
+##############################
+taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8, "2_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_none" : 1, "1_1_none" : 1}, "res": 1}
+input_data = {"tau": taus,
+              "initial_conditions" : {"0_0" : 4, "1_0" : 1, "2_1" : 8},
+              "penalty_weights" : {"0_0" : 2, "1_0" : 1, "2_1" : 1}}
+
+# print(input_data["tau"]["pass"]["0_0_1"])
+
+for t in [0,1,2]:
+    for s1 in [0,1]:
+        for s2 in [0,1]:
+            if s1 != s2 and t + s2 != 0 and t + s1 != 2 and t + s2 != 3:
+                print(t,s1,s2)
