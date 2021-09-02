@@ -12,13 +12,12 @@ def test_linear_solver():
 
 
 
-    not_considered_station = {
-        0: None,
-        1: None,
-        2: 0,
-    }
-
     train_sets = {
+    "Snotconsi": {
+        0: [None],
+        1: [None],
+        2: [0],
+    },
     "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
     "J": [0,1,2],
     "Jd": [[0,1], [2]],
@@ -28,8 +27,9 @@ def test_linear_solver():
     "Jswitch": dict()
     }
 
+    # print(train_sets["Paths"])
 
-    prob = solve_linear_problem(train_sets, d_max, μ, not_considered_station)
+    prob = solve_linear_problem(train_sets, d_max, μ)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -45,10 +45,15 @@ def test_linear_solver():
             delay = v.varValue
             assert delay == 0
 
-    # TODO objectove should be tested to be 0.5
+    # TODO objective should be tested to be 0.5
 
     ### rerouting ####
     train_sets = {
+    "Snotconsi": {
+        0: [None],
+        1: [None],
+        2: [0],
+    },
     "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
     "J": [0,1,2],
     "Jd": [],
@@ -59,7 +64,7 @@ def test_linear_solver():
     }
 
 
-    prob = solve_linear_problem(train_sets, d_max, μ, not_considered_station)
+    prob = solve_linear_problem(train_sets, d_max, μ)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -75,6 +80,6 @@ def test_linear_solver():
             delay = v.varValue
             assert delay == 3
 
-        # TODO objectove should be tested to be 0.4
+        # TODO objective should be tested to be 0.4
 
 test_linear_solver()
