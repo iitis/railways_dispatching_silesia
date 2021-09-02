@@ -35,6 +35,9 @@ def test_linear_solver():
         if v.name == "Delays_0_0":
             delay = v.varValue
             assert delay == 0
+        if v.name == "Delays_0_1":
+            delay = v.varValue
+            assert delay == 0
         if v.name == "Delays_1_0":
             delay = v.varValue
             assert delay == 5
@@ -60,6 +63,9 @@ def test_linear_solver():
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
+            delay = v.varValue
+            assert delay == 0
+        if v.name == "Delays_0_1":
             delay = v.varValue
             assert delay == 0
         if v.name == "Delays_1_0":
