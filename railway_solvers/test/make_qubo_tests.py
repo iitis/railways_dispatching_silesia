@@ -1,3 +1,7 @@
+import sys
+# the mock-0.3.1 dir contains testcase.py, testutils.py & mock.py
+sys.path.append('../src')
+
 from make_qubo import *
 
 
@@ -114,14 +118,14 @@ if True:
     ### should be 0  ####
 
 
-    k = inds.index({'j': 1, 's': 0, 'd': 1})
-    k1 = inds.index({'j': 2, 's': 1, 'd': 2})
+    k = inds.index({'j': 1, 's': 1, 'd': 1})
+    k1 = inds.index({'j': 0, 's': 0, 'd': 2})
 
     print(P1track(k, k1, inds, train_sets, S) == 0.)
     print(P1track(k1, k, inds, train_sets, S) == 0.)
 
 
-    k = inds.index({'j': 1, 's': 0, 'd': 0})
+    k = inds.index({'j': 1, 's': 1, 'd': 0})
     k1 = inds.index({'j': 2, 's': 1, 'd': 1})
 
     print(P1track(k, k1, inds, train_sets, S) == 0.)
@@ -136,6 +140,7 @@ print(l == 121)
 
 inds1 = list(np.concatenate([inds, inds_z]))
 print(len(inds1) == 176)
+
 
 if True:
 
@@ -207,3 +212,13 @@ k1 = inds1.index({'j': 1, 's': 0, 'd': 0})
 
 print(P2qubic(k, k1, inds1, train_sets, S) == 0.)
 print(P2qubic(k1, k, inds1, train_sets, S) == 0.)
+
+
+Q = np.load("files/Qfile.npz")["Q"]
+
+Q_r = np.load("files/Qfile_r.npz")["Q"]
+
+
+print(Q)
+
+print(Q_r)

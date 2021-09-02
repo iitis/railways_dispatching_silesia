@@ -51,7 +51,7 @@ def toy_problem_variables(train_sets, S, d_max, not_considered_station, μ = 30.
 
 # linear solver
 
-if False:
+if True:
     # this will be changed while rerouting
     train_sets = {
       "J": [0,1,2],
@@ -76,8 +76,10 @@ if False:
 
     toy_problem_variables(train_sets, S, 10, not_considered_station)
 
+    print("   ############   Done linear solver  #########")
 
-#####   QUBO implementation #########
+
+#####   QUBO implementation, writng Q matrix #########
 
 def energy(v, Q):
     if -1 in v:
@@ -257,7 +259,7 @@ if False:
             print("train", j, "station", s, "delay", d, "time", t)
 
 
-    print("       done      DW simulator  ")
+    print("    ############   done  simulated annealer ############  ")
 
 
 
@@ -343,10 +345,10 @@ if True:
               print("train", j, "station", s, "delay", d, "time", t)
 
 
-    print("  done  DW  results ")
+    print(" ##########   done  DW  results  ###################")
 
 
-if False:
+if True:
     train_sets = {
       "J": [0,1,2],
       "Jd": [[0,1], [2]],
@@ -385,7 +387,7 @@ if False:
             t = d + earliest_dep_time(S, j,s)
             print("train", j, "station", s, "delay", d, "time", t)
 
-if False:
+if True:
 
     train_sets = {
       "J": [0,1,2],
@@ -424,4 +426,4 @@ if False:
             print("train", j, "station", s, "delay", d, "time", t)
 
 
-    print("  done  Hybrid  results ")
+    print(" ######### done  Hybrid  results ############ ")
