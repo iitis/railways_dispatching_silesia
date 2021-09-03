@@ -131,10 +131,10 @@ def linear_varibles(train_sets, d_max):
 
     y = dict()
 
-    all_trains = np.concatenate([train_sets["Josingle"], train_sets["Jd"]])
+    l1 = list(train_sets["Josingle"])
+    l2 = list(train_sets["Jd"])
 
-
-    for js in all_trains:
+    for js in l1+l2:
         train1 = []
         train2 = []
         no_station = []
