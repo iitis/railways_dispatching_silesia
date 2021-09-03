@@ -1,4 +1,3 @@
-from input_data import initial_conditions, tau
 
 #####   functions ####
 
@@ -46,11 +45,48 @@ def update_dictofdicts(d1, d2):
 
 def earliest_dep_time(S, timetable, train = None, station = None):
 
-    t = initial_conditions(train, station)
-    if t >= 0:
-        return t
-    else:
+    try:
+        return initial_conditions(timetable, train, station)
+    except:
         s = previous_station(S, train, station)
-        tau_pass = timetable["tau"]["pass"][str(train)+"_"+str(s)+"_"+str(station)]
-        tau_stop = timetable["tau"]["stop"][str(train)+"_"+str(station)+"_none"]
+        tau_pass = tau(timetable, "pass", train, s, station)
+
+        tau_stop = tau(timetable, "stop", train, station)
+
         return earliest_dep_time(S, timetable, train, s) + tau_pass  + tau_stop
+
+
+
+def tau(timetable, x = None, train = None, first_station = None, second_station = None):
+
+     if x == "pass" or x == "blocks" or x == "stop":
+         return timetable["tau"][x][str(train)+"_"+str(first_station)+"_"+str(second_station)]
+     elif x == "res":
+         return timetable["tau"]["res"]
+     return None
+
+
+def initial_conditions(timetable, train, station):
+    return timetable["initial_conditions"][str(train)+"_"+str(station)]
+
+
+
+def penalty_weights(timetable, train, station):
+    try:
+        return timetable["penalty_weights"][str(train)+"_"+str(station)]
+    except:
+        return 0.
+
+
+
+#####   this wil go to tests #######
+
+# print(input_data["tau"]["pass"]["0_0_1"])
+
+# input_data = small_timetable()
+
+# for t in [0,1,2]:
+#     for s1 in [0,1]:
+#         for s2 in [0,1]:
+#             if s1 != s2 and t + s2 != 0 and t + s1 != 2 and t + s2 != 3:
+#                 print(t,s1,s2)

@@ -1,4 +1,4 @@
-from input_data import penalty_weights
+from helpers_functions import penalty_weights, tau
 import itertools
 import numpy as np
 from helpers_functions import *
@@ -20,7 +20,7 @@ def indexing4qubo(train_sets, d_max):
 def penalty(timetable, k, inds, d_max):
     j = inds[k]["j"]
     s = inds[k]["s"]
-    w = penalty_weights(j, s)/d_max
+    w = penalty_weights(timetable, j, s)/d_max
     return inds[k]["d"] * w
 
 
@@ -52,9 +52,11 @@ def Pspan(timetable, k, k1, inds, train_sets):
             t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
             t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s)
 
-            A =  - tau('blocks', j1, s, s_next) - max(0, tau('pass', j1, s, s_next) - tau('pass', j, s, s_next))
+            ofset_A = max(0, timetable["tau"]["pass"][str(j1)+"_"+str(s)+"_"+str(s_next)] - timetable["tau"]["pass"][str(j)+"_"+str(s)+"_"+str(s_next)])
 
-            B =  tau('blocks', j, s, s_next) + max(0, tau('pass', j, s, s_next) - tau('pass', j1, s, s_next))
+            A =  - tau(timetable, 'blocks', j1, s, s_next) - max(0, tau(timetable, 'pass', j1, s, s_next) - tau(timetable, 'pass', j, s, s_next))
+
+            B =  tau(timetable, 'blocks', j, s, s_next) + max(0, tau(timetable, 'pass', j, s, s_next) - tau(timetable, 'pass', j1, s, s_next))
 
 
             if A < t1-t < B:
@@ -101,13 +103,13 @@ def P1track(timetable, k, k1, inds, train_sets):
 
         if s1 == subsequent_station(S, j, s):
 
-            if - tau('res') - tau('pass', j1, s1 , s) < t1 - t < tau('pass', j, s , s1) + tau('res'):
+            if - tau(timetable, 'res') - tau(timetable, 'pass', j1, s1 , s) < t1 - t < tau(timetable, 'pass', j, s , s1) + tau(timetable, 'res'):
 
                     return 1.0
 
         if s == subsequent_station(S, j1, s1):
 
-            if - tau('res') - tau('pass', j, s , s1) < t - t1 < tau('pass', j1, s1 , s) + tau('res'):
+            if - tau(timetable, 'res') - tau(timetable, 'pass', j, s , s1) < t - t1 < tau(timetable, 'pass', j1, s1 , s) + tau(timetable, 'res'):
 
                     return 1.0
 
@@ -154,7 +156,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz1 = inds1[k1]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
 
-                if tx + tau("pass", jx, sx, sz) - tau("res") < tz1 <= tz:
+                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz1 <= tz:
                     return 1.
 
 
@@ -170,7 +172,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz1 = inds1[k1]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
 
-                if tx + tau("pass", jx, sx, sz) - tau("res") < tz <= tz1:
+                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz <= tz1:
                     return 1.
 
 
@@ -193,7 +195,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
                 tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau("pass", jx, sx, sz) - tau("res") < tz1 <= tz:
+                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz1 <= tz:
                     return 1.
 
 
@@ -204,7 +206,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
                 tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau("pass", jx, sx, sz) - tau("res") < tz <= tz1:
+                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz <= tz1:
                     return 1.
 
     return 0.

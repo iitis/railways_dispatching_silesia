@@ -83,11 +83,6 @@ function M2graph(M::Matrix{Float64}; k::Int = 2, sgn::Int = 1)
 end
 
 
-
-addprocs(19)
-println("number of workers = ", nworkers())
-eval(Expr(:toplevel, :(@everywhere using SpinGlassMetropolisHastings)))
-
 p = MH_parameters(2.)
 
 Qs = ["files/Qfile.npz", "files/Qfile_r.npz"]
