@@ -68,9 +68,6 @@ def toy_problem_variables(train_sets, timetable, d_max, μ = 30.):
     print("impact to objective t_3", impact_to_objective(prob, timetable, 2,1, d_max))
 
 
-# linear solver
-
-# this will be changed while rerouting
 train_sets = {
   "skip_station":{
    0: None,
@@ -142,33 +139,6 @@ if False:
     np.savez("files/Qfile_r.npz", Q=Q)
 
 
-###   Metropolis Hastings results ######
-if True:
-
-    file = "files/solution.npz"
-    file1 = "files/solution_r.npz"
-
-    solution = np.load(file)
-
-    Q = np.load("files/Qfile.npz")["Q"]
-
-    print("ground energy", energy(solution, Q))
-
-    visualise_Qubo_solution(solution, timetable, train_sets, d_max)
-
-
-    print(" ... rerouting ....")
-
-    solution_r = np.load(file1)
-
-    Q_r = np.load("files/Qfile_r.npz")["Q"]
-
-    print("ground energy", energy(solution_r, Q_r))
-
-    visualise_Qubo_solution(solution_r, timetable, train_sets_rerouted, d_max)
-
-
-    print("    Metropolis Hastings   done   ")
 
 #####  D-Wave output   ######
 
