@@ -267,8 +267,13 @@ def test_penalties_and_couplings():
 
 
 def test_performing_small_Qmat():
-    #####   dispatching problem that was solved on D-Wave   ########
+    #####   very simple problem two trains going one way ########
 
+
+    taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
+    timetable = {"tau": taus,
+                  "initial_conditions" : {"0_0" : 3, "1_0" : 1},
+                  "penalty_weights" : {"0_0" : 2, "1_0" : 0.5}}
 
     train_sets = {
     "skip_station" : {
@@ -288,9 +293,15 @@ def test_performing_small_Qmat():
     p_pair = 1.
     p_pair_qubic = 1.
     p_qubic = 2.
+    d_max = 5
 
 
-    Q = make_Q(train_sets, timetable, 5, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q = make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_qubic, p_qubic)
+
+    inds, q_bits = indexing4qubo(train_sets, d_max)
+
+    #(d_max+1) * 2 trains * 2 stations
+    assert q_bits == 6*2*2
 
     assert np.shape(Q) == (6*2*2, 6*2*2)
 
@@ -299,20 +310,91 @@ def test_performing_small_Qmat():
     assert np.array_equal(np.transpose(M), M)
 
     # diagonal, delay penalties and linear tem penalties
-    # J0 leaves S0
-    assert Q[0][0] == -2
-    assert Q[1][1] == -1.6
-    assert Q[2][2] == -1.2
+    # J0 leaves S0 -p_sum + 0.4 for each late minute
 
-    # J1 leaves S0
-    assert Q[12][12] == -2
-    assert Q[13][13] == -1.8
+    k = inds.index({'j': 0, 's': 0, 'd': 0})
+    assert Q[k][k] == -2
+    k = inds.index({'j': 0, 's': 0, 'd': 1})
+    assert Q[k][k] == -1.6
+    k = inds.index({'j': 0, 's': 0, 'd': 2})
+    assert Q[k][k] == -1.2
 
-    # J1 and J0 leaves to close to each other
-    assert Q[12][0] == 1.
-    assert Q[12][1] == 1.
-    assert Q[12][2] == 1.
-    assert Q[13][0] == 1.
+    # J1 leaves S0 -p_sum +  0.1 for each late minute
+    k = inds.index({'j': 1, 's': 0, 'd': 0})
+    assert Q[k][k] == -2
+    k = inds.index({'j': 1, 's': 0, 'd': 1})
+    assert Q[k][k] == -1.9
+
+    # J1 and J0 leaves to close to each other, p_pair
+    k = inds.index({'j': 0, 's': 0, 'd': 0})
+    k1 = inds.index({'j': 1, 's': 0, 'd': 0})
+    assert Q[k][k1] == 1.
+    k = inds.index({'j': 0, 's': 0, 'd': 1})
+    assert Q[k][k1] == 1.
+    k = inds.index({'j': 0, 's': 0, 'd': 2})
+    assert Q[k][k1] == 1.
+
+
+
+    ####  two trains going in opposite ways ######
+
+    taus = {"pass" : {"0_0_1" : 4, "1_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_1_0" : 2}, "stop": {"0_1_None" : 1, "1_0_None" : 1}, "res": 1}
+    timetable = {"tau": taus,
+                  "initial_conditions" : {"0_0" : 3, "1_1" : 1},
+                  "penalty_weights" : {"0_0" : 2, "1_1" : 0.5}}
+
+    train_sets = {
+    "skip_station" : {
+        0: None,
+        1: None,
+    },
+    "Paths": {0: [0,1], 1: [1,0]},
+    "J": [0,1],
+    "Jd": [],
+    "Josingle": [[0,1]],
+    "Jround": dict(),
+    "Jtrack": dict(),
+    "Jswitch": dict()
+    }
+
+    p_sum = 2.
+    p_pair = 1.
+    p_pair_qubic = 1.
+    p_qubic = 2.
+
+
+    Q = make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_qubic, p_qubic)
+
+    assert np.shape(Q) == (6*2*2, 6*2*2)
+
+    M = np.matrix(Q)
+
+    assert np.array_equal(np.transpose(M), M)
+
+    inds, q_bits = indexing4qubo(train_sets, d_max)
+
+    # diagonal, delay penalties and linear tem penalties
+    # J0 leaves S0 -p_sum + 0.4 for each late minute
+
+    k = inds.index({'j': 0, 's': 0, 'd': 0})
+    assert Q[k][k] == -2
+    k = inds.index({'j': 0, 's': 0, 'd': 1})
+    assert Q[k][k] == -1.6
+    k = inds.index({'j': 0, 's': 0, 'd': 2})
+    assert Q[k][k] == -1.2
+
+    # J1 leaves S1 -p_sum +  0.1 for each late minute
+    k = inds.index({'j': 1, 's': 1, 'd': 0})
+    assert Q[k][k] == -2
+    k = inds.index({'j': 1, 's': 1, 'd': 1})
+    assert Q[k][k] == -1.9
+
+    # trains starts in opposite directions in such a way that they would meet on the single track
+
+    k = inds.index({'j': 0, 's': 0, 'd': 0})
+    k1 = inds.index({'j': 1, 's': 1, 'd': 0})
+    assert Q[k][k1] == 1.
+    assert Q[k1][k] == 1.
 
 
 def test_performing_Qmat():
