@@ -324,10 +324,11 @@ def test_performing_Qmat():
     assert np.array_equal(Q_r, np.load("files/Qfile_r.npz")["Q"])
 
 
-test_performing_small_Qmat()
 
 test_pspan_pstay_p1track()
-
 test_qubic()
-
+test_performing_small_Qmat()
 test_performing_Qmat()
+
+
+print("tests done")

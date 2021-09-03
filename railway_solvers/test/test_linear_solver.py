@@ -28,6 +28,21 @@ def test_linear_solver():
     "Jswitch": dict()
     }
 
+    train_sets_rerouted = {
+    "skip_station": {
+        0: [None],
+        1: [None],
+        2: [0],
+    },
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
+    "J": [0,1,2],
+    "Jd": [],
+    "Josingle": [[1,2], []],
+    "Jround": dict(),
+    "Jtrack": {1: [0,1]},
+    "Jswitch": dict()
+    }
+
     prob = solve_linear_problem(train_sets, timetable, d_max, μ)
 
     for v in prob.variables():
@@ -44,26 +59,10 @@ def test_linear_solver():
             delay = v.varValue
             assert delay == 0
 
-    # TODO objective should be tested to be 0.5
-
-    ### rerouting ####
-    train_sets = {
-    "skip_station": {
-        0: [None],
-        1: [None],
-        2: [0],
-    },
-    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
-    "J": [0,1,2],
-    "Jd": [],
-    "Josingle": [[1,2], []],
-    "Jround": dict(),
-    "Jtrack": {1: [0,1]},
-    "Jswitch": dict()
-    }
+    assert prob.objective.value() == 0.5
 
 
-    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
+    prob = solve_linear_problem(train_sets_rerouted, timetable, d_max, μ)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -79,6 +78,7 @@ def test_linear_solver():
             delay = v.varValue
             assert delay == 3
 
-        # TODO objective should be tested to be 0.4
+    assert prob.objective.value() == 0.4
+
 
 test_linear_solver()
