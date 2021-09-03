@@ -1,22 +1,14 @@
 import sys
 import pulp as pus
+import pytest
 sys.path.append('../src')
 
 
 from linear_solver import *
 
-taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8, "2_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
-timetable = {"tau": taus,
-              "initial_conditions" : {"0_0" : 4, "1_0" : 1, "2_1" : 8},
-              "penalty_weights" : {"0_0" : 2, "1_0" : 1, "2_1" : 1}}
-
 
 def test_linear_varibles_creations():
 
-    taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
-    timetable = {"tau": taus,
-                  "initial_conditions" : {"0_0" : 3, "1_0" : 1},
-                  "penalty_weights" : {"0_0" : 2, "1_0" : 0.5}}
 
     train_sets = {
     "skip_station" : {
@@ -38,6 +30,27 @@ def test_linear_varibles_creations():
 
     assert str(v[1]) == "{0: {1: {0: y_0_1_0}}}"
 
+def simplest_problem():
+
+    taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
+    timetable = {"tau": taus,
+                  "initial_conditions" : {"0_0" : 3, "1_0" : 1},
+                  "penalty_weights" : {"0_0" : 2, "1_0" : 0.5}}
+
+    train_sets = {
+    "skip_station" : {
+        0: None,
+        1: None,
+    },
+    "Paths": {0: [0,1], 1: [0,1]},
+    "J": [0,1],
+    "Jd": [[0,1]],
+    "Josingle": [[]],
+    "Jround": dict(),
+    "Jtrack": dict(),
+    "Jswitch": dict()
+    }
+
     ####   simple problem #####
 
     prob = solve_linear_problem(train_sets, timetable, 10, 30)
@@ -55,9 +68,52 @@ def test_linear_varibles_creations():
 
     assert prob.objective.value() == 0.2
 
+    train_sets = {
+    "skip_station" : {
+        0: None,
+        1: None,
+    },
+    "Paths": {0: [0,1], 1: [1,0]},
+    "J": [0,1],
+    "Jd": [[]],
+    "Josingle": [[0,1]],
+    "Jround": dict(),
+    "Jtrack": dict(),
+    "Jswitch": dict()
+    }
+
+    taus = {"pass" : {"0_0_1" : 4, "1_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_1_0" : 2}, "stop": {"0_1_None" : 1, "1_0_None" : 1}, "res": 1}
+    timetable = {"tau": taus,
+                  "initial_conditions" : {"0_0" : 3, "1_1" : 1},
+                  "penalty_weights" : {"0_0" : 2, "1_1" : 0.5}}
+
+
+    ####   simple problem #####
+
+    prob = solve_linear_problem(train_sets, timetable, 10, 30)
+
+    for v in prob.variables():
+
+        if v.name == "Delays_0_0":
+            delay = v.varValue
+            assert delay == 0
+        if v.name == "Delays_1_1":
+            delay = v.varValue
+            assert delay == 7
+        if v.name == "y_0_1_0":
+            delay = v.varValue
+            assert delay == 1.
+
+    assert prob.objective.value() == pytest.approx(0.35)
+
 
 
 def test_linear_solver():
+
+    taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8, "2_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
+    timetable = {"tau": taus,
+                  "initial_conditions" : {"0_0" : 4, "1_0" : 1, "2_1" : 8},
+                  "penalty_weights" : {"0_0" : 2, "1_0" : 1, "2_1" : 1}}
 
 
     d_max = 10
@@ -131,5 +187,6 @@ def test_linear_solver():
     assert prob.objective.value() == 0.4
 
 test_linear_varibles_creations()
+simplest_problem()
 test_linear_solver()
 print("tests done")

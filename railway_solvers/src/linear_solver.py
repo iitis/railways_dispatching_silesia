@@ -36,12 +36,11 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
                 s_previousp = previous_station(S, jp, s)
 
                 if s_previousp != None:
-                    print(jp, s, s_previousp)
 
-                    problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*(1-y[j][jp][s])  \
+                    problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*(y[j][jp][s])  \
                      >= delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) + tau(timetable, 'pass', jp, s_previousp , s) + tau(timetable, 'res', jp, j , s)
 
-                    problem += delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) + μ*y[j][jp][s] \
+                    problem += delay_var[jp][s_previousp] + earliest_dep_time(S, timetable, jp, s_previousp) + μ*(1-y[j][jp][s]) \
                      >= delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + tau(timetable, 'pass', j, s, s_previousp) + tau(timetable, 'res', j, jp , s)
 
 
