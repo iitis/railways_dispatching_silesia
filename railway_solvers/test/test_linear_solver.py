@@ -16,7 +16,7 @@ def test_linear_varibles_creations():
     taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
     timetable = {"tau": taus,
                   "initial_conditions" : {"0_0" : 3, "1_0" : 1},
-                  "penalty_weights" : {"0_0" : 2, "1_0" : 1}}
+                  "penalty_weights" : {"0_0" : 2, "1_0" : 0.5}}
 
     train_sets = {
     "skip_station" : {
@@ -53,7 +53,7 @@ def test_linear_varibles_creations():
         if v.name == "y_0_1_0":
             assert v.varValue == 1.
 
-    assert prob.objective.value() == 0.4
+    assert prob.objective.value() == 0.2
 
 
 
