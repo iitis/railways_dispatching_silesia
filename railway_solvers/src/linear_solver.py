@@ -1,7 +1,6 @@
 import numpy as np
 import pulp as pus
 import itertools
-from input_data import *
 from helpers_functions import *
 
 def minimal_span(problem, timetable, delay_var, y, train_sets, μ):

@@ -4,11 +4,14 @@ sys.path.append('../src')
 
 
 from linear_solver import *
-from input_data import small_timetable
+
+taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8, "2_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
+timetable = {"tau": taus,
+              "initial_conditions" : {"0_0" : 4, "1_0" : 1, "2_1" : 8},
+              "penalty_weights" : {"0_0" : 2, "1_0" : 1, "2_1" : 1}}
 
 def test_linear_solver():
 
-    timetable = small_timetable()
 
     d_max = 10
     μ = 30
@@ -82,3 +85,4 @@ def test_linear_solver():
 
 
 test_linear_solver()
+print("tests done")

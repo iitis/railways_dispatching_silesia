@@ -5,7 +5,12 @@ sys.path.append('../src')
 
 from make_qubo import *
 
-from input_data import small_timetable
+#from input_data import small_timetable
+
+taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8, "2_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
+timetable = {"tau": taus,
+              "initial_conditions" : {"0_0" : 4, "1_0" : 1, "2_1" : 8},
+              "penalty_weights" : {"0_0" : 2, "1_0" : 1, "2_1" : 1}}
 
 ### testing particular QUBO element cration
 
@@ -15,7 +20,6 @@ def test_pspan_pstay_p1track():
 
     # default
 
-    timetable = small_timetable()
 
     train_sets = {
     "skip_station":{
@@ -66,7 +70,7 @@ def test_pspan_pstay_p1track():
     assert Pstay(timetable, k1, k, inds, train_sets) == 0.
 
     ### rerouting ####
-    train_sets = {
+    train_sets_r = {
     "skip_station":{
     0: None,
     1: None,
@@ -87,43 +91,42 @@ def test_pspan_pstay_p1track():
     k = inds.index({'j': 1, 's': 0, 'd': 0})
     k1 = inds.index({'j': 2, 's': 1, 'd': 0})
 
-    assert P1track(timetable, k, k1, inds, train_sets) == 1.
-    assert P1track(timetable, k1, k, inds, train_sets) == 1.
+    assert P1track(timetable, k, k1, inds, train_sets_r) == 1.
+    assert P1track(timetable, k1, k, inds, train_sets_r) == 1.
 
 
     k = inds.index({'j': 1, 's': 0, 'd': 6})
     k1 = inds.index({'j': 2, 's': 1, 'd': 0})
 
-    assert P1track(timetable, k, k1, inds, train_sets) == 1.
-    assert P1track(timetable, k1, k, inds, train_sets) == 1.
+    assert P1track(timetable, k, k1, inds, train_sets_r) == 1.
+    assert P1track(timetable, k1, k, inds, train_sets_r) == 1.
 
     k = inds.index({'j': 1, 's': 0, 'd': 10})
     k1 = inds.index({'j': 2, 's': 1, 'd': 0})
 
-    assert P1track(timetable, k, k1, inds, train_sets) == 1.
-    assert P1track(timetable, k1, k, inds, train_sets) == 1.
+    assert P1track(timetable, k, k1, inds, train_sets_r) == 1.
+    assert P1track(timetable, k1, k, inds, train_sets_r) == 1.
 
 
 
     k = inds.index({'j': 1, 's': 1, 'd': 1})
     k1 = inds.index({'j': 0, 's': 0, 'd': 2})
 
-    assert P1track(timetable, k, k1, inds, train_sets) == 0.
-    assert P1track(timetable, k1, k, inds, train_sets) == 0.
+    assert P1track(timetable, k, k1, inds, train_sets_r) == 0.
+    assert P1track(timetable, k1, k, inds, train_sets_r) == 0.
 
 
     k = inds.index({'j': 1, 's': 1, 'd': 0})
     k1 = inds.index({'j': 2, 's': 1, 'd': 1})
 
-    assert P1track(timetable, k, k1, inds, train_sets) == 0.
-    assert P1track(timetable, k1, k, inds, train_sets) == 0.
+    assert P1track(timetable, k, k1, inds, train_sets_r) == 0.
+    assert P1track(timetable, k1, k, inds, train_sets_r) == 0.
 
 
 
 
 def test_qubic():
 
-    timetable = small_timetable()
 
     ### rerouting ####
     train_sets = {
@@ -223,10 +226,48 @@ def test_qubic():
 
 
 
+def test_penalties_and_couplings():
+
+
+    train_sets = {
+    "skip_station":{
+    0: None,
+    1: None,
+    2: 0,
+    },
+    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
+    "J": [0,1,2],
+    "Jd": [[0,1], [2]],
+    "Josingle": [],
+    "Jround": dict(),
+    "Jtrack": {1: [0,1]},
+    "Jswitch": dict()
+    }
+
+    p_sum = 2.5
+    p_pair = 1.25
+    p_qubic = 2.1
+
+    d_max = 10
+
+    inds, q_bits = indexing4qubo(train_sets, d_max)
+    assert get_coupling(timetable, 0,0, train_sets, inds, p_sum, p_pair) == -2.5
+    assert get_coupling(timetable, 0,24, train_sets, inds, p_sum, p_pair) == 1.25
+
+
+    inds_z, l = z_indices(train_sets, d_max)
+    inds1 = list(np.concatenate([inds, inds_z]))
+
+    k = inds1.index({'j': 1, 's': 0, 'd': 0})
+    k1 = inds1.index({'j': 0, 'j1': 1, 's': 1, 'd': 4, 'd1': 8})
+
+    assert get_z_coupling(timetable, k, k1, train_sets, inds1, p_pair, p_qubic) == 1.25
+
+    assert penalty(timetable, 1, inds, d_max) == 0.2
+
+
 def test_performing_small_Qmat():
     #####   dispatching problem that was solved on D-Wave   ########
-
-    timetable = small_timetable()
 
 
     train_sets = {
@@ -277,7 +318,6 @@ def test_performing_small_Qmat():
 def test_performing_Qmat():
     #####   dispatching problem that was solved on D-Wave   ########
 
-    timetable = small_timetable()
 
     train_sets = {
     "skip_station":{
@@ -299,12 +339,14 @@ def test_performing_Qmat():
     p_pair_qubic = 1.25
     p_qubic = 2.1
 
+    d_max = 10
 
-    Q = make_Q(train_sets, timetable, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+
+    Q = make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     assert np.array_equal(Q, np.load("files/Qfile.npz")["Q"])
 
-    train_sets = {
+    train_sets_r = {
     "skip_station":{
     0: None,
     1: None,
@@ -319,12 +361,12 @@ def test_performing_Qmat():
     "Jswitch": dict()
     }
 
-    Q_r = make_Q(train_sets, timetable, 10, p_sum, p_pair, p_pair_qubic, p_qubic)
+    Q_r = make_Q(train_sets_r, timetable, d_max, p_sum, p_pair, p_pair_qubic, p_qubic)
 
     assert np.array_equal(Q_r, np.load("files/Qfile_r.npz")["Q"])
 
 
-
+test_penalties_and_couplings()
 test_pspan_pstay_p1track()
 test_qubic()
 test_performing_small_Qmat()

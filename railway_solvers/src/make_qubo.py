@@ -1,4 +1,3 @@
-from helpers_functions import penalty_weights, tau
 import itertools
 import numpy as np
 from helpers_functions import *
@@ -15,13 +14,6 @@ def indexing4qubo(train_sets, d_max):
                 for d in range(d_max+1):
                     inds.append({"j":j,"s":s,"d":d})
     return inds, len(inds)
-
-
-def penalty(timetable, k, inds, d_max):
-    j = inds[k]["j"]
-    s = inds[k]["s"]
-    w = penalty_weights(timetable, j, s)/d_max
-    return inds[k]["d"] * w
 
 
 def Psum(k, k1, inds):
@@ -114,7 +106,6 @@ def P1track(timetable, k, k1, inds, train_sets):
                     return 1.0
 
     return 0.
-
 
 
 
@@ -276,7 +267,11 @@ def P2qubic(k, k1, inds1, train_sets):
 
     return 0.
 
-
+def penalty(timetable, k, inds, d_max):
+    j = inds[k]["j"]
+    s = inds[k]["s"]
+    w = penalty_weights(timetable, j, s)/d_max
+    return inds[k]["d"] * w
 
 def get_coupling(timetable, k, k1, train_sets, inds, p_sum, p_pair):
 
@@ -295,8 +290,7 @@ def get_z_coupling(timetable, k, k1, train_sets, inds, p_pair, p_qubic):
 
 def make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_q, p_qubic):
 
-    # not_considered_station = train_sets["skip_station"]
-    inds, q_bits = indexing4qubo(train_sets, d_max)#, not_considered_station)
+    inds, q_bits = indexing4qubo(train_sets, d_max)
     inds_z, q_bits_z = z_indices(train_sets, d_max)
 
     inds1 = np.concatenate([inds, inds_z])
