@@ -3,16 +3,17 @@
 
 
 def occurs_as_pair(a,b, vecofvec):
+    "check whether a and b occurs together in the same vector of the vector of vectors"
     for v in vecofvec:
-        if (a in v and b in v) and a != b:
+        if a in v and b in v and a != b:
             return True
     return False
 
 def update_dictofdicts(d1, d2):
-    k1 = d1.keys()
-    k2 = d2.keys()
-    for k in k2:
-        if k in k1:
+    "update d1 by d2 in such a way that adds elements of d2 either to the outside dictionary or to the inside one if inside keys are the same"
+    #TODO check it for more complex
+    for k in d2.keys():
+        if k in d1.keys():
             update_dictofdicts(d1[k], d2[k])
         else:
             d1.update(d2)
