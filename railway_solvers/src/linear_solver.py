@@ -4,32 +4,31 @@ import itertools
 from helpers_functions import *
 
 def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
-    "minimum span condition"
-
+    "adds the minimum span condition to the pulp problem"
 
     S = train_sets["Paths"]
     for js in train_sets["Jd"]:
         for (j,jp) in itertools.combinations(js, 2):
-            for s in common_path(S, j, jp):
+            # the common path without last station is used, TODO think over
+            for s in common_path(S, j, jp)[0:-1]:
 
                 s_next = subsequent_station(S, j, s)
                 s_nextp = subsequent_station(S, jp, s)
 
-                if (s_next != None and s_next == s_nextp):
+                problem += delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(S, timetable, j, s) \
+                >= tau(timetable, 'blocks', j, s, s_next) + max(0, tau(timetable, 'pass', j, s, s_next) - tau(timetable, 'pass', jp, s, s_next))
 
-                    problem += delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(S, timetable, j, s) \
-                     >= tau(timetable, 'blocks', j, s, s_next) + max(0, tau(timetable, 'pass', j, s, s_next) - tau(timetable, 'pass', jp, s, s_next))
-
-                    problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*y[j][jp][s] - delay_var[jp][s] - earliest_dep_time(S, timetable,jp, s) \
-                    >= tau(timetable, 'blocks', jp, s, s_next) + max(0, tau(timetable, 'pass', jp, s, s_next) - tau(timetable, 'pass', j, s, s_next))
+                problem += delay_var[j][s] + earliest_dep_time(S, timetable, j, s) + μ*y[j][jp][s] - delay_var[jp][s] - earliest_dep_time(S, timetable,jp, s) \
+                >= tau(timetable, 'blocks', jp, s, s_next) + max(0, tau(timetable, 'pass', jp, s, s_next) - tau(timetable, 'pass', j, s, s_next))
 
 
 def single_line(problem, timetable, delay_var, y, train_sets, μ):
-    "minimum span condition"
+    " adds single line condition to the pulp problem"
 
     S = train_sets["Paths"]
     for js in train_sets["Josingle"]:
         for (j,jp) in itertools.combinations(js, 2):
+            # the common path without last station is used, TODO think over
             for s in common_path(S, j, jp)[0:-1]:
 
                 s_previous = previous_station(S, j, s)
@@ -46,11 +45,12 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
 
 
 def minimal_stay(problem, timetable, delay_var, train_sets):
+    "adds minimum stay condition to the pulp problem"
 
     not_considered_station = train_sets["skip_station"]
 
     S = train_sets["Paths"]
-    "minimum stay condition"
+
     for j in train_sets["J"]:
         for s in S[j]:
 
@@ -62,7 +62,7 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
 
 
 def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
-    "track occupation"
+    "adds track occupation condition to the pulp problem"
 
     S = train_sets["Paths"]
     for s in train_sets["Jtrack"].keys():
@@ -91,48 +91,30 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
 
 
 def objective(problem, timetable, delay_var, train_sets, d_max):
-    "objective function"
+    "adds objective function to the pulp problem"
 
     S = train_sets["Paths"]
     problem += pus.lpSum([delay_var[i][j] * penalty_weights(timetable, i, j)/d_max for i in train_sets["J"] for j in S[i] if penalty_weights(timetable, i,j) !=0])
 
 
-def return_delay_time(S, timetable, prob, j, s):
-
-    for v in prob.variables():
-        if v.name == "Delays_"+str(j)+"_"+str(s):
-            delay = v.varValue
-            time = v.varValue + earliest_dep_time(S, timetable, j, s)
-            return delay, time
-    return 0, 0
-
-def impact_to_objective(prob, timetable, j,s, d_max):
-    for v in prob.variables():
-        if v.name == "Delays_"+str(j)+"_"+str(s):
-            return penalty_weights(timetable, j,s)/d_max*v.varValue
-    return 0.
-
-
-
 
 def linear_varibles(train_sets, d_max):
+    " returns all linear variables for the optimisation problem, i.e. secondary_delays_vars and order_vars"
 
     S = train_sets["Paths"]
 
-    trains_inds = train_sets["J"]
-
-    secondary_delays_var = dict()
+    secondary_delays_vars = dict()
 
     for train in train_sets["J"]:
 
-        secondary_delays_var.update(pus.LpVariable.dicts("Delays", ([train], S[train]), 0, d_max, cat='Integer'))
+        secondary_delays_vars.update(pus.LpVariable.dicts("Delays", ([train], S[train]), 0, d_max, cat='Integer'))
 
-
-    y = dict()
+    order_vars = dict()
 
     l1 = list(train_sets["Josingle"])
     l2 = list(train_sets["Jd"])
 
+    # this is the single and double line case
     for js in l1+l2:
         train1 = []
         train2 = []
@@ -141,66 +123,63 @@ def linear_varibles(train_sets, d_max):
             train1.append(pair[0])
             train2.append(pair[1])
 
+            # common path without the last station TODO think over
             no_station = common_path(S, pair[0], pair[1])[0:-1]
         if len(js) > 1:
 
-            y1 = pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer')
+            y = pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer')
 
-            update_dictofdicts(y, y1)
+            update_dictofdicts(order_vars, y)
 
+    # this is the track occupation case
     for s in train_sets["Jtrack"].keys():
 
         for pair in itertools.combinations(train_sets["Jtrack"][s], 2):
 
-            y1 = pus.LpVariable.dicts("y", ([pair[0]], [pair[1]], [s]), 0, 1, cat='Integer')
+            y = pus.LpVariable.dicts("y", ([pair[0]], [pair[1]], [s]), 0, 1, cat='Integer')
 
-            update_dictofdicts(y, y1)
+            update_dictofdicts(order_vars, y)
 
-    return secondary_delays_var, y
+    return secondary_delays_vars, order_vars
 
 
 
-def solve_linear_problem(train_sets, timetable_input, d_max, μ):
+def solve_linear_problem(train_sets, timetable, d_max, μ):
+    "colves the linear problem returns the pulp object"
 
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
     secondary_delays_var, y = linear_varibles(train_sets, d_max)
 
+    # following conditions are added
+    minimal_span(prob, timetable, secondary_delays_var, y, train_sets, μ)
+    minimal_stay(prob, timetable, secondary_delays_var, train_sets)
+    single_line(prob, timetable, secondary_delays_var, y, train_sets, μ)
+    track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, μ)
+    # TODO other conditions such as common resources and circ
 
-    minimal_span(prob, timetable_input, secondary_delays_var, y, train_sets, μ)
-    minimal_stay(prob, timetable_input, secondary_delays_var, train_sets)
-    single_line(prob, timetable_input, secondary_delays_var, y, train_sets, μ)
-
-    track_occuparion(prob, timetable_input, secondary_delays_var, y, train_sets, μ)
-
-    objective(prob, timetable_input, secondary_delays_var, train_sets, d_max)
+    # objective is added
+    objective(prob, timetable, secondary_delays_var, train_sets, d_max)
 
     prob.solve()
-
     return prob
 
 
-if __name__ == "__main__":
-    d_max = 10
-    μ = 30
+# auxiliary functions for visualisation
 
-    timetable_input = small_timetable()
-
-    train_sets = {
-    "skip_station": {
-        0: [None],
-        1: [None],
-        2: [0],
-    },
-    "Paths": {0: [0,1], 1: [0,1], 2: [1,0]},
-    "J": [0,1,2],
-    "Jd": [],
-    "Josingle": [[1,2], []],
-    "Jround": dict(),
-    "Jtrack": {1: [0,1]},
-    "Jswitch": dict()
-    }
+def return_delay_and_acctual_time(S, timetable, prob, j, s):
+    "given the solution of the optimisation problem returns secondary delay and acctual time of leaving given station"
+    for v in prob.variables():
+        if v.name == "Delays_"+str(j)+"_"+str(s):
+            delay = v.varValue
+            time = v.varValue + earliest_dep_time(S, timetable, j, s)
+            return delay, time
+    return 0, 0
 
 
-
-    solve_linear_problem(train_sets, timetable_input, d_max, μ)
+def impact_to_objective(prob, timetable, j,s, d_max):
+    "teturn the inpact to the objective of the particular secondary delay of particular train at particular station"
+    for v in prob.variables():
+        if v.name == "Delays_"+str(j)+"_"+str(s):
+            return penalty_weights(timetable, j,s)/d_max*v.varValue
+    return 0.

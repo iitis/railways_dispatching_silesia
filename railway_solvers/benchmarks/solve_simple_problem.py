@@ -16,7 +16,7 @@ sys.path.append('../src')
 
 
 from helpers_functions import earliest_dep_time
-from linear_solver import solve_linear_problem, return_delay_time, impact_to_objective
+from linear_solver import solve_linear_problem, return_delay_and_acctual_time, impact_to_objective
 from make_qubo import make_Q, indexing4qubo
 
 
@@ -52,11 +52,11 @@ def toy_problem_variables(train_sets, timetable, d_max, μ = 30.):
 
     S = train_sets["Paths"]
 
-    print("d_1, t_1", return_delay_time(S, timetable, prob, 0,0))
-    print("d_2, t_2", return_delay_time(S, timetable, prob, 1,0))
-    print("d_3, t_3", return_delay_time(S, timetable, prob, 2,1))
+    print("d_1, t_1", return_delay_and_acctual_time(S, timetable, prob, 0,0))
+    print("d_2, t_2", return_delay_and_acctual_time(S, timetable, prob, 1,0))
+    print("d_3, t_3", return_delay_and_acctual_time(S, timetable, prob, 2,1))
 
-    print("d_1', t_1'", return_delay_time(S, timetable, prob, 0,1))
+    print("d_1', t_1'", return_delay_and_acctual_time(S, timetable, prob, 0,1))
 
 
     print("impact to objective t_1", impact_to_objective(prob, timetable, 0,0, d_max))

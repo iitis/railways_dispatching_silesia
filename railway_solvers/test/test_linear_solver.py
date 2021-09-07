@@ -7,6 +7,7 @@ sys.path.append('../src')
 from linear_solver import *
 
 
+
 def test_linear_varibles_creations():
 
 
@@ -67,6 +68,11 @@ def simplest_test_two_trains_going_one_way():
             assert v.varValue == 1.
 
     assert prob.objective.value() == 0.4
+
+
+    assert return_delay_and_acctual_time(train_sets["Paths"], timetable, prob, 1, 0) == (4.0, 5.0)
+    assert impact_to_objective(prob, timetable, 1,0, 5) == 0.4
+
 
 def simplest_test_two_trains_going_opposite_ways():
 
@@ -225,6 +231,7 @@ def test_linear_solver_default_problem():
             assert delay == 3
 
     assert prob.objective.value() == 0.4
+
 
 test_linear_varibles_creations()
 
