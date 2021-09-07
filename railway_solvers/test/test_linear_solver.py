@@ -30,7 +30,7 @@ def test_linear_varibles_creations():
 
     assert str(v[1]) == "{0: {1: {0: y_0_1_0}}}"
 
-def simplest_problem():
+def simplest_test_two_trains_going_one_way():
 
     taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
     timetable = {"tau": taus,
@@ -53,7 +53,7 @@ def simplest_problem():
 
     ####   simple problem #####
 
-    prob = solve_linear_problem(train_sets, timetable, 10, 30)
+    prob = solve_linear_problem(train_sets, timetable, 5, 30)
 
     for v in prob.variables():
 
@@ -66,7 +66,9 @@ def simplest_problem():
         if v.name == "y_0_1_0":
             assert v.varValue == 1.
 
-    assert prob.objective.value() == 0.2
+    assert prob.objective.value() == 0.4
+
+def simplest_test_two_trains_going_opposite_ways():
 
     train_sets = {
     "skip_station" : {
@@ -108,7 +110,7 @@ def simplest_problem():
 
 
 
-def test_linear_solver():
+def test_linear_solver_default_problem():
 
     taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 8, "2_1_0" : 8}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 1}
     timetable = {"tau": taus,
@@ -187,6 +189,10 @@ def test_linear_solver():
     assert prob.objective.value() == 0.4
 
 test_linear_varibles_creations()
-simplest_problem()
-test_linear_solver()
+
+# applications of the solver
+simplest_test_two_trains_going_one_way()
+simplest_test_two_trains_going_opposite_ways()
+
+test_linear_solver_default_problem()
 print("tests done")
