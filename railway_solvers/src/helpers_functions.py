@@ -18,7 +18,7 @@ def update_dictofdicts(d1, d2):
             d1.update(d2)
     return d1
 
-    
+
 
 def subsequent_station(S, j, s):
     path = S[j]
@@ -43,21 +43,6 @@ def common_path(S, j, jp):
     return [s for s in S[j] if s in S[jp]]
 
 
-
-def earliest_dep_time(S, timetable, train = None, station = None):
-
-    try:
-        return initial_conditions(timetable, train, station)
-    except:
-        s = previous_station(S, train, station)
-        tau_pass = tau(timetable, "pass", train, s, station)
-
-        tau_stop = tau(timetable, "stop", train, station)
-
-        return earliest_dep_time(S, timetable, train, s) + tau_pass  + tau_stop
-
-
-
 def tau(timetable, x = None, train = None, first_station = None, second_station = None):
 
      if x == "pass" or x == "blocks" or x == "stop":
@@ -77,6 +62,20 @@ def penalty_weights(timetable, train, station):
         return timetable["penalty_weights"][str(train)+"_"+str(station)]
     except:
         return 0.
+
+
+def earliest_dep_time(S, timetable, train, station):
+
+    try:
+        return initial_conditions(timetable, train, station)
+    except:
+        s = previous_station(S, train, station)
+        tau_pass = tau(timetable, "pass", train, s, station)
+
+        tau_stop = tau(timetable, "stop", train, station)
+
+        return earliest_dep_time(S, timetable, train, s) + tau_pass  + tau_stop
+
 
 
 

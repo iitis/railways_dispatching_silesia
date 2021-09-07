@@ -23,6 +23,12 @@ def energy(v, Q):
     return V*X*V.transpose()
 
 
+def helpers_tests():
+    v = [-1,1,1]
+    Q = [[1. for _ in range(3)] for _ in range(3)]
+    assert energy(v, Q) == 4.
+
+
 
 def test_pspan_pstay_p1track():
 
@@ -436,7 +442,7 @@ def test_performing_Qmat():
     assert np.array_equal(Q_r, np.load("files/Qfile_r.npz")["Q"])
 
 
-
+helpers_tests()
 test_penalties_and_couplings()
 test_pspan_pstay_p1track()
 test_qubic()
