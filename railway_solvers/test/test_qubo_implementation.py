@@ -311,6 +311,41 @@ def simple_test_two_trains_going_one_way():
     assert energy(sol, Q) == -8+0.4
 
 
+def simple_test_track_occupation():
+
+    taus = {"pass" : {"0_0_1" : 4, "1_0_1" : 4}, "blocks" : {"0_0_1" : 2, "1_0_1" : 2}, "stop": {"0_1_None" : 1, "1_1_None" : 1}, "res": 2}
+    timetable = {"tau": taus,
+                  "initial_conditions" : {"0_0" : 1, "1_0" : 1},
+                  "penalty_weights" : {"0_0" : 2, "1_0" : 0.5}}
+
+    train_sets = {
+    "skip_station" : {
+        0: None,
+        1: None,
+    },
+    "Paths": {0: [0,1], 1: [0,1]},
+    "J": [0,1],
+    "Jd": [[]],
+    "Josingle": [[]],
+    "Jround": dict(),
+    "Jtrack": {1: [0,1]},
+    "Jswitch": dict()
+    }
+
+    p_sum = 2
+    p_pair = 1.
+    p_pair_qubic = 1.
+    p_qubic = 2.
+    d_max = 5
+
+    Q = make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_qubic, p_qubic)
+
+    assert np.array_equal(Q, np.load("files/Qfile_track.npz")["Q"])
+
+    sol = np.load("files/solution_track.npz")
+
+    assert energy(sol, Q) == -8+0.3
+
 
 def simple_test_two_trains_going_opposite_ways():
 
@@ -409,6 +444,7 @@ test_qubic()
 # test on Q matrix
 simple_test_two_trains_going_one_way()
 simple_test_two_trains_going_opposite_ways()
+simple_test_track_occupation()
 test_performing_Qmat()
 
 
