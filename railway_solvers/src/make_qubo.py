@@ -35,7 +35,7 @@ def Pspan(timetable, k, k1, inds, train_sets):
         s = inds[k]["s"]
         s1 = inds[k1]["s"]
 
-
+        # this is a version of the common path, think over, perhaps clear
         s_next = subsequent_station(S[j], s)
         s_nextp = subsequent_station(S[j1], s1)
 
@@ -81,7 +81,6 @@ def Pstay(timetable, k, k1, inds, train_sets):
 def P1track(timetable, k, k1, inds, train_sets):
 
     S = train_sets["Paths"]
-
 
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
