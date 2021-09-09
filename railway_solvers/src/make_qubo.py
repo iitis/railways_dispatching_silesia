@@ -36,8 +36,8 @@ def Pspan(timetable, k, k1, inds, train_sets):
         s1 = inds[k1]["s"]
 
 
-        s_next = subsequent_station(S, j, s)
-        s_nextp = subsequent_station(S, j1, s1)
+        s_next = subsequent_station(S[j], s)
+        s_nextp = subsequent_station(S[j1], s1)
 
         if (s == s1 and s_next != None and s_next == s_nextp):
 
@@ -67,11 +67,11 @@ def Pstay(timetable, k, k1, inds, train_sets):
         s = inds[k]["s"]
         s1 = inds[k1]["s"]
 
-        if s1 == subsequent_station(S, j, s):
+        if s1 == subsequent_station(S[j], s):
             if inds[k]["d"] > inds[k1]["d"]:
                 return 1.0
 
-        if s == subsequent_station(S, j, s1):
+        if s == subsequent_station(S[j], s1):
             if inds[k1]["d"] > inds[k]["d"]:
                 return 1.0
 
@@ -93,13 +93,13 @@ def P1track(timetable, k, k1, inds, train_sets):
         t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
         t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
-        if s1 == subsequent_station(S, j, s):
+        if s1 == subsequent_station(S[j], s):
 
             if - tau(timetable, 'res') - tau(timetable, 'pass', j1, s1 , s) < t1 - t < tau(timetable, 'pass', j, s , s1) + tau(timetable, 'res'):
 
                     return 1.0
 
-        if s == subsequent_station(S, j1, s1):
+        if s == subsequent_station(S[j1], s1):
 
             if - tau(timetable, 'res') - tau(timetable, 'pass', j, s , s1) < t - t1 < tau(timetable, 'pass', j1, s1 , s) + tau(timetable, 'res'):
 
@@ -131,7 +131,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
         jx = inds1[k]["j"]
         sx = inds1[k]["s"]
         sz = inds1[k1]["s"]
-        if sz == subsequent_station(S, jx, sx):
+        if sz == subsequent_station(S[jx], sx):
 
             jz = inds1[k1]["j"]
             jz1 = inds1[k1]["j1"]
@@ -172,7 +172,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
 
         sx = inds1[k1]["s"]
         sz = inds1[k]["s"]
-        if sz == subsequent_station(S, jx, sx):
+        if sz == subsequent_station(S[jx], sx):
 
             jz = inds1[k]["j"]
             jz1 = inds1[k]["j1"]
@@ -260,7 +260,7 @@ def P2qubic(k, k1, inds1, train_sets):
         if s == inds1[k1]["s"]:
             j = inds1[k]["j"]
             j1 = inds1[k1]["j"]
-            sz = subsequent_station(S, j, s)
+            sz = subsequent_station(S[j], s)
             if s in train_sets["Jtrack"].keys():
                 if occurs_as_pair(j, j1, [train_sets["Jtrack"][s]]):
                     return 0.5

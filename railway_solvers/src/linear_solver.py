@@ -12,8 +12,8 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
             # the common path without last station is used, TODO think over
             for s in common_path(S, j, jp)[0:-1]:
 
-                s_next = subsequent_station(S, j, s)
-                s_nextp = subsequent_station(S, jp, s)
+                s_next = subsequent_station(S[j], s)
+                s_nextp = subsequent_station(S[jp], s)
 
                 problem += delay_var[jp][s] + earliest_dep_time(S, timetable, jp, s) + μ*(1-y[j][jp][s]) - delay_var[j][s] - earliest_dep_time(S, timetable, j, s) \
                 >= tau(timetable, 'blocks', j, s, s_next) + max(0, tau(timetable, 'pass', j, s, s_next) - tau(timetable, 'pass', jp, s, s_next))
@@ -31,8 +31,8 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
             # the common path without last station is used, TODO think over
             for s in common_path(S, j, jp)[0:-1]:
 
-                s_previous = previous_station(S, j, s)
-                s_previousp = previous_station(S, jp, s)
+                s_previous = previous_station(S[j], s)
+                s_previousp = previous_station(S[jp], s)
 
                 if s_previousp != None:
 
@@ -54,7 +54,7 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
     for j in train_sets["J"]:
         for s in S[j]:
 
-            s_previous = previous_station(S, j, s)
+            s_previous = previous_station(S[j], s)
 
             if (s_previous != None and s != not_considered_station[j]):
                 problem += delay_var[j][s]  >= delay_var[j][s_previous]
@@ -69,8 +69,8 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
         js = train_sets["Jtrack"][s]
         for (j,jp) in itertools.combinations(js, 2):
 
-            s_previous = previous_station(S, j, s)
-            s_previousp = previous_station(S, jp, s)
+            s_previous = previous_station(S[j], s)
+            s_previousp = previous_station(S[jp], s)
 
             # the last condition is to keep an order if trains are folowwing one another
             if (s_previous == s_previousp and s_previous != None and occurs_as_pair(j, jp, train_sets["Jd"])):
@@ -116,18 +116,13 @@ def linear_varibles(train_sets, d_max):
 
     # this is the single and double line case
     for js in l1+l2:
-        train1 = []
-        train2 = []
         no_station = []
         for pair in itertools.combinations(js, 2):
-            train1.append(pair[0])
-            train2.append(pair[1])
 
             # common path without the last station TODO think over
             no_station = common_path(S, pair[0], pair[1])[0:-1]
-        if len(js) > 1:
 
-            y = pus.LpVariable.dicts("y", (train1, train2, no_station), 0, 1, cat='Integer')
+            y = pus.LpVariable.dicts("y", ([pair[0]], [pair[1]], no_station), 0, 1, cat='Integer')
 
             update_dictofdicts(order_vars, y)
 
