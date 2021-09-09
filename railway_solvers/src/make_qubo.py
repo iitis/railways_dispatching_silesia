@@ -3,7 +3,8 @@ import numpy as np
 from helpers_functions import *
 
 def indexing4qubo(train_sets, d_max):
-
+    "returns vector of dicts containing trains, stations and delays"
+    "the index of vector correspond to the index on particulat train station and delay in Q matrix"
     not_considered_station = train_sets["skip_station"]
 
     S = train_sets["Paths"]
@@ -17,6 +18,8 @@ def indexing4qubo(train_sets, d_max):
 
 
 def Psum(k, k1, inds):
+    "given the vector of dicts from indexing4qubo(train_sets, d_max) and particular indices"
+    "returns the not wieghted contribution to Q matrix from ∑_i x_i  = 1 constrain"
     if inds[k]["j"] == inds[k1]["j"] and inds[k]["s"] == inds[k1]["s"]:
         if inds[k]["d"] == inds[k1]["d"]:
             return - 1.0
@@ -25,6 +28,10 @@ def Psum(k, k1, inds):
     return 0.
 
 def Pspan(timetable, k, k1, inds, train_sets):
+    "returns not weighted contribution to Q from the minimal span condition constrain, here additionaly train paths are necessary"
+
+    " ..... j1 -> ....... j2 -> ....."
+    "              span              "
 
     S = train_sets["Paths"]
 
@@ -47,9 +54,7 @@ def Pspan(timetable, k, k1, inds, train_sets):
             ofset_A = max(0, timetable["tau"]["pass"][str(j1)+"_"+str(s)+"_"+str(s_next)] - timetable["tau"]["pass"][str(j)+"_"+str(s)+"_"+str(s_next)])
 
             A =  - tau(timetable, 'blocks', j1, s, s_next) - max(0, tau(timetable, 'pass', j1, s, s_next) - tau(timetable, 'pass', j, s, s_next))
-
             B =  tau(timetable, 'blocks', j, s, s_next) + max(0, tau(timetable, 'pass', j, s, s_next) - tau(timetable, 'pass', j1, s, s_next))
-
 
             if A < t1-t < B:
                 return 1.
@@ -58,28 +63,31 @@ def Pspan(timetable, k, k1, inds, train_sets):
 
 
 def Pstay(timetable, k, k1, inds, train_sets):
-
+    "returns not weighted contribution to Q from the minimal stay condition constrain, here additionaly train paths are necessary"
     S = train_sets["Paths"]
 
     j = inds[k]["j"]
-    j1 = inds[k1]["j"]
-    if j == j1:
+    if j == inds[k1]["j"]:
         s = inds[k]["s"]
         s1 = inds[k1]["s"]
-
         if s1 == subsequent_station(S[j], s):
             if inds[k]["d"] > inds[k1]["d"]:
                 return 1.0
-
         if s == subsequent_station(S[j], s1):
             if inds[k1]["d"] > inds[k]["d"]:
                 return 1.0
-
     return 0.
 
 
 def P1track(timetable, k, k1, inds, train_sets):
-
+    "returns not weighted contribution to Q from the single track line condition constrain, here additionaly train paths are necessary"
+    " ......                            ......  "
+    "       \                          /        "
+    " .j1 ->............................. <-j2.."
+    "switch occupancy condition from the single line is included"
+    "  ------         "
+    "         \       "
+    "---------  c ----"
     S = train_sets["Paths"]
 
     j = inds[k]["j"]
@@ -93,22 +101,23 @@ def P1track(timetable, k, k1, inds, train_sets):
         t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
         if s1 == subsequent_station(S[j], s):
-
             if - tau(timetable, 'res') - tau(timetable, 'pass', j1, s1 , s) < t1 - t < tau(timetable, 'pass', j, s , s1) + tau(timetable, 'res'):
-
                     return 1.0
 
         if s == subsequent_station(S[j1], s1):
-
             if - tau(timetable, 'res') - tau(timetable, 'pass', j, s , s1) < t - t1 < tau(timetable, 'pass', j1, s1 , s) + tau(timetable, 'res'):
-
                     return 1.0
 
     return 0.
 
+# TODO  circulation condition  and swotch occupancy condition (if not included in single line and later in track occupancy)
+
 
 
 def z_indices(train_sets, d_max):
+    "returns a vector of dicts consisten with auxiliary variable used to decompose 3'rd order terms"
+    "used to handle track occupancy condition, dicts contains two trains, a station where the condition is checked"
+    "and delays of this two trains"
     inds = []
     for s in train_sets["Jtrack"].keys():
         for (j, j1) in itertools.combinations(train_sets["Jtrack"][s], 2):
@@ -121,7 +130,7 @@ def z_indices(train_sets, d_max):
 
 
 def P1qubic(timetable, k, k1, inds1, train_sets):
-
+    "returns not weighted contribution to Q from the single track occupancy conditions constrains, auxiliary variables are included"
     S = train_sets["Paths"]
     # x with z
     if len(inds1[k].keys()) == 3 and len(inds1[k1].keys()) == 5:
@@ -202,14 +211,11 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
     return 0.
 
 
-#def h(x,y,z):
-#    return 3*z**2+ x * y - 2 *x * z - 2 * y * z
 
 
 def P2qubic(k, k1, inds1, train_sets):
-
+    "returns not weighted contribution to Q from constrains inposed on the auxilairy variables by the Rosenberg polynomial approach "
     S = train_sets["Paths"]
-
 
     # diagonal for z-ts
     if len(inds1[k].keys()) == len(inds1[k1].keys()) == 5:
@@ -267,13 +273,14 @@ def P2qubic(k, k1, inds1, train_sets):
     return 0.
 
 def penalty(timetable, k, inds, d_max):
+    "returns weighted contribution to Q from the objective penalties"
     j = inds[k]["j"]
     s = inds[k]["s"]
     w = penalty_weights(timetable, j, s)/d_max
     return inds[k]["d"] * w
 
 def get_coupling(timetable, k, k1, train_sets, inds, p_sum, p_pair):
-
+    "returns hard constrains elements of Q matrix in the case where no auxiliary variables are included"
     J = p_sum*Psum(k, k1, inds)
     J += p_pair*Pspan(timetable, k, k1, inds, train_sets)
     J += p_pair*Pstay(timetable, k, k1, inds, train_sets)
@@ -282,13 +289,13 @@ def get_coupling(timetable, k, k1, train_sets, inds, p_sum, p_pair):
 
 
 def get_z_coupling(timetable, k, k1, train_sets, inds, p_pair, p_qubic):
-
+    "returns hard constrains elements of Q matrix in the case where auxiliary variables are included"
     J = p_pair*P1qubic(timetable, k, k1, inds, train_sets)
     J += p_qubic*P2qubic(k, k1, inds, train_sets)
     return J
 
 def make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_q, p_qubic):
-
+    "returns Q matrix"
     inds, q_bits = indexing4qubo(train_sets, d_max)
     inds_z, q_bits_z = z_indices(train_sets, d_max)
 
@@ -309,6 +316,5 @@ def make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_q, p_qubic):
     for k in range(l1):
         for k1 in range(l1):
             Q[k][k1] += get_z_coupling(timetable, k, k1, train_sets, inds1, p_pair_q, p_qubic)
-
 
     return Q

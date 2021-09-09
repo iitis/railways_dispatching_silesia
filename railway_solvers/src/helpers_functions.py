@@ -45,6 +45,21 @@ def common_path(S, j, jp):
     return [s for s in S[j] if s in S[jp]]
 
 
+###################### timetable input is extected to be in the following form of dict of dicts
+#  taus are given as
+# taus = {"pass" : {"j_s_si" : τ^pass(j,s,s1), ...}, "blocks" : {"j_s_s1" : τ^pass(j,s,s1)  .... },
+# "stop": {"j_s_None" : τ^stop(j,s)}, "res": τ^res}
+# τ^res is just one for all situations, it may need to be extended
+
+#train schedule if available (train can not leave before schedule)
+# schedule = {"j_s" : t_schedule(j,s_out), ... }
+
+#timetable = {"tau": taus, "schedule" : schedule,
+#              "initial_conditions" : {"j_s" : t(j,s_out), ...},
+#              "penalty_weights" : {"j_s" : w(j,s), ...}}
+#
+#
+
 def tau(timetable, key, train = None, first_station = None, second_station = None):
      "from timetable return particular τs values, for given train and station/stations"
      if key == "pass" or key == "blocks" or key == "stop":
