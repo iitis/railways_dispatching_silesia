@@ -1,10 +1,6 @@
 import pandas as pd
 import numpy as np
 
-# TODO make a function that parse the station block with a platform and read the platform number e.g.
-# "KO", "ST", 3, "(2)" => 2
-# "CB", "ST", 2, "(1)" => 1
-# "KO", "ST", 120, "(5)" => 5
 
 # get indexes in dataframe
 def get_indexes(dfObj, value):
@@ -68,14 +64,34 @@ def get_default_dir(path_column):
         default_dir = 'default_A-B'
     else:
         default_dir = 'default_B-A'
+    print('Warning',default_dir)
     return default_dir
+
+def train_time_table(train):
+    train_dict = timetable_to_train_dict(data)
+    time_table = train_dict[train][1]
+    return time_table
+
+def get_arrdep(train):
+    time_table = train_time_table(train)
+    arrdep = time_table.loc[:,['Arr','Dep']]
+    return arrdep
+
+def get_schmes(train):
+    arrdep = get_arrdep(train)
+    a = list(arrdep.dropna(how='all').index)
+    a.append(len(arrdep)-1)
+    b_list = []
+    for i in range(len(a)-1):
+        b_list+= [list(range(a[i],a[i+1]))]
+    return b_list
 
 # check paths time
 def check_path_time(train, scheme = 'complete'):
     train_dict = timetable_to_train_dict(data)
     data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
     path_type,time_table = train_dict[train][0][0], train_dict[train][1]
-    print(path_type)
+    print('This line belongs to', path_type)
     if scheme == 'complete':
         scheme = list(range(len(time_table)-1))
     times = []
@@ -96,7 +112,6 @@ def check_path_time(train, scheme = 'complete'):
                 print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
         total_time += time_passed
-        # TODO if Shunting time * 2
         times += [[time_table['path'][i]+' to '+ time_table['path'][i+1],time_passed]]
     return total_time,times
 
@@ -110,9 +125,11 @@ if __name__ == "__main__":
 
     if True:
         train = 34319
-        total_time,times = check_path_time(train)
-        print("Total time is:",total_time)
-        print("For each path",times)
+        print('Train is', train)
+        for scheme in get_schmes(train):
+            total_time,times = check_path_time(train,scheme)
+            print("Total time is:",total_time)
+            print("For each path",times)
 
     if False:
         for train in list(train_dict.keys()):
