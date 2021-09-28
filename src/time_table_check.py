@@ -127,7 +127,8 @@ if __name__ == "__main__":
     if True:
         train = 40150
         print('The train number is', train,'\n')
-        for scheme in    get_schmes(train):
+        for scheme in get_schmes(train):
+            print('Checking time for path {} to {}'.format(train_time_table(train)['path'][scheme[0]],train_time_table(train)['path'][scheme[-1]+1]))
             total_time,times = check_path_time(train,scheme)
             print("Total time is:",total_time)
             # print("For each path",times)
