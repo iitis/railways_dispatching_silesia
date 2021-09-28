@@ -64,7 +64,6 @@ def get_default_dir(path_column):
         default_dir = 'default_A-B'
     else:
         default_dir = 'default_B-A'
-    print('Warning:',default_dir)
     return default_dir
 
 def train_time_table(train):
@@ -104,7 +103,12 @@ def check_path_time(train, scheme = 'complete'):
                 # print("The position is", position)
                 # print("The block direction is", block_dir)
         path_column  = get_path_type_colunm(path_type,block_dir)
-        if data_path_check.iloc[position][get_default_dir(path_column)] == 'N':
+        # print(path_column)
+        # print(get_default_dir(path_column))
+        # print(data_path_check.iloc[position][get_default_dir(path_column)])
+        default_dir = get_default_dir(path_column)
+        if data_path_check.iloc[position][default_dir] == 'N':
+            print('Warning: {} {} is not default'.format(data_path_check.iloc[position][0:2].tolist(),default_dir))
             if  train_dict[train][1]['Shunting'][i+1] == 'Y':
                 print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
             elif train_dict[train][1]['Shunting'][i] == 'Y':
