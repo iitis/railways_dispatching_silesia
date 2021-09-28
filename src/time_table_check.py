@@ -86,6 +86,14 @@ def get_schmes(train):
         b_list+= [list(range(a[i],a[i+1]))]
     return b_list
 
+def get_arr_dep_vals(train):
+    arrdep = get_arrdep(train)
+    short_list = arrdep.dropna(how='all')
+    arr_dep_vals = []
+    for i in range(len(short_list)):
+        arr_dep_vals+=[short_list.iloc[i].tolist()]
+    return arr_dep_vals
+
 # check paths time
 def check_path_time(train, scheme = 'complete'):
     train_dict = timetable_to_train_dict(data)
@@ -141,9 +149,11 @@ if __name__ == "__main__":
         print('This train is not listed, using train number {} instead'.format(train))
 
     schemes = get_schmes(train)
-    for scheme in schemes:
-        print('Checking time for path {} to {}'.format(train_time_table(train)['path'][scheme[0]],train_time_table(train)['path'][scheme[-1]+1]))
-        total_time,times = check_path_time(train,scheme)
+    arr_dep_vals = get_arr_dep_vals(train)
+    for i in range(len(schemes)):
+        print('Checking time for path {} to {}'.format(train_time_table(train)['path'][schemes[i][0]],train_time_table(train)['path'][schemes[i][-1]+1]))
+        print('Arrival and departure times:',arr_dep_vals[i])
+        total_time,times = check_path_time(train,schemes[i])
         print("Total time is:",total_time,'\n')
 
         # for train in list(train_dict.keys()):
