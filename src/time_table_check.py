@@ -140,7 +140,7 @@ if __name__ == "__main__":
     for scheme in schemes:
         print('Checking time for path {} to {}'.format(train_time_table(train)['path'][scheme[0]],train_time_table(train)['path'][scheme[-1]+1]))
         total_time,times = check_path_time(train,scheme)
-        print("Total time is:",total_time)
+        print("Total time is:",total_time,'\n')
 
         # for train in list(train_dict.keys()):
         #     total_time,times = check_path_time(train)
