@@ -64,7 +64,7 @@ def get_default_dir(path_column):
         default_dir = 'default_A-B'
     else:
         default_dir = 'default_B-A'
-    print('Warning',default_dir)
+    print('Warning:',default_dir)
     return default_dir
 
 def train_time_table(train):
@@ -80,7 +80,8 @@ def get_arrdep(train):
 def get_schmes(train):
     arrdep = get_arrdep(train)
     a = list(arrdep.dropna(how='all').index)
-    a.append(len(arrdep)-1)
+    if a[-1] != len(arrdep)-1:
+        a.append(len(arrdep)-1)
     b_list = []
     for i in range(len(a)-1):
         b_list+= [list(range(a[i],a[i+1]))]
@@ -124,12 +125,12 @@ if __name__ == "__main__":
     print()
 
     if True:
-        train = 34319
-        print('Train is', train)
-        for scheme in get_schmes(train):
+        train = 40150
+        print('The train number is', train,'\n')
+        for scheme in    get_schmes(train):
             total_time,times = check_path_time(train,scheme)
             print("Total time is:",total_time)
-            print("For each path",times)
+            # print("For each path",times)
 
     if False:
         for train in list(train_dict.keys()):
