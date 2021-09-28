@@ -117,24 +117,32 @@ def check_path_time(train, scheme = 'complete'):
     return total_time,times
 
 if __name__ == "__main__":
+    import sys
+    import random
+
 
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     train_dict = timetable_to_train_dict(data)
+    trains_list = list(train_dict.keys())
 
-    print("The trains are:", *list(train_dict.keys()))
+    print("The available trains are:", *trains_list)
     print()
 
-    if True:
-        train = 40150
-        print('The train number is', train,'\n')
-        for scheme in get_schmes(train):
-            print('Checking time for path {} to {}'.format(train_time_table(train)['path'][scheme[0]],train_time_table(train)['path'][scheme[-1]+1]))
-            total_time,times = check_path_time(train,scheme)
-            print("Total time is:",total_time)
-            # print("For each path",times)
+    train = int(sys.argv[1])
 
-    if False:
-        for train in list(train_dict.keys()):
-            total_time,times = check_path_time(train)
-            print("Total time is:",total_time)
-            print("For each path",times)
+    if train in trains_list:
+        print('The train number is', train,'\n')
+    else:
+        train = random.choice(trains_list)
+        print('This train is not listed, using train number {} instead'.format(train))
+
+    schemes = get_schmes(train)
+    for scheme in schemes:
+        print('Checking time for path {} to {}'.format(train_time_table(train)['path'][scheme[0]],train_time_table(train)['path'][scheme[-1]+1]))
+        total_time,times = check_path_time(train,scheme)
+        print("Total time is:",total_time)
+
+        # for train in list(train_dict.keys()):
+        #     total_time,times = check_path_time(train)
+        #     print("Total time is:",total_time)
+        #     print("For each path",times)
