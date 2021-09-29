@@ -159,7 +159,8 @@ if __name__ == "__main__":
         print('Arrival and departure times:',arr_dep_vals[i])
         total_time,times = check_path_time(train,schemes[i])
         print("Total time is:",total_time,'\n')
-
+    if len(arr_dep_vals) - len(schemes) == 1:
+        print('The last station {}: {}'.format(train_time_table(train)['path'][schemes[-1][-1]],arr_dep_vals[-1]))
         # for train in list(train_dict.keys()):
         #     total_time,times = check_path_time(train)
         #     print("Total time is:",total_time)
