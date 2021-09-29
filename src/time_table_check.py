@@ -93,14 +93,9 @@ def get_schmes(train,return_index = False):
 def get_arr_dep_vals(train):
     arrdep = get_arrdep(train)
     short_list = arrdep.dropna(how='all')
-    a = list(short_list.index)
-    if a[0] != 0:
-        a.insert(0,0)
-    if a[-1] != len(arrdep)-1:
-        a.append(len(arrdep)-1)
     arr_dep_vals = []
-    for i in range(len(a)-1):
-        arr_dep_vals+=[[arrdep.loc[a[i]]['Arr'],arrdep.loc[a[i+1]]['Dep']]]
+    for i in range(len(short_list)):
+        arr_dep_vals+=[short_list.iloc[i].tolist()]
     return arr_dep_vals
 
 # check paths time
