@@ -78,7 +78,8 @@ def get_arrdep(train):
 
 def get_schmes(train,return_index = False):
     arrdep = get_arrdep(train)
-    a = list(arrdep.dropna(how='all').index)
+    indexs = list(arrdep.dropna(how='all').index)
+    a = indexs.copy()
     if a[0] != 0:
         a.insert(0,0)
     if a[-1] != len(arrdep)-1:
@@ -87,7 +88,7 @@ def get_schmes(train,return_index = False):
     for i in range(len(a)-1):
         b_list+= [list(range(a[i],a[i+1]))]
     if return_index == True:
-        return b_list, a
+        return b_list, indexs
     return b_list
 
 def get_arr_dep_vals(train):
@@ -132,6 +133,7 @@ def check_path_time(train, scheme = 'complete'):
         times += [[time_table['path'][i], time_table['path'][i+1],time_passed]]
     return total_time,times
 
+
 if __name__ == "__main__":
     import sys
     import random
@@ -153,14 +155,25 @@ if __name__ == "__main__":
         train = random.choice(trains_list)
         print('This train is not listed, using train number {} instead'.format(train))
 
-    schemes = get_schmes(train)
+    schemes,station_ind = get_schmes(train,return_index = True)
     arr_dep_vals = get_arr_dep_vals(train)
     for i in range(len(schemes)):
         print('Checking time for path {} to {}'.format(train_time_table(train)['path'][schemes[i][0]],train_time_table(train)['path'][schemes[i][-1]+1]))
-        print('Arrival and departure times:',arr_dep_vals[i])
+        station_time = 'N/A'
+        arr_dep_time = 'N/A'
+        check_start = 0
         total_time,times = check_path_time(train,schemes[i])
-        blocks_time = sum([times[n][-1] for n in range(1,len(times))])
-        print('Station stay time:{},'.format(times[0][-1]),'blocks passing time: {}'.format(blocks_time),"Total time is:",total_time,'\n')
+        if len(list(set(schemes[i]).intersection(station_ind))) !=0:
+            station_time = times[0][-1]
+            value = list((set(schemes[1]).intersection(station_ind)))[0]
+            arr_dep_time = get_arrdep(train).loc[value].tolist()
+            check_start=+1
+        print('Arrival and departure times:',arr_dep_time)
+
+        blocks_time = sum([times[n][-1] for n in range(check_start,len(times))])
+
+
+        print('Station stay time:{},'.format(station_time),'blocks passing time: {}'.format(blocks_time),"Total time is:",total_time,'\n')
         # print('For each block {}'.format(times),'\n')
     if len(arr_dep_vals) - len(schemes) == 1:
         print('The last station {}: {}'.format(train_time_table(train)['path'][schemes[-1][-1]],arr_dep_vals[-1]))
