@@ -129,7 +129,7 @@ def check_path_time(train, scheme = 'complete'):
                 print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
         total_time += time_passed
-        times += [[time_table['path'][i]+' to '+ time_table['path'][i+1],time_passed]]
+        times += [[time_table['path'][i], time_table['path'][i+1],time_passed]]
     return total_time,times
 
 if __name__ == "__main__":
@@ -158,7 +158,9 @@ if __name__ == "__main__":
         print('Checking time for path {} to {}'.format(train_time_table(train)['path'][schemes[i][0]],train_time_table(train)['path'][schemes[i][-1]+1]))
         print('Arrival and departure times:',arr_dep_vals[i])
         total_time,times = check_path_time(train,schemes[i])
-        print("Total time is:",total_time,'\n')
+        blocks_time = sum([times[n][-1] for n in range(1,len(times))])
+        print('Station stay time:{},'.format(times[0][-1]),'blocks passing time: {}'.format(blocks_time),"Total time is:",total_time)
+        print('For each station {}'.format(times),'\n')
     if len(arr_dep_vals) - len(schemes) == 1:
         print('The last station {}: {}'.format(train_time_table(train)['path'][schemes[-1][-1]],arr_dep_vals[-1]))
 
