@@ -160,7 +160,7 @@ if __name__ == "__main__":
         total_time,times = check_path_time(train,schemes[i])
         blocks_time = sum([times[n][-1] for n in range(1,len(times))])
         print('Station stay time:{},'.format(times[0][-1]),'blocks passing time: {}'.format(blocks_time),"Total time is:",total_time)
-        print('For each station {}'.format(times),'\n')
+        print('For each block {}'.format(times),'\n')
     if len(arr_dep_vals) - len(schemes) == 1:
         print('The last station {}: {}'.format(train_time_table(train)['path'][schemes[-1][-1]],arr_dep_vals[-1]))
 
