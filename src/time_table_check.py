@@ -143,9 +143,9 @@ if __name__ == "__main__":
     train_dict = timetable_to_train_dict(data)
     trains_list = list(train_dict.keys())
 
-    if len(sys.argv) < 1:
+    if len(sys.argv) < 2:
         print("The available trains are:", *trains_list)
-        exit()
+        exit(0)
 
     train = int(sys.argv[1])
 
@@ -165,7 +165,7 @@ if __name__ == "__main__":
         total_time,times = check_path_time(train,schemes[i])
         if len(list(set(schemes[i]).intersection(station_ind))) !=0:
             station_time = times[0][-1]
-            value = list((set(schemes[1]).intersection(station_ind)))[0]
+            value = list((set(schemes[i]).intersection(station_ind)))[0]
             arr_dep_time = get_arrdep(train).loc[value].tolist()
             check_start=+1
         print('Arrival and departure times:',arr_dep_time)
