@@ -154,8 +154,10 @@ if __name__ == "__main__":
     if train in trains_list:
         print('The train number is', train,'\n')
     else:
-        train = random.choice(trains_list)
-        print('This train is not listed, using train number {} instead'.format(train))
+        # train = random.choice(trains_list)
+        print('\nThis train is not listed.\n')
+        print('The available trains are:', *trains_list)
+        exit()
 
     schemes,station_ind = get_schmes(train,return_index = True)
     arr_dep_vals = get_arr_dep_vals(train)
