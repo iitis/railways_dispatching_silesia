@@ -100,7 +100,7 @@ def get_arr_dep_vals(train):
     return arr_dep_vals
 
 # check paths time
-def check_path_time(train, scheme = 'complete'):
+def check_path_time(train, scheme = 'complete', show_warning = True):
     train_dict = timetable_to_train_dict(data)
     data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
     path_type,time_table = train_dict[train][0][0], train_dict[train][1]
@@ -120,14 +120,16 @@ def check_path_time(train, scheme = 'complete'):
         # print(get_default_dir(path_column))
         # print(data_path_check.iloc[position][get_default_dir(path_column)])
         default_dir = get_default_dir(path_column)
-        if data_path_check.iloc[position][default_dir] == 'N':
-            print('Warning: {} {} is not default'.format(data_path_check.iloc[position][0:2].tolist(),default_dir))
-            if  train_dict[train][1]['Shunting'][i+1] == 'Y':
-                print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
-            elif train_dict[train][1]['Shunting'][i] == 'Y':
+        if show_warning == True:
+            if data_path_check.iloc[position][default_dir] == 'N' and time_table['Shunting'][i+1] == 'N':
+                print('Warning: {} {} is not default'.format(data_path_check.iloc[position][0:2].tolist(),default_dir))
+            if  time_table['Shunting'][i] == 'Y':
                     print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
-            else:
-                print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
+                # elif time_table['Shunting'][i] == 'Y':
+            elif time_table['Shunting'][i+1] == 'Y':
+                print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
+                # else:
+                #     print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
         total_time += time_passed
         times += [[time_table['path'][i], time_table['path'][i+1],time_passed]]
@@ -178,7 +180,7 @@ if __name__ == "__main__":
     if len(arr_dep_vals) - len(schemes) == 1:
         print('The last station {}: {}'.format(train_time_table(train)['path'][schemes[-1][-1]],arr_dep_vals[-1]))
 
-    total_time_path,_ = check_path_time(train)
+    total_time_path,_ = check_path_time(train,show_warning = False)
     print("The total time for whole path is {}".format(total_time_path))
         # for train in list(train_dict.keys()):
         #     total_time,times = check_path_time(train)
