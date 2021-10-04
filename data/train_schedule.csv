@@ -1,4 +1,4 @@
-;speed;Arr;Dep;Approx_enter;Label;Shunting;Turnaround_time
+;speed;Arr;Dep;Approx_enter;Label;Shunting;Turnaround_time_minutes
 ####;;;;;;;
 KS - Os;;;;;;;
 94766;;;;;;;
@@ -61,7 +61,7 @@ SZTYGAR;;;;;;;
 departs from Katowice;;;;;;;
 """KO(IC)"", ""B-M"", 500, ""(N/A)""";R;;;15:50;;Y;
 """KO"", ""ST"", 114, ""(N/A)""";R;;;;;Y;
-"""KO"", ""ST"", 2, ""(3)""";IC;;16:08;;Katowice;;00:05:00
+"""KO"", ""ST"", 2, ""(3)""";IC;;16:08;;Katowice;;5
 """KO"", ""ST"", 114, ""(N/A)""";IC;;;;;;
 """KO-KZ"", ""SBL+Sem(ST)"", 2, ""1"", ""(1)""";IC;;;;;;
 """KZ"", ""ST"", 2, ""(1)""";IC;;;16:12;;;
@@ -130,9 +130,9 @@ from Kraków Główny;;;;;;;
 """KZ"", ""ST"", 3, ""(2)""";R;16:10;16:10;;Katowice Zawodzie;;
 """KZ-KO"", ""SBL+Sem(ST)"", 3, ""1"", ""(1)""";R;;;;;;
 """KO"", ""ST"", 114, ""(N/A)""";R;;;;;;
-"""KO"", ""ST"", 10, ""(4)""";R;16:14;;;Katowice;;
-"""KO"", ""ST-M"", 1118, ""(N/A)""";R;;;16:17;;Y;
-"terminates in Katowice; turn around";;;;;;;00:05:00
+"""KO"", ""ST"", 10, ""(4)""";R;16:14;;;Katowice;;5
+"""KO"", ""ST-M"", 1118, ""(N/A)""";R;;;16:22;;Y;
+"terminates in Katowice; turn around";;;;;;;
 ####;;;;;;;
 IC - IC;;;;;;;
 14006;;;;;;;
@@ -166,7 +166,7 @@ KS - OsP;;;;;;;
 S6;;;;;;;
 departs from Katowice;;;;;;;
 """Rac(KS)"", ""B-M"", 200, ""(N/A)""";R;;;15:55;;Y;
-"""KO"", ""ST"", 1, ""(2)""";R;;16:12;;Katowice;;00:05:00
+"""KO"", ""ST"", 1, ""(2)""";R;;16:12;;Katowice;;5
 """KO-Bugla-Bry-1"", ""Sem(ST)+SBL"", 1, ""1"", ""(2)""";R;;;;;;
 """KO-Bugla-Bry-2"", ""SBL+Sem(PODG)"", 1, ""2"", ""(2)""";R;;;;;;
 """Bry-KL-1"", ""SBL+POGP"", 1, ""1"", ""(2)""";IC;;;;;;
@@ -244,8 +244,8 @@ KS - OsP;;;;;;;
 94113;;;;;;;
 S5 SPRINTER;;;;;;;
 departs from Katowice;;;;;;;
-"""Rac(KS)"", ""B-M"", 200, ""(N/A)""";R;;;16:07;;Y;00:05:00
-"""KO"", ""ST"", 1, ""(2)""";R;;16:24;;Katowice;;
+"""Rac(KS)"", ""B-M"", 200, ""(N/A)""";R;;;16:07;;Y;
+"""KO"", ""ST"", 1, ""(2)""";R;;16:24;;Katowice;;5
 """KO-Bugla-Bry-1"", ""Sem(ST)+SBL"", 1, ""1"", ""(2)""";R;;;;;;
 """KO-Bugla-Bry-2"", ""SBL+Sem(PODG)"", 1, ""2"", ""(2)""";R;;;;;;
 """Bry-KL-1"", ""SBL+POGP"", 1, ""1"", ""(2)""";IC;;;;;;
@@ -303,7 +303,7 @@ from Gdynia Główna via Koluszki;;;;16:24;;;
 """KZ"", ""ST"", 1, ""(1)""";IC;;;;;;
 """KZ-KO"", ""SBL+Sem(ST)"", 1, ""1"", ""(1)""";IC;;;;;;
 """KO"", ""ST"", 117, ""(N/A)""";IC;;;;;;
-"""KO"", ""ST"", 9, ""(1)""";IC;16:28;;;Katowice;;00:05:00
+"""KO"", ""ST"", 9, ""(1)""";IC;16:28;;;Katowice;;5
 """KO"", ""ST"", 113, ""(N/A)""";R;;;;;Y;
 """KO(IC)"", ""B-M"", 500, ""(N/A)""";R;;;16:43;;Y;
 terminates in Katowice;;;;;;;
