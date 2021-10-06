@@ -110,11 +110,16 @@ def check_path_time(train, scheme = 'complete', show_warning = True):
     times = []
     total_time = 0
     for i in scheme:
-        for x in get_indexes(data_path_check,time_table['path'][i]):
+        positions_in_table_check = get_indexes(data_path_check,time_table['path'][i])
+        assert len(positions_in_table_check) > 0 ,"{} not found".format(time_table['path'][i])
+        for x in positions_in_table_check:
             if x[0] in [y[0] for y in get_indexes(data_path_check,time_table['path'][i+1])]:
                 position,block_dir = x
                 # print("The position is", position)
                 # print("The block direction is", block_dir)
+            # else:
+            #     print('the entry does not exist!')
+            #     exit()
         path_column  = get_path_type_colunm(path_type,block_dir)
         # print(path_column)
         # print(get_default_dir(path_column))
