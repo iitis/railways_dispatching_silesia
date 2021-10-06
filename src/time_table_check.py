@@ -166,6 +166,7 @@ if __name__ == "__main__":
 
     schemes,station_ind = get_schmes(train,return_index = True)
     arr_dep_vals = get_arr_dep_vals(train)
+    cumulative_time = 0
     for i in range(len(schemes)):
         print('Checking time for path {} to {}'.format(train_time_table(train)['path'][schemes[i][0]],train_time_table(train)['path'][schemes[i][-1]+1]))
         station_time = 'N/A'
@@ -180,15 +181,15 @@ if __name__ == "__main__":
         print('Arrival and departure times:',arr_dep_time)
 
         blocks_time = sum([times[n][-1] for n in range(check_start,len(times))])
+        cumulative_time+=total_time
 
-
-        print('Station stay time:{},'.format(station_time),'blocks passing time: {}'.format(blocks_time),"Total time is:",total_time,'\n')
+        print('Station stay time:{},'.format(station_time),'blocks passing time: {}'.format(np.round(blocks_time,1)),"Total time is:",np.round(total_time,1),'cumulative time is:',np.round(cumulative_time,1),'\n')
         # print('For each block {}'.format(times),'\n')
     if len(arr_dep_vals) - len(schemes) == 1:
         print('The last station {}: {}'.format(train_time_table(train)['path'][schemes[-1][-1]],arr_dep_vals[-1]))
 
     total_time_path,_ = check_path_time(train,show_warning = False)
-    print("The total time for whole path is {}".format(total_time_path))
+    print("The total time for whole path is {}".format(np.round(total_time_path,1)))
         # for train in list(train_dict.keys()):
         #     total_time,times = check_path_time(train)
         #     print("Total time is:",total_time)
