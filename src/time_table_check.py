@@ -138,6 +138,8 @@ def check_path_time(train, scheme = 'complete', show_warning = True):
                 # else:
                 #     print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
+        if np.isnan(time_table.iloc[i]['Turnaround_time_minutes']) == False:
+            time_passed+= time_table.iloc[i]['Turnaround_time_minutes']
         total_time += time_passed
         times += [[time_table['path'][i], time_table['path'][i+1],time_passed]]
     return total_time,times
