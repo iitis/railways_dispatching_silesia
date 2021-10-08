@@ -126,11 +126,11 @@ def check_path_time(train, scheme = 'complete', show_warning = True):
         if show_warning == True:
             if data_path_check.iloc[position][default_dir] == 'N' and time_table['Shunting'][i+1] == 'N':
                 print('Warning: {} {} is not default'.format(data_path_check.iloc[position][0:2].tolist(),default_dir))
-            if  time_table['Shunting'][i] == 'Y':
+            if  time_table['Shunting'][i] == 'Y' and data_path_check.iloc[position][default_dir] == 'N':
                     print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
                 # elif time_table['Shunting'][i] == 'Y':
-            # elif time_table['Shunting'][i+1] == 'Y':
-            #     print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
+            elif time_table['Shunting'][i+1] == 'Y' and data_path_check.iloc[position][default_dir] == 'N':
+                print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
                 # else:
                 #     print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
