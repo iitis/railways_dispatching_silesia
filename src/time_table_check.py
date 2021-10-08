@@ -73,17 +73,13 @@ def train_time_table(train):
 
 def get_arrdep(train):
     time_table = train_time_table(train)
-    arrdep = time_table.loc[:,['Arr','Dep']]
+    arrdep = time_table.loc[:,['Arr','Dep','Approx_enter']]
     return arrdep
 
 def get_schmes(train,return_index = False):
     arrdep = get_arrdep(train)
     indexs = list(arrdep.dropna(how='all').index)
     a = indexs.copy()
-    if a[0] != 0:
-        a.insert(0,0)
-    if a[-1] != len(arrdep)-1:
-        a.append(len(arrdep)-1)
     b_list = []
     for i in range(len(a)-1):
         b_list+= [list(range(a[i],a[i+1]))]
@@ -144,11 +140,9 @@ def check_path_time(train, scheme = 'complete', show_warning = True):
         times += [[time_table['path'][i], time_table['path'][i+1],time_passed]]
     return total_time,times
 
-
 if __name__ == "__main__":
     import sys
     import random
-
 
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     train_dict = timetable_to_train_dict(data)
@@ -180,9 +174,12 @@ if __name__ == "__main__":
         if len(list(set(schemes[i]).intersection(station_ind))) !=0:
             station_time = times[0][-1]
             value = list((set(schemes[i]).intersection(station_ind)))[0]
-            arr_dep_time = get_arrdep(train).loc[value].tolist()
+            arr_dep_time = get_arrdep(train).loc[value].dropna().tolist()
             check_start=+1
-        print('Arrival and departure times:',arr_dep_time)
+            if pd.isnull(get_arrdep(train).loc[value]['Approx_enter'])== False:
+                print('Approximate enter',get_arrdep(train).loc[value]['Approx_enter'])
+            else:
+                print('Arrival and departure times:',arr_dep_time)
 
         blocks_time = sum([times[n][-1] for n in range(check_start,len(times))])
         cumulative_time+=total_time
@@ -192,7 +189,7 @@ if __name__ == "__main__":
     if len(arr_dep_vals) - len(schemes) == 1:
         print('The last station {}: {}'.format(train_time_table(train)['path'][schemes[-1][-1]],arr_dep_vals[-1]))
 
-    total_time_path,_ = check_path_time(train,show_warning = False)
+    total_time_path,_ = check_path_time(train,scheme=range(schemes[0][0],schemes[-1][-1]+1),show_warning = False)
     print("The total time for whole path is {}".format(np.round(total_time_path,1)))
         # for train in list(train_dict.keys()):
         #     total_time,times = check_path_time(train)
