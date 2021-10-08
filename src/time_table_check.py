@@ -43,12 +43,12 @@ def timetable_to_train_dict(data):
 
 # check path directions and type: A to B or B to A, regional or intercity
 def get_path_type_colunm(path_type,block_dir):
-    if path_type in ['KS - Os','KS - OsP','PR - R']:
+    if path_type in ['R']:
         if block_dir == 'previous_block':
             path_column  = 'time_regional_train_A-B'
         else:
             path_column  = 'time_regional_train_B-A'
-    elif path_type in ['IC - IC','IC - TLK','IC - EIP']:
+    elif path_type in ['IC']:
         if block_dir == 'previous_block':
             path_column = 'time_inter_city_A-B'
         else:
@@ -103,13 +103,15 @@ def get_arr_dep_vals(train):
 def check_path_time(train, scheme = 'complete', show_warning = True):
     train_dict = timetable_to_train_dict(data)
     data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-    path_type,time_table = train_dict[train][0][0], train_dict[train][1]
-    print('This line belongs to', path_type)
+    time_table = train_dict[train][1]
+
+    print('This line belongs to', train_dict[train][0][0])
     if scheme == 'complete':
         scheme = list(range(len(time_table)-1))
     times = []
     total_time = 0
     for i in scheme:
+        path_type = time_table.iloc[i]['speed']
         positions_in_table_check = get_indexes(data_path_check,time_table['path'][i])
         assert len(positions_in_table_check) > 0 ,"{} not found".format(time_table['path'][i])
         for x in positions_in_table_check:
