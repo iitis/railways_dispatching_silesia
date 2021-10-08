@@ -129,8 +129,8 @@ def check_path_time(train, scheme = 'complete', show_warning = True):
             if  time_table['Shunting'][i] == 'Y':
                     print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
                 # elif time_table['Shunting'][i] == 'Y':
-            elif time_table['Shunting'][i+1] == 'Y':
-                print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
+            # elif time_table['Shunting'][i+1] == 'Y':
+            #     print("Non default shunting ",time_table['path'][i],"to",time_table['path'][i+1], "for train No.", train, "name",  train_dict[train][0][1])
                 # else:
                 #     print("Warning: the route",time_table['path'][i],"to",time_table['path'][i+1],"is not default!", "for train No.", train, "name",  train_dict[train][0][1])
         time_passed = float(data_path_check.iloc[position][path_column])
