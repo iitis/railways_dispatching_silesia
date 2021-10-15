@@ -23,7 +23,7 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
                 RHS = tau(timetable, 'blocks', j, s, s_next)
                 RHS += max(0, tau(timetable, 'pass', j, s, s_next) -
                            tau(timetable, 'pass', jp, s, s_next))
-                problem += LHS >= RHS
+                problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{jp}_{j}_{s}"
 
                 LHS = delay_var[j][s]
                 LHS += earliest_dep_time(S, timetable, j, s)
@@ -33,7 +33,7 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
                 RHS = tau(timetable, 'blocks', jp, s, s_next)
                 RHS += max(0, tau(timetable, 'pass', jp, s, s_next) -
                            tau(timetable, 'pass', j, s, s_next))
-                problem += LHS >= RHS
+                problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{j}_{jp}_{s}"
 
 
 def single_line(problem, timetable, delay_var, y, train_sets, μ):
@@ -53,7 +53,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
                     RHS += earliest_dep_time(S, timetable, jp, s_previousp)
                     RHS += tau(timetable, 'pass', jp, s_previousp, s)
                     RHS += tau(timetable, 'res', jp, j, s)
-                    problem += LHS >= RHS
+                    problem += LHS >= RHS, f"single_line_{js[0]}_{js[1]}_{j}_{jp}_{s}"
 
                     LHS = delay_var[jp][s_previousp]
                     LHS += earliest_dep_time(S, timetable, jp, s_previousp)
@@ -62,8 +62,9 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
                     RHS += earliest_dep_time(S, timetable, j, s)
                     RHS += tau(timetable, 'pass', j, s, s_previousp)
                     RHS += tau(timetable, 'res', j, jp, s)
-                    problem += LHS >= RHS
+                    problem += LHS >= RHS, f"single_line_{js[0]}_{js[1]}_{jp}_{j}_{s}"
 
+    print(problem)
 
 def minimal_stay(problem, timetable, delay_var, train_sets):
     "adds minimum stay condition to the pulp problem"
@@ -75,7 +76,7 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
         for s in S[j]:
             s_previous = previous_station(S[j], s)
             if (s_previous != None and s != not_considered_station[j]):
-                problem += delay_var[j][s] >= delay_var[j][s_previous]
+                problem += delay_var[j][s] >= delay_var[j][s_previous], f"minimal_stay_{j}_{s}"
 
 
 def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
@@ -91,7 +92,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
             # the last condition is to keep an order if trains are folowwing one another
             if s_previous == s_previousp and s_previous != None:
                 if occurs_as_pair(j, jp, train_sets["Jd"]):
-                    problem += y[j][jp][s] == y[j][jp][s_previous]
+                    problem += y[j][jp][s] == y[j][jp][s_previous], f"track_occupation_{s}_{s_previous}"
 
             if s_previousp != None:
                 LHS = delay_var[jp][s_previousp]
@@ -101,7 +102,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
                 RHS = delay_var[j][s]
                 RHS += earliest_dep_time(S, timetable, j, s)
                 RHS += tau(timetable, "res")
-                problem += LHS >= RHS
+                problem += LHS >= RHS, f"track_occupation_{s}_{s_previousp}_{s_previous}_p"
 
             if s_previous != None:
                 LHS = delay_var[j][s_previous]
@@ -111,7 +112,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
                 RHS = delay_var[jp][s]
                 RHS += earliest_dep_time(S, timetable, jp, s)
                 RHS += tau(timetable, "res")
-                problem += LHS >= RHS
+                problem += LHS >= RHS, f"track_occupation_{s}_{s_previous}_{s_previousp}"
 
 
 def objective(problem, timetable, delay_var, train_sets, d_max):
