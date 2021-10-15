@@ -100,15 +100,15 @@ def test_bad_leq():
     vars = dict()
     for i in range(n):
         vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
+    print(vars)
 
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) <= 1
-    pulp_problem += sum((i+1)*vars[i] for i in range(n))
     dwave_pulp_problem = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
-    pulp_problem += sum(vars.values()) <= 2
+    cqm.add_constraint(sum(var_dwave) <= 2, label="_C1")
 
     bqm1 = cqm_to_bqm(dwave_pulp_problem, lagrange_multiplier=1)[0]
     bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]

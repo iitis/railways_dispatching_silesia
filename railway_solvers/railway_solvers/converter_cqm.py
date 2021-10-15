@@ -5,8 +5,8 @@ from pulp import LpProblem
 
 def _is_binary(var):
     result = var.cat == pulp.LpInteger
-    result &= var.lowBound == 0
-    return result & var.upBound == 1
+    result = result and var.lowBound == 0
+    return result and var.upBound == 1
 
 
 def convert_to_cqm(model: LpProblem):
@@ -39,9 +39,12 @@ def convert_to_cqm(model: LpProblem):
 
     # objective
     if model.objective:
+        assert model.sense == pulp.LpMinimize, "Converter works only for minimization problems"
+
         obj = model.objective
         dimod_obj = 0
         dimod_obj += obj.constant
         dimod_obj += sum(val*vars_trans[var] for var, val in obj.items())
         cqm.set_objective(dimod_obj)
+
     return cqm

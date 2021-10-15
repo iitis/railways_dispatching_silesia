@@ -221,7 +221,7 @@ def test_linear_solver_default_problem():
 
     assert prob.objective.value() == 0.4
 
-@pytest.mark.skip(reason="Note satisfied one, wait for Ozlem to finish")
+# @pytest.mark.skip(reason="Note satisfied one, wait for Ozlem to finish")
 def test_constraint_labels():
     taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {
         "0_0_1": 2, "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}

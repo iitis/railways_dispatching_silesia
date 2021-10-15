@@ -185,7 +185,7 @@ def solve_linear_problem(train_sets, timetable, d_max, μ):
 # auxiliary functions for visualisation
 
 def return_delay_and_acctual_time(S, timetable, prob, j, s):
-    "given the solution of the optimisation problem returns secondary delay and acctual time of leaving given station"
+    "given the solution of the optimisation problem returns secondary delay and actual time of leaving given station"
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
             delay = v.varValue
@@ -195,7 +195,7 @@ def return_delay_and_acctual_time(S, timetable, prob, j, s):
 
 
 def impact_to_objective(prob, timetable, j, s, d_max):
-    "teturn the inpact to the objective of the particular secondary delay of particular train at particular station"
+    "return the impact to the objective of the particular secondary delay of particular train at particular station"
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
             return penalty_weights(timetable, j, s)/d_max*v.varValue
