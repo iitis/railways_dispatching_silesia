@@ -29,7 +29,7 @@ feasible_ens = []
 ground = -7.4
 title = "annealing t = 250 μs, 3996 runs, default"
 
-plotD_Wave("DW_default.pdf", title, non_feasible_css,
+plotD_Wave("plots/DW_default.pdf", title, non_feasible_css,
            non_feasible_ens, feasible_css, feasible_ens, ground)
 
 
@@ -43,5 +43,5 @@ ground = -10.1
 
 title = "annealing t = 250 μs, 3996 runs, rerouting"
 
-plotD_Wave("DW_rerouting.pdf", title, non_feasible_css,
+plotD_Wave("plots/DW_rerouting.pdf", title, non_feasible_css,
            non_feasible_ens, feasible_css, feasible_ens, ground)
