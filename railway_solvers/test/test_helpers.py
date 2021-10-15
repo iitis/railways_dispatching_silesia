@@ -1,4 +1,4 @@
-from railway_solvers import *
+from ..railway_solvers import *
 
 
 def test_pairs():
