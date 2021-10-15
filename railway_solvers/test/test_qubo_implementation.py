@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..railway_solvers import *
+from railway_solvers import *
 
 #from input_data import small_timetable
 

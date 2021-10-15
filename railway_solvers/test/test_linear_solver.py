@@ -1,6 +1,6 @@
 import pytest
 
-from ..railway_solvers import *
+from railway_solvers import *
 
 
 def test_linear_varibles_creations():
