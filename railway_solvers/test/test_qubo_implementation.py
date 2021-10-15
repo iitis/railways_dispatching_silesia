@@ -16,9 +16,9 @@ timetable = {"tau": taus,
 def energy(v, Q):
     if -1 in v:
         v = [(y+1)/2 for y in v]
-    X = np.matrix(Q)
-    V = np.matrix(v)
-    return V*X*V.transpose()
+    X = np.array(Q)
+    V = np.array(v)
+    return V @ X @ V.transpose()
 
 
 def test_helpers():
@@ -360,7 +360,7 @@ def test_two_trains_going_opposite_ways_simple():
 
     sol = np.load("test/files/solution_two_ways.npz")
 
-    assert energy(sol, Q)[0][0] == -8+0.35
+    assert energy(sol, Q) == -8+0.35
 
 
 def test_performing_Qmat():
