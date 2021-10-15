@@ -158,9 +158,8 @@ def linear_varibles(train_sets, d_max):
 
     return secondary_delays_vars, order_vars
 
-
-def solve_linear_problem(train_sets, timetable, d_max, μ):
-    "colves the linear problem returns the pulp object"
+def create_linear_problem(train_sets, timetable, d_max, μ):
+    "creates the linear problem model"
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
     secondary_delays_var, y = linear_varibles(train_sets, d_max)
@@ -174,7 +173,11 @@ def solve_linear_problem(train_sets, timetable, d_max, μ):
 
     # objective is added
     objective(prob, timetable, secondary_delays_var, train_sets, d_max)
+    return prob
 
+def solve_linear_problem(train_sets, timetable, d_max, μ):
+    "solves the linear problem returns the pulp object"
+    prob = create_linear_problem(train_sets, timetable, d_max, μ)
     prob.solve()
     return prob
 
