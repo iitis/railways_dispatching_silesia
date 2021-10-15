@@ -55,13 +55,14 @@ def Pspan(timetable, k, k1, inds, train_sets):
             t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
             t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s)
 
-            ofset_A = max(
-                0, timetable["tau"]["pass"][f"{j1}_{s}_{s_next}"] - timetable["tau"]["pass"][f"{j}_{s}_{s_next}"])
+            # ofset_A = max(0, timetable["tau"]["pass"][f"{j1}_{s}_{s_next}"] - timetable["tau"]["pass"][f"{j}_{s}_{s_next}"])
 
-            A = - tau(timetable, 'blocks', j1, s, s_next) - max(0, tau(timetable,
-                                                                       'pass', j1, s, s_next) - tau(timetable, 'pass', j, s, s_next))
-            B = tau(timetable, 'blocks', j, s, s_next) + max(0, tau(timetable,
-                                                                    'pass', j, s, s_next) - tau(timetable, 'pass', j1, s, s_next))
+            A = -tau(timetable, 'blocks', j1, s, s_next)
+            A -= max(0, tau(timetable, 'pass', j1, s, s_next) -
+                     tau(timetable, 'pass', j, s, s_next))
+            B = tau(timetable, 'blocks', j, s, s_next)
+            B += max(0, tau(timetable, 'pass', j, s, s_next) -
+                     tau(timetable, 'pass', j1, s, s_next))
 
             if A < t1-t < B:
                 return 1.
@@ -107,12 +108,14 @@ def P1track(timetable, k, k1, inds, train_sets):
         t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
         if s1 == subsequent_station(S[j], s):
-            if -tau(timetable, 'res') - tau(timetable, 'pass', j1, s1, s) < t1 - t < tau(timetable, 'pass', j, s, s1) + tau(timetable, 'res'):
-                return 1.0
+            if -tau(timetable, 'res') - tau(timetable, 'pass', j1, s1, s) < t1 - t:
+                if t1-t < tau(timetable, 'pass', j, s, s1) + tau(timetable, 'res'):
+                    return 1.0
 
         if s == subsequent_station(S[j1], s1):
-            if -tau(timetable, 'res') - tau(timetable, 'pass', j, s, s1) < t - t1 < tau(timetable, 'pass', j1, s1, s) + tau(timetable, 'res'):
-                return 1.0
+            if -tau(timetable, 'res') - tau(timetable, 'pass', j, s, s1) < t - t1:
+                if t - t1 < tau(timetable, 'pass', j1, s1, s) + tau(timetable, 'res'):
+                    return 1.0
 
     return 0.
 
