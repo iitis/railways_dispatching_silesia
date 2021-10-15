@@ -298,9 +298,9 @@ to Gliwice;;;;;;;
 IC - TLK;;;;;;;
 54101;;;;;;;
 DOKER;;;;;;;
-from Gdynia Główna via Koluszki;;;;16:24;;;
+from Gdynia Główna via Koluszki;;;;;;;
 """SG-KZ"", ""SBL"", 1, ""3"", ""(3)""";IC;;;;;;
-"""KZ"", ""ST"", 1, ""(1)""";IC;;;;;;
+"""KZ"", ""ST"", 1, ""(1)""";IC;;;16:24;;;
 """KZ-KO"", ""SBL+Sem(ST)"", 1, ""1"", ""(1)""";IC;;;;;;
 """KO"", ""ST"", 117, ""(N/A)""";IC;;;;;;
 """KO"", ""ST"", 9, ""(1)""";IC;16:28;;;Katowice;;5
