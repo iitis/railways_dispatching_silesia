@@ -65,7 +65,7 @@ def parse_results(file_name):
         df[l] = samples[:, index]
     df["energies"] = energies
     df["feas"] = feas
-    df.sort_values('energies')
+    df = df.sort_values('energies')
 
     return df
 
