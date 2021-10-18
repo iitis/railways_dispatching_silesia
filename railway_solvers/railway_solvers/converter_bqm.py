@@ -25,6 +25,7 @@ def _get_slack_ub(data, offset):
     assert int(result) == result
     return int(result)
 
+
 def convert_to_pyqubo(model: LpProblem):
     H = 0
 
@@ -40,7 +41,6 @@ def convert_to_pyqubo(model: LpProblem):
             ub = var.upBound
             vars_trans[var] = LogEncInteger(var.name, (lb, ub))
             
-    print(vars_trans)
     # constraints
     for cname, c in model.constraints.items():
         sense = c.sense
