@@ -1,9 +1,11 @@
 from typing import KeysView
 import neal
 import numpy as np
-from dwave.system import EmbeddingComposite, DWaveSampler, LeapHybridSampler
+from dwave.system import EmbeddingComposite, DWaveSampler, LeapHybridSampler, LeapHybridCQMSampler
 import dimod
 import pickle
+
+
 
 
 def anneal_solutuon(method):
@@ -18,9 +20,9 @@ def anneal_solutuon(method):
     return qubo
 
 
-def sim_anneal(method):
+def sim_anneal(method, beta_range=(5, 100),num_sweeps=4000, num_reads=1000):
     s = neal.SimulatedAnnealingSampler()
-    sampleset = s.sample_qubo(anneal_solutuon(method), beta_range=(5, 100), num_sweeps=4000, num_reads=1000,
+    sampleset = s.sample_qubo(anneal_solutuon(method), beta_range, num_sweeps, num_reads ,
                               beta_schedule_type='geometric')
     return sampleset
 
@@ -33,11 +35,34 @@ def real_anneal(method, num_reads, annealing_time, chain_strength):
     return sampleset
 
 
+def constrained_solver(method, cqm):
+    sampler = LeapHybridCQMSampler()
+    sampleset = sampler.sample_cqm(cqm)
+    return sampleset
+
+
 def hybrid_anneal(method):
     sampler = LeapHybridSampler()
     sampleset = sampler.sample_qubo(anneal_solutuon(method))
     return sampleset
 
+
+def store_result(file_name, sampleset):
+    results = []
+    for datum in sampleset.data():
+        x = dimod.sampleset.as_samples(datum.sample)[0][0]
+        results.append((x, datum.energy))
+
+    sdf = sampleset.to_serializable()
+
+    with open(file_name, 'wb') as handle:
+        pickle.dump(sdf, handle)
+    with open(f"{file_name}_samples", 'wb') as handle:
+        pickle.dump(results, handle)
+
+def display_results(file_name):
+    print(pickle.load(open(file_name, "rb")))
+    print(pickle.load(open(f"{file_name}_samples", "rb")))
 
 def annealing_outcome(method, annealing, num_reads=None, annealing_time=None):
     """method: 'reroute', 'default',
