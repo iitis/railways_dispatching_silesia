@@ -78,23 +78,22 @@ def test_geq():
     bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]
     assert _compare_bqm(dwave_pulp_problem, bqm2)
 
-@pytest.mark.skip(reason="test won't work, unless lb!=0 implemented")
 def test_geq_negative():
     n = 3
 
     vars = dict()
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], -10, 20, cat="Integer"))
+        vars.update(pulp.LpVariable.dicts("y", [i], -5, 10, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(val*var for var, val in zip(vars.values(),[-1,2,3])) >= 3, "minimal_span_1"
+    pulp_problem += sum(val*vars[i] for i, val in zip(range(n),[1,2,3])) <= 3, "minimal_span_1"
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem = convert_to_bqm(pulp_problem, pdict)
 
-    var_dwave = [dimod.Integer(f"y_{i}", lower_bound=-10, upper_bound=20) for i in range(n)]
+    var_dwave = [dimod.Integer(f"y_{i}", upper_bound=15) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
-    cqm.add_constraint(sum(var_dwave) >= 3, label="_C1")
+    cqm.add_constraint(sum(val*var for var, val in zip(var_dwave,[1,2,3])) -30 <= 3)
     cqm.set_objective(var_dwave[0]-var_dwave[0])
 
     bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]
@@ -120,7 +119,27 @@ def test_leq():
     bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]
     assert _compare_bqm(dwave_pulp_problem, bqm2)
 
-# @pytest.mark.skip(reason="implement bqm_to_cqm first")
+def test_nonzero_lb():
+    n = 3
+
+    vars = dict()
+    for i in range(n):
+        vars.update(pulp.LpVariable.dicts("y", [i], 5, 20, cat="Integer"))
+
+    pulp_problem = pulp.LpProblem("simple_test")
+    pulp_problem += sum(vars.values()) <= 17, "minimal_span_1"
+    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pdict = {"minimal_span" : 1, "objective" : 1}
+    dwave_pulp_problem = convert_to_bqm(pulp_problem, pdict)
+
+    var_dwave = [dimod.Integer(f"y_{i}", upper_bound=15) for i in range(n)]
+    cqm = dimod.ConstrainedQuadraticModel()
+    cqm.add_constraint(sum(var_dwave) +15  <= 17, label="_C1")
+
+    bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]
+    assert _compare_bqm(dwave_pulp_problem, bqm2)
+
+
 def test_bad_leq():
     n = 3
 

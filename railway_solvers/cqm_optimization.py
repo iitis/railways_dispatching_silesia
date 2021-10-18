@@ -1,4 +1,4 @@
-from railway_solvers import create_linear_problem, convert_to_cqm
+from railway_solvers import create_linear_problem, convert_to_cqm, convert_to_pyqubo
 taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {
         "0_0_1": 2, "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
 timetable = {"tau": taus,
@@ -40,3 +40,4 @@ train_sets_rerouted = {
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)
 convert_to_cqm(prob)
+convert_to_pyqubo(prob)
