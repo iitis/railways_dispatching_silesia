@@ -1,5 +1,5 @@
-from railway_solvers import create_linear_problem, convert_to_cqm, convert_to_pyqubo, analyze_constraints
-from Qfile_solve import  constrained_solver
+from railway_solvers import create_linear_problem, convert_to_bqm
+from Qfile_solve import sim_anneal
 from results_manipulation import *
 
 taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {
@@ -42,18 +42,19 @@ train_sets_rerouted = {
 }
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)
-cqm, model = convert_to_cqm(prob)
-file_name = f"annealing_results/cqm_default"
+pdict = {"minimal_span":1, "single_line":1, "minimal_stay":1, "track_occupation":1, "objective":1 }
+bqm, model = convert_to_bqm(prob, pdict)
+file_name = f"annealing_results/bqm_sa_default"
 
-#sampleset = constrained_solver(cqm)
-#store_result(file_name, sampleset, "cqm")
+#sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
+#store_result(file_name, sampleset, "bqm")
 
 sampleset = load_results(file_name)
-print(get_results_cqm(sampleset, "cqm"))
+print(get_results_cqm(sampleset, "pyqubo", prob, model, pdict, bqm.offset))
 
-sample_dict = results_to_dict(sampleset, "cqm")
+sample_dict = results_to_dict(sampleset, "pyqubo", model, pdict)
 print("Feasible ", is_feasible(prob, sample_dict))
-print("Best Sample ", get_best_sample(sampleset,"cqm"))
+print("Best Sample ", get_best_sample(sampleset,"pyqubo", prob, model, pdict, bqm.offset))
 print("---------------------------------------------------")
 
 for sample in sample_dict:
