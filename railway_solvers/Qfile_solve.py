@@ -5,7 +5,7 @@ from dwave.system import EmbeddingComposite, DWaveSampler, LeapHybridSampler, Le
 import dimod
 import pickle
 import pandas as pd
-
+import numpy as np
 
 
 def anneal_solutuon(method):
@@ -55,13 +55,15 @@ def store_result(file_name, sampleset):
 
 def parse_results(file_name):
     d = pickle.load(open(f"{file_name}", "rb"))
-    samples = d['sample_data']['data']
     energies = d['vectors']['energy']['data']
     feas = d['vectors']['is_feasible']['data']
+    labels = d['variable_labels']
+    samples = np.array(d['sample_data']['data'])
 
     df = pd.DataFrame()
+    for index, l in enumerate(labels):
+        df[l] = samples[:, index]
     df["energies"] = energies
-    df["samples"] = samples
     df["feas"] = feas
     df.sort_values('energies')
 
