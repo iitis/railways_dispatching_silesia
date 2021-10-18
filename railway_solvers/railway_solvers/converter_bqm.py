@@ -69,4 +69,4 @@ def convert_to_pyqubo(model: LpProblem):
 
 def convert_to_bqm(model: LpProblem, pdict):
     pyqubo_model = convert_to_pyqubo(model)
-    return pyqubo_model.to_bqm(feed_dict=pdict)
+    return pyqubo_model.to_bqm(feed_dict=pdict), pyqubo_model
