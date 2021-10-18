@@ -21,7 +21,7 @@ def convert_to_cqm(model: LpProblem):
             lb = var.lowBound
             ub = var.upBound
             vars_trans[var] = dimod.Integer(
-                var.name, lower_bound=lb, upper_bound=ub)
+                var.name, lower_bound=0, upper_bound=ub-lb)+lb
         else:
             assert var.cat != pulp.LpContinuous
 

@@ -37,7 +37,6 @@ def convert_to_pyqubo(model: LpProblem):
             vars_trans[var] = Binary(var.name)
         else:
             lb = var.lowBound
-            assert lb == 0
             ub = var.upBound
             vars_trans[var] = LogEncInteger(var.name, (lb, ub))
             

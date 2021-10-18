@@ -94,6 +94,27 @@ def test_leq():
     bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]
     assert _compare_bqm(bqm1, bqm2)
 
+def test_leq():
+    n = 3
+
+    vars = dict()
+    for i in range(n):
+        vars.update(pulp.LpVariable.dicts("y", [i], 5, 20, cat="Integer"))
+
+    pulp_problem = pulp.LpProblem("simple_test")
+    pulp_problem += sum(vars.values()) <= 17
+    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    dwave_pulp_problem = convert_to_cqm(pulp_problem)
+
+    var_dwave = [dimod.Integer(f"y_{i}", upper_bound=15) for i in range(n)]
+    cqm = dimod.ConstrainedQuadraticModel()
+    cqm.add_constraint(sum(var_dwave) +15 <= 17, label="_C1")
+
+
+    bqm1 = cqm_to_bqm(dwave_pulp_problem, lagrange_multiplier=1)[0]
+    bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]
+    assert _compare_bqm(bqm1, bqm2)
+
 def test_bad_leq():
     n = 3
 
