@@ -4,7 +4,7 @@ import numpy as np
 from dwave.system import EmbeddingComposite, DWaveSampler, LeapHybridSampler, LeapHybridCQMSampler
 import dimod
 import pickle
-
+import pandas as pd
 
 
 
@@ -48,21 +48,29 @@ def hybrid_anneal(method):
 
 
 def store_result(file_name, sampleset):
-    results = []
-    for datum in sampleset.data():
-        x = dimod.sampleset.as_samples(datum.sample)[0][0]
-        results.append((x, datum.energy))
 
     sdf = sampleset.to_serializable()
-
     with open(file_name, 'wb') as handle:
         pickle.dump(sdf, handle)
-    with open(f"{file_name}_samples", 'wb') as handle:
-        pickle.dump(results, handle)
+
+def parse_results(file_name):
+    d = pickle.load(open(f"{file_name}", "rb"))
+    samples = d['sample_data']['data']
+    energies = d['vectors']['energy']['data']
+    feas = d['vectors']['is_feasible']['data']
+
+    df = pd.DataFrame()
+    df["energies"] = energies
+    df["samples"] = samples
+    df["feas"] = feas
+    df.sort_values('energies')
+
+    return df
+
 
 def display_results(file_name):
     print(pickle.load(open(file_name, "rb")))
-    print(pickle.load(open(f"{file_name}_samples", "rb")))
+
 
 def annealing_outcome(method, annealing, num_reads=None, annealing_time=None):
     """method: 'reroute', 'default',
