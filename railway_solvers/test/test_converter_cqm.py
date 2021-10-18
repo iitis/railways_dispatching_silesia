@@ -24,7 +24,7 @@ def test_equality_binary():
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) == 1
     pulp_problem += sum((i+1)*vars[i] for i in range(n))
-    dwave_pulp_problem = convert_to_cqm(pulp_problem)
+    dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Binary(f"y_{i}") for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -43,7 +43,7 @@ def test_equality():
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) == 1
     pulp_problem += sum((i+1)*vars[i] for i in range(n))
-    dwave_pulp_problem = convert_to_cqm(pulp_problem)
+    dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -62,7 +62,7 @@ def test_geq():
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) >= 3
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
-    dwave_pulp_problem = convert_to_cqm(pulp_problem)
+    dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -83,7 +83,7 @@ def test_leq():
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) <= 1
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
-    dwave_pulp_problem = convert_to_cqm(pulp_problem)
+    dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -104,7 +104,7 @@ def test_leq():
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) <= 17
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
-    dwave_pulp_problem = convert_to_cqm(pulp_problem)
+    dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=15) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -125,7 +125,7 @@ def test_bad_leq():
 
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) <= 1
-    dwave_pulp_problem = convert_to_cqm(pulp_problem)
+    dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()

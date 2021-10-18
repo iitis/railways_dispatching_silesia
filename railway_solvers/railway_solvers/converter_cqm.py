@@ -1,3 +1,5 @@
+from copy import deepcopy
+from dimod.sampleset import SampleSet
 import pulp
 import dimod
 from pulp import LpProblem
@@ -47,4 +49,12 @@ def convert_to_cqm(model: LpProblem):
         dimod_obj += sum(val*vars_trans[var] for var, val in obj.items())
         cqm.set_objective(dimod_obj)
 
-    return cqm
+    def interpreter(sampleset, model):
+        result = deepcopy(sampleset)
+        for i in range(result['num_rows']):
+            for j, name in enumerate(result['variable_labels']):
+                var = next(i for i in model.variables() if i.name==name)
+                result['sample_data']['data'][i][j] += var.lowBound
+        return result
+
+    return cqm, lambda ss: interpreter(ss, model)
