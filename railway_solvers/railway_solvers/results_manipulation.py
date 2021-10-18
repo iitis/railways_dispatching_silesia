@@ -4,7 +4,7 @@ from typing import Dict
 from pulp.pulp import LpProblem
 import pulp
 
-def results_to_dict(data, mode):
+def results_to_dict(data, mode, model = None, pdict = None):
     if mode == "cqm":
         results = []
         for i in range(data['num_rows']):
@@ -13,7 +13,14 @@ def results_to_dict(data, mode):
             results.append(values)
         return results
     elif mode == "pyqubo":
-        pass
+        assert pdict !=None
+        assert model != None
+        results = []
+        for row in data.record:
+            sample = {v:row[i] for i,v in enumerate(model.variables)}
+            decoded = model.decode_sample(sample, vartype='BINARY', feed_dict=pdict)
+            results.append(decoded.subh)
+        return results
     else:
         raise "unrecognized mode"
     pass
