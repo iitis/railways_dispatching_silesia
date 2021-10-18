@@ -21,7 +21,9 @@ def _get_placeholder(cname):
 # for LE
 def _get_slack_ub(data, offset):
     ub = sum(val*(var.upBound if val<0 else var.lowBound) for var, val in data)
-    return -(ub + offset)
+    result = -(ub + offset)
+    assert int(result) == result
+    return int(result)
 
 def convert_to_pyqubo(model: LpProblem):
     H = 0
