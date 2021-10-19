@@ -31,14 +31,14 @@ def get_best_fesible_sample(dict_list):
             return l
 
 
-def sample_to_dict(sample, mode, var_names=None, model=None, pdict=None):
+def sample_to_dict(sample, mode, var_names, model=None, pdict=None):
     if mode == "cqm":
         return {var: val for val, var in zip(sample, var_names)}
     elif mode == "pyqubo":
         sample_dict = {v: sample[0][i] for i, v in enumerate(model.variables)}
         decoded = model.decode_sample(sample_dict, vartype='BINARY', feed_dict=pdict)
         vars = decoded.subh
-        for v in model.variables:
+        for v in var_names:
             if v not in decoded.subh:
                 vars[v] = decoded.sample[v]
         return vars
@@ -47,20 +47,21 @@ def sample_to_dict(sample, mode, var_names=None, model=None, pdict=None):
     pass
 
 
-def get_results(sampleset, mode, prob=None, model=None, pdict=None):
+def get_results(sampleset, mode, prob, model=None, pdict=None):
     dict_list = []
     sample_size = sampleset['num_rows'] if mode == "cqm" else len(sampleset.record)
     for i in range(sample_size):
         rdict = {}
         if mode == "cqm":
             varlist = sampleset['variable_labels']
-            sample = sample_to_dict(sampleset['sample_data']['data'][i], mode, var_names=varlist)
+            sample = sample_to_dict(sampleset['sample_data']['data'][i], mode, varlist)
             rdict['energy'] = sampleset['vectors']['energy']['data'][i]
         elif mode == "pyqubo":
             assert model != None
             assert pdict != None
             assert prob != None
-            sample = sample_to_dict(sampleset.record[i], mode, model=model, pdict=pdict)
+            varlist = [str(v) for v in prob.variables()]
+            sample = sample_to_dict(sampleset.record[i], mode, varlist, model=model, pdict=pdict)
             rdict['energy'] = sampleset.record[i][1]
         else:
             raise "unrecognized mode"
