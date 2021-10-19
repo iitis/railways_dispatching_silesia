@@ -49,15 +49,18 @@ file_name = f"annealing_results/cqm_default"
 #store_result(file_name, sampleset, "cqm")
 
 sampleset = load_results(file_name)
-print(get_results_cqm(sampleset, "cqm"))
+df = get_results(sampleset, "cqm")
+print(df)
 
 sample_dict = results_to_dict(sampleset, "cqm")
 print("Feasible ", is_feasible(prob, sample_dict))
-print("Best Sample ", get_best_sample(sampleset,"cqm"))
+print("Best Sample ", get_best_sample(df, sampleset,"cqm"))
 print("---------------------------------------------------")
 
+'''
 for sample in sample_dict:
     print("Sample ", sample)
     print("Objective ", get_objective(prob, sample))
     print("Feasiblity info ", analyze_constraints(prob, sample))
     print("---------------------------------------------------")
+'''

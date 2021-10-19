@@ -50,15 +50,18 @@ file_name = f"annealing_results/bqm_sa_default"
 #store_result(file_name, sampleset, "bqm")
 
 sampleset = load_results(file_name)
-print(get_results_cqm(sampleset, "pyqubo", prob, model, pdict, bqm.offset))
+df = get_results(sampleset, "pyqubo", prob, model, pdict, bqm.offset)
+print(df)
 
 sample_dict = results_to_dict(sampleset, "pyqubo", model, pdict)
 print("Feasible ", is_feasible(prob, sample_dict))
-print("Best Sample ", get_best_sample(sampleset,"pyqubo", prob, model, pdict, bqm.offset))
+print("Best Sample ", get_best_sample(df, sampleset,"pyqubo", prob, model, pdict, bqm.offset))
 print("---------------------------------------------------")
 
+'''
 for sample in sample_dict:
     print("Sample ", sample)
     print("Objective ", get_objective(prob, sample))
     print("Feasiblity info ", analyze_constraints(prob, sample))
     print("---------------------------------------------------")
+'''

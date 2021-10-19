@@ -54,8 +54,7 @@ def get_objective(prob, sample):
     result += sum(val*sample[var.name] for var, val in obj.items())
     return result
 
-def get_best_sample(sampleset,mode, prob = None, model = None, pdict = None, offset = None):
-    df = get_results_cqm(sampleset, mode, prob, model, pdict, offset)
+def get_best_sample(df, sampleset,mode, prob = None, model = None, pdict = None, offset = None):
     df_feas = df[df.feas==True]
     return dict(df_feas.iloc[0])
 
@@ -71,7 +70,7 @@ def store_result(file_name, sampleset, mode):
         raise "unrecognized mode"
 
 
-def get_results_cqm(sampleset, mode, prob = None, model = None, pdict = None, offset = None):
+def get_results(sampleset, mode, prob = None, model = None, pdict = None, offset = None):
     if mode == "cqm":
         labels = sampleset['variable_labels']
         samples = np.array(sampleset['sample_data']['data'])
@@ -100,6 +99,7 @@ def get_results_cqm(sampleset, mode, prob = None, model = None, pdict = None, of
             df[l] = samples[:, index]
         df['energies'] = energies
         df['feas'] = feas
+        df = df.sort_values('energies')
         return df
 
 
