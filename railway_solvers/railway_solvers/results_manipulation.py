@@ -4,7 +4,6 @@ from pulp.pulp import LpProblem
 import pulp
 
 
-
 def analyze_constraints(prob: LpProblem, sample: Dict):
     result = {}
     for cname, c in prob.constraints.items():
@@ -28,7 +27,7 @@ def get_objective(prob, sample):
 
 def get_best_fesible_sample(dict_list):
     for l in dict_list:
-        if l['feasible'] == True:
+        if l['feasible']:
             return l
 
 
