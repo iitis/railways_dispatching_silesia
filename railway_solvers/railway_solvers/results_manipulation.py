@@ -47,7 +47,7 @@ def sample_to_dict(sample, mode, var_names=None, model=None, pdict=None):
     pass
 
 
-def get_results(sampleset, mode, prob=None, model=None, pdict=None, offset=None):
+def get_results(sampleset, mode, prob=None, model=None, pdict=None):
     dict_list = []
     sample_size = sampleset['num_rows'] if mode == "cqm" else len(sampleset.record)
     for i in range(sample_size):
