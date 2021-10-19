@@ -42,15 +42,15 @@ train_sets_rerouted = {
 }
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)
-pdict = {"minimal_span":1, "single_line":1, "minimal_stay":1, "track_occupation":1, "objective":1 }
-bqm, model = convert_to_bqm(prob, pdict)
+pdict = {"minimal_span":0, "single_line":0, "minimal_stay":0, "track_occupation":1.25, "objective":1 }
+bqm, interpreter = convert_to_bqm(prob, pdict)
 file_name = f"annealing_results/bqm_sa_default"
 
-#sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
-#store_result(file_name, sampleset, "pyqubo")
+sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
+store_result(file_name, sampleset, "pyqubo")
 
 sampleset = load_results(file_name)
-dict_list = get_results(sampleset, "pyqubo", prob= prob, model = model, pdict = pdict)
+dict_list = get_results(sampleset, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
 print("Best Sample ", get_best_fesible_sample(dict_list))
 
 for i,l in enumerate(dict_list):
