@@ -42,25 +42,15 @@ train_sets_rerouted = {
 }
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)
-cqm, model = convert_to_cqm(prob)
+cqm, interpreter = convert_to_cqm(prob)
 file_name = f"annealing_results/cqm_default"
 
 #sampleset = constrained_solver(cqm)
 #store_result(file_name, sampleset, "cqm")
 
-sampleset = load_results(file_name)
-df = get_results(sampleset, "cqm")
-print(df)
+sampleset = interpreter(load_results(file_name))
+dict_list = get_results(sampleset, "cqm", prob)
+print("Best Sample ", get_best_sample(dict_list))
 
-sample_dict = results_to_dict(sampleset, "cqm")
-print("Feasible ", is_feasible(prob, sample_dict))
-print("Best Sample ", get_best_sample(df, sampleset,"cqm"))
-print("---------------------------------------------------")
-
-'''
-for sample in sample_dict:
-    print("Sample ", sample)
-    print("Objective ", get_objective(prob, sample))
-    print("Feasiblity info ", analyze_constraints(prob, sample))
-    print("---------------------------------------------------")
-'''
+for l in dict_list:
+    print(l)
