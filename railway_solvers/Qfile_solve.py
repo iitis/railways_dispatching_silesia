@@ -1,13 +1,40 @@
 from typing import KeysView
 import neal
-import numpy as np
 from dwave.system import EmbeddingComposite, DWaveSampler, LeapHybridSampler, LeapHybridCQMSampler
 import dimod
 import pickle
-import pandas as pd
 import numpy as np
 
 
+
+def sim_anneal(bqm, beta_range=(5, 100), num_sweeps=4000, num_reads=1000):
+    s = neal.SimulatedAnnealingSampler()
+    sampleset = s.sample(bqm, beta_range, num_sweeps, num_reads,
+                         beta_schedule_type='geometric')
+    return sampleset
+
+
+def real_anneal(bqm, num_reads, annealing_time, chain_strength):
+    sampler = EmbeddingComposite(DWaveSampler())
+    # annealing time in micro second, 20 is default.
+    sampleset = sampler.sample(bqm, num_reads=num_reads,
+                               auto_scale='true', annealing_time=annealing_time, chain_strength=chain_strength)
+    return sampleset
+
+
+def constrained_solver(cqm):
+    sampler = LeapHybridCQMSampler()
+    sampleset = sampler.sample_cqm(cqm)
+    return sampleset
+
+
+def hybrid_anneal(bqm):
+    sampler = LeapHybridSampler()
+    sampleset = sampler.sample_qubo(bqm)
+    return sampleset
+
+
+#those should be removed or resructurrd
 def anneal_solutuon(method):
     if method == 'reroute':
         Q_init = np.load('files/Qfile_r.npz')
@@ -18,60 +45,6 @@ def anneal_solutuon(method):
     model = dimod.BinaryQuadraticModel.from_numpy_matrix(Q)
     qubo, offset = model.to_qubo()
     return qubo
-
-
-def sim_anneal(method, beta_range=(5, 100),num_sweeps=4000, num_reads=1000):
-    s = neal.SimulatedAnnealingSampler()
-    sampleset = s.sample_qubo(anneal_solutuon(method), beta_range, num_sweeps, num_reads ,
-                              beta_schedule_type='geometric')
-    return sampleset
-
-
-def real_anneal(method, num_reads, annealing_time, chain_strength):
-    sampler = EmbeddingComposite(DWaveSampler())
-    # annealing time in micro second, 20 is default.
-    sampleset = sampler.sample_qubo(anneal_solutuon(method), num_reads=num_reads,
-                                    auto_scale='true', annealing_time=annealing_time, chain_strength=chain_strength)
-    return sampleset
-
-
-def constrained_solver(method, cqm):
-    sampler = LeapHybridCQMSampler()
-    sampleset = sampler.sample_cqm(cqm)
-    return sampleset
-
-
-def hybrid_anneal(method):
-    sampler = LeapHybridSampler()
-    sampleset = sampler.sample_qubo(anneal_solutuon(method))
-    return sampleset
-
-
-def store_result(file_name, sampleset):
-
-    sdf = sampleset.to_serializable()
-    with open(file_name, 'wb') as handle:
-        pickle.dump(sdf, handle)
-
-def parse_results(file_name):
-    d = pickle.load(open(f"{file_name}", "rb"))
-    energies = d['vectors']['energy']['data']
-    feas = d['vectors']['is_feasible']['data']
-    labels = d['variable_labels']
-    samples = np.array(d['sample_data']['data'])
-
-    df = pd.DataFrame()
-    for index, l in enumerate(labels):
-        df[l] = samples[:, index]
-    df["energies"] = energies
-    df["feas"] = feas
-    df = df.sort_values('energies')
-
-    return df
-
-
-def display_results(file_name):
-    print(pickle.load(open(file_name, "rb")))
 
 
 def annealing_outcome(method, annealing, num_reads=None, annealing_time=None):
@@ -135,3 +108,4 @@ def annealing_outcome(method, annealing, num_reads=None, annealing_time=None):
                 pickle.dump(results, handle)
 
             # print(f"Energy {sampleset.first} with chain strength {chain_strength} run")
+

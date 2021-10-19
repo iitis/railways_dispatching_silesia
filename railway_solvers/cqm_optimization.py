@@ -50,7 +50,7 @@ file_name = f"annealing_results/cqm_default"
 
 sampleset = interpreter(load_results(file_name))
 dict_list = get_results(sampleset, "cqm", prob)
-print("Best Sample ", get_best_sample(dict_list))
+print("Best Sample ", get_best_fesible_sample(dict_list))
 
 for l in dict_list:
     print(l)

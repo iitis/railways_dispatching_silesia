@@ -47,21 +47,13 @@ bqm, model = convert_to_bqm(prob, pdict)
 file_name = f"annealing_results/bqm_sa_default"
 
 #sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
-#store_result(file_name, sampleset, "bqm")
+#store_result(file_name, sampleset, "pyqubo")
 
 sampleset = load_results(file_name)
-df = get_results(sampleset, "pyqubo", prob, model, pdict, bqm.offset)
-print(df)
+dict_list = get_results(sampleset, "pyqubo", prob= prob, model = model, pdict = pdict)
+print("Best Sample ", get_best_fesible_sample(dict_list))
 
-sample_dict = results_to_dict(sampleset, "pyqubo", model, pdict)
-print("Feasible ", is_feasible(prob, sample_dict))
-print("Best Sample ", get_best_sample(df, sampleset,"pyqubo", prob, model, pdict, bqm.offset))
-print("---------------------------------------------------")
-
-'''
-for sample in sample_dict:
-    print("Sample ", sample)
-    print("Objective ", get_objective(prob, sample))
-    print("Feasiblity info ", analyze_constraints(prob, sample))
-    print("---------------------------------------------------")
-'''
+for i,l in enumerate(dict_list):
+    print(l)
+    if i==100:
+        break
