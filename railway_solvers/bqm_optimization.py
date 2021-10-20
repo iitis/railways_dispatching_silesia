@@ -41,7 +41,7 @@ train_sets_rerouted = {
 }
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)
-pdict = {"minimal_span":5, "single_line":5, "minimal_stay":5, "track_occupation":5, "objective":1 }
+pdict = {"minimal_span":2.5, "single_line":2.5, "minimal_stay":2.5, "track_occupation":2.5, "objective":1 }
 bqm, interpreter = convert_to_bqm(prob, pdict)
 file_name = f"annealing_results/bqm_sa_default"
 
