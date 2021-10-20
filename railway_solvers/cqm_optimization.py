@@ -1,6 +1,5 @@
-from railway_solvers import create_linear_problem, convert_to_cqm, convert_to_pyqubo, analyze_constraints
+from railway_solvers import *
 from Qfile_solve import  constrained_solver
-from results_manipulation import *
 
 taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {
         "0_0_1": 2, "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
@@ -45,8 +44,8 @@ prob = create_linear_problem(train_sets, timetable, d_max, μ)
 cqm, interpreter = convert_to_cqm(prob)
 file_name = f"annealing_results/cqm_default"
 
-#sampleset = constrained_solver(cqm)
-#store_result(file_name, sampleset, "cqm")
+sampleset = constrained_solver(cqm)
+store_result(file_name, sampleset, "cqm")
 
 sampleset = interpreter(load_results(file_name))
 dict_list = get_results(sampleset, "cqm", prob)

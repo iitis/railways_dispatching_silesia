@@ -1,6 +1,5 @@
-from railway_solvers import create_linear_problem, convert_to_bqm
+from railway_solvers import *
 from Qfile_solve import sim_anneal
-from results_manipulation import *
 
 taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {
         "0_0_1": 2, "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
@@ -42,7 +41,7 @@ train_sets_rerouted = {
 }
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)
-pdict = {"minimal_span":0, "single_line":0, "minimal_stay":0, "track_occupation":1.25, "objective":1 }
+pdict = {"minimal_span":5, "single_line":5, "minimal_stay":5, "track_occupation":5, "objective":1 }
 bqm, interpreter = convert_to_bqm(prob, pdict)
 file_name = f"annealing_results/bqm_sa_default"
 
@@ -53,7 +52,7 @@ sampleset = load_results(file_name)
 dict_list = get_results(sampleset, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
 print("Best Sample ", get_best_fesible_sample(dict_list))
 
-for i,l in enumerate(dict_list):
-    print(l)
-    if i==100:
-        break
+# for i,l in enumerate(dict_list):
+#     print(l)
+#     if i==100:
+#         break
