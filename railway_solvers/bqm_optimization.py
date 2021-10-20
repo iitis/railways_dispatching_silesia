@@ -43,6 +43,7 @@ train_sets_rerouted = {
 prob = create_linear_problem(train_sets, timetable, d_max, μ)
 pdict = {"minimal_span":2.5, "single_line":2.5, "minimal_stay":2.5, "track_occupation":2.5, "objective":1 }
 bqm, interpreter = convert_to_bqm(prob, pdict)
+print("bqm qubo size = ", bqm.num_variables)
 file_name = f"annealing_results/bqm_sa_default"
 
 sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
