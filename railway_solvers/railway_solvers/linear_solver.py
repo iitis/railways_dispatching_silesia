@@ -20,9 +20,8 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
                 LHS += earliest_dep_time(S, timetable, jp, s)
                 LHS += μ*(1-y[j][jp][s]) - delay_var[j][s]
                 LHS -= earliest_dep_time(S, timetable, j, s)
-                RHS = tau(timetable, 'blocks', j, s, s_next)
-                RHS += max(0, tau(timetable, 'pass', j, s, s_next) -
-                           tau(timetable, 'pass', jp, s, s_next))
+                RHS = tau(timetable, 'blocks', first_train=j, second_train = jp, first_station=s, second_station=s_next)
+
                 problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{jp}_{j}_{s}"
 
                 LHS = delay_var[j][s]
@@ -30,9 +29,8 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
                 LHS += μ*y[j][jp][s]
                 LHS -= delay_var[jp][s]
                 LHS -= earliest_dep_time(S, timetable, jp, s)
-                RHS = tau(timetable, 'blocks', jp, s, s_next)
-                RHS += max(0, tau(timetable, 'pass', jp, s, s_next) -
-                           tau(timetable, 'pass', j, s, s_next))
+                RHS = tau(timetable, 'blocks', first_train=jp, second_train = j, first_station=s, second_station=s_next)
+
                 problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{j}_{jp}_{s}"
 
 
@@ -51,8 +49,8 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
                     LHS += μ*(y[j][jp][s])
                     RHS = delay_var[jp][s_previousp]
                     RHS += earliest_dep_time(S, timetable, jp, s_previousp)
-                    RHS += tau(timetable, 'pass', jp, s_previousp, s)
-                    RHS += tau(timetable, 'res', jp, j, s)
+                    RHS += tau(timetable, 'pass', first_train=jp, first_station=s_previousp, second_station=s)
+                    RHS += tau(timetable, 'res', first_train=jp, second_train=j, first_station=s)
                     problem += LHS >= RHS, f"single_line_{js[0]}_{js[1]}_{j}_{jp}_{s}"
 
                     LHS = delay_var[jp][s_previousp]
@@ -60,8 +58,8 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
                     LHS += μ*(1-y[j][jp][s])
                     RHS = delay_var[j][s]
                     RHS += earliest_dep_time(S, timetable, j, s)
-                    RHS += tau(timetable, 'pass', j, s, s_previousp)
-                    RHS += tau(timetable, 'res', j, jp, s)
+                    RHS += tau(timetable, 'pass', first_train=j, first_station=s, second_station=s_previousp)
+                    RHS += tau(timetable, 'res', first_train=j, second_train=jp, first_station=s)
                     problem += LHS >= RHS, f"single_line_{js[0]}_{js[1]}_{jp}_{j}_{s}"
 
     print(problem)
@@ -97,7 +95,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
             if s_previousp != None:
                 LHS = delay_var[jp][s_previousp]
                 LHS += earliest_dep_time(S, timetable, jp, s_previousp)
-                LHS += tau(timetable, "pass", jp, s_previousp, s)
+                LHS += tau(timetable, "pass", first_train=jp, first_station=s_previousp, second_station=s)
                 LHS += μ*(1-y[j][jp][s])
                 RHS = delay_var[j][s]
                 RHS += earliest_dep_time(S, timetable, j, s)
@@ -107,7 +105,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
             if s_previous != None:
                 LHS = delay_var[j][s_previous]
                 LHS += earliest_dep_time(S, timetable, j, s_previous)
-                LHS += tau(timetable, "pass", j, s_previous, s)
+                LHS += tau(timetable, "pass", first_train=j, first_station=s_previous, second_station=s)
                 LHS += μ*y[j][jp][s]
                 RHS = delay_var[jp][s]
                 RHS += earliest_dep_time(S, timetable, jp, s)

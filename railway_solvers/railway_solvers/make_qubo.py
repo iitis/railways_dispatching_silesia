@@ -55,14 +55,9 @@ def Pspan(timetable, k, k1, inds, train_sets):
             t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
             t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s)
 
-            # ofset_A = max(0, timetable["tau"]["pass"][f"{j1}_{s}_{s_next}"] - timetable["tau"]["pass"][f"{j}_{s}_{s_next}"])
+            A = -tau(timetable, 'blocks', first_train=j1, second_train=j, first_station=s, second_station=s_next)
 
-            A = -tau(timetable, 'blocks', j1, s, s_next)
-            A -= max(0, tau(timetable, 'pass', j1, s, s_next) -
-                     tau(timetable, 'pass', j, s, s_next))
-            B = tau(timetable, 'blocks', j, s, s_next)
-            B += max(0, tau(timetable, 'pass', j, s, s_next) -
-                     tau(timetable, 'pass', j1, s, s_next))
+            B = tau(timetable, 'blocks', first_train=j, second_train=j1, first_station=s, second_station=s_next)
 
             if A < t1-t < B:
                 return 1.
@@ -108,13 +103,13 @@ def P1track(timetable, k, k1, inds, train_sets):
         t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
         if s1 == subsequent_station(S[j], s):
-            if -tau(timetable, 'res') - tau(timetable, 'pass', j1, s1, s) < t1 - t:
-                if t1-t < tau(timetable, 'pass', j, s, s1) + tau(timetable, 'res'):
+            if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) < t1 - t:
+                if t1-t < tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) + tau(timetable, 'res'):
                     return 1.0
 
         if s == subsequent_station(S[j1], s1):
-            if -tau(timetable, 'res') - tau(timetable, 'pass', j, s, s1) < t - t1:
-                if t - t1 < tau(timetable, 'pass', j1, s1, s) + tau(timetable, 'res'):
+            if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) < t - t1:
+                if t - t1 < tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) + tau(timetable, 'res'):
                     return 1.0
 
     return 0.
@@ -157,7 +152,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz1 = inds1[k1]["d1"] + \
                     earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz1 <= tz:
+                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz1 <= tz:
                     return 1.
 
             if (jx == jz1) and occurs_as_pair(jx, jz, [train_sets["Jtrack"][sz]]):
@@ -170,7 +165,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz1 = inds1[k1]["d1"] + \
                     earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz <= tz1:
+                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz <= tz1:
                     return 1.
 
     if len(inds1[k].keys()) == 5 and len(inds1[k1].keys()) == 3:
@@ -186,7 +181,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
                 tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz1 <= tz:
+                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz1 <= tz:
                     return 1.
 
             if (jx == jz1) and occurs_as_pair(jx, jz, [train_sets["Jtrack"][sz]]):
@@ -194,7 +189,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
                 tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
 
-                if tx + tau(timetable, "pass", jx, sx, sz) - tau(timetable, "res") < tz <= tz1:
+                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz <= tz1:
                     return 1.
     return 0.
 

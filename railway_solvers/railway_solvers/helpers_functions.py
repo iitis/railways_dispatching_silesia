@@ -48,7 +48,7 @@ def common_path(S, j, jp):
 
 # timetable input is extected to be in the following form of dict of dicts
 #  taus are given as
-# taus = {"pass" : {"j_s_si" : τ^pass(j,s,s1), ...}, "blocks" : {"j_s_s1" : τ^pass(j,s,s1)  .... },
+# taus = {"pass" : {"j_s_si" : τ^pass(j,s,s1), ...}, "blocks" : {"j_s_s1" : τ^pass(j,j1,s,s1)  .... },
 # "stop": {"j_s_None" : τ^stop(j,s)}, "res": τ^res}
 # τ^res is just one for all situations, it may need to be extended
 
@@ -61,10 +61,15 @@ def common_path(S, j, jp):
 #
 #
 
-def tau(timetable, key, train=None, first_station=None, second_station=None):
+def tau(timetable, key, first_train=None, first_station=None, second_station=None, second_train=None):
     "from timetable return particular τs values, for given train and station/stations"
-    if key == "pass" or key == "blocks" or key == "stop":
-        return timetable["tau"][key][f"{train}_{first_station}_{second_station}"]
+    if key == "blocks":
+        A = timetable["tau"]["pass"][f"{first_train}_{first_station}_{second_station}"]
+        B = timetable["tau"]["pass"][f"{second_train}_{first_station}_{second_station}"]
+        ofset = max(0, A-B)
+        return timetable["tau"][key][f"{first_train}_{first_station}_{second_station}"]+ofset
+    elif key == "pass" or key == "stop":
+        return timetable["tau"][key][f"{first_train}_{first_station}_{second_station}"]
     elif key == "res":
         return timetable["tau"]["res"]
     return None
@@ -85,7 +90,7 @@ def penalty_weights(timetable, train, station):
 
 def earliest_dep_time(S, timetable, train, station):
     "returns earlies possible departure of a train from the given station"
-    # this is to ensure train can not leave befire tche schedule, if schedule is given
+    # this is to ensure train can not leave before scheduled time, if schedule is given
     if "schedule" in timetable:
         sched = timetable["schedule"][f"{train}_{station}"]
     else:
@@ -94,7 +99,7 @@ def earliest_dep_time(S, timetable, train, station):
         return np.maximum(sched, initial_conditions(timetable, train, station))
     except:
         s = previous_station(S[train], station)
-        tau_pass = tau(timetable, "pass", train, s, station)
-        tau_stop = tau(timetable, "stop", train, station)
+        tau_pass = tau(timetable, "pass", first_train=train, first_station=s, second_station=station)
+        tau_stop = tau(timetable, "stop", first_train=train, first_station=station)
 
         return np.maximum(sched, earliest_dep_time(S, timetable, train, s) + tau_pass + tau_stop)
