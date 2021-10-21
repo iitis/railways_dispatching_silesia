@@ -30,6 +30,16 @@ def annealing(prob, pdict, method, train_route):
         dict_list_real = get_results(sampleset_real, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
         print(f"Best Sample {method} device", get_best_fesible_sample(dict_list_real))
 
+    elif method == "read":
+        file_name = f"annealing_results/bqm_real_anneal_{train_route}"
+        sampleset_real = load_results(file_name)
+        dict_list_real = get_results(sampleset_real, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
+        print(f"Best Sample {method} device", get_best_fesible_sample(dict_list_real))
+
+
+
+
+
 
 if __name__ == "__main__":
 
@@ -75,7 +85,7 @@ if __name__ == "__main__":
     #WE WILL IMPORT THE ABOVE FROM OTHER FILE
 
     train_route = 'rerouted'
-    method = 'real'
+    method = 'read'
     prob = create_linear_problem(eval(f"train_sets_{train_route}"), timetable, d_max, μ)
     pdict = {"minimal_span":2.5, "single_line":2.5, "minimal_stay":2.5, "track_occupation":2.5, "objective":1 }
     annealing(prob, pdict, method, train_route)
