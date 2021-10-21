@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     #WE WILL IMPORT THE ABOVE FROM OTHER FILE
 
-    train_route = 'rerouted'
+    train_route = 'default'
     method = 'read'
     prob = create_linear_problem(eval(f"train_sets_{train_route}"), timetable, d_max, μ)
     pdict = {"minimal_span":2.5, "single_line":2.5, "minimal_stay":2.5, "track_occupation":2.5, "objective":1 }
