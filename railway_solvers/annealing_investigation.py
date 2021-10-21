@@ -59,6 +59,7 @@ interpreted_data = interpreter(data)
 
 out = results_to_dict(interpreted_data, mode="cqm")
 print(analyze_constraints(prob, out[1]))
+print('----------')
 for i in range(50):
     print(get_objective(prob, out[i]), is_feasible(prob, out[i]))
 # final_data = []

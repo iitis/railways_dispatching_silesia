@@ -47,7 +47,7 @@ def anneal_solutuon(method):
     return qubo
 
 
-def annealing_outcome(method, annealing, num_reads=None, annealing_time=None):
+def annealing_outcome(method, annealing, num_reads=None, annealing_time=None, chain_strength = None):
     """method: 'reroute', 'default',
     annealing: 'simulated', 'hybrid', 'quantum', 
     num_reads: Number of reads in quantum annealing annealing,
@@ -71,8 +71,8 @@ def annealing_outcome(method, annealing, num_reads=None, annealing_time=None):
         with open(f"files/Qfile_samples_sol_sim-anneal_{method}", 'wb') as handle:
             pickle.dump(results, handle)
 
-        print(f"Simulated solver energy {results[0]}")
-        # hybrid annealing!!!
+        
+    # hybrid annealing!!!
     elif annealing == 'hybrid':
         sampleset = hybrid_anneal(method)
 
@@ -87,25 +87,24 @@ def annealing_outcome(method, annealing, num_reads=None, annealing_time=None):
             pickle.dump(sdf, handle)
         with open(f"files/hybrid_data/Qfile_samples_sol_hybrid-anneal_{method}", 'wb') as handle:
             pickle.dump(results, handle)
-        # print(f"Hybrid solver energy {results}")
 
     # quantum annealing!!!!!
     elif annealing == 'quantum':
-        for chain_strength in [3, 3.5, 4, 4.5]:
-            sampleset = real_anneal(
-                method, num_reads, annealing_time, chain_strength)
 
-            results = []
-            for datum in sampleset.data():
-                x = dimod.sampleset.as_samples(datum.sample)[0][0]
-                results.append((x, datum.energy))
+        sampleset = real_anneal(
+            method, num_reads, annealing_time, chain_strength)
 
-            sdf = sampleset.to_serializable()
+        results = []
+        for datum in sampleset.data():
+            x = dimod.sampleset.as_samples(datum.sample)[0][0]
+            results.append((x, datum.energy))
 
-            with open(f"files/dwave_data/Qfile_complete_sol_real-anneal_numread{num_reads}_antime{annealing_time}_chainst{chain_strength}_{method}", 'wb') as handle:
-                pickle.dump(sdf, handle)
-            with open(f"files/dwave_data/Qfile_samples_sol_real-anneal_numread{num_reads}_antime{annealing_time}_chainst{chain_strength}_{method}", 'wb') as handle:
-                pickle.dump(results, handle)
+        sdf = sampleset.to_serializable()
+
+        with open(f"files/dwave_data/Qfile_complete_sol_real-anneal_numread{num_reads}_antime{annealing_time}_chainst{chain_strength}_{method}", 'wb') as handle:
+            pickle.dump(sdf, handle)
+        with open(f"files/dwave_data/Qfile_samples_sol_real-anneal_numread{num_reads}_antime{annealing_time}_chainst{chain_strength}_{method}", 'wb') as handle:
+            pickle.dump(results, handle)
 
             # print(f"Energy {sampleset.first} with chain strength {chain_strength} run")
 

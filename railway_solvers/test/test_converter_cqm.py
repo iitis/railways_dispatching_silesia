@@ -1,6 +1,7 @@
+import dimod
 from dimod.constrained import cqm_to_bqm
 import pulp
-import dimod
+
 from railway_solvers import convert_to_cqm
 
 
