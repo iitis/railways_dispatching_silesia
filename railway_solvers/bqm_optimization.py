@@ -14,28 +14,18 @@ def annealing(prob, pdict, method, train_route):
     bqm, interpreter = convert_to_bqm(prob, pdict)
     print(f"[{train_route}]: bqm qubo size  = ", bqm.num_variables)
 
+    file_name = f"annealing_results/bqm_{method}_anneal_{train_route}"
+
     if method == 'sim':
-        file_name = f"annealing_results/bqm_{method}_anneal_{train_route}"
         sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
-        store_result(file_name, sampleset, "pyqubo")
-        sampleset = load_results(file_name)
-        dict_list = get_results(sampleset, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
-        print(f"Best Sample {method} device", get_best_fesible_sample(dict_list))
 
     elif method == 'real':
-        file_name = f"annealing_results/bqm_{method}_anneal_{train_route}"
         sampleset =  real_anneal(bqm, num_reads = 1000, annealing_time = 250, chain_strength = 4)
-        store_result(file_name, sampleset, "pyqubo")
-        sampleset_real = load_results(file_name)
-        dict_list_real = get_results(sampleset_real, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
-        print(f"Best Sample {method} device", get_best_fesible_sample(dict_list_real))
-
-    elif method == "read":
-        file_name = f"annealing_results/bqm_real_anneal_{train_route}"
-        sampleset_real = load_results(file_name)
-        dict_list_real = get_results(sampleset_real, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
-        print(f"Best Sample {method} device", get_best_fesible_sample(dict_list_real))
-
+    
+    store_result(file_name, sampleset, "pyqubo")
+    sampleset = load_results(file_name)
+    dict_list = get_results(sampleset, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
+    print(f"Best Sample {method} device", get_best_fesible_sample(dict_list))
 
 
 
@@ -84,8 +74,8 @@ if __name__ == "__main__":
 
     #WE WILL IMPORT THE ABOVE FROM OTHER FILE
 
-    train_route = 'default'
-    method = 'read'
+    train_route = 'rerouted'
+    method = 'sim'
     prob = create_linear_problem(eval(f"train_sets_{train_route}"), timetable, d_max, μ)
     pdict = {"minimal_span":2.5, "single_line":2.5, "minimal_stay":2.5, "track_occupation":2.5, "objective":1 }
     annealing(prob, pdict, method, train_route)
