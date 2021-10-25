@@ -48,7 +48,7 @@ def common_path(S, j, jp):
 
 # timetable input is extected to be in the following form of dict of dicts
 #  taus are given as
-# taus = {"pass" : {"j_s_si" : τ^pass(j,s,s1), ...}, "blocks" : {"j_s_s1" : τ^pass(j,j1,s,s1)  .... },
+# taus = {"pass" : {"j_s_si" : τ^pass(j,s,s1), ...}, "blocks" : {"j_j1_s_s1" : τ^pass(j,j1,s,s1)  .... },
 # "stop": {"j_s_None" : τ^stop(j,s)}, "res": τ^res}
 # τ^res is just one for all situations, it may need to be extended
 
@@ -64,10 +64,7 @@ def common_path(S, j, jp):
 def tau(timetable, key, first_train=None, first_station=None, second_station=None, second_train=None):
     "from timetable return particular τs values, for given train and station/stations"
     if key == "blocks":
-        A = timetable["tau"]["pass"][f"{first_train}_{first_station}_{second_station}"]
-        B = timetable["tau"]["pass"][f"{second_train}_{first_station}_{second_station}"]
-        ofset = max(0, A-B)
-        return timetable["tau"][key][f"{first_train}_{first_station}_{second_station}"]+ofset
+        return timetable["tau"]["blocks"][f"{first_train}_{second_train}_{first_station}_{second_station}"]
     elif key == "pass" or key == "stop":
         return timetable["tau"][key][f"{first_train}_{first_station}_{second_station}"]
     elif key == "res":

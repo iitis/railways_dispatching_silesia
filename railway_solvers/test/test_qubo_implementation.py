@@ -1,12 +1,10 @@
 import numpy as np
-# import sys
-# sys.path.append('/...')
 from railway_solvers import *
 
-#from input_data import small_timetable
 
-taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {
-    "0_0_1": 2, "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
+
+taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
+                                                                }, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
 
 timetable = {"tau": taus,
              "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
@@ -255,9 +253,9 @@ def test_penalties_and_couplings():
 
 
 def test_two_trains_going_one_way_simple():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 8}, "blocks": {"0_0_1": 2,
-                                                         "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
-    timetable = {"tau": taus,
+    taus = {"pass": {"0_0_1": 4, "1_0_1": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
+                                                         }, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
+    timetable_1 = {"tau": taus,
                  "initial_conditions": {"0_0": 3, "1_0": 1},
                  "penalty_weights": {"0_0": 2, "1_0": 0.5}}
 
@@ -281,7 +279,7 @@ def test_two_trains_going_one_way_simple():
     p_qubic = 2.
     d_max = 5
 
-    Q = make_Q(train_sets, timetable, d_max, p_sum,
+    Q = make_Q(train_sets, timetable_1, d_max, p_sum,
                p_pair, p_pair_qubic, p_qubic)
 
     assert np.array_equal(Q, np.load("test/files/Qfile_one_way.npz")["Q"])
@@ -292,9 +290,9 @@ def test_two_trains_going_one_way_simple():
 
 
 def test_track_occupation_simple():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 4}, "blocks": {"0_0_1": 2,
-                                                         "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 2}
-    timetable = {"tau": taus,
+    taus = {"pass": {"0_0_1": 4, "1_0_1": 4}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 4,
+                                                         }, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 2}
+    timetable_2 = {"tau": taus,
                  "initial_conditions": {"0_0": 1, "1_0": 1},
                  "penalty_weights": {"0_0": 2, "1_0": 0.5}}
 
@@ -318,7 +316,7 @@ def test_track_occupation_simple():
     p_qubic = 2.
     d_max = 5
 
-    Q = make_Q(train_sets, timetable, d_max, p_sum,
+    Q = make_Q(train_sets, timetable_2, d_max, p_sum,
                p_pair, p_pair_qubic, p_qubic)
 
     assert np.array_equal(Q, np.load("test/files/Qfile_track.npz")["Q"])
@@ -329,9 +327,9 @@ def test_track_occupation_simple():
 
 
 def test_two_trains_going_opposite_ways_simple():
-    taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "blocks": {"0_0_1": 2,
-                                                         "1_1_0": 2}, "stop": {"0_1_None": 1, "1_0_None": 1}, "res": 1}
-    timetable = {"tau": taus,
+    taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
+                                                         }, "stop": {"0_1_None": 1, "1_0_None": 1}, "res": 1}
+    timetable_3 = {"tau": taus,
                  "initial_conditions": {"0_0": 3, "1_1": 1},
                  "penalty_weights": {"0_0": 2., "1_1": 0.5}}
 
@@ -355,7 +353,7 @@ def test_two_trains_going_opposite_ways_simple():
     p_qubic = 2.
     d_max = 10
 
-    Q = make_Q(train_sets, timetable, d_max, p_sum,
+    Q = make_Q(train_sets, timetable_3, d_max, p_sum,
                p_pair, p_pair_qubic, p_qubic)
 
     assert np.array_equal(Q, np.load("test/files/Qfile_two_ways.npz")["Q"])

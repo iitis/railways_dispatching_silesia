@@ -21,7 +21,7 @@ def annealing(prob, pdict, method, train_route):
 
     elif method == 'real':
         sampleset =  real_anneal(bqm, num_reads = 1000, annealing_time = 250, chain_strength = 4)
-    
+
     store_result(file_name, sampleset, "pyqubo")
     sampleset = load_results(file_name)
     dict_list = get_results(sampleset, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
@@ -33,8 +33,8 @@ def annealing(prob, pdict, method, train_route):
 
 if __name__ == "__main__":
 
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {
-        "0_0_1": 2, "1_0_1": 2}, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
+    taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6
+                                                                    }, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
     timetable = {"tau": taus,
                     "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
                     "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
