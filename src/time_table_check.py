@@ -67,6 +67,7 @@ def get_default_dir(path_column):
     return default_dir
 
 def train_time_table(train):
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     train_dict = timetable_to_train_dict(data)
     time_table = train_dict[train][1]
     return time_table
@@ -94,6 +95,15 @@ def get_arr_dep_vals(train):
     for i in range(len(short_list)):
         arr_dep_vals+=[short_list.iloc[i].tolist()]
     return arr_dep_vals
+
+def check_important_stations(train):
+    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    time_table = train_time_table(train)
+    blocks = time_table['path']
+    station_list = []
+    for block in blocks:
+        station_list += [key for key, value in important_stations.items() if block in value]
+    return station_list
 
 # check paths time
 def check_path_time(train, scheme = 'complete', show_warning = True):
@@ -191,6 +201,7 @@ if __name__ == "__main__":
 
     total_time_path,_ = check_path_time(train,scheme=range(schemes[0][0],schemes[-1][-1]+1),show_warning = False)
     print("The total time for whole path is {}".format(np.round(total_time_path,1)))
+    print("The important stations are:",check_important_stations(train))
         # for train in list(train_dict.keys()):
         #     total_time,times = check_path_time(train)
         #     print("Total time is:",total_time)

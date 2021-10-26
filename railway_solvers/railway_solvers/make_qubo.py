@@ -41,26 +41,30 @@ def Pspan(timetable, k, k1, inds, train_sets):
 
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
-    if occurs_as_pair(j, j1, train_sets["Jd"]):
 
-        s = inds[k]["s"]
-        s1 = inds[k1]["s"]
+    s = inds[k]["s"]
+    s1 = inds[k1]["s"]
 
-        # this is a version of the common path, think over, perhaps clear
-        s_next = subsequent_station(S[j], s)
-        s_nextp = subsequent_station(S[j1], s1)
+    s_next = subsequent_station(S[j], s)
+    s_nextp = subsequent_station(S[j1], s1)
 
-        if (s == s1 and s_next != None and s_next == s_nextp):
+    if (s == s1 and s_next != None and s_next == s_nextp):
+        print(".................")
 
-            t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-            t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s)
+        if s in train_sets["Jd"].keys():
+            if s_next in train_sets["Jd"][s].keys():
+                if occurs_as_pair(j, j1, train_sets["Jd"][s][s_next]):
 
-            A = -tau(timetable, 'blocks', first_train=j1, second_train=j, first_station=s, second_station=s_next)
 
-            B = tau(timetable, 'blocks', first_train=j, second_train=j1, first_station=s, second_station=s_next)
+                    t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+                    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s)
 
-            if A < t1-t < B:
-                return 1.
+                    A = -tau(timetable, 'blocks', first_train=j1, second_train=j, first_station=s, second_station=s_next)
+
+                    B = tau(timetable, 'blocks', first_train=j, second_train=j1, first_station=s, second_station=s_next)
+
+                    if A < t1-t < B:
+                        return 1.
     return 0.
 
 
