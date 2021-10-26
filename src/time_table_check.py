@@ -105,7 +105,6 @@ def check_important_stations(train):
         station_list += [key for key, value in important_stations.items() if block in value]
     return station_list
 
-
 # check paths time
 def check_path_time(train, scheme = 'complete', show_warning = True):
     train_dict = timetable_to_train_dict(data)
