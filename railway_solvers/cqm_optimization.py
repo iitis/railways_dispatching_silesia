@@ -44,11 +44,11 @@ prob = create_linear_problem(train_sets, timetable, d_max, μ)
 cqm, interpreter = convert_to_cqm(prob)
 file_name = f"annealing_results/cqm_default"
 
-sampleset = constrained_solver(cqm)
-store_result(file_name, sampleset, "cqm")
+#sampleset = constrained_solver(cqm)
+#store_result(file_name, sampleset)
 
-sampleset = interpreter(load_results(file_name))
-dict_list = get_results(sampleset, "cqm", prob)
+sampleset = load_results(file_name)
+dict_list = get_results(sampleset, "cqm", prob, interpreter)
 print("Best Sample ", get_best_fesible_sample(dict_list))
 
 for l in dict_list:

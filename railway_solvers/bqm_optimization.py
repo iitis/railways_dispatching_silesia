@@ -16,15 +16,15 @@ def annealing(prob, pdict, method, train_route):
 
     file_name = f"annealing_results/bqm_{method}_anneal_{train_route}"
 
-    if method == 'sim':
-        sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
+    #if method == 'sim':
+    #    sampleset = sim_anneal(bqm, num_sweeps=4000, num_reads=1000)
 
-    elif method == 'real':
-        sampleset =  real_anneal(bqm, num_reads = 1000, annealing_time = 250, chain_strength = 4)
+    #elif method == 'real':
+    #    sampleset =  real_anneal(bqm, num_reads = 1000, annealing_time = 250, chain_strength = 4)
 
-    store_result(file_name, sampleset, "pyqubo")
+    #store_result(file_name, sampleset)
     sampleset = load_results(file_name)
-    dict_list = get_results(sampleset, "pyqubo", interpreter = interpreter, prob= prob, pdict = pdict)
+    dict_list = get_results(sampleset, "pyqubo", interpreter = interpreter, prob= prob)
     print(f"Best Sample {method} device", get_best_fesible_sample(dict_list))
 
 

@@ -57,4 +57,10 @@ def convert_to_cqm(model: LpProblem):
                 result['sample_data']['data'][i][j] += var.lowBound
         return result
 
-    return cqm, lambda ss: interpreter(ss, model)
+    def interpreter2(sample, model):
+        for key in sample:
+            var = next(i for i in model.variables() if i.name==key)
+            sample[key] += var.lowBound
+        return sample
+
+    return cqm, lambda ss: interpreter2(ss, model)
