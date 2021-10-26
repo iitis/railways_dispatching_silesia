@@ -40,7 +40,7 @@ def test_pspan_pstay_p1track():
         "Jd": [[0, 1], [2]],
         "Josingle": [],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -83,7 +83,7 @@ def test_pspan_pstay_p1track():
         "Jd": [],
         "Josingle": [[1, 2], []],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -135,7 +135,7 @@ def test_qubic():
         "Jd": [],
         "Josingle": [[1, 2], []],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -224,7 +224,7 @@ def test_penalties_and_couplings():
         "Jd": [[0, 1], [2]],
         "Josingle": [],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -306,7 +306,7 @@ def test_track_occupation_simple():
         "Jd": [[]],
         "Josingle": [[]],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -376,7 +376,7 @@ def test_performing_Qmat():
         "Jd": [[0, 1], [2]],
         "Josingle": [],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -403,7 +403,7 @@ def test_performing_Qmat():
         "Jd": [],
         "Josingle": [[1, 2], []],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 

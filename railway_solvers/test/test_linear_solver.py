@@ -124,7 +124,7 @@ def test_track_occupation_simplest():
         "Jd": [[]],
         "Josingle": [[]],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1], []]},
         "Jswitch": dict()
     }
 
@@ -166,7 +166,7 @@ def test_linear_solver_default_problem():
         "Jd": [[0, 1], [2]],
         "Josingle": [],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -181,7 +181,7 @@ def test_linear_solver_default_problem():
         "Jd": [],
         "Josingle": [[1, 2], []],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -243,7 +243,7 @@ def test_constraint_labels():
         "Jd": [[0, 1], [2]],
         "Josingle": [],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -258,7 +258,7 @@ def test_constraint_labels():
         "Jd": [],
         "Josingle": [[1, 2], []],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 

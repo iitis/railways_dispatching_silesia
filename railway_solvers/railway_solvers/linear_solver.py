@@ -82,35 +82,35 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
 
     S = train_sets["Paths"]
     for s in train_sets["Jtrack"].keys():
-        js = train_sets["Jtrack"][s]
-        for (j, jp) in itertools.combinations(js, 2):
-            s_previous = previous_station(S[j], s)
-            s_previousp = previous_station(S[jp], s)
+        for js in train_sets["Jtrack"][s]:
+            for (j, jp) in itertools.combinations(js, 2):
+                s_previous = previous_station(S[j], s)
+                s_previousp = previous_station(S[jp], s)
 
-            # the last condition is to keep an order if trains are folowwing one another
-            if s_previous == s_previousp and s_previous != None:
-                if occurs_as_pair(j, jp, train_sets["Jd"]):
-                    problem += y[j][jp][s] == y[j][jp][s_previous], f"track_occupation_{s}_{s_previous}"
+                # the last condition is to keep an order if trains are folowwing one another
+                if s_previous == s_previousp and s_previous != None:
+                    if occurs_as_pair(j, jp, train_sets["Jd"]):
+                        problem += y[j][jp][s] == y[j][jp][s_previous], f"track_occupation_{s}_{s_previous}"
 
-            if s_previousp != None:
-                LHS = delay_var[jp][s_previousp]
-                LHS += earliest_dep_time(S, timetable, jp, s_previousp)
-                LHS += tau(timetable, "pass", first_train=jp, first_station=s_previousp, second_station=s)
-                LHS += μ*(1-y[j][jp][s])
-                RHS = delay_var[j][s]
-                RHS += earliest_dep_time(S, timetable, j, s)
-                RHS += tau(timetable, "res")
-                problem += LHS >= RHS, f"track_occupation_{s}_{s_previousp}_{s_previous}_p"
+                if s_previousp != None:
+                    LHS = delay_var[jp][s_previousp]
+                    LHS += earliest_dep_time(S, timetable, jp, s_previousp)
+                    LHS += tau(timetable, "pass", first_train=jp, first_station=s_previousp, second_station=s)
+                    LHS += μ*(1-y[j][jp][s])
+                    RHS = delay_var[j][s]
+                    RHS += earliest_dep_time(S, timetable, j, s)
+                    RHS += tau(timetable, "res")
+                    problem += LHS >= RHS, f"track_occupation_{s}_{s_previousp}_{s_previous}_p"
 
-            if s_previous != None:
-                LHS = delay_var[j][s_previous]
-                LHS += earliest_dep_time(S, timetable, j, s_previous)
-                LHS += tau(timetable, "pass", first_train=j, first_station=s_previous, second_station=s)
-                LHS += μ*y[j][jp][s]
-                RHS = delay_var[jp][s]
-                RHS += earliest_dep_time(S, timetable, jp, s)
-                RHS += tau(timetable, "res")
-                problem += LHS >= RHS, f"track_occupation_{s}_{s_previous}_{s_previousp}"
+                if s_previous != None:
+                    LHS = delay_var[j][s_previous]
+                    LHS += earliest_dep_time(S, timetable, j, s_previous)
+                    LHS += tau(timetable, "pass", first_train=j, first_station=s_previous, second_station=s)
+                    LHS += μ*y[j][jp][s]
+                    RHS = delay_var[jp][s]
+                    RHS += earliest_dep_time(S, timetable, jp, s)
+                    RHS += tau(timetable, "res")
+                    problem += LHS >= RHS, f"track_occupation_{s}_{s_previous}_{s_previousp}"
 
 
 def objective(problem, timetable, delay_var, train_sets, d_max):
@@ -149,10 +149,11 @@ def linear_varibles(train_sets, d_max):
 
     # this is the track occupation case
     for s in train_sets["Jtrack"].keys():
-        for pair in itertools.combinations(train_sets["Jtrack"][s], 2):
-            y = pus.LpVariable.dicts(
-                "y", ([pair[0]], [pair[1]], [s]), 0, 1, cat='Integer')
-            update_dictofdicts(order_vars, y)
+        for js in train_sets["Jtrack"][s]:
+            for pair in itertools.combinations(js, 2):
+                y = pus.LpVariable.dicts(
+                    "y", ([pair[0]], [pair[1]], [s]), 0, 1, cat='Integer')
+                update_dictofdicts(order_vars, y)
 
     return secondary_delays_vars, order_vars
 

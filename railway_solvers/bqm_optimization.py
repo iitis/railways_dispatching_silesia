@@ -53,7 +53,7 @@ if __name__ == "__main__":
         "Jd": [[0, 1], [2]],
         "Josingle": [],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         "Jd": [],
         "Josingle": [[1, 2], []],
         "Jround": dict(),
-        "Jtrack": {1: [0, 1]},
+        "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
     }
 

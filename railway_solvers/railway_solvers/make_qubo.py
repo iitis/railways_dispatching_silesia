@@ -123,10 +123,11 @@ def z_indices(train_sets, d_max):
     "and delays of this two trains"
     inds = []
     for s in train_sets["Jtrack"].keys():
-        for (j, j1) in itertools.combinations(train_sets["Jtrack"][s], 2):
-            for d in range(d_max+1):
-                for d1 in range(d_max+1):
-                    inds.append({"j": j, "j1": j1, "s": s, "d": d, "d1": d1})
+        for js in train_sets["Jtrack"][s]:
+            for (j, j1) in itertools.combinations(js, 2):
+                for d in range(d_max+1):
+                    for d1 in range(d_max+1):
+                        inds.append({"j": j, "j1": j1, "s": s, "d": d, "d1": d1})
     return inds, len(inds)
 
 
@@ -142,7 +143,9 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
             jz = inds1[k1]["j"]
             jz1 = inds1[k1]["j1"]
 
-            if (jx == jz) and occurs_as_pair(jx, jz1, [train_sets["Jtrack"][sz]]):
+            #print(train_sets["Jtrack"][sz])
+
+            if (jx == jz) and occurs_as_pair(jx, jz1, train_sets["Jtrack"][sz]):
                 # jz, jz1, tx => j', j, j', according to Eq 32
                 # tz, tz1, tx => t', t,  t'' according to Eq 32
                 # sx, sz -> s', s
@@ -155,7 +158,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz1 <= tz:
                     return 1.
 
-            if (jx == jz1) and occurs_as_pair(jx, jz, [train_sets["Jtrack"][sz]]):
+            if (jx == jz1) and occurs_as_pair(jx, jz, train_sets["Jtrack"][sz]):
                 # jz1, jz, tx => j', j, j', according to Eq 32
                 # tz1, tz, tx => t', t,  t'' according to Eq 32
                 # sx, sz -> s', s
@@ -176,7 +179,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
             jz = inds1[k]["j"]
             jz1 = inds1[k]["j1"]
 
-            if (jx == jz) and occurs_as_pair(jx, jz1, [train_sets["Jtrack"][sz]]):
+            if (jx == jz) and occurs_as_pair(jx, jz1, train_sets["Jtrack"][sz]):
                 tx = inds1[k1]["d"] + earliest_dep_time(S, timetable, jx, sx)
                 tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
                 tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
@@ -184,7 +187,7 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
                 if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz1 <= tz:
                     return 1.
 
-            if (jx == jz1) and occurs_as_pair(jx, jz, [train_sets["Jtrack"][sz]]):
+            if (jx == jz1) and occurs_as_pair(jx, jz, train_sets["Jtrack"][sz]):
                 tx = inds1[k1]["d"] + earliest_dep_time(S, timetable, jx, sx)
                 tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
                 tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
@@ -241,7 +244,7 @@ def P2qubic(k, k1, inds1, train_sets):
             j1 = inds1[k1]["j"]
             sz = subsequent_station(S[j], s)
             if s in train_sets["Jtrack"].keys():
-                if occurs_as_pair(j, j1, [train_sets["Jtrack"][s]]):
+                if occurs_as_pair(j, j1, train_sets["Jtrack"][s]):
                     return 0.5
     return 0.
 
