@@ -53,7 +53,7 @@ def Pspan(timetable, k, k1, inds, train_sets):
 
         if s in train_sets["Jd"].keys():
             if s_next in train_sets["Jd"][s].keys():
-                if occurs_as_pair(j, j1, [train_sets["Jd"][s][s_next]]):
+                if occurs_as_pair(j, j1, train_sets["Jd"][s][s_next]):
 
 
                     t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
