@@ -33,7 +33,7 @@ def test_trains_paths():
 
 def test_auxiliary_timetable_functions():
     taus = {"pass": {"0_0_1": 5, "1_0_1": 7, "2_1_0": 10}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 5,
-                                                                      }, "stop": {"0_1_None": 1, "1_1_None": 2, "2_0_None": 1}, "res": 3}
+                                                                      }, "stop": {"0_1": 1, "1_1": 2, "2_0": 1}, "res": 3}
     schedule = {"0_0": -10, "1_0": 0, "2_1": 0, "0_1": -3, "1_1": 9, "2_0": 11}
     timetable = {"tau": taus, "schedule": schedule,
                  "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},

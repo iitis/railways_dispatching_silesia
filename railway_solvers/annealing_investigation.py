@@ -2,7 +2,7 @@ from pulp.constants import LpSolutionInfeasible, LpSolutionIntegerFeasible, LpSt
 from railway_solvers import *
 from copy import deepcopy
 taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6
-                                                                }, "stop": {"0_1_None": 1, "1_1_None": 1}, "res": 1}
+                                                                }, "stop": {"0_1": 1, "1_1": 1}, "res": 1}
 
 timetable = {"tau": taus,
                 "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},

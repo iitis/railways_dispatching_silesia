@@ -65,8 +65,10 @@ def tau(timetable, key, first_train=None, first_station=None, second_station=Non
     "from timetable return particular τs values, for given train and station/stations"
     if key == "blocks":
         return timetable["tau"]["blocks"][f"{first_train}_{second_train}_{first_station}_{second_station}"]
-    elif key == "pass" or key == "stop":
+    elif key == "pass":
         return timetable["tau"][key][f"{first_train}_{first_station}_{second_station}"]
+    elif key == "stop":
+        return timetable["tau"][key][f"{first_train}_{first_station}"]
     elif key == "res":
         return timetable["tau"]["res"]
     return None
