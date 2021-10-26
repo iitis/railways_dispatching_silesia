@@ -67,7 +67,17 @@ def convert_to_pyqubo(model: LpProblem):
         H += Placeholder("objective") * pyqubo_obj
     return H.compile()
 
+
 def convert_to_bqm(model: LpProblem, pdict):
     pyqubo_model = convert_to_pyqubo(model)
-    interpreter = lambda s: pyqubo_model.decode_sample(s, vartype='BINARY', feed_dict=pdict)
-    return pyqubo_model.to_bqm(feed_dict=pdict), interpreter
+
+    def interpreter(sampleset):
+        result = []
+        energies = [d.energy for d in sampleset.data()]
+        for sample in sampleset.samples():
+            decoded = (pyqubo_model.decode_sample(dict(sample), vartype='BINARY', feed_dict=pdict))
+            decoded_dict = {**decoded.subh, **decoded.sample}
+            result.append({v: decoded_dict[v] for v in map(str, model.variables())})
+        return dimod.SampleSet.from_samples(dimod.as_samples(result), 'BINARY', energies)
+
+    return pyqubo_model.to_bqm(feed_dict=pdict), lambda ss: interpreter(ss)

@@ -50,17 +50,14 @@ def convert_to_cqm(model: LpProblem):
         cqm.set_objective(dimod_obj)
 
     def interpreter(sampleset, model):
-        result = deepcopy(sampleset)
-        for i in range(result['num_rows']):
-            for j, name in enumerate(result['variable_labels']):
+        result = []
+        energies = [d.energy for d in sampleset.data()]
+        for sample in sampleset.samples():
+            new_sample = {}
+            for name in sampleset.variables:
                 var = next(i for i in model.variables() if i.name==name)
-                result['sample_data']['data'][i][j] += var.lowBound
-        return result
+                new_sample[name] = var.lowBound + sample[name]
+            result.append(new_sample)
+        return dimod.SampleSet.from_samples(dimod.as_samples(result), 'BINARY', energies)
 
-    def interpreter2(sample, model):
-        for key in sample:
-            var = next(i for i in model.variables() if i.name==key)
-            sample[key] += var.lowBound
-        return sample
-
-    return cqm, lambda ss: interpreter2(ss, model)
+    return cqm, lambda ss: interpreter(ss, model)

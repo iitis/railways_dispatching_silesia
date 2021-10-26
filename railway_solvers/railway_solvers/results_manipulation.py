@@ -1,6 +1,5 @@
 import pickle
 from typing import Dict
-
 import dimod
 from pulp.pulp import LpProblem
 import pulp
@@ -27,26 +26,15 @@ def get_objective(prob, sample):
     return result
 
 
-def get_best_fesible_sample(dict_list):
-    for l in dict_list:
-        if l['feasible']:
-            return l
+def get_best_feasible_sample(dict_list):
+    return next(l for l in dict_list if l['feasible'])
 
 
-def pyqubo_sample_to_dict(sample, interpreter = None, prob = None):
-    decoded = interpreter(sample)
-    decoded_dict  = {**decoded.subh, **decoded.sample}
-    return {v: decoded_dict[v] for v in map(str,prob.variables())}
-
-
-def get_results(sampleset, mode, prob = None, interpreter = None):
+def get_results(sampleset, prob):
     dict_list = []
     for data in sampleset.data():
-        if mode == "cqm":
-            sample = interpreter(data.sample)
-        elif mode == "pyqubo":
-            sample = pyqubo_sample_to_dict(data.sample, interpreter = interpreter, prob= prob)
         rdict = {}
+        sample = data.sample
         rdict['energy'] = data.energy
         rdict['objective'] = round(get_objective(prob, sample), 2)
         rdict['feasible'] = all(analyze_constraints(prob, sample)[0].values())
@@ -64,4 +52,4 @@ def store_result(file_name, sampleset):
 
 def load_results(file_name):
     file = pickle.load(open(file_name, "rb"))
-    return  dimod.SampleSet.from_serializable(file)
+    return dimod.SampleSet.from_serializable(file)
