@@ -9,12 +9,11 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
     "adds the minimum span condition to the pulp problem"
 
     S = train_sets["Paths"]
-    for js in train_sets["Jd"]:
-        for (j, jp) in itertools.combinations(js, 2):
-            # the common path without last station is used, TODO think over
-            for s in common_path(S, j, jp)[0:-1]:
-                s_next = subsequent_station(S[j], s)
-                s_nextp = subsequent_station(S[jp], s)
+    for s in train_sets["Jd"].keys():
+        for s_next in train_sets["Jd"][s].keys():
+            js = train_sets["Jd"][s][s_next]
+            for (j, jp) in itertools.combinations(js, 2):
+
 
                 LHS = delay_var[jp][s]
                 LHS += earliest_dep_time(S, timetable, jp, s)
@@ -87,10 +86,13 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
                 s_previous = previous_station(S[j], s)
                 s_previousp = previous_station(S[jp], s)
 
-                # the last condition is to keep an order if trains are folowwing one another
+                # the last condition is to keep an order if trains are folowing one another
                 if s_previous == s_previousp and s_previous != None:
-                    if occurs_as_pair(j, jp, train_sets["Jd"]):
-                        problem += y[j][jp][s] == y[j][jp][s_previous], f"track_occupation_{s}_{s_previous}"
+                    if s_previous in train_sets["Jd"].keys():
+                        if s in train_sets["Jd"][s_previous].keys():
+                            if occurs_as_pair(j, jp, [train_sets["Jd"][s_previous][s]]):
+                                problem += y[j][jp][s] == y[j][jp][s_previous], f"track_occupation_{s}_{s_previous}"
+
 
                 if s_previousp != None:
                     LHS = delay_var[jp][s_previousp]
@@ -133,11 +135,9 @@ def linear_varibles(train_sets, d_max):
     order_vars = dict()
 
     l1 = list(train_sets["Josingle"])
-    l2 = list(train_sets["Jd"])
+    # this is the single line
+    for js in l1:
 
-    # this is the single and double line case
-    for js in l1+l2:
-        no_station = []
         for pair in itertools.combinations(js, 2):
             # common path without the last station TODO think over
             no_station = common_path(S, pair[0], pair[1])[0:-1]
@@ -146,6 +146,18 @@ def linear_varibles(train_sets, d_max):
                 "y", ([pair[0]], [pair[1]], no_station), 0, 1, cat='Integer')
 
             update_dictofdicts(order_vars, y)
+
+    # this is the double line case
+    for no_stations in train_sets["Jd"].keys():
+        for js in train_sets["Jd"][no_stations].items():
+            for pair in itertools.combinations(js[1], 2):
+
+                y = pus.LpVariable.dicts(
+                    "y", ([pair[0]], [pair[1]], [no_stations]), 0, 1, cat='Integer')
+
+                update_dictofdicts(order_vars, y)
+
+
 
     # this is the track occupation case
     for s in train_sets["Jtrack"].keys():
