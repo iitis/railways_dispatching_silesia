@@ -61,11 +61,12 @@ aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
 
 "ZZ":['"ZZ", "ST", 1, "(1)"',
 '"ZZ", "ST", 2, "(1)"'],
-
+# branch junctions:
+# Mc for trains going KL-> Ty
 "Mc":['"Mc", "PODG", 1, "(N/A)"',
 '"Mc", "PODG", 2, "(N/A)"',
 '"Mc", "PODG", 3, "(N/A)"'],
-# branch junctions:
+
 # KTC (for trains going KO -> CB):
 "KTC":['"KTC-KO-1", "SBL+PO(Załęże)", 2, "1", "(2)"',
 '"KO-KTC-2", "SBL+POGP", 1, "2", "(2)"'],
@@ -76,5 +77,5 @@ aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
 np.savez('important_stations',important_stations)
 np.savez('aditional_stations',aditional_stations)
 
-npzfile = np.load('./important_stations.npz')
-print(npzfile.files)
+# npzfile = np.load('./important_stations.npz')
+# print(npzfile.files)
