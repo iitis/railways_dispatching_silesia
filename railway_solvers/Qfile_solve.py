@@ -1,0 +1,110 @@
+from typing import KeysView
+import neal
+from dwave.system import EmbeddingComposite, DWaveSampler, LeapHybridSampler, LeapHybridCQMSampler
+import dimod
+import pickle
+import numpy as np
+
+
+
+def sim_anneal(bqm, beta_range=(5, 100), num_sweeps=4000, num_reads=1000):
+    s = neal.SimulatedAnnealingSampler()
+    sampleset = s.sample(bqm, beta_range, num_sweeps, num_reads,
+                         beta_schedule_type='geometric')
+    return sampleset
+
+
+def real_anneal(bqm, num_reads, annealing_time, chain_strength):
+    sampler = EmbeddingComposite(DWaveSampler())
+    # annealing time in micro second, 20 is default.
+    sampleset = sampler.sample(bqm, num_reads=num_reads,
+                               auto_scale='true', annealing_time=annealing_time, chain_strength=chain_strength)
+    return sampleset
+
+
+def constrained_solver(cqm):
+    sampler = LeapHybridCQMSampler()
+    sampleset = sampler.sample_cqm(cqm)
+    return sampleset
+
+
+def hybrid_anneal(bqm):
+    sampler = LeapHybridSampler()
+    sampleset = sampler.sample_qubo(bqm)
+    return sampleset
+
+
+#those should be removed or resructurrd
+def anneal_solutuon(method):
+    if method == 'reroute':
+        Q_init = np.load('files/Qfile_r.npz')
+    elif method == 'default':
+        Q_init = np.load('files/Qfile.npz')
+
+    Q = Q_init['Q'].astype(np.float32)
+    model = dimod.BinaryQuadraticModel.from_numpy_matrix(Q)
+    qubo, offset = model.to_qubo()
+    return qubo
+
+
+def annealing_outcome(method, annealing, num_reads=None, annealing_time=None, chain_strength = None):
+    """method: 'reroute', 'default',
+    annealing: 'simulated', 'hybrid', 'quantum', 
+    num_reads: Number of reads in quantum annealing annealing,
+    annealing_time: Choose an annealing time
+
+    returns: minimum energy/optimal solution"""
+
+    # simulated annealing!!!!
+    if annealing == 'simulated':
+        sampleset = sim_anneal(method)
+
+        results = []
+        for datum in sampleset.data():
+            x = dimod.sampleset.as_samples(datum.sample)[0][0]
+            results.append((x, datum.energy))
+
+        sdf = sampleset.to_serializable()
+
+        with open(f"files/Qfile_complete_sol_sim-anneal_{method}", 'wb') as handle:
+            pickle.dump(sdf, handle)
+        with open(f"files/Qfile_samples_sol_sim-anneal_{method}", 'wb') as handle:
+            pickle.dump(results, handle)
+
+        
+    # hybrid annealing!!!
+    elif annealing == 'hybrid':
+        sampleset = hybrid_anneal(method)
+
+        results = []
+        for datum in sampleset.data():
+            x = dimod.sampleset.as_samples(datum.sample)[0][0]
+            results.append((x, datum.energy))
+
+        sdf = sampleset.to_serializable()
+
+        with open(f"files/hybrid_data/Qfile_complete_sol_hybrid-anneal_{method}", 'wb') as handle:
+            pickle.dump(sdf, handle)
+        with open(f"files/hybrid_data/Qfile_samples_sol_hybrid-anneal_{method}", 'wb') as handle:
+            pickle.dump(results, handle)
+
+    # quantum annealing!!!!!
+    elif annealing == 'quantum':
+
+        sampleset = real_anneal(
+            method, num_reads, annealing_time, chain_strength)
+
+        results = []
+        for datum in sampleset.data():
+            x = dimod.sampleset.as_samples(datum.sample)[0][0]
+            results.append((x, datum.energy))
+
+        sdf = sampleset.to_serializable()
+
+        with open(f"files/dwave_data/Qfile_complete_sol_real-anneal_numread{num_reads}_antime{annealing_time}_chainst{chain_strength}_{method}", 'wb') as handle:
+            pickle.dump(sdf, handle)
+        with open(f"files/dwave_data/Qfile_samples_sol_real-anneal_numread{num_reads}_antime{annealing_time}_chainst{chain_strength}_{method}", 'wb') as handle:
+            pickle.dump(results, handle)
+
+            # print(f"Energy {sampleset.first} with chain strength {chain_strength} run")
+
