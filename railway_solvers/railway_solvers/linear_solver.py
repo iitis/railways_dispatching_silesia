@@ -11,26 +11,26 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
     S = train_sets["Paths"]
     for s in train_sets["Jd"].keys():
         for s_next in train_sets["Jd"][s].keys():
-            js = train_sets["Jd"][s][s_next]
-            for (j, jp) in itertools.combinations(js, 2):
+            for js in train_sets["Jd"][s][s_next]:
+                for (j, jp) in itertools.combinations(js, 2):
 
 
-                LHS = delay_var[jp][s]
-                LHS += earliest_dep_time(S, timetable, jp, s)
-                LHS += μ*(1-y[j][jp][s]) - delay_var[j][s]
-                LHS -= earliest_dep_time(S, timetable, j, s)
-                RHS = tau(timetable, 'blocks', first_train=j, second_train = jp, first_station=s, second_station=s_next)
+                    LHS = delay_var[jp][s]
+                    LHS += earliest_dep_time(S, timetable, jp, s)
+                    LHS += μ*(1-y[j][jp][s]) - delay_var[j][s]
+                    LHS -= earliest_dep_time(S, timetable, j, s)
+                    RHS = tau(timetable, 'blocks', first_train=j, second_train = jp, first_station=s, second_station=s_next)
 
-                problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{jp}_{j}_{s}"
+                    problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{jp}_{j}_{s}"
 
-                LHS = delay_var[j][s]
-                LHS += earliest_dep_time(S, timetable, j, s)
-                LHS += μ*y[j][jp][s]
-                LHS -= delay_var[jp][s]
-                LHS -= earliest_dep_time(S, timetable, jp, s)
-                RHS = tau(timetable, 'blocks', first_train=jp, second_train = j, first_station=s, second_station=s_next)
+                    LHS = delay_var[j][s]
+                    LHS += earliest_dep_time(S, timetable, j, s)
+                    LHS += μ*y[j][jp][s]
+                    LHS -= delay_var[jp][s]
+                    LHS -= earliest_dep_time(S, timetable, jp, s)
+                    RHS = tau(timetable, 'blocks', first_train=jp, second_train = j, first_station=s, second_station=s_next)
 
-                problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{j}_{jp}_{s}"
+                    problem += LHS >= RHS, f"minimal_span_{js[0]}_{js[1]}_{j}_{jp}_{s}"
 
 
 def single_line(problem, timetable, delay_var, y, train_sets, μ):
@@ -90,7 +90,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
                 if s_previous == s_previousp and s_previous != None:
                     if s_previous in train_sets["Jd"].keys():
                         if s in train_sets["Jd"][s_previous].keys():
-                            if occurs_as_pair(j, jp, [train_sets["Jd"][s_previous][s]]):
+                            if occurs_as_pair(j, jp, train_sets["Jd"][s_previous][s]):
                                 problem += y[j][jp][s] == y[j][jp][s_previous], f"track_occupation_{s}_{s_previous}"
 
 
@@ -150,12 +150,13 @@ def linear_varibles(train_sets, d_max):
     # this is the double line case
     for no_stations in train_sets["Jd"].keys():
         for js in train_sets["Jd"][no_stations].items():
-            for pair in itertools.combinations(js[1], 2):
+            for j in js[1]:
+                for pair in itertools.combinations(j, 2):
 
-                y = pus.LpVariable.dicts(
-                    "y", ([pair[0]], [pair[1]], [no_stations]), 0, 1, cat='Integer')
+                    y = pus.LpVariable.dicts(
+                        "y", ([pair[0]], [pair[1]], [no_stations]), 0, 1, cat='Integer')
 
-                update_dictofdicts(order_vars, y)
+                    update_dictofdicts(order_vars, y)
 
 
 
