@@ -49,7 +49,6 @@ def Pspan(timetable, k, k1, inds, train_sets):
     s_nextp = subsequent_station(S[j1], s1)
 
     if (s == s1 and s_next != None and s_next == s_nextp):
-        print(".................")
 
         if s in train_sets["Jd"].keys():
             if s_next in train_sets["Jd"][s].keys():
@@ -99,22 +98,22 @@ def P1track(timetable, k, k1, inds, train_sets):
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
 
-    if occurs_as_pair(j, j1, train_sets["Josingle"]):
-        s = inds[k]["s"]
-        s1 = inds[k1]["s"]
+    s = inds[k]["s"]
+    s1 = inds[k1]["s"]
 
-        t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-        t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
+    t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
-        if s1 == subsequent_station(S[j], s):
-            if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) < t1 - t:
-                if t1-t < tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) + tau(timetable, 'res'):
-                    return 1.0
+    if (s, s1) in train_sets["Josingle"].keys() and [j, j1] in train_sets["Josingle"][(s, s1)]:
+        if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) < t1 - t:
+            if t1-t < tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) + tau(timetable, 'res'):
+                return 1.0
 
-        if s == subsequent_station(S[j1], s1):
-            if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) < t - t1:
-                if t - t1 < tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) + tau(timetable, 'res'):
-                    return 1.0
+
+    if (s1, s) in train_sets["Josingle"].keys() and [j1, j] in train_sets["Josingle"][(s1, s)]:
+        if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) < t - t1:
+            if t - t1 < tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) + tau(timetable, 'res'):
+                return 1.0
 
     return 0.
 
