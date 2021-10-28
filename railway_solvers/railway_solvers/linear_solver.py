@@ -48,7 +48,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
             RHS += earliest_dep_time(S, timetable, jp, sp)
             RHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
             RHS += tau(timetable, 'res', first_train=jp, second_train=j, first_station=s)
-            problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}"
+            problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
 
             LHS = delay_var[jp][sp]
             LHS += earliest_dep_time(S, timetable, jp, sp)
@@ -57,7 +57,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
             RHS += earliest_dep_time(S, timetable, j, s)
             RHS += tau(timetable, 'pass', first_train=j, first_station=s, second_station=sp)
             RHS += tau(timetable, 'res', first_train=j, second_train=jp, first_station=s)
-            problem += LHS >= RHS, f"single_line_{jp}_{j}_{s}"
+            problem += LHS >= RHS, f"single_line_{jp}_{j}_{s}_{sp}"
 
     print(problem)
 
@@ -89,7 +89,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
                     if sp in train_sets["Jd"].keys():
                         if s in train_sets["Jd"][sp].keys():
                             if occurs_as_pair(j, jp, train_sets["Jd"][sp][s]):
-                                problem += y[j][jp][s] == y[j][jp][sp], f"track_occupation_{s}_{sp}"
+                                problem += y[j][jp][s] == y[j][jp][sp], f"track_occupation_{j}_{jp}_{s}_{sp}"
 
 
                 if spp != None:
@@ -100,7 +100,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
                     RHS = delay_var[j][s]
                     RHS += earliest_dep_time(S, timetable, j, s)
                     RHS += tau(timetable, "res")
-                    problem += LHS >= RHS, f"track_occupation_{s}_{spp}_{sp}_p"
+                    problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
 
                 if sp != None:
                     LHS = delay_var[j][sp]
@@ -110,7 +110,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
                     RHS = delay_var[jp][s]
                     RHS += earliest_dep_time(S, timetable, jp, s)
                     RHS += tau(timetable, "res")
-                    problem += LHS >= RHS, f"track_occupation_{s}_{sp}_{spp}"
+                    problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}"
 
 
 def objective(problem, timetable, delay_var, train_sets, d_max):
