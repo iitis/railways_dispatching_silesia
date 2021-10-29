@@ -5,7 +5,7 @@ import pulp as pus
 from .helpers_functions import *
 
 
-def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
+def minimal_span(problem, timetable, delay_var, y, train_sets, d_max, μ):
     "adds the minimum span condition to the pulp problem"
 
     S = train_sets["Paths"]
@@ -15,25 +15,33 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, μ):
                 for (j, jp) in itertools.combinations(js, 2):
 
 
-                    LHS = delay_var[jp][s]
-                    LHS += earliest_dep_time(S, timetable, jp, s)
-                    LHS += μ*(1-y[j][jp][s]) - delay_var[j][s]
+                    LHS = earliest_dep_time(S, timetable, jp, s)
                     LHS -= earliest_dep_time(S, timetable, j, s)
                     RHS = tau(timetable, 'blocks', first_train=j, second_train = jp, first_station=s, second_station=sp)
 
-                    problem += LHS >= RHS, f"minimal_span_{jp}_{j}_{s}_{sp}"
+                    # otherwise almost fulfilled TODO will be further tested
+                    if LHS - d_max < RHS:
 
-                    LHS = delay_var[j][s]
-                    LHS += earliest_dep_time(S, timetable, j, s)
-                    LHS += μ*y[j][jp][s]
-                    LHS -= delay_var[jp][s]
+                        #LHS - d_max - smallest possible LHS
+                        LHS += delay_var[jp][s]
+                        LHS += μ*(1-y[j][jp][s])
+                        LHS -= delay_var[j][s]
+                        problem += LHS >= RHS, f"minimal_span_{jp}_{j}_{s}_{sp}"
+
+
+                    LHS = earliest_dep_time(S, timetable, j, s)
                     LHS -= earliest_dep_time(S, timetable, jp, s)
                     RHS = tau(timetable, 'blocks', first_train=jp, second_train = j, first_station=s, second_station=sp)
+                    # otherwise almost fulfilled
+                    if LHS - d_max < RHS:
 
-                    problem += LHS >= RHS, f"minimal_span_{j}_{jp}_{s}_{sp}"
+                        LHS += delay_var[j][s]
+                        LHS += μ*y[j][jp][s]
+                        LHS -= delay_var[jp][s]
+                        problem += LHS >= RHS, f"minimal_span_{j}_{jp}_{s}_{sp}"
 
 
-def single_line(problem, timetable, delay_var, y, train_sets, μ):
+def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
     " adds single line condition to the pulp problem"
     S = train_sets["Paths"]
 
@@ -41,25 +49,37 @@ def single_line(problem, timetable, delay_var, y, train_sets, μ):
         for (j, jp) in train_sets["Josingle"][(s, sp)]:
 
 
-            LHS = delay_var[j][s]
-            LHS += earliest_dep_time(S, timetable, j, s)
-            LHS += μ*(y[j][jp][s])
-            RHS = delay_var[jp][sp]
-            RHS += earliest_dep_time(S, timetable, jp, sp)
+
+            LHS = earliest_dep_time(S, timetable, j, s)
+            RHS = earliest_dep_time(S, timetable, jp, sp)
             RHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
             RHS += tau(timetable, 'res', first_train=jp, second_train=j, first_station=s)
-            problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
 
-            LHS = delay_var[jp][sp]
-            LHS += earliest_dep_time(S, timetable, jp, sp)
-            LHS += μ*(1-y[j][jp][s])
-            RHS = delay_var[j][s]
-            RHS += earliest_dep_time(S, timetable, j, s)
+
+            # otherwise almost fulfilled
+            if LHS - d_max < RHS:
+
+                LHS += delay_var[j][s]
+                LHS += μ*(y[j][jp][s])
+                LHS -= delay_var[jp][sp]
+
+                problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
+
+
+            LHS = earliest_dep_time(S, timetable, jp, sp)
+            RHS = earliest_dep_time(S, timetable, j, s)
             RHS += tau(timetable, 'pass', first_train=j, first_station=s, second_station=sp)
             RHS += tau(timetable, 'res', first_train=j, second_train=jp, first_station=s)
-            problem += LHS >= RHS, f"single_line_{jp}_{j}_{s}_{sp}"
 
-    print(problem)
+            if LHS - d_max < RHS:
+
+                LHS += delay_var[jp][sp]
+                LHS += μ*(1-y[j][jp][s])
+                LHS -= delay_var[j][s]
+
+                problem += LHS >= RHS, f"single_line_{jp}_{j}_{s}_{sp}"
+
+    #print(problem)
 
 def minimal_stay(problem, timetable, delay_var, train_sets):
     "adds minimum stay condition to the pulp problem"
@@ -74,7 +94,7 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
                 problem += delay_var[j][s] >= delay_var[j][sp], f"minimal_stay_{j}_{s}"
 
 
-def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
+def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
     "adds track occupation condition to the pulp problem"
 
     S = train_sets["Paths"]
@@ -93,24 +113,32 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, μ):
 
 
                 if spp != None:
-                    LHS = delay_var[jp][spp]
-                    LHS += earliest_dep_time(S, timetable, jp, spp)
+
+                    LHS = earliest_dep_time(S, timetable, jp, spp)
                     LHS += tau(timetable, "pass", first_train=jp, first_station=spp, second_station=s)
-                    LHS += μ*(1-y[j][jp][s])
-                    RHS = delay_var[j][s]
-                    RHS += earliest_dep_time(S, timetable, j, s)
+                    RHS = earliest_dep_time(S, timetable, j, s)
                     RHS += tau(timetable, "res")
-                    problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
+
+                    if LHS - d_max < RHS:
+                        LHS += μ*(1-y[j][jp][s])
+                        LHS -= delay_var[j][s]
+                        LHS += delay_var[jp][spp]
+
+                        problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
 
                 if sp != None:
-                    LHS = delay_var[j][sp]
-                    LHS += earliest_dep_time(S, timetable, j, sp)
+
+                    LHS = earliest_dep_time(S, timetable, j, sp)
                     LHS += tau(timetable, "pass", first_train=j, first_station=sp, second_station=s)
-                    LHS += μ*y[j][jp][s]
-                    RHS = delay_var[jp][s]
-                    RHS += earliest_dep_time(S, timetable, jp, s)
+                    RHS = earliest_dep_time(S, timetable, jp, s)
                     RHS += tau(timetable, "res")
-                    problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}"
+
+                    if LHS - d_max < RHS:
+                        LHS = delay_var[j][sp]
+                        LHS += μ*y[j][jp][s]
+                        RHS += delay_var[jp][s]
+
+                        problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}"
 
 
 def objective(problem, timetable, delay_var, train_sets, d_max):
@@ -168,10 +196,10 @@ def create_linear_problem(train_sets, timetable, d_max, μ):
     secondary_delays_var, y = linear_varibles(train_sets, d_max)
 
     # following conditions are added
-    minimal_span(prob, timetable, secondary_delays_var, y, train_sets, μ)
+    minimal_span(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
     minimal_stay(prob, timetable, secondary_delays_var, train_sets)
-    single_line(prob, timetable, secondary_delays_var, y, train_sets, μ)
-    track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, μ)
+    single_line(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
+    track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
     # TODO other conditions such as common resources and circ
 
     # objective is added
