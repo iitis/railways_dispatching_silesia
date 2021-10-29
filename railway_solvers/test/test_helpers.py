@@ -26,9 +26,6 @@ def test_trains_paths():
     assert subsequent_station(S[0], 2) == 4
     assert subsequent_station(S[2], 1) == 0
 
-    assert common_path(S, 0, 1) == [0, 1, 2]
-    assert common_path(S, 0, 2) == [0, 1]
-    assert common_path(S, 2, 1) == [1, 0]
 
 
 def test_auxiliary_timetable_functions():

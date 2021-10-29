@@ -19,7 +19,7 @@ train_sets_default = {
     "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
     "J": [0, 1, 2],
     "Jd": {0: {1: [[0, 1]]}, 1: {0: [[2]]}},
-    "Josingle": [],
+    "Josingle": dict(),
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
     "Jswitch": dict()
@@ -34,7 +34,7 @@ train_sets_rerouted = {
     "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
     "J": [0, 1, 2],
     "Jd": dict(),
-    "Josingle": [[1, 2], []],
+    "Josingle": {(0,1): [[1,2]]},
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
     "Jswitch": dict()
