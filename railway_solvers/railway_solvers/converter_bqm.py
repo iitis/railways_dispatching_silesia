@@ -76,6 +76,16 @@ def convert_to_bqm(model: LpProblem, pdict):
         energies = [d.energy for d in sampleset.data()]
         for sample in sampleset.samples():
             decoded = (pyqubo_model.decode_sample(dict(sample), vartype='BINARY', feed_dict=pdict))
+            print('--------------------')
+            print('decoded.subh')
+            print(decoded.subh)
+            print('--------------------')
+            print('--------------------')
+            print('decoded.sample')
+            print(decoded.sample)
+            print('--------------------')
+            print('###################')
+            exit()
             decoded_dict = {**decoded.subh, **decoded.sample}
             result.append({v: decoded_dict[v] for v in map(str, model.variables())})
         return dimod.SampleSet.from_samples(dimod.as_samples(result), 'BINARY', energies)
