@@ -41,10 +41,6 @@ def previous_station(path, s):
         return path[k-1]
 
 
-def common_path(S, j, jp):
-    "returns a common path of 2 trains"
-    return [s for s in S[j] if s in S[jp]]
-
 
 # timetable input is extected to be in the following form of dict of dicts
 #  taus are given as

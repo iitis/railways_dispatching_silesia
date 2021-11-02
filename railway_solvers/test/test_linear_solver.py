@@ -12,7 +12,7 @@ def test_linear_varibles_creations():
         "Paths": {0: [0, 1], 1: [0, 1]},
         "J": [0, 1],
         "Jd": {0: {1: [[0, 1]]}},
-        "Josingle": [[]],
+        "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": dict(),
         "Jswitch": dict()
@@ -41,7 +41,7 @@ def test_two_trains_going_one_way_simplest():
         "Paths": {0: [0, 1], 1: [0, 1]},
         "J": [0, 1],
         "Jd": {0: {1: [[0, 1]]}},
-        "Josingle": [[]],
+        "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": dict(),
         "Jswitch": dict()
@@ -77,7 +77,7 @@ def test_two_trains_going_opposite_ways_simplest():
         "Paths": {0: [0, 1], 1: [1, 0]},
         "J": [0, 1],
         "Jd": dict(),
-        "Josingle": [[0, 1]],
+        "Josingle": {(0,1): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
         "Jswitch": dict()
@@ -122,7 +122,7 @@ def test_track_occupation_simplest():
         "Paths": {0: [0, 1], 1: [0, 1]},
         "J": [0, 1],
         "Jd": dict(),
-        "Josingle": [[]],
+        "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1], []]},
         "Jswitch": dict()
@@ -164,7 +164,7 @@ def test_linear_solver_default_problem():
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
         "Jd": {0: {1: [[0, 1]]}, 1: {0: [[2]]}},
-        "Josingle": [],
+        "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
@@ -179,7 +179,7 @@ def test_linear_solver_default_problem():
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
         "Jd": dict(),
-        "Josingle": [[1, 2], []],
+        "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
@@ -241,7 +241,7 @@ def test_constraint_labels():
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
         "Jd": {0: {1: [[0, 1]]}, 1: {0: [[2]]}},
-        "Josingle": [],
+        "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
@@ -256,7 +256,7 @@ def test_constraint_labels():
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
         "Jd": dict(),
-        "Josingle": [[1, 2], []],
+        "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
         "Jswitch": dict()
