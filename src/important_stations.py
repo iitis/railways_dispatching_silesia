@@ -3,8 +3,7 @@ import numpy as np
 important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 '"KZ", "ST", 2, "(1)"',
 '"KZ", "ST", 3, "(2)"',
-'"KZ", "ST", 4, "(2)"',
-'"KO(IC)", "B-M", 500, "(N/A)"'],
+'"KZ", "ST", 4, "(2)"'],
 
 "KO":['"KO", "ST", 9, "(1)"',
 '"KO", "ST", 7, "(1)"',
@@ -21,7 +20,7 @@ important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 
 "Rac(KS)":['"Rac(KS)", "B-M", 200, "(N/A)"'],
 
-# "KO(IC)":['"KO(IC)", "B-M", 500, "(N/A)"'],
+"KO(IC)":['"KO(IC)", "B-M", 500, "(N/A)"'],
 
 "CB":['"CB", "ST", 1, "(1)"',
 '"CB", "ST", 2, "(1)"',
