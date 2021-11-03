@@ -41,6 +41,30 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, d_max, μ):
                         problem += LHS >= RHS, f"minimal_span_{j}_{jp}_{s}_{sp}"
 
 
+
+def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
+    " adds rolling stock circulation condition to the pulp problem"
+    S = train_sets["Paths"]
+
+    for s in train_sets["Jround"].keys():
+        for (j, jp) in train_sets["Jround"][s]:
+
+            sp = previous_station(S[j], s)
+
+            LHS = earliest_dep_time(S, timetable, j, sp)
+            RHS = earliest_dep_time(S, timetable, jp, s)
+            LHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+            LHS += tau(timetable, 'prep', first_train=jp, first_station=s)
+
+            # TODO add if
+            LHS += delay_var[j][sp]
+            RHS += delay_var[jp][s]
+
+            problem += LHS >= RHS, f"circulation_{j}_{jp}_{s}"
+
+
+
+
 def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
     " adds single line condition to the pulp problem"
     S = train_sets["Paths"]
@@ -200,7 +224,8 @@ def create_linear_problem(train_sets, timetable, d_max, μ):
     minimal_stay(prob, timetable, secondary_delays_var, train_sets)
     single_line(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
     track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
-    # TODO other conditions such as common resources and circ
+    rolling_stock_circ(prob, timetable, secondary_delays_var, train_sets, d_max)
+    # TODO other conditions such as common resources
 
     # objective is added
     objective(prob, timetable, secondary_delays_var, train_sets, d_max)

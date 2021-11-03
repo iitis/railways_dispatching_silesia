@@ -117,7 +117,37 @@ def P1track(timetable, k, k1, inds, train_sets):
 
     return 0.
 
-# TODO  circulation condition  and swotch occupancy condition (if not included in single line and later in track occupancy)
+
+def Pcirc(timetable, k, k1, inds, train_sets):
+    "returns not weighted penalty for circulation condition"
+    S = train_sets["Paths"]
+
+    j = inds[k]["j"]
+    j1 = inds[k1]["j"]
+
+    s = inds[k]["s"]
+    s1 = inds[k1]["s"]
+
+    t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+    t1 = inds[k]["d"] + earliest_dep_time(S, timetable, j1, s1)
+
+
+    if s == s1 and s in train_sets["Jround"].keys() and [j, j1] in train_sets["Jround"][s]:
+        sp = previous_station(S[j], s)
+        tp = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, sp)
+        if t + tau(timetable, 'prep', first_train=j1, first_station=s) + tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s) < tp:
+            return 1.0
+
+
+    if s == s1 and s in train_sets["Jround"].keys() and [j1, j] in train_sets["Jround"][s]:
+        sp = previous_station(S[j1], s)
+        tp = inds[k1]["d"] + earliest_dep_time(S, timetable, j, sp)
+        if t1 + tau(timetable, 'prep', first_train=j, first_station=s) + tau(timetable, 'pass', first_train=j1, first_station=sp, second_station=s) < tp:
+            return 1.0
+
+    return 0.
+
+# TODO  switch occupancy condition (if not included in single line and later in track occupancy)
 
 
 def z_indices(train_sets, d_max):
@@ -266,6 +296,7 @@ def get_coupling(timetable, k, k1, train_sets, inds, p_sum, p_pair):
     J += p_pair*Pspan(timetable, k, k1, inds, train_sets)
     J += p_pair*Pstay(timetable, k, k1, inds, train_sets)
     J += p_pair*P1track(timetable, k, k1, inds, train_sets)
+    J += p_pair*Pcirc(timetable, k, k1, inds, train_sets)
     return J
 
 
