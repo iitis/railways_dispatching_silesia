@@ -129,21 +129,28 @@ def Pcirc(timetable, k, k1, inds, train_sets):
     s1 = inds[k1]["s"]
 
     t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-    t1 = inds[k]["d"] + earliest_dep_time(S, timetable, j1, s1)
+    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
 
-    if s == s1 and s in train_sets["Jround"].keys() and [j, j1] in train_sets["Jround"][s]:
-        sp = previous_station(S[j], s)
-        tp = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, sp)
-        if t + tau(timetable, 'prep', first_train=j1, first_station=s) + tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s) < tp:
-            return 1.0
+    if s1 in train_sets["Jround"].keys():
+        if previous_station(S[j], s1) == s:
+            if [j, j1] in train_sets["Jround"][s1]:
+                print(j,j1)
+                if t + tau(timetable, 'prep', first_train=j1, first_station=s1) + tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) > t1:
+                    return 1.0
+
+    if s in train_sets["Jround"].keys():
+        if previous_station(S[j1], s) == s1:
+            if [j1, j] in train_sets["Jround"][s]:
+                print(j,j1)
+                if t1 + tau(timetable, 'prep', first_train=j, first_station=s) + tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) > t:
+                    return 1.0
 
 
-    if s == s1 and s in train_sets["Jround"].keys() and [j1, j] in train_sets["Jround"][s]:
-        sp = previous_station(S[j1], s)
-        tp = inds[k1]["d"] + earliest_dep_time(S, timetable, j, sp)
-        if t1 + tau(timetable, 'prep', first_train=j, first_station=s) + tau(timetable, 'pass', first_train=j1, first_station=sp, second_station=s) < tp:
-            return 1.0
+    #if s == previous_station(S[j1], s1) and s in train_sets["Jround"].keys() and [j1, j] in train_sets["Jround"][s]:
+    #    tp = inds[k1]["d"] + earliest_dep_time(S, timetable, j, sp)
+    #    if t1 + tau(timetable, 'prep', first_train=j, first_station=s) + tau(timetable, 'pass', first_train=j1, first_station=sp, second_station=s) < t:
+    #        return 1.0
 
     return 0.
 

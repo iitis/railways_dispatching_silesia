@@ -120,6 +120,54 @@ def test_pspan_pstay_p1track():
     assert P1track(timetable, k1, k, inds, train_sets_r) == 0.
 
 
+def test_rolling_stock_circulation():
+    train_sets = {
+        "skip_station": {
+            0: None,
+            1: None,
+        },
+        "Paths": {0: [0, 1], 1: [1, 0]},
+        "J": [0, 1],
+        "Jd": dict(),
+        "Josingle": dict(),
+        "Jround": {1: [[0,1]]},
+        "Jtrack": dict(),
+        "Jswitch": dict()
+    }
+
+    taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "prep": {"1_1": 2}}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_0": 3, "1_1": 1},
+                 "penalty_weights": {"0_0": 2, "1_1": 0.5}}
+
+    inds, q_bits = indexing4qubo(train_sets, 10)
+
+    k = inds.index({'j': 0, 's': 0, 'd': 0})
+    k1 = inds.index({'j': 1, 's': 1, 'd': 7})
+
+    assert Pcirc(timetable, k, k1, inds, train_sets) == 1.
+    assert Pcirc(timetable, k1, k, inds, train_sets) == 1.
+
+    k = inds.index({'j': 0, 's': 0, 'd': 2})
+    k1 = inds.index({'j': 1, 's': 1, 'd': 9})
+
+    assert Pcirc(timetable, k, k1, inds, train_sets) == 1.
+    assert Pcirc(timetable, k1, k, inds, train_sets) == 1.
+
+    k = inds.index({'j': 0, 's': 0, 'd': 0})
+    k1 = inds.index({'j': 1, 's': 1, 'd': 8})
+
+    assert Pcirc(timetable, k, k1, inds, train_sets) == 0.
+    assert Pcirc(timetable, k1, k, inds, train_sets) == 0.
+
+    k = inds.index({'j': 0, 's': 0, 'd': 2})
+    k1 = inds.index({'j': 1, 's': 1, 'd': 10})
+
+    assert Pcirc(timetable, k, k1, inds, train_sets) == 0.
+    assert Pcirc(timetable, k1, k, inds, train_sets) == 0.
+
+
+
 def test_qubic():
 
     ### rerouting ####
@@ -361,6 +409,38 @@ def test_two_trains_going_opposite_ways_simple():
     sol = np.load("test/files/solution_two_ways.npz")
 
     assert energy(sol, Q) == -8+0.35
+
+def circ_Qmat():
+    train_sets = {
+        "skip_station": {
+            0: None,
+            1: None,
+        },
+        "Paths": {0: [0, 1], 1: [1, 0]},
+        "J": [0, 1],
+        "Jd": dict(),
+        "Josingle": dict(),
+        "Jround": {1: [[0,1]]},
+        "Jtrack": dict(),
+        "Jswitch": dict()
+    }
+
+    taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "prep": {"1_1": 2}}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_0": 3, "1_1": 1},
+                 "penalty_weights": {"0_0": 2, "1_1": 0.5}}
+
+    p_sum = 2.
+    p_pair = 1.
+    p_pair_qubic = 1.
+    p_qubic = 2.
+    d_max = 10
+
+    Q = make_Q(train_sets, timetable_3, d_max, p_sum,
+               p_pair, p_pair_qubic, p_qubic)
+
+
+
 
 
 def test_performing_Qmat():
