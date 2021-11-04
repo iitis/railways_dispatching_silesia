@@ -67,7 +67,7 @@ def get_default_dir(path_column):
     return default_dir
 
 def train_time_table(train):
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data = pd.read_csv("../data/train_schedule_1.csv", sep = ";")
     train_dict = timetable_to_train_dict(data)
     time_table = train_dict[train][1]
     return time_table
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     import sys
     import random
 
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data = pd.read_csv("../data/train_schedule_1.csv", sep = ";")
     train_dict = timetable_to_train_dict(data)
     trains_list = list(train_dict.keys())
 
