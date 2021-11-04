@@ -22,8 +22,9 @@ def test_equality_binary():
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(vars.values()) == 1, "minimal_span_1"
     pulp_problem += sum((i+1)*vars[i] for i in range(n))
-    pdict = {"minimal_span" : 1, 
+    pdict = {"minimal_span" : 1,
             "single_line" : 1,
+            "circulation": 1,
             "minimal_stay" : 1,
             "track_occupation" : 1,
             "objective" : 1}
@@ -159,6 +160,3 @@ def test_bad_leq():
 
     bqm2 = cqm_to_bqm(cqm, lagrange_multiplier=1)[0]
     assert not _compare_bqm(dwave_pulp_problem, bqm2)
-
-
-

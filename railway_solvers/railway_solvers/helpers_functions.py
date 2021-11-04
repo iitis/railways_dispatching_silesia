@@ -65,6 +65,8 @@ def tau(timetable, key, first_train=None, first_station=None, second_station=Non
         return timetable["tau"][key][f"{first_train}_{first_station}_{second_station}"]
     elif key == "stop":
         return timetable["tau"][key][f"{first_train}_{first_station}"]
+    elif key == "prep":
+        return timetable["tau"][key][f"{first_train}_{first_station}"]
     elif key == "res":
         return timetable["tau"]["res"]
     return None

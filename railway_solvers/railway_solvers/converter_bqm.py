@@ -9,6 +9,8 @@ import re
 def _get_placeholder(cname):
     if re.match("minimal_span_", cname):
         return Placeholder("minimal_span")
+    if re.match("circulation_", cname):
+        return Placeholder("circulation")
     if re.match("single_line_", cname):
         return Placeholder("single_line")
     if re.match("minimal_stay_", cname):
@@ -39,7 +41,7 @@ def convert_to_pyqubo(model: LpProblem):
             lb = var.lowBound
             ub = var.upBound
             vars_trans[var] = LogEncInteger(var.name, (lb, ub))
-            
+
     # constraints
     for cname, c in model.constraints.items():
         sense = c.sense

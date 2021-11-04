@@ -52,15 +52,26 @@ def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
             sp = previous_station(S[j], s)
 
             LHS = earliest_dep_time(S, timetable, j, sp)
+
+            print("....................")
+
+            print(LHS)
+
             RHS = earliest_dep_time(S, timetable, jp, s)
-            LHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+            LHS += tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
+
+            print(LHS)
             LHS += tau(timetable, 'prep', first_train=jp, first_station=s)
+
+            print(LHS)
+
+            print(RHS)
 
             # TODO add if
             LHS += delay_var[j][sp]
             RHS += delay_var[jp][s]
 
-            problem += LHS >= RHS, f"circulation_{j}_{jp}_{s}"
+            problem += RHS >= LHS, f"circulation_{j}_{jp}_{s}"
 
 
 
