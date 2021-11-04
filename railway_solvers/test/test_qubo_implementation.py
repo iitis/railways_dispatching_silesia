@@ -410,11 +410,12 @@ def test_two_trains_going_opposite_ways_simple():
 
     assert energy(sol, Q) == -8+0.35
 
-def circ_Qmat():
+
+def test_circ_Qmat():
     train_sets = {
         "skip_station": {
-            0: None,
-            1: None,
+            0: 1,
+            1: 0,
         },
         "Paths": {0: [0, 1], 1: [1, 0]},
         "J": [0, 1],
@@ -436,8 +437,19 @@ def circ_Qmat():
     p_qubic = 2.
     d_max = 10
 
-    Q = make_Q(train_sets, timetable_3, d_max, p_sum,
+    Q = make_Q(train_sets, timetable, d_max, p_sum,
                p_pair, p_pair_qubic, p_qubic)
+
+
+    assert np.array_equal(Q, np.load("test/files/Qfile_circ.npz")["Q"])
+
+    sol1 = np.load("test/files/solution_circ.npz")
+
+    sol = [1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1]
+
+    assert np.array_equal(sol, sol1)
+
+    assert energy(sol, Q) == -4+0.4
 
 
 

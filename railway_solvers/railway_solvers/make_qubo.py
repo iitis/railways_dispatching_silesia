@@ -101,16 +101,19 @@ def P1track(timetable, k, k1, inds, train_sets):
     s = inds[k]["s"]
     s1 = inds[k1]["s"]
 
-    t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
-
     if (s, s1) in train_sets["Josingle"].keys() and [j, j1] in train_sets["Josingle"][(s, s1)]:
+        t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+        t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
+
         if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) < t1 - t:
             if t1-t < tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) + tau(timetable, 'res'):
                 return 1.0
 
 
     if (s1, s) in train_sets["Josingle"].keys() and [j1, j] in train_sets["Josingle"][(s1, s)]:
+        t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+        t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
+
         if -tau(timetable, 'res') - tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) < t - t1:
             if t - t1 < tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) + tau(timetable, 'res'):
                 return 1.0
@@ -128,21 +131,20 @@ def Pcirc(timetable, k, k1, inds, train_sets):
     s = inds[k]["s"]
     s1 = inds[k1]["s"]
 
-    t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
-
 
     if s1 in train_sets["Jround"].keys():
         if previous_station(S[j], s1) == s:
             if [j, j1] in train_sets["Jround"][s1]:
-                print(j,j1)
+                t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+                t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
                 if t + tau(timetable, 'prep', first_train=j1, first_station=s1) + tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1) > t1:
                     return 1.0
 
     if s in train_sets["Jround"].keys():
         if previous_station(S[j1], s) == s1:
             if [j1, j] in train_sets["Jround"][s]:
-                print(j,j1)
+                t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+                t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
                 if t1 + tau(timetable, 'prep', first_train=j, first_station=s) + tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s) > t:
                     return 1.0
 
