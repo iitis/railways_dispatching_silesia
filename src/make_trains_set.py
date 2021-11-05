@@ -17,6 +17,18 @@ def check_common_path(train1,train2):
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
+def get_Jd(data):
+    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    jd = {}
+    for station in list(important_stations.keys()):
+        nextstation_dict = {}
+        trains = []
+        for train, path in list(path_dict.items()):
+            if station in path and path.index(station)!=len(path)-1:
+                trains += [train]
+                nextstation_dict[path[path.index(station)+1]] =[trains]
+        jd[station] = nextstation_dict
+    return jd
 # train_sets = {
 #
 # }
