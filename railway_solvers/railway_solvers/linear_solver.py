@@ -50,29 +50,79 @@ def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
         for (j, jp) in train_sets["Jround"][s]:
 
             sp = previous_station(S[j], s)
-
             LHS = earliest_dep_time(S, timetable, j, sp)
-
-            print("....................")
-
-            print(LHS)
-
             RHS = earliest_dep_time(S, timetable, jp, s)
             LHS += tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
-
-            print(LHS)
             LHS += tau(timetable, 'prep', first_train=jp, first_station=s)
 
-            print(LHS)
+            if RHS < LHS + d_max:
+                LHS += delay_var[j][sp]
+                RHS += delay_var[jp][s]
 
-            print(RHS)
+                problem += RHS >= LHS, f"circulation_{j}_{jp}_{s}"
 
-            # TODO add if
-            LHS += delay_var[j][sp]
-            RHS += delay_var[jp][s]
 
-            problem += RHS >= LHS, f"circulation_{j}_{jp}_{s}"
+def switch_occuparion(problem, timetable, delay_var, train_sets, d_max):
+    " adds switch occupation condition to the pulp problem"
+    S = train_sets["Paths"]
 
+    for s in train_sets["Jswitch"].keys():
+        for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
+
+            LHS = earliest_dep_time(S, timetable, jp, sp)
+            RHS = earliest_dep_time(S, timetable, jpp, spp)
+            RHS  += tau(timetable, 'res', first_train=jp, second_train=jpp, first_station=s)
+            if s != sp:
+                LHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+
+            if s != spp:
+                RHS += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+
+            if LHS < RHS + d_max:
+                if sp == spp:
+                    try:
+                        LHS += μ*(y[jp][jpp][sp])
+                    except:
+                        LHS += μ*(1-y[jpp][jp][sp])
+                else:
+                    try:
+                        LHS += μ*(y[jp][jpp][sp][spp])
+                    except:
+                        LHS += μ*(1-y[jpp][jp][sp][spp])
+
+                LHS += delay_var[jp][sp]
+                RHS += delay_var[jpp][spp]
+
+                problem += LHS >= RHS, f"switch_{jp}_{jpp}_{s}_{sp}_{spp}"
+
+
+            LHS = earliest_dep_time(S, timetable, jpp, spp)
+            RHS = earliest_dep_time(S, timetable, jp, sp)
+            RHS  += tau(timetable, 'res', first_train=jpp, second_train=jp, first_station=s)
+            if s != spp:
+                LHS += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+
+            if s != sp:
+                RHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+
+            if LHS < RHS + d_max:
+
+                if sp == spp:
+                    try:
+                        LHS += μ*(1-y[jp][jpp][sp])
+                    except:
+                        LHS += μ*(y[jpp][jp][sp])
+                else:
+                    try:
+                        LHS += μ*(1-y[jp][jpp][sp][spp])
+                    except:
+                        LHS += μ*(1-y[jpp][jp][sp][spp])
+
+
+                LHS += delay_var[jpp][spp]
+                RHS += delay_var[jp][sp]
+
+                problem += LHS >= RHS, f"switch_{jpp}_{jp}_{s}_{spp}_{sp}"
 
 
 
@@ -221,6 +271,30 @@ def linear_varibles(train_sets, d_max):
                 y = pus.LpVariable.dicts(
                     "y", ([j], [jp], [s]), 0, 1, cat='Integer')
                 update_dictofdicts(order_vars, y)
+
+    # switch occupacy
+    for s in train_sets["Jswitch"].keys():
+        for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
+            if sp == spp:
+                try:
+                    order_vars[jp][jpp][sp]
+                except:
+                    try:
+                        order_vars[jp][jpp][sp]
+                    except:
+                        y = pus.LpVariable.dicts(
+                            "y", ([jp], [jpp], [sp]), 0, 1, cat='Integer')
+                        update_dictofdicts(order_vars, y)
+            else:
+                try:
+                    order_vars[jp][jpp][sp][spp]
+                except:
+                    try:
+                        order_vars[jp][jpp][sp][spp]
+                    except:
+                        y = pus.LpVariable.dicts(
+                            "y", ([jp], [jpp], [sp], [spp]), 0, 1, cat='Integer')
+                        update_dictofdicts(order_vars, y)
 
     return secondary_delays_vars, order_vars
 

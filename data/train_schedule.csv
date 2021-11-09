@@ -137,14 +137,14 @@ from Kraków Główny;;;;;;;
 """KZ"", ""ST"", 3, ""(2)""";R;16:10;16:10;;Katowice Zawodzie;;
 """KZ-KO"", ""SBL+Sem(ST)"", 3, ""1"", ""(1)""";R;;;;;;
 """KO"", ""ST"", 114, ""(N/A)""";R;;;;;;
-"""KO"", ""ST"", 8, ""(4)""";R;16:14;;;Katowice;;5
+"""KO"", ""ST"", 8, ""(4)""";R;16:14;;;Katowice;;
 to Katowice;;;;;;;
 ####;;;;;;;
 PR - R;;;;;;;
 343199;;;;;;;
 No name;;;;;;;
 from Katowice platforms;;;;;;;
-"""KO"", ""ST"", 8, ""(4)""";R;;;16:14:00;Katowice;Y;
+"""KO"", ""ST"", 8, ""(4)""";R;;;16:14:00;Katowice;Y;5
 """KO"", ""ST-M"", 1118, ""(N/A)""";R;;;16:22;;Y;
 to Katowice STM;;;;;;;
 ####;;;;;;;
@@ -317,14 +317,14 @@ from Gdynia Główna via Koluszki;;;;;;;
 """KZ"", ""ST"", 1, ""(1)""";IC;;;16:24;;;
 """KZ-KO"", ""SBL+Sem(ST)"", 1, ""1"", ""(1)""";IC;;;;;;
 """KO"", ""ST"", 117, ""(N/A)""";IC;;;;;;
-"""KO"", ""ST"", 9, ""(1)""";IC;16:28;;;Katowice;;5
+"""KO"", ""ST"", 9, ""(1)""";IC;16:28;;;Katowice;;
 to Katowice;;;;;;;
 ####;;;;;;;
 IC - TLK;;;;;;;
 541019;;;;;;;
 DOKER;;;;;;;
 from Katowice platforms;;;;;;;
-"""KO"", ""ST"", 9, ""(1)""";R;;;16:28:00;Katowice;Y;
+"""KO"", ""ST"", 9, ""(1)""";R;;;16:28:00;Katowice;Y;5
 """KO"", ""ST"", 113, ""(N/A)""";R;;;;;Y;
 """KO(IC)"", ""B-M"", 500, ""(N/A)""";R;;;16:43;;Y;
 to Katowice KO(IC);;;;;;;
