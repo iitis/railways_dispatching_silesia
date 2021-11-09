@@ -79,15 +79,14 @@ if __name__ == "__main__":
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": dict()
+        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+        #"Jswitch": dict()
     }
 
     #WE WILL IMPORT THE ABOVE FROM OTHER FILE
-<<<<<<< HEAD
     real_anneal_var = {"num_reads" : 1000, "annealing_time" : 20, "chain_strength" : 4}
-=======
+
     # real_anneal_var = {"num_reads" : 10, "annealing_time" : annealing_time, "chain_strength" : chain_strength}
->>>>>>> f8b8e5c409e1c2e117c8e1565f35d685f9fd049a
     train_route = 'rerouted'
     method = 'sim'
     prob = create_linear_problem(eval(f"train_sets_{train_route}"), timetable, d_max, μ)

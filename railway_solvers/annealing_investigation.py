@@ -38,7 +38,8 @@ train_sets_rerouted = {
     "Josingle": {(0,1): [[1,2]]},
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
-    "Jswitch": dict()
+    "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+    #"Jswitch": dict()
 }
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)

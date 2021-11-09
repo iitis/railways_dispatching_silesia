@@ -138,7 +138,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
             LHS = earliest_dep_time(S, timetable, j, s)
             RHS = earliest_dep_time(S, timetable, jp, sp)
             RHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
-            RHS += tau(timetable, 'res', first_train=jp, second_train=j, first_station=s)
+            #RHS += tau(timetable, 'res', first_train=jp, second_train=j, first_station=s)
 
 
             # otherwise almost fulfilled
@@ -154,7 +154,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
             LHS = earliest_dep_time(S, timetable, jp, sp)
             RHS = earliest_dep_time(S, timetable, j, s)
             RHS += tau(timetable, 'pass', first_train=j, first_station=s, second_station=sp)
-            RHS += tau(timetable, 'res', first_train=j, second_train=jp, first_station=s)
+            #RHS += tau(timetable, 'res', first_train=j, second_train=jp, first_station=s)
 
             if LHS - d_max < RHS:
 

@@ -17,6 +17,8 @@ def _get_placeholder(cname):
         return Placeholder("minimal_stay")
     if re.match("track_occupation_", cname):
         return Placeholder("track_occupation")
+    if re.match("switch_", cname):
+        return Placeholder("switch")
     if re.match("circulation_", cname):
         return Placeholder("circulation")
     raise ValueError(f"{cname} not handled")

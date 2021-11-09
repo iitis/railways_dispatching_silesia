@@ -27,6 +27,7 @@ def test_equality_binary():
             "circulation": 1,
             "minimal_stay" : 1,
             "track_occupation" : 1,
+            "switch": 1,
             "objective" : 1}
     dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
 
