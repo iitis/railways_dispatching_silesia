@@ -310,7 +310,7 @@ def create_linear_problem(train_sets, timetable, d_max, μ):
     single_line(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
     track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
     rolling_stock_circ(prob, timetable, secondary_delays_var, train_sets, d_max)
-    # TODO other conditions such as common resources
+    switch_occuparion(prob, timetable, secondary_delays_var, train_sets, d_max)
 
     # objective is added
     objective(prob, timetable, secondary_delays_var, train_sets, d_max)
