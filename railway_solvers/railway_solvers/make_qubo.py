@@ -121,6 +121,8 @@ def P1track(timetable, k, k1, inds, train_sets):
     return 0.
 
 
+
+
 def Pcirc(timetable, k, k1, inds, train_sets):
     "returns not weighted penalty for circulation condition"
     S = train_sets["Paths"]
@@ -156,7 +158,46 @@ def Pcirc(timetable, k, k1, inds, train_sets):
 
     return 0.
 
-# TODO  switch occupancy condition (if not included in single line and later in track occupancy)
+def Pswitch(timetable, k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+
+    jp = inds[k]["j"]
+    jpp = inds[k1]["j"]
+
+    sp = inds[k]["s"]
+    spp = inds[k1]["s"]
+
+    for s in train_sets["Jswitch"].keys():
+
+        if (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
+            t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
+            if s != sp:
+                t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+
+            t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
+            if s != spp:
+                t += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+
+            if -tau(timetable, 'res')  < t1 - t:
+                if t1-t <  tau(timetable, 'res'):
+                    return 1.0
+
+
+        if (spp, sp, jpp, jp) in train_sets["Jswitch"][s]:
+            t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
+            if s != sp:
+                t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+
+            t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
+            if s != spp:
+                t += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+
+            if -tau(timetable, 'res')  < t - t1:
+                if t-t1 <  tau(timetable, 'res'):
+                    return 1.0
+
+    return 0.
 
 
 def z_indices(train_sets, d_max):
@@ -306,6 +347,7 @@ def get_coupling(timetable, k, k1, train_sets, inds, p_sum, p_pair):
     J += p_pair*Pstay(timetable, k, k1, inds, train_sets)
     J += p_pair*P1track(timetable, k, k1, inds, train_sets)
     J += p_pair*Pcirc(timetable, k, k1, inds, train_sets)
+    J += p_pair*Pswitch(timetable, k, k1, inds, train_sets)
     return J
 
 
