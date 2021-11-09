@@ -90,7 +90,7 @@ if __name__ == "__main__":
     train_route = 'rerouted'
     method = 'sim'
     prob = create_linear_problem(eval(f"train_sets_{train_route}"), timetable, d_max, μ)
-    pdict = {"minimal_span":2.5, "single_line":2.5, "minimal_stay":2.5, "track_occupation":2.5, "objective":1 }
+    pdict = {"minimal_span":2.5, "single_line":2.5, "minimal_stay":2.5, "track_occupation":2.5, "switch": 2.5, "occupation":2.5, "objective":1 }
     annealing(prob, pdict, method, train_route)
 
 
