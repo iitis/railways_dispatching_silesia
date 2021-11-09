@@ -80,7 +80,8 @@ def test_two_trains_going_opposite_ways_simplest():
         "Josingle": {(0,1): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        "Jswitch": dict()
+        #"Jswitch": dict()
+        "Jswitch": {0: [[0, 1, 0, 1]], 1: [[0, 1, 0, 1]]}
     }
 
     taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,

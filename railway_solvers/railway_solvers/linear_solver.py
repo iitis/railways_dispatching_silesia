@@ -62,7 +62,7 @@ def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
                 problem += RHS >= LHS, f"circulation_{j}_{jp}_{s}"
 
 
-def switch_occuparion(problem, timetable, delay_var, train_sets, d_max):
+def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
     " adds switch occupation condition to the pulp problem"
     S = train_sets["Paths"]
 
@@ -88,7 +88,7 @@ def switch_occuparion(problem, timetable, delay_var, train_sets, d_max):
                     try:
                         LHS += μ*(y[jp][jpp][sp][spp])
                     except:
-                        LHS += μ*(1-y[jpp][jp][sp][spp])
+                        LHS += μ*(1-y[jpp][jp][spp][sp])
 
                 LHS += delay_var[jp][sp]
                 RHS += delay_var[jpp][spp]
@@ -116,7 +116,7 @@ def switch_occuparion(problem, timetable, delay_var, train_sets, d_max):
                     try:
                         LHS += μ*(1-y[jp][jpp][sp][spp])
                     except:
-                        LHS += μ*(1-y[jpp][jp][sp][spp])
+                        LHS += μ*(1-y[jpp][jp][spp][sp])
 
 
                 LHS += delay_var[jpp][spp]
@@ -145,7 +145,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
             if LHS - d_max < RHS:
 
                 LHS += delay_var[j][s]
-                LHS += μ*(y[j][jp][s])
+                LHS += μ*(y[j][jp][s][sp])
                 LHS -= delay_var[jp][sp]
 
                 problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
@@ -159,7 +159,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
             if LHS - d_max < RHS:
 
                 LHS += delay_var[jp][sp]
-                LHS += μ*(1-y[j][jp][s])
+                LHS += μ*(1-y[j][jp][s][sp])
                 LHS -= delay_var[j][s]
 
                 problem += LHS >= RHS, f"single_line_{jp}_{j}_{s}_{sp}"
@@ -249,7 +249,7 @@ def linear_varibles(train_sets, d_max):
     for s in train_sets["Josingle"].keys():
         for (j, jp) in train_sets["Josingle"][s]:
 
-            y = pus.LpVariable.dicts("y", ([j], [jp], s), 0, 1, cat='Integer')
+            y = pus.LpVariable.dicts("y", ([j], [jp], [s[0]], [s[1]]), 0, 1, cat='Integer')
             update_dictofdicts(order_vars, y)
 
     # order variables for trains sequence
@@ -273,6 +273,7 @@ def linear_varibles(train_sets, d_max):
                 update_dictofdicts(order_vars, y)
 
     # switch occupacy
+
     for s in train_sets["Jswitch"].keys():
         for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
             if sp == spp:
@@ -310,7 +311,7 @@ def create_linear_problem(train_sets, timetable, d_max, μ):
     single_line(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
     track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
     rolling_stock_circ(prob, timetable, secondary_delays_var, train_sets, d_max)
-    switch_occuparion(prob, timetable, secondary_delays_var, train_sets, d_max)
+    switch_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
 
     # objective is added
     objective(prob, timetable, secondary_delays_var, train_sets, d_max)
