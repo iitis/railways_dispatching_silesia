@@ -80,7 +80,6 @@ if __name__ == "__main__":
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
         "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
-        #"Jswitch": dict()
     }
 
     #WE WILL IMPORT THE ABOVE FROM OTHER FILE

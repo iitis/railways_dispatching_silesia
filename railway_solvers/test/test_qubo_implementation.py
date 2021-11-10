@@ -120,6 +120,59 @@ def test_pspan_pstay_p1track():
     assert P1track(timetable, k1, k, inds, train_sets_r) == 0.
 
 
+def test_pswith():
+
+    taus = {"pass": {"1_0_1": 8, "2_1_0": 8}, "res": 1}
+
+
+    train_sets_r = {
+        "skip_station": {
+            0: None,
+            1: None,
+            2: 0,
+        },
+        "Paths": {1: [0, 1], 2: [1, 0]},
+        "J": [1, 2],
+        "Jd": dict(),
+        "Josingle": {(0,1): [[1,2]]},
+        "Jround": dict(),
+        "Jtrack": dict(),
+        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+    }
+
+    timetable = {"tau": taus,
+                 "initial_conditions": { "1_0": 1, "2_1": 8},
+                 "penalty_weights": {"1_0": 1, "2_1": 1}}
+
+    inds, q_bits = indexing4qubo(train_sets_r, 10)
+
+    # .....  1 track  ......
+
+    k = inds.index({'j': 1, 's': 0, 'd': 0})
+    k1 = inds.index({'j': 2, 's': 1, 'd': 0})
+
+    assert Pswitch(timetable, k, k1, inds, train_sets_r) == 0.
+    assert Pswitch(timetable, k1, k, inds, train_sets_r) == 0.
+
+    k = inds.index({'j': 1, 's': 0, 'd': 0})
+    k1 = inds.index({'j': 2, 's': 1, 'd': 2})
+
+    assert Pswitch(timetable, k, k1, inds, train_sets_r) == 0.
+    assert Pswitch(timetable, k1, k, inds, train_sets_r) == 0.
+
+    k = inds.index({'j': 1, 's': 0, 'd': 0})
+    k1 = inds.index({'j': 2, 's': 1, 'd': 1})
+
+    assert Pswitch(timetable, k, k1, inds, train_sets_r) == 1.
+    assert Pswitch(timetable, k1, k, inds, train_sets_r) == 1.
+
+    k = inds.index({'j': 1, 's': 0, 'd': 5})
+    k1 = inds.index({'j': 2, 's': 1, 'd': 6})
+
+    assert Pswitch(timetable, k, k1, inds, train_sets_r) == 1.
+    assert Pswitch(timetable, k1, k, inds, train_sets_r) == 1.
+
+
 def test_rolling_stock_circulation():
     train_sets = {
         "skip_station": {
@@ -184,7 +237,7 @@ def test_qubic():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": dict()
+        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
     }
 
     inds, q_bits = indexing4qubo(train_sets, 10)
@@ -392,7 +445,7 @@ def test_two_trains_going_opposite_ways_simple():
         "Josingle": {(0,1): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        "Jswitch": dict()
+        "Jswitch": {0: [[0, 1, 0, 1]], 1: [[0, 1, 0, 1]]}
     }
 
     p_sum = 2.
@@ -496,7 +549,7 @@ def test_performing_Qmat():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": dict()
+        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
     }
 
     Q_r = make_Q(train_sets_r, timetable, d_max,

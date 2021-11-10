@@ -8,6 +8,9 @@ from .helpers_functions import *
 def minimal_span(problem, timetable, delay_var, y, train_sets, d_max, μ):
     "adds the minimum span condition to the pulp problem"
 
+    " ..... j1 -> ....... j2 -> ....."
+    "              span              "
+
     S = train_sets["Paths"]
     for s in train_sets["Jd"].keys():
         for sp in train_sets["Jd"][s].keys():
@@ -64,6 +67,11 @@ def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
 
 def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
     " adds switch occupation condition to the pulp problem"
+
+    "  ------         "
+    "         \       "
+    "---------  c ----"
+    
     S = train_sets["Paths"]
 
     for s in train_sets["Jswitch"].keys():
@@ -128,6 +136,11 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
 
 def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
     " adds single line condition to the pulp problem"
+
+    " ......                            ......  "
+    "       \                          /        "
+    " .j1 ->............................. <-j2.."
+
     S = train_sets["Paths"]
 
     for (s, sp) in train_sets["Josingle"].keys():

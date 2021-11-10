@@ -23,7 +23,6 @@ train_sets_default = {
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
     "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
-    #"Jswitch": dict()
 }
 
 train_sets_rerouted = {
