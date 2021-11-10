@@ -81,7 +81,7 @@ def test_many_trains_single_line():
                  "stop": {"10_B": 1, "12_B": 1, "14_B": 1, "16_B": 1, '11_A': 1, '13_A':1, '15_A': 1, '17_A':1},
                   "res": 1}
     timetable = {"tau": taus,
-                 "initial_conditions": {"10_A": 10, "12_A": 10, "14_A": 20, "16_A": 30, "11_B": 5, "13_B": 15, "15_B": 25, "17_B": 35},
+                 "initial_conditions": {"10_A": 5, "12_A": 10, "14_A": 20, "16_A": 30, "11_B": 5, "13_B": 15, "15_B": 25, "17_B": 35},
                  "penalty_weights": {"10_A": 0.5, "12_A": 0.5, "14_A": 0.5, "16_A": 0.5, "11_B": 0.5, "11_B": 0.5, "13_B": 0.5, "15_B": 0.5, "17_B": 0.5}}
 
 
@@ -107,11 +107,11 @@ def test_many_trains_single_line():
         "Jswitch": dict()
     }
 
-    prob = solve_linear_problem(train_sets, timetable, 20, 100)
+    prob = solve_linear_problem(train_sets, timetable, 10, 100)
 
     for v in prob.variables():
         print(v)
         print(v.varValue)
 
-    # should be zero, such case may be dificult fot the solver. 
-    assert prob.objective.value() == pytest.approx(0.1, 1.)
+
+    assert prob.objective.value() == pytest.approx(0.25)
