@@ -80,7 +80,6 @@ def test_two_trains_going_opposite_ways_simplest():
         "Josingle": {(0,1): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        #"Jswitch": dict()
         "Jswitch": {0: [[0, 1, 0, 1]], 1: [[0, 1, 0, 1]]}
     }
 
@@ -222,7 +221,6 @@ def test_linear_solver_default_problem():
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
         "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
-        #"Jswitch": dict()
     }
 
     prob = solve_linear_problem(train_sets, timetable, d_max, μ)
@@ -300,7 +298,6 @@ def test_constraint_labels():
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
         "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
-        #"Jswitch": dict()
     }
 
     prob = create_linear_problem(train_sets, timetable, d_max, μ)

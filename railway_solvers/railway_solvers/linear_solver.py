@@ -1,7 +1,6 @@
 import itertools
-
 import pulp as pus
-
+import time
 from .helpers_functions import *
 
 
@@ -249,12 +248,14 @@ def linear_varibles(train_sets, d_max):
     for s in train_sets["Jtrack"].keys():
         for js in train_sets["Jtrack"][s]:
             for (j, jp) in itertools.combinations(js, 2):
-                y = pus.LpVariable.dicts(
-                    "y", ([j], [jp], [s]), 0, 1, cat='Integer')
-                update_dictofdicts(order_vars, y)
+                try:
+                    order_vars[j][jp][s]
+                except:
+                    y = pus.LpVariable.dicts(
+                        "y", ([j], [jp], [s]), 0, 1, cat='Integer')
+                    update_dictofdicts(order_vars, y)
 
     # switch occupacy
-
     for s in train_sets["Jswitch"].keys():
         for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
             if sp == spp:
@@ -301,7 +302,10 @@ def create_linear_problem(train_sets, timetable, d_max, μ):
 def solve_linear_problem(train_sets, timetable, d_max, μ):
     "solves the linear problem returns the pulp object"
     prob = create_linear_problem(train_sets, timetable, d_max, μ)
+    start_time = time.time()
     prob.solve()
+    print("optimisation, time = ", time.time() - start_time, "seconds")
+
     return prob
 
 
