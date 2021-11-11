@@ -1,6 +1,6 @@
 from Qfile_solve import *
 from railway_solvers import convert_to_bqm, store_result, get_results, load_results, get_best_feasible_sample, \
-    create_linear_problem, convert_to_cqm
+    create_linear_problem, convert_to_cqm, solve_linear_problem
 import os
 import logging
 import importlib
@@ -18,11 +18,12 @@ def get_file_name(input_name, method, train_route, num_reads=None, annealing_tim
 
 def log_experiment(folder, file_name, bqm, dict_list):
     logging.basicConfig(filename=os.path.join(f"annealing_results\{folder}", 'results.log'), level=logging.INFO)
+    logging.info("------------------------new run---------------------")
     logging.info(file_name)
     logging.info(f"Number of variables: {len(bqm.variables)}")
-    logging.info(f"Best Sample", get_best_feasible_sample(dict_list))
+    logging.info(f"Best Sample, {get_best_feasible_sample(dict_list)}")
     logging.info("Samples:")
-    for d in dict_list[:20]:
+    for d in dict_list[:50]:
         logging.info(d)
 
 
@@ -56,7 +57,7 @@ def annealing(prob, method, train_route, input_name, pdict=None, real_anneal_var
     else:
         bqm, interpreter = convert_to_bqm(prob, pdict)
         if method == 'sim':
-            sampleset = sim_anneal(bqm, num_sweeps=10000, num_reads=1000)
+            sampleset = sim_anneal(bqm, num_sweeps=1000, num_reads=1000)
         elif method == 'real':
             num_reads, annealing_time, chain_strength = get_parameters(real_anneal_var_dict)
             file_name = get_file_name(input_name, method, train_route, num_reads, annealing_time, chain_strength)
@@ -72,7 +73,8 @@ def annealing(prob, method, train_route, input_name, pdict=None, real_anneal_var
 
 def test_all_files(method, train_route = "default", pdict=None, real_anneal_var=None):
     for file in os.listdir("inputs"):
-        test_single_file(file[:-3], method, train_route, pdict, real_anneal_var)
+        if "init" not in file and "pycach" not in file:
+            test_single_file(file[:-3], method, train_route, pdict, real_anneal_var)
 
 
 def test_single_file(file, method, train_route = "default", pdict=None, real_anneal_var=None):
@@ -87,10 +89,10 @@ def test_single_file(file, method, train_route = "default", pdict=None, real_ann
 
 
 if __name__ == "__main__":
-    file = "test_two_trains_going_one_way_simplest"
+    file = "rolling_stock_circulation"
     real_anneal_var = {"num_reads": 1000, "annealing_time": 20, "chain_strength": 4}
     method = 'sim'
     pdict = {"minimal_span": 2.5, "single_line": 2.5, "minimal_stay": 2.5, "track_occupation": 2.5, "switch": 2.5,
              "occupation": 2.5, "circulation": 2.5, "objective": 1}
     test_single_file(file, method, pdict = pdict)
-    #test_all_files(method, pdict = pdict, real_anneal_var)
+    #test_all_files(method, pdict = pdict) logging not working properly

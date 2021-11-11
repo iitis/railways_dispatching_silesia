@@ -27,7 +27,7 @@ def get_objective(prob, sample):
 
 
 def get_best_feasible_sample(dict_list):
-    return next((l for l in dict_list if l['feasible']), None)
+    return next((l for l in dict_list if l['feasible']),None)
 
 
 def get_results(sampleset, prob):
@@ -41,7 +41,7 @@ def get_results(sampleset, prob):
         rdict['sample'] = sample
         rdict['feas_constraints'] = analyze_constraints(prob, sample)
         dict_list.append(rdict)
-    return sorted(dict_list, key=lambda d: d['objective'])
+    return sorted(dict_list, key=lambda d: d['energy'])
 
 
 def store_result(file_name, sampleset):
