@@ -27,7 +27,7 @@ def get_objective(prob, sample):
 
 
 def get_best_feasible_sample(dict_list):
-    return next(l for l in dict_list if l['feasible'])
+    return next((l for l in dict_list if l['feasible']), None)
 
 
 def get_results(sampleset, prob):
