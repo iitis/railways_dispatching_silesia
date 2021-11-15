@@ -1,7 +1,12 @@
 import pytest
 from railway_solvers import *
 
-
+def energy(v, Q):
+    if -1 in v:
+        v = [(y+1)/2 for y in v]
+    X = np.array(Q)
+    V = np.array(v)
+    return V @ X @ V.transpose()
 
 def test_5_trains_all_cases():
 
@@ -43,9 +48,9 @@ def test_5_trains_all_cases():
         "Jswitch": {'C': [['C', 'C', 23, 24], ['B', 'C', 22, 24]], 'D': [['C', 'D', 24, 25]]}
     }
 
-    ####   simple problem #####
+    d_max = 10
 
-    prob = solve_linear_problem(train_sets, timetable, 10, 30)
+    prob = solve_linear_problem(train_sets, timetable, d_max, 30)
 
     for v in prob.variables():
         print(v)
@@ -64,6 +69,22 @@ def test_5_trains_all_cases():
     assert return_delay_and_acctual_time(train_sets["Paths"], timetable, prob, 25, 'D') == (2., 30.)
     assert prob.objective.value() == pytest.approx(1.01)
 
+
+    p_sum = 2.5
+    p_pair = 1.25
+    p_pair_qubic = 1.25
+    p_qubic = 2.1
+
+    Q = make_Q(train_sets, timetable, d_max, p_sum,
+               p_pair, p_pair_qubic, p_qubic)
+
+    #np.savez("test/files/Qfile_5trains.npz", Q=Q)
+
+    sol = np.load("test/files/solution_5trains.npz")
+
+    # (2*3+2)*2.5
+
+    assert energy(sol, Q) == pytest.approx(-20+1.01, .02)
 
 def test_many_trains_single_line():
 
@@ -107,7 +128,9 @@ def test_many_trains_single_line():
         "Jswitch": dict()
     }
 
-    prob = solve_linear_problem(train_sets, timetable, 10, 100)
+    d_max = 10
+
+    prob = solve_linear_problem(train_sets, timetable, d_max, 100)
 
     for v in prob.variables():
         print(v)
