@@ -23,12 +23,32 @@ def check_common_station(train1,train2):
 def check_common_blocks(train1,train2):
     return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
 
-def is_going2samedirection(train1,train2):
-    return
+def sequential_blocks_same_direction(train1,train2):
+    blocks_list1, blocks_list2= list(time_table1['path']),list(time_table2['path'])
+    common_path_list = []
+    i = 0
+    while i in range(len(blocks_list1)):
+    if len(common_elements(blocks_list1[i:i+1], blocks_list2)) < 1:
+        i+=1
+    else:
+        c=1
+        blocks_seq = [blocks_list1[i]]
+        while blocks_list1[i+c] in blocks_list2:
+            blocks_seq.append(blocks_list1[i+c])
+            c+=1
+        common_path_list += [blocks_seq]
+        i+=c
+        print(i)
 
-def get_Jd(data):
+# def is_going2samedirection(train1,train2):
+#     blocks_list1,blocks_list2 = list(train_time_table(train1)['path'],list(train_time_table(train2)['path']
+#     for i in range(blocks_list1):
+#
+#     return
+
+def get_trains_with_same_stations(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    jd = {}
+    jdict = {}
     for station in list(important_stations.keys()):
         nextstation_dict = {}
         trains = []
@@ -36,8 +56,8 @@ def get_Jd(data):
             if station in path and path.index(station)!=len(path)-1:
                 trains += [train]
                 nextstation_dict[path[path.index(station)+1]] =[trains]
-        jd[station] = nextstation_dict
-    return jd
+        jdict[station] = nextstation_dict
+    return jdict
 # train_sets = {
 #
 # }
