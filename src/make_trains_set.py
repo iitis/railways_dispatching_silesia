@@ -24,7 +24,7 @@ def check_common_blocks(train1,train2):
     return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
 
 def is_going2samedirection(train1,train2):
-
+    return
 
 def get_Jd(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
