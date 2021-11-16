@@ -18,12 +18,14 @@ def test_linear_varibles_creations():
         "Jswitch": dict()
     }
 
-    v = linear_varibles(train_sets, 5)
+    dv = delay_varibles(train_sets, 5)
 
     assert str(
-        v[0]) == "{0: {0: Delays_0_0, 1: Delays_0_1}, 1: {0: Delays_1_0, 1: Delays_1_1}}"
+        dv) == "{0: {0: Delays_0_0, 1: Delays_0_1}, 1: {0: Delays_1_0, 1: Delays_1_1}}"
 
-    assert str(v[1]) == "{0: {1: {0: y_0_1_0}}}"
+    y = order_variables(train_sets, 5)
+
+    assert str(y) == "{0: {1: {0: y_0_1_0}}}"
 
 
 def test_two_trains_going_one_way_simplest():

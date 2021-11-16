@@ -5,6 +5,18 @@ from .helpers_functions import *
 
 
 
+def get_y_j_jp_s(y, j, jp, s):
+    try:
+        return y[jp][j][s]
+    except:
+        return 1-y[j][jp][s]
+
+def get_y_j_jp_s_sp(y, j, jp, s, sp):
+    try:
+        return y[j][jp][s][sp]
+    except:
+        return 1-y[jp][j][sp][s]
+
 def minimal_s(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
     S = train_sets["Paths"]
 
@@ -16,11 +28,7 @@ def minimal_s(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max,
     if LHS - d_max < RHS:
 
         LHS += delay_var[jp][s]
-        try:
-            LHS += μ*(1-y[j][jp][s])
-        except:
-            LHS += μ*y[jp][j][s]
-
+        LHS += μ*get_y_j_jp_s(y, j, jp, s)
         LHS -= delay_var[j][s]
         problem += LHS >= RHS, f"minimal_span_{jp}_{j}_{s}_{sp}"
 
@@ -78,15 +86,11 @@ def switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets
 
     if LHS < RHS + d_max:
         if sp == spp:
-            try:
-                LHS += μ*y[jp][jpp][sp]
-            except:
-                LHS += μ*(1-y[jpp][jp][sp])
+            LHS += μ*get_y_j_jp_s(y, jp, jpp, sp)
+
         else:
-            try:
-                LHS += μ*(y[jp][jpp][sp][spp])
-            except:
-                LHS += μ*(1-y[jpp][jp][spp][sp])
+            LHS += μ*get_y_j_jp_s_sp(y, jp, jpp, sp, spp)
+
 
         LHS += delay_var[jp][sp]
         RHS += delay_var[jpp][spp]
@@ -123,10 +127,7 @@ def single_l(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, 
     if LHS - d_max < RHS:
 
         LHS += delay_var[j][s]
-        try:
-            LHS += μ*y[j][jp][s][sp]
-        except:
-            LHS += μ*(1-y[jp][j][sp][s])
+        LHS += μ*get_y_j_jp_s_sp(y, j, jp, s, sp)
 
         LHS -= delay_var[jp][sp]
         problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
@@ -177,10 +178,7 @@ def trains_order_at_s(s, sp, j, jp, problem, timetable, delay_var, y, train_sets
         RHS += tau(timetable, "res")
 
         if LHS - d_max < RHS:
-            try:
-                LHS += μ*(1-y[j][jp][s])
-            except:
-                LHS += μ*y[jp][j][s]
+            LHS += μ*get_y_j_jp_s(y, j, jp, s)
             LHS -= delay_var[j][s]
             LHS += delay_var[jp][sp]
 
@@ -199,9 +197,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
 
 
                 trains_order_if_follows(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-
                 trains_order_at_s(s, spp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-
                 trains_order_at_s(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
 
@@ -213,7 +209,73 @@ def objective(problem, timetable, delay_var, train_sets, d_max):
                          d_max for i in train_sets["J"] for j in S[i] if penalty_weights(timetable, i, j) != 0])
 
 
-def linear_varibles(train_sets, d_max):
+
+def update_y_j_jp_s(order_vars, j, jp, s):
+    try:
+        order_vars[j][jp][s]
+    except:
+        try:
+            order_vars[jp][j][s]
+        except:
+            y = pus.LpVariable.dicts(
+                "y", ([j], [jp], [s]), 0, 1, cat='Integer')
+
+            update_dictofdicts(order_vars, y)
+
+
+def update_y_j_jp_s_ps(order_vars, j, jp, s, sp):
+    try:
+        order_vars[j][jp][s][sp]
+    except:
+        try:
+            order_vars[jp][j][sp][s]
+        except:
+            y = pus.LpVariable.dicts(
+                "y", ([j], [jp], [s], [sp]), 0, 1, cat='Integer')
+
+            update_dictofdicts(order_vars, y)
+
+
+def order_variables(train_sets, d_max):
+    S = train_sets["Paths"]
+
+    order_vars = dict()
+
+    # order variables for single line trains going in opposite direction
+    for s in train_sets["Josingle"].keys():
+        for (j, jp) in train_sets["Josingle"][s]:
+            update_y_j_jp_s_ps(order_vars, j, jp, s[0], s[1])
+
+
+    # order variables for trains sequence
+    for s in train_sets["Jd"].keys():
+        for all_js in train_sets["Jd"][s].values():
+            for js in all_js:
+                for (j, jp) in itertools.combinations(js, 2):
+                    update_y_j_jp_s(order_vars, j, jp, s)
+
+
+    # this is the track occupation case
+    for s in train_sets["Jtrack"].keys():
+        for js in train_sets["Jtrack"][s]:
+            for (j, jp) in itertools.combinations(js, 2):
+                update_y_j_jp_s(order_vars, j, jp, s)
+
+
+    # switch occupacy
+    for s in train_sets["Jswitch"].keys():
+        for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
+            # if jp and jpp starts from the same station
+            if sp == spp:
+                update_y_j_jp_s(order_vars, jp, jpp, sp)
+            else:
+                update_y_j_jp_s_ps(order_vars, jp, jpp, sp, spp)
+
+
+    return order_vars
+
+
+def delay_varibles(train_sets, d_max):
     " returns all linear variables for the optimisation problem, i.e. secondary_delays_vars and order_vars"
     S = train_sets["Paths"]
 
@@ -223,69 +285,16 @@ def linear_varibles(train_sets, d_max):
         secondary_delays_vars.update(pus.LpVariable.dicts(
             "Delays", ([j], S[j]), 0, d_max, cat='Integer'))
 
-    order_vars = dict()
-
-    # order variables for single line trains going in opposite direction
-    for s in train_sets["Josingle"].keys():
-        for (j, jp) in train_sets["Josingle"][s]:
-
-            y = pus.LpVariable.dicts("y", ([j], [jp], [s[0]], [s[1]]), 0, 1, cat='Integer')
-            update_dictofdicts(order_vars, y)
-
-    # order variables for trains sequence
-    for s in train_sets["Jd"].keys():
-        for all_js in train_sets["Jd"][s].values():
-            for js in all_js:
-                for (j, jp) in itertools.combinations(js, 2):
-
-                    y = pus.LpVariable.dicts(
-                        "y", ([j], [jp], [s]), 0, 1, cat='Integer')
-
-                    update_dictofdicts(order_vars, y)
+    return secondary_delays_vars
 
 
-    # this is the track occupation case
-    for s in train_sets["Jtrack"].keys():
-        for js in train_sets["Jtrack"][s]:
-            for (j, jp) in itertools.combinations(js, 2):
-                try:
-                    order_vars[j][jp][s]
-                except:
-                    y = pus.LpVariable.dicts(
-                        "y", ([j], [jp], [s]), 0, 1, cat='Integer')
-                    update_dictofdicts(order_vars, y)
-
-    # switch occupacy
-    for s in train_sets["Jswitch"].keys():
-        for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
-            if sp == spp:
-                try:
-                    order_vars[jp][jpp][sp]
-                except:
-                    try:
-                        order_vars[jp][jpp][sp]
-                    except:
-                        y = pus.LpVariable.dicts(
-                            "y", ([jp], [jpp], [sp]), 0, 1, cat='Integer')
-                        update_dictofdicts(order_vars, y)
-            else:
-                try:
-                    order_vars[jp][jpp][sp][spp]
-                except:
-                    try:
-                        order_vars[jp][jpp][sp][spp]
-                    except:
-                        y = pus.LpVariable.dicts(
-                            "y", ([jp], [jpp], [sp], [spp]), 0, 1, cat='Integer')
-                        update_dictofdicts(order_vars, y)
-
-    return secondary_delays_vars, order_vars
 
 def create_linear_problem(train_sets, timetable, d_max, μ):
     "creates the linear problem model"
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
-    secondary_delays_var, y = linear_varibles(train_sets, d_max)
+    secondary_delays_var = delay_varibles(train_sets, d_max)
+    y = order_variables(train_sets, d_max)
 
     # following conditions are added
     minimal_span(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
