@@ -38,8 +38,6 @@ def sequential_blocks_same_direction(train1,train2):
             c+=1
         common_path_list += [blocks_seq]
         i+=c
-        print(i)
-
 # def is_going2samedirection(train1,train2):
 #     blocks_list1,blocks_list2 = list(train_time_table(train1)['path'],list(train_time_table(train2)['path']
 #     for i in range(blocks_list1):
