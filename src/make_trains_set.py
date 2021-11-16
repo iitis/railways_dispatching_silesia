@@ -2,6 +2,9 @@ from time_table_check import *
 
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
+def common_elements(list1, list2):
+    return [element for element in list1 if element in list2]
+
 def get_J(data):
     train_dict = timetable_to_train_dict(data)
     return list(train_dict.keys())
@@ -17,6 +20,10 @@ def check_common_station(train1,train2):
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
+def check_common_blocks(train1,train2):
+    return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
+
+    return
 def get_Jd(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     jd = {}
