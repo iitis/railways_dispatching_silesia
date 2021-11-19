@@ -110,9 +110,10 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
 
     for s in train_sets["Jswitch"].keys():
         for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
+            if not_the_same_rolling_stock(jp, jpp, train_sets):
 
-            switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-            switch_occ(s, spp, sp, jpp, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                switch_occ(s, spp, sp, jpp, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
 
 
@@ -143,9 +144,10 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
 
     for (s, sp) in train_sets["Josingle"].keys():
         for (j, jp) in train_sets["Josingle"][(s, sp)]:
+            if not_the_same_rolling_stock(j, jp, train_sets):
 
-            single_l(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-            single_l(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                single_l(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                single_l(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
 
 def minimal_stay(problem, timetable, delay_var, train_sets):
@@ -195,10 +197,11 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
                 sp = previous_station(S[j], s)
                 spp = previous_station(S[jp], s)
 
+                if not_the_same_rolling_stock(j, jp, train_sets):
 
-                trains_order_if_follows(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                trains_order_at_s(s, spp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                trains_order_at_s(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    trains_order_if_follows(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    trains_order_at_s(s, spp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    trains_order_at_s(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
 
 

@@ -91,16 +91,18 @@ def p_track(timetable, k, k1, inds, train_sets):
     s = inds[k]["s"]
     s1 = inds[k1]["s"]
 
-    if (s, s1) in train_sets["Josingle"].keys() and [j, j1] in train_sets["Josingle"][(s, s1)]:
-        t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-        t2 = t
-        t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
+    if not_the_same_rolling_stock(j, j1, train_sets):
 
-        t += - tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s)
-        t2 += tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1)
+        if (s, s1) in train_sets["Josingle"].keys() and [j, j1] in train_sets["Josingle"][(s, s1)]:
+            t = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+            t2 = t
+            t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
 
-        if t < t1 < t2:
-            return 1.0
+            t += - tau(timetable, 'pass', first_train=j1, first_station=s1, second_station=s)
+            t2 += tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1)
+
+            if t < t1 < t2:
+                return 1.0
     return 0.
 
 def P1track(timetable, k, k1, inds, train_sets):
@@ -149,20 +151,22 @@ def p_switch(timetable, k, k1, inds, train_sets):
     sp = inds[k]["s"]
     spp = inds[k1]["s"]
 
-    for s in train_sets["Jswitch"].keys():
+    if not_the_same_rolling_stock(jp, jpp, train_sets):
 
-        if [sp, spp, jp, jpp] in train_sets["Jswitch"][s]:
+        for s in train_sets["Jswitch"].keys():
 
-            t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
-            if s != sp:
-                t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+            if [sp, spp, jp, jpp] in train_sets["Jswitch"][s]:
 
-            t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
-            if s != spp:
-                t1 += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+                t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
+                if s != sp:
+                    t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
 
-            if -tau(timetable, 'res')  < t1-t <  tau(timetable, 'res'):
-                return 1.0
+                t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
+                if s != spp:
+                    t1 += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+
+                if -tau(timetable, 'res')  < t1-t <  tau(timetable, 'res'):
+                    return 1.0
     return 0.
 
 
@@ -187,15 +191,20 @@ def z_indices(train_sets, d_max):
     for s in train_sets["Jtrack"].keys():
         for js in train_sets["Jtrack"][s]:
             for (j, j1) in itertools.combinations(js, 2):
-                for d in range(d_max+1):
-                    for d1 in range(d_max+1):
-                        inds.append({"j": j, "j1": j1, "s": s, "d": d, "d1": d1})
+                if not_the_same_rolling_stock(j, j1, train_sets):
+                    for d in range(d_max+1):
+                        for d1 in range(d_max+1):
+                            inds.append({"j": j, "j1": j1, "s": s, "d": d, "d1": d1})
     return inds, len(inds)
 
 
 def P1qubic(timetable, k, k1, inds1, train_sets):
     "returns not weighted contribution to Q from the single track occupancy conditions constrains, auxiliary variables are included"
     S = train_sets["Paths"]
+    # if trains have the same rolling stock we are not checking
+    if not not_the_same_rolling_stock(inds1[k]["j"], inds1[k1]["j"], train_sets):
+        return 0.
+
     # x with z
     if len(inds1[k].keys()) == 3 and len(inds1[k1].keys()) == 5:
         jx = inds1[k]["j"]
