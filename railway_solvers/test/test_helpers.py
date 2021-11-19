@@ -51,3 +51,12 @@ def test_auxiliary_timetable_functions():
 
     assert earliest_dep_time(S, timetable, 2, 0) == 19
     assert earliest_dep_time(S, timetable, 2, 1) == 8
+
+def test_common_rolling_stock_case():
+
+        train_sets = {
+            "Jround": {'B': [[1,2]]}}
+
+        assert not_the_same_rolling_stock(0, 1, train_sets) == True
+        assert not_the_same_rolling_stock(0, 1, train_sets) == True
+        assert not_the_same_rolling_stock(1,2, train_sets) == False
