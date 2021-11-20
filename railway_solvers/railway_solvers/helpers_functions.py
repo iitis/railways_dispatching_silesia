@@ -100,3 +100,12 @@ def earliest_dep_time(S, timetable, train, station):
         tau_stop = tau(timetable, "stop", first_train=train, first_station=station)
 
         return np.maximum(sched, earliest_dep_time(S, timetable, train, s) + tau_pass + tau_stop)
+
+
+def not_the_same_rolling_stock(j, jp, train_sets):
+    "determines whether two trains are not served by the same rolling stock"
+    for s in train_sets["Jround"].keys():
+        if occurs_as_pair(j, jp, train_sets["Jround"][s]):
+            #print("xxxxxxxxxxxxxxxxxxxxx", "FALSE")
+            return False
+    return True
