@@ -18,6 +18,12 @@ def getSizeOfNestedList(listOfElem):
 def flatten(t):
     return [item for sublist in t for item in sublist]
 
+def same_digit(x, y):
+    if sorted(str(x)) == sorted(str(y)):
+        return True
+    else:
+        return False
+
 def common_elements(list1, list2):
     return [element for element in list1 if element in list2]
 
