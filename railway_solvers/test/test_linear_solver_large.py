@@ -82,9 +82,9 @@ def test_5_trains_all_cases():
 
     sol = np.load("test/files/solution_5trains.npz")
 
-    # (2*3+2)*2.5
+    # (2*3+1+2)*2.5
 
-    #assert energy(sol, Q) == pytest.approx(-20+1.01, .02)
+    assert energy(sol, Q) == pytest.approx(-22.5+1.01, .02)
 
 def test_many_trains_single_line():
 
