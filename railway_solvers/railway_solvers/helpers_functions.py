@@ -106,6 +106,5 @@ def not_the_same_rolling_stock(j, jp, train_sets):
     "determines whether two trains are not served by the same rolling stock"
     for s in train_sets["Jround"].keys():
         if occurs_as_pair(j, jp, train_sets["Jround"][s]):
-            #print("xxxxxxxxxxxxxxxxxxxxx", "FALSE")
             return False
     return True

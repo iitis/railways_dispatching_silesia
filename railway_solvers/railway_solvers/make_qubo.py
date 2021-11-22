@@ -8,13 +8,12 @@ from .helpers_functions import *
 def indexing4qubo(train_sets, d_max):
     "returns vector of dicts containing trains, stations and delays"
     "the index of vector correspond to the index on particulat train station and delay in Q matrix"
-    not_considered_station = train_sets["skip_station"]
 
     S = train_sets["Paths"]
     inds = []
     for j in train_sets["J"]:
         for s in S[j]:
-            if s != not_considered_station[j]:
+            if s != train_sets["skip_station"][j]:
                 for d in range(d_max+1):
                     inds.append({"j": j, "s": s, "d": d})
     return inds, len(inds)
@@ -64,35 +63,6 @@ def Pspan(timetable, k, k1, inds, train_sets):
     return 0.
 
 
-def p_stay(timetable, k, k1, inds, train_sets):
-    S = train_sets["Paths"]
-    j = inds[k]["j"]
-
-    if j == inds[k1]["j"]:
-        sp = inds[k]["s"]
-        s = inds[k1]["s"]
-        if s == subsequent_station(S[j], sp):
-            LHS = inds[k1]["d"]
-            LHS += earliest_dep_time(S, timetable, j, s)
-
-            RHS = inds[k]["d"]
-            RHS += earliest_dep_time(S, timetable, j, sp)
-            RHS +=  tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
-            RHS +=  tau(timetable, 'stop', first_train=j, first_station=s)
-
-            #if inds[k]["d"] > inds[k1]["d"]:
-            if LHS < RHS:
-                return 1.0
-    return 0.
-
-
-def Pstay(timetable, k, k1, inds, train_sets):
-    "returns not weighted contribution to Q from the minimal stay condition constrain, here additionaly train paths are necessary"
-    p = p_stay(timetable, k, k1, inds, train_sets)
-    p += p_stay(timetable, k1, k, inds, train_sets)
-    return p
-
-
 def p_track(timetable, k, k1, inds, train_sets):
     S = train_sets["Paths"]
     j = inds[k]["j"]
@@ -123,6 +93,37 @@ def P1track(timetable, k, k1, inds, train_sets):
     p = p_track(timetable, k, k1, inds, train_sets)
     p += p_track(timetable, k1, k, inds, train_sets)
     return p
+
+
+
+def p_stay(timetable, k, k1, inds, train_sets):
+    S = train_sets["Paths"]
+    j = inds[k]["j"]
+
+    if j == inds[k1]["j"]:
+        sp = inds[k]["s"]
+        s = inds[k1]["s"]
+        if s == subsequent_station(S[j], sp):
+            LHS = inds[k1]["d"]
+            LHS += earliest_dep_time(S, timetable, j, s)
+
+            RHS = inds[k]["d"]
+            RHS += earliest_dep_time(S, timetable, j, sp)
+            RHS +=  tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
+            RHS +=  tau(timetable, 'stop', first_train=j, first_station=s)
+
+            #if inds[k]["d"] > inds[k1]["d"]:
+            if LHS < RHS:
+                return 1.0
+    return 0.
+
+
+def Pstay(timetable, k, k1, inds, train_sets):
+    "returns not weighted contribution to Q from the minimal stay condition constrain, here additionaly train paths are necessary"
+    p = p_stay(timetable, k, k1, inds, train_sets)
+    p += p_stay(timetable, k1, k, inds, train_sets)
+    return p
+
 
 
 def p_circ(timetable, k, k1, inds, train_sets):

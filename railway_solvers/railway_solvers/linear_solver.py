@@ -95,7 +95,8 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
         for s in S[j]:
             sp = previous_station(S[j], s)
             if sp != None:
-                if (train_sets["skip_station"][j] == None) or (s not in train_sets["skip_station"][j]):
+                if s != train_sets["skip_station"][j]:
+                #if (train_sets["skip_station"][j] == None) or (s not in train_sets["skip_station"][j]):
 
                         LHS = delay_var[j][s]
                         LHS += earliest_dep_time(S, timetable, j, s)
@@ -210,12 +211,6 @@ def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets
             LHS += delay_var[jp][sp]
 
 
-        print('yyyyyyyyyyy')
-
-        print(s, sp)
-
-        print(LHS, ">=", RHS)
-
         problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
 
 
@@ -317,8 +312,15 @@ def delay_varibles(train_sets, d_max):
     secondary_delays_vars = dict()
 
     for j in train_sets["J"]:
-        secondary_delays_vars.update(pus.LpVariable.dicts(
-            "Delays", ([j], S[j]), 0, d_max, cat='Integer'))
+        print("ssssssssssssssssssss")
+        print(S[j])
+        for s in S[j]:
+            if s != train_sets["skip_station"][j]:
+                print(s)
+                dvar = pus.LpVariable.dicts(
+                    "Delays", ([j], [s]), 0, d_max, cat='Integer')
+
+                update_dictofdicts(secondary_delays_vars, dvar)
 
     return secondary_delays_vars
 

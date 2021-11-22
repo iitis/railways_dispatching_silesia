@@ -197,9 +197,9 @@ def test_linear_solver_default_problem():
 
     train_sets = {
         "skip_station": {
-            0: [None],
-            1: [None],
-            2: [0],
+            0: None,
+            1: None,
+            2: 0,
         },
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
@@ -212,9 +212,9 @@ def test_linear_solver_default_problem():
 
     train_sets_rerouted = {
         "skip_station": {
-            0: [None],
-            1: [None],
-            2: [0],
+            0: None,
+            1: None,
+            2: 0,
         },
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
@@ -274,9 +274,9 @@ def test_constraint_labels():
 
     train_sets = {
         "skip_station": {
-            0: [None],
-            1: [None],
-            2: [0],
+            0: None,
+            1: None,
+            2: 0,
         },
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
@@ -289,9 +289,9 @@ def test_constraint_labels():
 
     train_sets_rerouted = {
         "skip_station": {
-            0: [None],
-            1: [None],
-            2: [0],
+            0: None,
+            1: None,
+            2: 0,
         },
         "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
         "J": [0, 1, 2],
