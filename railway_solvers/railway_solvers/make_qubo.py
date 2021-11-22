@@ -19,6 +19,8 @@ def indexing4qubo(train_sets, d_max):
     return inds, len(inds)
 
 
+##### summ to one constrain #####
+
 def Psum(k, k1, inds):
     "given the vector of dicts from indexing4qubo(train_sets, d_max) and particular indices"
     "returns the not wieghted contribution to Q matrix from ∑_i x_i  = 1 constrain"
@@ -29,6 +31,10 @@ def Psum(k, k1, inds):
             return 1.0
     return 0.
 
+
+#  constrains from dispatching
+
+#####  minimal span constrain #######
 
 def Pspan(timetable, k, k1, inds, train_sets):
     "returns not weighted contribution to Q from the minimal span condition constrain, here additionaly train paths are necessary"
@@ -62,8 +68,9 @@ def Pspan(timetable, k, k1, inds, train_sets):
                         return 1.
     return 0.
 
+#### single track line and deadlock constrain ######
 
-def p_track(timetable, k, k1, inds, train_sets):
+def penalty_single_track_condition(timetable, k, k1, inds, train_sets):
     S = train_sets["Paths"]
     j = inds[k]["j"]
     j1 = inds[k1]["j"]
@@ -90,13 +97,13 @@ def P1track(timetable, k, k1, inds, train_sets):
     "       \                          /        "
     " .j1 ->............................. <-j2.."
 
-    p = p_track(timetable, k, k1, inds, train_sets)
-    p += p_track(timetable, k1, k, inds, train_sets)
+    p = penalty_single_track_condition(timetable, k, k1, inds, train_sets)
+    p += penalty_single_track_condition(timetable, k1, k, inds, train_sets)
     return p
 
+#### minimal stay constrain ######
 
-
-def p_stay(timetable, k, k1, inds, train_sets):
+def penalty_for_minimal_stay_condition(timetable, k, k1, inds, train_sets):
     S = train_sets["Paths"]
     j = inds[k]["j"]
 
@@ -113,84 +120,19 @@ def p_stay(timetable, k, k1, inds, train_sets):
             RHS +=  tau(timetable, 'stop', first_train=j, first_station=s)
 
             #if inds[k]["d"] > inds[k1]["d"]:
-            if LHS < RHS:
+            if LHS < RHS:  # timetable is ensured by nono-zero delay
                 return 1.0
     return 0.
 
 
 def Pstay(timetable, k, k1, inds, train_sets):
     "returns not weighted contribution to Q from the minimal stay condition constrain, here additionaly train paths are necessary"
-    p = p_stay(timetable, k, k1, inds, train_sets)
-    p += p_stay(timetable, k1, k, inds, train_sets)
+    p = penalty_for_minimal_stay_condition(timetable, k, k1, inds, train_sets)
+    p += penalty_for_minimal_stay_condition(timetable, k1, k, inds, train_sets)
     return p
 
 
-
-def p_circ(timetable, k, k1, inds, train_sets):
-
-    S = train_sets["Paths"]
-    j = inds[k]["j"]
-    j1 = inds[k1]["j"]
-    s = inds[k]["s"]
-    s1 = inds[k1]["s"]
-
-    if s1 in train_sets["Jround"].keys():
-        if previous_station(S[j], s1) == s:
-            if [j, j1] in train_sets["Jround"][s1]:
-                LHS = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-                LHS += tau(timetable, 'prep', first_train=j1, first_station=s1)
-                LHS += tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1)
-                RHS = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
-                if LHS > RHS:
-                    return 1.0
-    return 0.
-
-def Pcirc(timetable, k, k1, inds, train_sets):
-    "returns not weighted penalty for circulation condition"
-
-    p = p_circ(timetable, k, k1, inds, train_sets)
-    p += p_circ(timetable, k1, k, inds, train_sets)
-    return p
-
-
-def p_switch(timetable, k, k1, inds, train_sets):
-
-    S = train_sets["Paths"]
-    jp = inds[k]["j"]
-    jpp = inds[k1]["j"]
-    sp = inds[k]["s"]
-    spp = inds[k1]["s"]
-
-    if not_the_same_rolling_stock(jp, jpp, train_sets):
-
-        for s in train_sets["Jswitch"].keys():
-
-            if [sp, spp, jp, jpp] in train_sets["Jswitch"][s]:
-
-                t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
-                if s != sp:
-                    t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
-
-                t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
-                if s != spp:
-                    t1 += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
-
-                if -tau(timetable, 'res')  < t1-t <  tau(timetable, 'res'):
-                    return 1.0
-    return 0.
-
-
-
-def Pswitch(timetable, k, k1, inds, train_sets):
-
-    "switch occupancy condition"
-    "  ------         "
-    "         \       "
-    "---------  c ----"
-
-    p = p_switch(timetable, k, k1, inds, train_sets)
-    p += p_switch(timetable, k1, k, inds, train_sets)
-    return(p)
+#####  single track occupation  at station condition #####
 
 
 def z_indices(train_sets, d_max):
@@ -327,6 +269,76 @@ def P2qubic(k, k1, inds1, train_sets):
                 if occurs_as_pair(j, j1, train_sets["Jtrack"][s]):
                     return 0.5
     return 0.
+
+
+def p_circ(timetable, k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+    j = inds[k]["j"]
+    j1 = inds[k1]["j"]
+    s = inds[k]["s"]
+    s1 = inds[k1]["s"]
+
+    if s1 in train_sets["Jround"].keys():
+        if previous_station(S[j], s1) == s:
+            if [j, j1] in train_sets["Jround"][s1]:
+                LHS = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+                LHS += tau(timetable, 'prep', first_train=j1, first_station=s1)
+                LHS += tau(timetable, 'pass', first_train=j, first_station=s, second_station=s1)
+                RHS = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
+                if LHS > RHS:
+                    return 1.0
+    return 0.
+
+def Pcirc(timetable, k, k1, inds, train_sets):
+    "returns not weighted penalty for circulation condition"
+
+    p = p_circ(timetable, k, k1, inds, train_sets)
+    p += p_circ(timetable, k1, k, inds, train_sets)
+    return p
+
+
+def p_switch(timetable, k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+    jp = inds[k]["j"]
+    jpp = inds[k1]["j"]
+    sp = inds[k]["s"]
+    spp = inds[k1]["s"]
+
+    if not_the_same_rolling_stock(jp, jpp, train_sets):
+
+        for s in train_sets["Jswitch"].keys():
+
+            if [sp, spp, jp, jpp] in train_sets["Jswitch"][s]:
+
+                t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
+                if s != sp:
+                    t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+
+                t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
+                if s != spp:
+                    t1 += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+
+                if -tau(timetable, 'res')  < t1-t <  tau(timetable, 'res'):
+                    return 1.0
+    return 0.
+
+
+
+def Pswitch(timetable, k, k1, inds, train_sets):
+
+    "switch occupancy condition"
+    "  ------         "
+    "         \       "
+    "---------  c ----"
+
+    p = p_switch(timetable, k, k1, inds, train_sets)
+    p += p_switch(timetable, k1, k, inds, train_sets)
+    return  p
+
+
+
 
 
 def penalty(timetable, k, inds, d_max):

@@ -20,8 +20,11 @@ def get_y_j_jp_s_sp(y, j, jp, s, sp):
 
 ############  below particular dispatching conditions #######################
 
-def helper_minimal_span(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
-    """ helper for minimal span condition"""
+
+##############  minimal span ###################
+
+def minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+    """ ecnoding constrains for minimal span condition"""
     S = train_sets["Paths"]
 
     LHS = earliest_dep_time(S, timetable, jp, s)
@@ -49,12 +52,13 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, d_max, μ):
             for js in train_sets["Jd"][s][sp]:
                 for (j, jp) in itertools.combinations(js, 2):
 
-                    helper_minimal_span(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    helper_minimal_span(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    minimal_span_constrain(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
+################  single track line - deadlock ####################
 
-def helper_single_line(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
-    """ hepler for the single line condition """
+def single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+    """ encoding constrsains for the single line condition """
     S = train_sets["Paths"]
 
     LHS = earliest_dep_time(S, timetable, j, s)
@@ -82,53 +86,96 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
         for (j, jp) in train_sets["Josingle"][(s, sp)]:
             if not_the_same_rolling_stock(j, jp, train_sets):
 
-                helper_single_line(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                helper_single_line(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                single_line_constrain(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+
+
+###### minimal stay   ######
+
+def minimal_stay_constrin(j, s, problem, timetable, delay_var, train_sets):
+
+    S = train_sets["Paths"]
+
+    sp = previous_station(S[j], s)
+    if sp != None:
+        if s != train_sets["skip_station"][j]:
+        #if (train_sets["skip_station"][j] == None) or (s not in train_sets["skip_station"][j]):
+
+                LHS = delay_var[j][s]
+                LHS += earliest_dep_time(S, timetable, j, s)
+
+                RHS = delay_var[j][sp]
+                RHS += earliest_dep_time(S, timetable, j, sp)
+                RHS +=  tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
+                RHS +=  tau(timetable, 'stop', first_train=j, first_station=s)
+
+
+                problem += LHS >= RHS, f"minimal_stay_{j}_{s}"  # schedule is ensured by delay_var[j][s] >= 0
 
 
 def minimal_stay(problem, timetable, delay_var, train_sets):
-    "minimal stan condition on the staiton"
-
-    S = train_sets["Paths"]
+    "minimal stay on the staiton"
 
     for j in train_sets["J"]:
-        for s in S[j]:
-            sp = previous_station(S[j], s)
-            if sp != None:
-                if s != train_sets["skip_station"][j]:
-                #if (train_sets["skip_station"][j] == None) or (s not in train_sets["skip_station"][j]):
-
-                        LHS = delay_var[j][s]
-                        LHS += earliest_dep_time(S, timetable, j, s)
-
-                        RHS = delay_var[j][sp]
-                        RHS += earliest_dep_time(S, timetable, j, sp)
-                        RHS +=  tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
-                        RHS +=  tau(timetable, 'stop', first_train=j, first_station=s)
-
-                        problem += LHS >= RHS, f"minimal_stay_{j}_{s}"
+        for s in train_sets["Paths"][j]:
+            minimal_stay_constrin(j, s, problem, timetable, delay_var, train_sets)
 
 
+######         station   -- track occupation      #######
 
-def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
-    " adds rolling stock circulation condition to the pulp problem"
+def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+    """  if two trains follow each other from s′ to s, i.e. j,j′∈Jd and (s′,s)∈Cj,j′, we also required y(j,j′,s′) = y(j,j′,s)"""
+    if sp in train_sets["Jd"].keys():
+        if s in train_sets["Jd"][sp].keys():
+            #if both trains goes sp -> s and have common path
+            if occurs_as_pair(j, jp, train_sets["Jd"][sp][s]):
+                # the order on station y[j][jp][s] must be the same as on the path y[j][jp][sp] (previous station)
+                problem += y[j][jp][s] == y[j][jp][sp], f"track_occupation_{j}_{jp}_{s}_{sp}"
+
+
+def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+
     S = train_sets["Paths"]
 
-    for s in train_sets["Jround"].keys():
-        for (j, jp) in train_sets["Jround"][s]:
+    # getting t in
+    if sp != None:
+        LHS = earliest_dep_time(S, timetable, jp, sp)
+        LHS += tau(timetable, "pass", first_train=jp, first_station=sp, second_station=s)
+    else:   # this means that we do not have a previous station
+        LHS = earliest_dep_time(S, timetable, jp, s)
 
-            sp = previous_station(S[j], s)
-            LHS = earliest_dep_time(S, timetable, j, sp)
-            RHS = earliest_dep_time(S, timetable, jp, s)
-            LHS += tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
-            LHS += tau(timetable, 'prep', first_train=jp, first_station=s)
+    RHS = earliest_dep_time(S, timetable, j, s)
+    RHS += tau(timetable, "res")
 
-            if RHS < LHS + d_max:
-                LHS += delay_var[j][sp]
-                RHS += delay_var[jp][s]
+    if LHS - d_max < RHS:
 
-                problem += RHS >= LHS, f"circulation_{j}_{jp}_{s}"
+        if sp != None:
+            LHS += delay_var[jp][sp]
 
+        RHS -= μ*get_y_j_jp_s(y, jp, j, s)
+        LHS -= delay_var[j][s]
+
+        problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
+
+
+def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
+    "adds track occupation condition to the pulp problem"
+
+    S = train_sets["Paths"]
+    for s in train_sets["Jtrack"].keys():
+        for js in train_sets["Jtrack"][s]:
+            for (j, jp) in itertools.combinations(js, 2):
+                sp = previous_station(S[j], s)
+                spp = previous_station(S[jp], s)
+
+                if not_the_same_rolling_stock(j, jp, train_sets):
+
+                    keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    trains_order_at_s(spp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    trains_order_at_s(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+
+
+#### switch occupatiion condition at stations #############
 
 
 def switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets, d_max, μ):
@@ -178,57 +225,26 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
                 switch_occ(s, spp, sp, jpp, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
 
+####### rolling stock circulation #######
 
-
-def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
-    """  if two trains follow each other from s′ to s, i.e. j,j′∈Jd and (s′,s)∈Cj,j′, we also required y(j,j′,s′) = y(j,j′,s)"""
-    if sp in train_sets["Jd"].keys():
-        if s in train_sets["Jd"][sp].keys():
-            #if both trains goes sp -> s and have common path
-            if occurs_as_pair(j, jp, train_sets["Jd"][sp][s]):
-                # the order on station y[j][jp][s] must be the same as on the path y[j][jp][sp] (previous station)
-                problem += y[j][jp][s] == y[j][jp][sp], f"track_occupation_{j}_{jp}_{s}_{sp}"
-
-def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
-
+def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
+    " adds rolling stock circulation condition to the pulp problem"
     S = train_sets["Paths"]
 
-    if sp != None:
+    for s in train_sets["Jround"].keys():
+        for (j, jp) in train_sets["Jround"][s]:
 
-        LHS = earliest_dep_time(S, timetable, jp, sp)
-        LHS += tau(timetable, "pass", first_train=jp, first_station=sp, second_station=s)
-    else:
-        LHS = earliest_dep_time(S, timetable, jp, s)
+            sp = previous_station(S[j], s)
+            LHS = earliest_dep_time(S, timetable, j, sp)
+            RHS = earliest_dep_time(S, timetable, jp, s)
+            LHS += tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
+            LHS += tau(timetable, 'prep', first_train=jp, first_station=s)
 
+            if RHS < LHS + d_max:
+                LHS += delay_var[j][sp]
+                RHS += delay_var[jp][s]
 
-    RHS = earliest_dep_time(S, timetable, j, s)
-    RHS += tau(timetable, "res")
-
-    if LHS - d_max < RHS:
-        LHS += μ*get_y_j_jp_s(y, jp, j, s)
-        LHS -= delay_var[j][s]
-        if sp != None:
-            LHS += delay_var[jp][sp]
-
-
-        problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
-
-
-def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
-    "adds track occupation condition to the pulp problem"
-
-    S = train_sets["Paths"]
-    for s in train_sets["Jtrack"].keys():
-        for js in train_sets["Jtrack"][s]:
-            for (j, jp) in itertools.combinations(js, 2):
-                sp = previous_station(S[j], s)
-                spp = previous_station(S[jp], s)
-
-                if not_the_same_rolling_stock(j, jp, train_sets):
-
-                    keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    trains_order_at_s(spp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    trains_order_at_s(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                problem += RHS >= LHS, f"circulation_{j}_{jp}_{s}"
 
 
 
