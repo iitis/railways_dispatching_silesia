@@ -78,7 +78,7 @@ def test_5_trains_all_cases():
     Q = make_Q(train_sets, timetable, d_max, p_sum,
                p_pair, p_pair_qubic, p_qubic)
 
-    #np.savez("test/files/Qfile_5trains.npz", Q=Q)
+    np.savez("test/files/Qfile_5trains.npz", Q=Q)
 
     sol = np.load("test/files/solution_5trains.npz")
 
