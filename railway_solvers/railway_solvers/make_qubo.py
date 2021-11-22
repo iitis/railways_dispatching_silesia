@@ -69,10 +69,19 @@ def p_stay(timetable, k, k1, inds, train_sets):
     j = inds[k]["j"]
 
     if j == inds[k1]["j"]:
-        s = inds[k]["s"]
-        s1 = inds[k1]["s"]
-        if s1 == subsequent_station(S[j], s):
-            if inds[k]["d"] > inds[k1]["d"]:
+        sp = inds[k]["s"]
+        s = inds[k1]["s"]
+        if s == subsequent_station(S[j], sp):
+            LHS = inds[k1]["d"]
+            LHS += earliest_dep_time(S, timetable, j, s)
+
+            RHS = inds[k]["d"]
+            RHS += earliest_dep_time(S, timetable, j, sp)
+            RHS +=  tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
+            RHS +=  tau(timetable, 'stop', first_train=j, first_station=s)
+
+            #if inds[k]["d"] > inds[k1]["d"]:
+            if LHS < RHS:
                 return 1.0
     return 0.
 

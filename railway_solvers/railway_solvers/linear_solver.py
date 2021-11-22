@@ -7,9 +7,9 @@ from .helpers_functions import *
 
 def get_y_j_jp_s(y, j, jp, s):
     try:
-        return y[jp][j][s]
+        return y[j][jp][s]
     except:
-        return 1-y[j][jp][s]
+        return 1-y[jp][j][s]
 
 def get_y_j_jp_s_sp(y, j, jp, s, sp):
     try:
@@ -17,19 +17,23 @@ def get_y_j_jp_s_sp(y, j, jp, s, sp):
     except:
         return 1-y[jp][j][sp][s]
 
-def minimal_s(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+
+############  below particular dispatching conditions #######################
+
+def helper_minimal_span(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+    """ helper for minimal span condition"""
     S = train_sets["Paths"]
 
     LHS = earliest_dep_time(S, timetable, jp, s)
-    LHS -= earliest_dep_time(S, timetable, j, s)
-    RHS = tau(timetable, 'blocks', first_train=j, second_train = jp, first_station=s, second_station=sp)
 
-    #LHS - d_max - smallest possible LHS -- otherwise always fulfilled
-    if LHS - d_max < RHS:
+    RHS = earliest_dep_time(S, timetable, j, s)
+    RHS += tau(timetable, 'blocks', first_train=j, second_train = jp, first_station=s, second_station=sp)
 
+    if LHS - d_max < RHS:  #otherwise always fulfilled  (redundant)
         LHS += delay_var[jp][s]
-        LHS += μ*get_y_j_jp_s(y, j, jp, s)
-        LHS -= delay_var[j][s]
+
+        RHS += delay_var[j][s]
+        RHS -= μ*get_y_j_jp_s(y, jp, j, s)
         problem += LHS >= RHS, f"minimal_span_{jp}_{j}_{s}_{sp}"
 
 
@@ -45,8 +49,63 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, d_max, μ):
             for js in train_sets["Jd"][s][sp]:
                 for (j, jp) in itertools.combinations(js, 2):
 
-                    minimal_s(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    minimal_s(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    helper_minimal_span(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    helper_minimal_span(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+
+
+def helper_single_line(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+    """ hepler for the single line condition """
+    S = train_sets["Paths"]
+
+    LHS = earliest_dep_time(S, timetable, j, s)
+    RHS = earliest_dep_time(S, timetable, jp, sp)
+    RHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+
+    if LHS - d_max < RHS:  # otherwise always fulfilled (redundant)
+        LHS += delay_var[j][s]
+
+        RHS += delay_var[jp][sp]
+        RHS -= μ*get_y_j_jp_s_sp(y, j, jp, s, sp)
+
+        problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
+
+
+def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
+    " adds single line condition to the pulp problem"
+
+    " ......                            ......  "
+    "       \                          /        "
+    " .j1 ->............................. <-j2.."
+
+
+    for (s, sp) in train_sets["Josingle"].keys():
+        for (j, jp) in train_sets["Josingle"][(s, sp)]:
+            if not_the_same_rolling_stock(j, jp, train_sets):
+
+                helper_single_line(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                helper_single_line(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+
+
+def minimal_stay(problem, timetable, delay_var, train_sets):
+    "minimal stan condition on the staiton"
+
+    S = train_sets["Paths"]
+
+    for j in train_sets["J"]:
+        for s in S[j]:
+            sp = previous_station(S[j], s)
+            if sp != None:
+                if (train_sets["skip_station"][j] == None) or (s not in train_sets["skip_station"][j]):
+
+                        LHS = delay_var[j][s]
+                        LHS += earliest_dep_time(S, timetable, j, s)
+
+                        RHS = delay_var[j][sp]
+                        RHS += earliest_dep_time(S, timetable, j, sp)
+                        RHS +=  tau(timetable, 'pass', first_train=j, first_station=sp, second_station=s)
+                        RHS +=  tau(timetable, 'stop', first_train=j, first_station=s)
+
+                        problem += LHS >= RHS, f"minimal_stay_{j}_{s}"
 
 
 
@@ -77,6 +136,7 @@ def switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets
 
     LHS = earliest_dep_time(S, timetable, jp, sp)
     RHS = earliest_dep_time(S, timetable, jpp, spp)
+
     RHS  += tau(timetable, 'res', first_train=jp, second_train=jpp, first_station=s)
     if s != sp:
         LHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
@@ -84,12 +144,13 @@ def switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets
     if s != spp:
         RHS += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
 
+
     if LHS < RHS + d_max:
         if sp == spp:
-            LHS += μ*get_y_j_jp_s(y, jp, jpp, sp)
+            RHS -= μ*get_y_j_jp_s(y, jp, jpp, sp)
 
         else:
-            LHS += μ*get_y_j_jp_s_sp(y, jp, jpp, sp, spp)
+            RHS -= μ*get_y_j_jp_s_sp(y, jp, jpp, sp, spp)
 
 
         LHS += delay_var[jp][sp]
@@ -117,74 +178,45 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
 
 
 
-def single_l(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
-    S = train_sets["Paths"]
 
-    LHS = earliest_dep_time(S, timetable, j, s)
-    RHS = earliest_dep_time(S, timetable, jp, sp)
-    RHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
-
-    # otherwise almost fulfilled
-    if LHS - d_max < RHS:
-
-        LHS += delay_var[j][s]
-        LHS += μ*get_y_j_jp_s_sp(y, j, jp, s, sp)
-
-        LHS -= delay_var[jp][sp]
-        problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
-
-
-def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
-    " adds single line condition to the pulp problem"
-
-    " ......                            ......  "
-    "       \                          /        "
-    " .j1 ->............................. <-j2.."
-
-
-    for (s, sp) in train_sets["Josingle"].keys():
-        for (j, jp) in train_sets["Josingle"][(s, sp)]:
-            if not_the_same_rolling_stock(j, jp, train_sets):
-
-                single_l(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                single_l(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
-
-
-def minimal_stay(problem, timetable, delay_var, train_sets):
-    "adds minimum stay condition to the pulp problem"
-    not_considered_station = train_sets["skip_station"]
-
-    S = train_sets["Paths"]
-
-    for j in train_sets["J"]:
-        for s in S[j]:
-            sp = previous_station(S[j], s)
-            if (sp != None and s != not_considered_station[j]):
-                problem += delay_var[j][s] >= delay_var[j][sp], f"minimal_stay_{j}_{s}"
-
-def trains_order_if_follows(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+    """  if two trains follow each other from s′ to s, i.e. j,j′∈Jd and (s′,s)∈Cj,j′, we also required y(j,j′,s′) = y(j,j′,s)"""
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
-            #if trains have common path
+            #if both trains goes sp -> s and have common path
             if occurs_as_pair(j, jp, train_sets["Jd"][sp][s]):
+                # the order on station y[j][jp][s] must be the same as on the path y[j][jp][sp] (previous station)
                 problem += y[j][jp][s] == y[j][jp][sp], f"track_occupation_{j}_{jp}_{s}_{sp}"
 
-def trains_order_at_s(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+
+    S = train_sets["Paths"]
 
     if sp != None:
-        S = train_sets["Paths"]
 
         LHS = earliest_dep_time(S, timetable, jp, sp)
         LHS += tau(timetable, "pass", first_train=jp, first_station=sp, second_station=s)
-        RHS = earliest_dep_time(S, timetable, j, s)
-        RHS += tau(timetable, "res")
+    else:
+        LHS = earliest_dep_time(S, timetable, jp, s)
 
-        if LHS - d_max < RHS:
-            LHS += μ*get_y_j_jp_s(y, j, jp, s)
-            LHS -= delay_var[j][s]
+
+    RHS = earliest_dep_time(S, timetable, j, s)
+    RHS += tau(timetable, "res")
+
+    if LHS - d_max < RHS:
+        LHS += μ*get_y_j_jp_s(y, jp, j, s)
+        LHS -= delay_var[j][s]
+        if sp != None:
             LHS += delay_var[jp][sp]
 
-            problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
+
+        print('yyyyyyyyyyy')
+
+        print(s, sp)
+
+        print(LHS, ">=", RHS)
+
+        problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
 
 
 def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
@@ -199,9 +231,9 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
 
                 if not_the_same_rolling_stock(j, jp, train_sets):
 
-                    trains_order_if_follows(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    trains_order_at_s(s, spp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    trains_order_at_s(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    trains_order_at_s(spp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    trains_order_at_s(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
 
 
