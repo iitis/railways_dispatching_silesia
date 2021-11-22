@@ -150,6 +150,60 @@ def z_indices(train_sets, d_max):
     return inds, len(inds)
 
 
+
+def one_track_constrains(jx, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable):
+
+    S = train_sets["Paths"]
+
+    tx = d + earliest_dep_time(S, timetable, jx, sx)
+    tx += tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz)
+    if "add_swithes_at_s" in train_sets.keys():
+        if sz in train_sets["add_swithes_at_s"]:  # this is the approximation used in  ArXiv:2107.03234,
+            tx -= tau(timetable, "res")
+    tz = d1 + earliest_dep_time(S, timetable, jz, sz)
+    tz1 = d2 + earliest_dep_time(S, timetable, jz1, sz)
+
+    if tx < tz1 <= tz:
+        return 1.
+    return 0.
+
+def pair_of_one_track_constrains(inds1, k, k1, train_sets, timetable):
+
+    S = train_sets["Paths"]
+
+    jx = inds1[k]["j"]
+    sx = inds1[k]["s"]
+    sz = inds1[k1]["s"]
+    d =  inds1[k]["d"]
+    d1 =  inds1[k1]["d"]
+    d2 = inds1[k1]["d1"]
+
+    if sz == subsequent_station(S[jx], sx):
+        jz = inds1[k1]["j"]
+        jz1 = inds1[k1]["j1"]
+
+        if (jx == jz) and occurs_as_pair(jx, jz1, train_sets["Jtrack"][sz]):
+            # jz, jz1, tx => j', j, j', according to Eq 32
+            # tz, tz1, tx => t', t,  t'' according to Eq 32
+            # sx, sz -> s', s
+
+            p = one_track_constrains(jx, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable)
+            if p > 0:
+                return p
+
+        if (jx == jz1) and occurs_as_pair(jx, jz, train_sets["Jtrack"][sz]):
+            # jz1, jz, tx => j', j, j', according to Eq 32
+            # tz1, tz, tx => t', t,  t'' according to Eq 32
+            # sx, sz -> s', s
+
+            p = one_track_constrains(jx, jz1, jz, sx, sz, d, d2, d1, train_sets, timetable)
+            if p > 0:
+                return p
+    return 0
+
+
+
+
 def P1qubic(timetable, k, k1, inds1, train_sets):
     "returns not weighted contribution to Q from the single track occupancy conditions constrains, auxiliary variables are included"
     S = train_sets["Paths"]
@@ -157,65 +211,12 @@ def P1qubic(timetable, k, k1, inds1, train_sets):
     if not not_the_same_rolling_stock(inds1[k]["j"], inds1[k1]["j"], train_sets):
         return 0.
 
-    # x with z
     if len(inds1[k].keys()) == 3 and len(inds1[k1].keys()) == 5:
-        jx = inds1[k]["j"]
-        sx = inds1[k]["s"]
-        sz = inds1[k1]["s"]
-        if sz == subsequent_station(S[jx], sx):
-            jz = inds1[k1]["j"]
-            jz1 = inds1[k1]["j1"]
+        return pair_of_one_track_constrains(inds1, k, k1, train_sets, timetable)
 
+    elif len(inds1[k].keys()) == 5 and len(inds1[k1].keys()) == 3:
+        return pair_of_one_track_constrains(inds1, k1, k, train_sets, timetable)
 
-            if (jx == jz) and occurs_as_pair(jx, jz1, train_sets["Jtrack"][sz]):
-                # jz, jz1, tx => j', j, j', according to Eq 32
-                # tz, tz1, tx => t', t,  t'' according to Eq 32
-                # sx, sz -> s', s
-
-                tx = inds1[k]["d"] + earliest_dep_time(S, timetable, jx, sx)
-                tz = inds1[k1]["d"] + earliest_dep_time(S, timetable, jz, sz)
-                tz1 = inds1[k1]["d1"] + \
-                    earliest_dep_time(S, timetable, jz1, sz)
-
-                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz1 <= tz:
-                    return 1.
-
-            if (jx == jz1) and occurs_as_pair(jx, jz, train_sets["Jtrack"][sz]):
-                # jz1, jz, tx => j', j, j', according to Eq 32
-                # tz1, tz, tx => t', t,  t'' according to Eq 32
-                # sx, sz -> s', s
-
-                tx = inds1[k]["d"] + earliest_dep_time(S, timetable, jx, sx)
-                tz = inds1[k1]["d"] + earliest_dep_time(S, timetable, jz, sz)
-                tz1 = inds1[k1]["d1"] + \
-                    earliest_dep_time(S, timetable, jz1, sz)
-
-                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz <= tz1:
-                    return 1.
-
-    if len(inds1[k].keys()) == 5 and len(inds1[k1].keys()) == 3:
-        jx = inds1[k1]["j"]
-        sx = inds1[k1]["s"]
-        sz = inds1[k]["s"]
-        if sz == subsequent_station(S[jx], sx):
-            jz = inds1[k]["j"]
-            jz1 = inds1[k]["j1"]
-
-            if (jx == jz) and occurs_as_pair(jx, jz1, train_sets["Jtrack"][sz]):
-                tx = inds1[k1]["d"] + earliest_dep_time(S, timetable, jx, sx)
-                tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
-                tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
-
-                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz1 <= tz:
-                    return 1.
-
-            if (jx == jz1) and occurs_as_pair(jx, jz, train_sets["Jtrack"][sz]):
-                tx = inds1[k1]["d"] + earliest_dep_time(S, timetable, jx, sx)
-                tz = inds1[k]["d"] + earliest_dep_time(S, timetable, jz, sz)
-                tz1 = inds1[k]["d1"] + earliest_dep_time(S, timetable, jz1, sz)
-
-                if tx + tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz) - tau(timetable, "res") < tz <= tz1:
-                    return 1.
     return 0.
 
 

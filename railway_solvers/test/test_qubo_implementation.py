@@ -408,7 +408,8 @@ def test_track_occupation_simple():
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": dict()
+        "Jswitch": dict(),
+        "add_swithes_at_s": [1]
     }
 
     p_sum = 2
@@ -522,7 +523,8 @@ def test_performing_Qmat():
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": dict()
+        "Jswitch": dict(),
+        "add_swithes_at_s": [1]
     }
 
     p_sum = 2.5
@@ -549,7 +551,8 @@ def test_performing_Qmat():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]},
+        "add_swithes_at_s": [1]
     }
 
     Q_r = make_Q(train_sets_r, timetable, d_max,

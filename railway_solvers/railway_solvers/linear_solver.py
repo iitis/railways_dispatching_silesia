@@ -145,7 +145,10 @@ def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets
         LHS = earliest_dep_time(S, timetable, jp, s)
 
     RHS = earliest_dep_time(S, timetable, j, s)
-    RHS += tau(timetable, "res")
+
+    if "add_swithes_at_s" in train_sets.keys():
+        if s in train_sets["add_swithes_at_s"]:  # this is the approximation used in  ArXiv:2107.03234,
+            RHS += tau(timetable, "res")
 
     if LHS - d_max < RHS:
 
@@ -328,11 +331,9 @@ def delay_varibles(train_sets, d_max):
     secondary_delays_vars = dict()
 
     for j in train_sets["J"]:
-        print("ssssssssssssssssssss")
-        print(S[j])
         for s in S[j]:
             if s != train_sets["skip_station"][j]:
-                print(s)
+
                 dvar = pus.LpVariable.dicts(
                     "Delays", ([j], [s]), 0, d_max, cat='Integer')
 

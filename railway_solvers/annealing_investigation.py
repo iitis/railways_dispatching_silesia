@@ -13,9 +13,9 @@ d_max = 10
 
 train_sets = {
     "skip_station": {
-        0: [None],
-        1: [None],
-        2: [0],
+        0: None,
+        1: None,
+        2: 0,
     },
     "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
     "J": [0, 1, 2],
@@ -23,14 +23,15 @@ train_sets = {
     "Josingle": dict(),
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
-    "Jswitch": dict()
+    "Jswitch": dict(),
+    "add_swithes_at_s": [1]
 }
 
 train_sets_rerouted = {
     "skip_station": {
-        0: [None],
-        1: [None],
-        2: [0],
+        0: None,
+        1: None,
+        2: 0,
     },
     "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
     "J": [0, 1, 2],
@@ -38,7 +39,8 @@ train_sets_rerouted = {
     "Josingle": {(0,1): [[1,2]]},
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
-    "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+    "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]},
+    "add_swithes_at_s": [1]
 }
 
 prob = create_linear_problem(train_sets, timetable, d_max, μ)

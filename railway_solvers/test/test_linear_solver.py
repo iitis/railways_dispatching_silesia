@@ -165,7 +165,8 @@ def test_track_occupation_simplest():
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1], []]},
-        "Jswitch": dict()
+        "Jswitch": {1: [[0, 0, 0, 1], [1,1,0,1]]},
+        "add_swithes_at_s": [1]
     }
 
     ####   simple problem #####
@@ -207,7 +208,8 @@ def test_linear_solver_default_problem():
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": dict()
+        "Jswitch": dict(),
+        "add_swithes_at_s": [1]
     }
 
     train_sets_rerouted = {
@@ -222,7 +224,8 @@ def test_linear_solver_default_problem():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]},
+        "add_swithes_at_s": [1]
     }
 
     prob = solve_linear_problem(train_sets, timetable, d_max, μ)

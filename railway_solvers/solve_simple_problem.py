@@ -72,7 +72,8 @@ train_sets = {
     "Josingle": dict(),
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
-    "Jswitch": dict()
+    "Jswitch": dict(),
+    "add_swithes_at_s": [1]
 }
 
 train_sets_rerouted = {
@@ -87,7 +88,8 @@ train_sets_rerouted = {
     "Josingle": {(0,1): [[1,2]]},
     "Jround": dict(),
     "Jtrack": {1: [[0, 1]]},
-    "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+    "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]},
+    "add_swithes_at_s": [1]
 }
 
 d_max = 10
