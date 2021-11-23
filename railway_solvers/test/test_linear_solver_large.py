@@ -45,7 +45,7 @@ def test_5_trains_all_cases():
         "Josingle": {('C', 'D'): [[24, 25]]},
         "Jround": {'C': [[22, 23]]},
         "Jtrack": {'B': [[21, 22]], 'C':[[21,24], [22, 23]]},
-        "Jswitch": {'B':[['B', 'B', 21, 22], ['A', 'A', 21, 22]], 'C': [['C', 'C', 23, 24], ['B', 'C', 22, 24], ['B', 'C', 22, 23], ['B', 'C', 21, 24]], 'D': [['C', 'D', 24, 25]]}
+        "Jswitch": {'B':[{21:"out", 22:"out"}, {21:"in", 22:"in"}], 'C': [{23:"out", 24:"out"}, {22:"in", 24:"out"}, {22:"in", 23:"out"}, {21:"in", 24:"out"}], 'D': [{24:"in", 25:"out"}]}
     }
 
     d_max = 10
@@ -78,13 +78,13 @@ def test_5_trains_all_cases():
     Q = make_Q(train_sets, timetable, d_max, p_sum,
                p_pair, p_pair_qubic, p_qubic)
 
-    np.savez("test/files/Qfile_5trains.npz", Q=Q)
+    #np.savez("test/files/Qfile_5trains.npz", Q=Q)
 
     sol = np.load("test/files/solution_5trains.npz")
 
-    # (2*3+1+2)*2.5
+    # ofset = (2*3+1+2)*2.5 = -22.5
 
-    assert energy(sol, Q) == pytest.approx(-22.5+1.01, .02)
+    assert energy(sol, Q) == pytest.approx(-22.5+1.01)
 
 def test_many_trains_single_line():
 

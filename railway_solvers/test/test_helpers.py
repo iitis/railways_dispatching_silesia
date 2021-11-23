@@ -52,11 +52,17 @@ def test_auxiliary_timetable_functions():
     assert earliest_dep_time(S, timetable, 2, 0) == 19
     assert earliest_dep_time(S, timetable, 2, 1) == 8
 
-def test_common_rolling_stock_case():
+def test_helpers_of_train_sets():
 
         train_sets = {
-            "Jround": {'B': [[1,2]]}}
+            "Paths": {1: ['A', 'B'], 2: ['B', 'A'], 3: ['A', 'B']},
+            "Jround": {'B': [[1,2]]},
+            "Jswitch": {'B':[{1:"out", 3:"out"}, {1:"in", 3:"in"}]}
+        }
 
         assert not_the_same_rolling_stock(0, 1, train_sets) == True
         assert not_the_same_rolling_stock(0, 1, train_sets) == True
         assert not_the_same_rolling_stock(1,2, train_sets) == False
+
+        assert departure_station4switches('B', 1, {1:"out", 3:"out"}, train_sets) == 'B'
+        assert departure_station4switches('B', 1, {1:"in", 3:"in"}, train_sets) == 'A'

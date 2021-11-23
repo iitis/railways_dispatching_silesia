@@ -181,9 +181,10 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
 #### switch occupatiion condition at stations #############
 
 
-def switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets, d_max, μ):
 
     S = train_sets["Paths"]
+
 
     LHS = earliest_dep_time(S, timetable, jp, sp)
     RHS = earliest_dep_time(S, timetable, jpp, spp)
@@ -211,6 +212,7 @@ def switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets
 
 
 
+
 def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
     " adds switch occupation condition to the pulp problem"
 
@@ -221,11 +223,15 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
     S = train_sets["Paths"]
 
     for s in train_sets["Jswitch"].keys():
-        for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
+        for pair in train_sets["Jswitch"][s]:
+            (jp, jpp) = pair.keys()
             if not_the_same_rolling_stock(jp, jpp, train_sets):
 
-                switch_occ(s, sp, spp, jp, jpp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                switch_occ(s, spp, sp, jpp, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                sp =  departure_station4switches(s, jp, pair, train_sets)
+                spp =  departure_station4switches(s, jpp, pair, train_sets)
+
+                switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                switch_occ(s, jpp, spp, jp, sp, problem, timetable, delay_var, y, train_sets, d_max, μ)
 
 
 ####### rolling stock circulation #######
@@ -313,8 +319,12 @@ def order_variables(train_sets, d_max):
 
     # switch occupacy
     for s in train_sets["Jswitch"].keys():
-        for (sp, spp, jp, jpp) in train_sets["Jswitch"][s]:
-            # if jp and jpp starts from the same station
+        for pair in train_sets["Jswitch"][s]:
+            (jp, jpp) = pair.keys()
+
+            sp = departure_station4switches(s, jp, pair, train_sets)
+            spp = departure_station4switches(s, jpp, pair, train_sets)
+
             if sp == spp:
                 update_y_j_jp_s(order_vars, jp, jpp, sp)
             else:

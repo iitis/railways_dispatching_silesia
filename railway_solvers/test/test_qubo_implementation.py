@@ -137,7 +137,8 @@ def test_pswith():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+        "Jswitch": {0: [{1: "out", 2: "in"}], 1: [{1: "in", 2: "out"}]}
+        #"Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
     }
 
     timetable = {"tau": taus,
@@ -237,7 +238,8 @@ def test_qubic():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+        #"Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+        "Jswitch": {0: [{1:"out", 2:"in"}], 1: [{1:"in", 2:"out"}]}
     }
 
     inds, q_bits = indexing4qubo(train_sets, 10)
@@ -446,7 +448,7 @@ def test_two_trains_going_opposite_ways_simple():
         "Josingle": {(0,1): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        "Jswitch": {0: [[0, 1, 0, 1]], 1: [[0, 1, 0, 1]]}
+        "Jswitch": {0: [{0:"out", 1:"in"}], 1: [{0:"in", 1:"out"}]}
     }
 
     p_sum = 2.
@@ -551,7 +553,8 @@ def test_performing_Qmat():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]},
+        #"Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]},
+        "Jswitch": {0: [{1:"out", 2:"in"}], 1: [{1:"in", 2:"out"}]},
         "add_swithes_at_s": [1]
     }
 

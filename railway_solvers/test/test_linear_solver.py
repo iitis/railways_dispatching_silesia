@@ -82,7 +82,7 @@ def test_two_trains_going_opposite_ways_simplest():
         "Josingle": {(0,1): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        "Jswitch": {0: [[0, 1, 0, 1]], 1: [[0, 1, 0, 1]]}
+        "Jswitch": {0: [{0: "out", 1: "in"}], 1: [{0: "in", 1: "out"}]}
     }
 
     taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
@@ -165,7 +165,7 @@ def test_track_occupation_simplest():
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": {1: [[0, 1], []]},
-        "Jswitch": {1: [[0, 0, 0, 1], [1,1,0,1]]},
+        "Jswitch": {1: [{0:"in", 1:"in"}, {0:"out", 1:"out"}]},
         "add_swithes_at_s": [1]
     }
 
@@ -224,7 +224,7 @@ def test_linear_solver_default_problem():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]},
+        "Jswitch": {0: [{1:"out", 2:"in"}], 1: [{1:"in", 2:"out"}]},
         "add_swithes_at_s": [1]
     }
 
@@ -302,7 +302,7 @@ def test_constraint_labels():
         "Josingle": {(0,1): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {1: [[0, 1]]},
-        "Jswitch": {0: [[0, 1, 1, 2]], 1: [[0, 1, 1, 2]]}
+        "Jswitch": {0: [{1:"out", 2:"in"}], 1: [{1:"in", 2:"out"}]}
     }
 
     prob = create_linear_problem(train_sets, timetable, d_max, μ)
