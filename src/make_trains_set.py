@@ -2,6 +2,7 @@ from time_table_check import *
 
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
+# return total number of elements in list of lists
 def getSizeOfNestedList(listOfElem):
     ''' Get number of elements in a nested list'''
     count = 0
@@ -14,19 +15,13 @@ def getSizeOfNestedList(listOfElem):
         else:
             count += 1
     return count
-
+# make a single list of lists of lists
 def flatten(t):
     return [item for sublist in t for item in sublist]
-
-def same_digit(x, y):
-    if sorted(str(x)) == sorted(str(y)):
-        return True
-    else:
-        return False
-
+# get common elements, but without order
 def common_elements(list1, list2):
     return [element for element in list1 if element in list2]
-
+# check if list is sublist of list, ordered
 def sublist(lst1, lst2):
     from collections import Counter
     c1 = Counter(lst1)
@@ -35,25 +30,26 @@ def sublist(lst1, lst2):
         if count > c2[item]:
             return False
     return True
-
+# return a dictionary of trains
 def get_J(data):
     train_dict = timetable_to_train_dict(data)
     return list(train_dict.keys())
 
+# return a dictonary of important stations
 def get_Paths(data):
     trains = get_J(data)
     paths_per_train = {}
     for train in trains:
         paths_per_train[train] = check_important_stations(train)
     return paths_per_train
-
+# get common station betwenn two trains, does not check order
 def check_common_station(train1,train2):
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
-
+# get common blocks between trains, does not check order
 def check_common_blocks_elements(train1,train2):
     return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
-
+# functon for checking sequential blocks
 def sequential_elementsets_in_2lists(list1,list2):
     common_list_sets = []
     i = 0
@@ -69,7 +65,7 @@ def sequential_elementsets_in_2lists(list1,list2):
             common_list_sets += [blocks_seq[0:-1]]
             i+=c
         return common_list_sets
-
+#
 def get_trains_with_same_stations(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     jdict = {}
