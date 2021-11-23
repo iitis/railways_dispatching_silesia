@@ -1,4 +1,5 @@
 from time_table_check import *
+import re
 
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
@@ -21,15 +22,23 @@ def flatten(t):
 # get common elements, but without order
 def common_elements(list1, list2):
     return [element for element in list1 if element in list2]
-# check if list is sublist of list, ordered
-def sublist(lst1, lst2):
-    from collections import Counter
-    c1 = Counter(lst1)
-    c2 = Counter(lst2)
-    for item, count in c1.items():
-        if count > c2[item]:
-            return False
-    return True
+# generate sublists in order
+def sub_lists(l,no_single = False):
+    lists = []
+    for i in range(len(l) + 1):
+        for j in range(i):
+            subsl = l[j: i]
+            if no_single == True:
+                if len(subsl)<2:
+                    continue
+            lists.append(subsl)
+    return lists
+# check if sequential items from a short list (short) is in the bigger list (bigger)    
+def check_sequential_elements(short,bigger):
+    if re.search("".join(short),"".join(short)):
+        return True
+    else:
+        return False
 # return a dictionary of trains
 def get_J(data):
     train_dict = timetable_to_train_dict(data)
