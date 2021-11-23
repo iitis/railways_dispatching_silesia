@@ -102,9 +102,20 @@ def earliest_dep_time(S, timetable, train, station):
         return np.maximum(sched, earliest_dep_time(S, timetable, train, s) + tau_pass + tau_stop)
 
 
+####    helpers for trains set ####
+
 def not_the_same_rolling_stock(j, jp, train_sets):
     "determines whether two trains are not served by the same rolling stock"
     for s in train_sets["Jround"].keys():
         if occurs_as_pair(j, jp, train_sets["Jround"][s]):
             return False
     return True
+
+
+def departure_station4switches(s, j, pair_on_switch, train_sets):
+    "returns departure station for train approaching the wsitch at s "
+    S = train_sets["Paths"]
+    if pair_on_switch[j] == "out":
+        return s
+    elif pair_on_switch[j] == "in":
+        return previous_station(S[j], s)

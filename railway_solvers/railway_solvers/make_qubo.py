@@ -298,8 +298,30 @@ def Pcirc(timetable, k, k1, inds, train_sets):
     p += p_circ(timetable, k1, k, inds, train_sets)
     return p
 
+####  common switch condition #####
 
-def p_switch(timetable, k, k1, inds, train_sets):
+
+def p_switch(s, sp, spp, jp, jpp, timetable, k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+
+    t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
+    if s != sp:
+        t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
+
+    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
+    if s != spp:
+        t1 += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
+
+    if -tau(timetable, 'res')  < t1-t <  tau(timetable, 'res'):
+        return 1.0
+    return 0.
+
+def Pswitch(timetable, k, k1, inds, train_sets):
+    "switch occupancy condition"
+    "  ------         "
+    "         \       "
+    "---------  c ----"
 
     S = train_sets["Paths"]
     jp = inds[k]["j"]
@@ -310,35 +332,16 @@ def p_switch(timetable, k, k1, inds, train_sets):
     if not_the_same_rolling_stock(jp, jpp, train_sets):
 
         for s in train_sets["Jswitch"].keys():
+            for pairs_of_switch in train_sets["Jswitch"][s]:
+                if [jp, jpp] == list(pairs_of_switch.keys()) or [jpp, jp] == list(pairs_of_switch.keys()):  # here is symmetrisation
+                    if sp == departure_station4switches(s, jp, pairs_of_switch, train_sets):
+                        if spp == departure_station4switches(s, jpp, pairs_of_switch, train_sets):
 
-            if [sp, spp, jp, jpp] in train_sets["Jswitch"][s]:
+                            p = p_switch(s, sp, spp, jp, jpp, timetable, k, k1, inds, train_sets)
+                            if p > 0:
+                                return p
 
-                t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
-                if s != sp:
-                    t += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
-
-                t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
-                if s != spp:
-                    t1 += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
-
-                if -tau(timetable, 'res')  < t1-t <  tau(timetable, 'res'):
-                    return 1.0
     return 0.
-
-
-
-def Pswitch(timetable, k, k1, inds, train_sets):
-
-    "switch occupancy condition"
-    "  ------         "
-    "         \       "
-    "---------  c ----"
-
-    p = p_switch(timetable, k, k1, inds, train_sets)
-    p += p_switch(timetable, k1, k, inds, train_sets)
-    return  p
-
-
 
 
 
