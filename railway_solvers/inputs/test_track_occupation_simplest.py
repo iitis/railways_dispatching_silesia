@@ -17,5 +17,5 @@ train_sets = {
     "Jtrack": {1: [[0, 1], []]},
     "Jswitch": {1: [{0:"in", 1:"in"}, {0:"out", 1:"out"}]},
     "add_swithes_at_s": [1]
-
+}
 d_max = 10
