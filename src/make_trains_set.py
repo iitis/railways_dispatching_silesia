@@ -33,12 +33,14 @@ def sub_lists(l,no_single = False):
                     continue
             lists.append(subsl)
     return lists
-# check if sequential items from a short list (short) is in the bigger list (bigger)    
+# check if sequential items from a short list (short) is in the bigger list (bigger)
 def check_sequential_elements(short,bigger):
     if re.search("".join(short),"".join(short)):
         return True
     else:
         return False
+# def train_blocks_b2win_stations(train,station1,station2):
+
 # return a dictionary of trains
 def get_J(data):
     train_dict = timetable_to_train_dict(data)
@@ -51,30 +53,31 @@ def get_Paths(data):
     for train in trains:
         paths_per_train[train] = check_important_stations(train)
     return paths_per_train
+
 # get common station betwenn two trains, does not check order
 def check_common_station(train1,train2):
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
+
 # get common blocks between trains, does not check order
 def check_common_blocks_elements(train1,train2):
     return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
-# functon for checking sequential blocks
-def sequential_elementsets_in_2lists(list1,list2):
-    common_list_sets = []
+
+def get_block_b2win_station4train(train,station1,station2):
+    station1,station2 = '"'+station1,'"'+station2
+    blocks_list = train_time_table(train1)['path'].tolist()
     i = 0
-    while i in range(len(list1)):
-        if len(common_elements(list1[i:i+1], list2)) < 1:
-            i+=1
-        else:
-            c=1
-            blocks_seq = [list1[i]]
-            while sublist(list1,list2) and i+c<len(list1):
-                blocks_seq.append(list1[i+c])
-                c+=1
-            common_list_sets += [blocks_seq[0:-1]]
-            i+=c
-        return common_list_sets
-#
+    block = blocks_list[i]
+    blocksb2win = []
+    while block[0:len(station1)] != station1:
+        i+=1
+        block = blocks_list[i]
+    while block[0:len(station2)] != station2:
+        block = blocks_list[i]
+        i+=1
+        blocksb2win.append(block)
+    return blockb2win
+# check shared stations between trains, does not check order
 def get_trains_with_same_stations(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     jdict = {}
