@@ -50,7 +50,7 @@ def test_two_trains_going_one_way_simplest():
     }
 
     ####   simple problem #####
-    prob = solve_linear_problem(train_sets, timetable, 5, 10)
+    prob = solve_linear_problem(train_sets, timetable, 5)
 
     for v in prob.variables():
 
@@ -93,7 +93,7 @@ def test_two_trains_going_opposite_ways_simplest():
 
     ####   simple problem #####
 
-    prob = solve_linear_problem(train_sets, timetable, 10, 30)
+    prob = solve_linear_problem(train_sets, timetable, 10)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -132,7 +132,7 @@ def test_rolling_stock_circulation():
 
     ####   simple problem #####
 
-    prob = solve_linear_problem(train_sets, timetable, 10, 10)
+    prob = solve_linear_problem(train_sets, timetable, 10)
 
 
     for v in prob.variables():
@@ -171,7 +171,7 @@ def test_track_occupation_simplest():
 
     ####   simple problem #####
 
-    prob = solve_linear_problem(train_sets, timetable, 5, 8)
+    prob = solve_linear_problem(train_sets, timetable, 5)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -194,7 +194,6 @@ def test_linear_solver_default_problem():
                  "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
 
     d_max = 10
-    μ = 26
 
     train_sets = {
         "skip_station": {
@@ -228,7 +227,7 @@ def test_linear_solver_default_problem():
         "add_swithes_at_s": [1]
     }
 
-    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
+    prob = solve_linear_problem(train_sets, timetable, d_max)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -246,7 +245,7 @@ def test_linear_solver_default_problem():
 
     assert prob.objective.value() == 0.5
 
-    prob = solve_linear_problem(train_sets_rerouted, timetable, d_max, μ)
+    prob = solve_linear_problem(train_sets_rerouted, timetable, d_max)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -273,7 +272,6 @@ def test_constraint_labels():
                  "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
 
     d_max = 10
-    μ = 26
 
     train_sets = {
         "skip_station": {
@@ -305,12 +303,12 @@ def test_constraint_labels():
         "Jswitch": {0: [{1:"out", 2:"in"}], 1: [{1:"in", 2:"out"}]}
     }
 
-    prob = create_linear_problem(train_sets, timetable, d_max, μ)
+    prob = create_linear_problem(train_sets, timetable, d_max)
     cnames = [cname for cname, _ in prob.constraints.items()]
     from re import match
     assert all(not match("_C[0-9]+", c) for c in cnames)
 
-    prob = create_linear_problem(train_sets_rerouted, timetable, d_max, μ)
+    prob = create_linear_problem(train_sets_rerouted, timetable, d_max)
     cnames = [cname for cname, _ in prob.constraints.items()]
     from re import match
     assert all(not match("_C[0-9]+", c) for c in cnames)

@@ -9,7 +9,6 @@ timetable = {"tau": taus,
                 "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
 
 d_max = 10
-μ = 30
 
 train_sets = {
     "skip_station": {
@@ -43,7 +42,7 @@ train_sets_rerouted = {
     "add_swithes_at_s": [1]
 }
 
-prob = create_linear_problem(train_sets, timetable, d_max, μ)
+prob = create_linear_problem(train_sets, timetable, d_max)
 
 import pickle
 import io

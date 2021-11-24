@@ -4,8 +4,6 @@ timetable = {"tau": taus,
              "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
              "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
 
-d_max = 10
-μ = 30
 
 train_sets = {
     "skip_station": {
@@ -40,4 +38,3 @@ train_sets_rerouted = {
 }
 
 d_max = 10
-μ = 30

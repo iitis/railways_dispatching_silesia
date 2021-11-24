@@ -19,4 +19,3 @@ train_sets = {
     "add_swithes_at_s": [1]
 
 d_max = 10
-μ = 30

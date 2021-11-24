@@ -38,4 +38,3 @@ train_sets = {
 }
 
 d_max = 10
-μ = 30

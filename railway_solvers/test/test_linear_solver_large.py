@@ -49,9 +49,8 @@ def test_5_trains_all_cases():
     }
 
     d_max = 10
-    μ = 20
 
-    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
+    prob = solve_linear_problem(train_sets, timetable, d_max)
 
     for v in prob.variables():
         print(v)
@@ -88,7 +87,6 @@ def test_5_trains_all_cases():
     assert energy(sol, Q) == pytest.approx(-22.5+1.01)
 
 def test_many_trains_single_line():
-    μ = 44
 
     "   10, 12, 14, 16 -->                             "
     "  ----------------------------------------       "
@@ -132,7 +130,7 @@ def test_many_trains_single_line():
 
     d_max = 10
 
-    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
+    prob = solve_linear_problem(train_sets, timetable, d_max)
 
     for v in prob.variables():
         print(v)

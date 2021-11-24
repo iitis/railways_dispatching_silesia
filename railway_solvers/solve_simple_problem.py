@@ -29,8 +29,8 @@ def visualise_Qubo_solution(solution, timetable, train_sets, d_max):
             print("train", j, "station", s, "delay", d, "time", t)
 
 
-def toy_problem_variables(train_sets, timetable, d_max, μ=30.):
-    prob = solve_linear_problem(train_sets, timetable, d_max, μ)
+def toy_problem_variables(train_sets, timetable, d_max):
+    prob = solve_linear_problem(train_sets, timetable, d_max)
     S = train_sets["Paths"]
 
     print("d_1, t_1", return_delay_and_acctual_time(S, timetable, prob, 0, 0))

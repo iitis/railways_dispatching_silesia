@@ -66,3 +66,5 @@ def test_helpers_of_train_sets():
 
         assert departure_station4switches('B', 1, {1:"out", 3:"out"}, train_sets) == 'B'
         assert departure_station4switches('B', 1, {1:"in", 3:"in"}, train_sets) == 'A'
+
+        assert get_μ(2,3,4) == 5

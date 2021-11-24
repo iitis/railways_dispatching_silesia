@@ -19,4 +19,3 @@ timetable = {"tau": taus,
              "penalty_weights": {"0_0": 2, "1_1": 0.5}}
 
 d_max = 10
-μ = 30

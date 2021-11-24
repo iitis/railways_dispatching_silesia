@@ -119,3 +119,12 @@ def departure_station4switches(s, j, pair_on_switch, train_sets):
         return s
     elif pair_on_switch[j] == "in":
         return previous_station(S[j], s)
+
+
+def get_μ(LHS, RHS, d_max):
+    """computes minimal value of large number for
+
+      LHS + delay >= RHS + delay - μ y
+
+      to always hold if y = 1"""
+    return np.max([RHS + d_max - LHS, 1.])

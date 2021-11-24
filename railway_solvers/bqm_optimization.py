@@ -82,9 +82,9 @@ def test_single_file(file, method, train_route = "default", pdict=None, real_ann
     mdl = importlib.import_module(file_name)
     globals().update(mdl.__dict__)
     if train_route == 'default':
-        prob = create_linear_problem(train_sets, timetable, d_max, μ)
+        prob = create_linear_problem(train_sets, timetable, d_max)
     elif train_route == "rerouted":
-        prob = create_linear_problem(train_sets_rerouted, timetable, d_max, μ)
+        prob = create_linear_problem(train_sets_rerouted, timetable, d_max)
     annealing(prob, method, train_route, file_name, pdict)
 
 

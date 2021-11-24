@@ -20,18 +20,10 @@ def get_y_j_jp_s_sp(y, j, jp, s, sp):
 
 ############  below particular dispatching conditions #######################
 
-def get_μ(LHS, RHS, d_max):
-    """computes minimal value of large number for
-
-      LHS + delay >= RHS + delay - μ y
-
-      to always hold if y = 1"""
-    return np.max([RHS + d_max - LHS, 1.])
-
 
 ##############  minimal span ###################
 
-def minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
     """ ecnoding constrains for minimal span condition"""
     S = train_sets["Paths"]
 
@@ -50,7 +42,7 @@ def minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train
         problem += LHS >= RHS, f"minimal_span_{jp}_{j}_{s}_{sp}"
 
 
-def minimal_span(problem, timetable, delay_var, y, train_sets, d_max, μ):
+def minimal_span(problem, timetable, delay_var, y, train_sets, d_max):
     "adds the minimum span condition to the pulp problem"
 
     " ..... j1 -> ....... j2 -> ....."
@@ -62,12 +54,12 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, d_max, μ):
             for js in train_sets["Jd"][s][sp]:
                 for (j, jp) in itertools.combinations(js, 2):
 
-                    minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    minimal_span_constrain(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max)
+                    minimal_span_constrain(s, sp, jp, j, problem, timetable, delay_var, y, train_sets, d_max)
 
 ################  single track line - deadlock ####################
 
-def single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
     """ encoding constrsains for the single line condition """
     S = train_sets["Paths"]
 
@@ -86,7 +78,7 @@ def single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_
         problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
 
 
-def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
+def single_line(problem, timetable, delay_var, y, train_sets, d_max):
     " adds single line condition to the pulp problem"
 
     " ......                            ......  "
@@ -98,8 +90,8 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max, μ):
         for (j, jp) in train_sets["Josingle"][(s, sp)]:
             if not_the_same_rolling_stock(j, jp, train_sets):
 
-                single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                single_line_constrain(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max)
+                single_line_constrain(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max)
 
 
 ###### minimal stay   ######
@@ -135,7 +127,7 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
 
 ######         station   -- track occupation      #######
 
-def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
     """  if two trains follow each other from s′ to s, i.e. j,j′∈Jd and (s′,s)∈Cj,j′, we also required y(j,j′,s′) = y(j,j′,s)"""
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
@@ -145,7 +137,7 @@ def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets
                 problem += y[j][jp][s] == y[j][jp][sp], f"track_occupation_{j}_{jp}_{s}_{sp}"
 
 
-def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
 
     S = train_sets["Paths"]
 
@@ -175,7 +167,7 @@ def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets
         problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
 
 
-def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
+def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
     "adds track occupation condition to the pulp problem"
 
     S = train_sets["Paths"]
@@ -187,15 +179,15 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
 
                 if not_the_same_rolling_stock(j, jp, train_sets):
 
-                    keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    trains_order_at_s(spp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                    trains_order_at_s(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                    keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max)
+                    trains_order_at_s(spp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max)
+                    trains_order_at_s(sp, s, jp, j, problem, timetable, delay_var, y, train_sets, d_max)
 
 
 #### switch occupatiion condition at stations #############
 
 
-def switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets, d_max, μ):
+def switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets, d_max):
 
     S = train_sets["Paths"]
 
@@ -228,7 +220,7 @@ def switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets
 
 
 
-def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
+def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
     " adds switch occupation condition to the pulp problem"
 
     "  ------         "
@@ -245,8 +237,8 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max, μ):
                 sp =  departure_station4switches(s, jp, pair, train_sets)
                 spp =  departure_station4switches(s, jpp, pair, train_sets)
 
-                switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets, d_max, μ)
-                switch_occ(s, jpp, spp, jp, sp, problem, timetable, delay_var, y, train_sets, d_max, μ)
+                switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets, d_max)
+                switch_occ(s, jpp, spp, jp, sp, problem, timetable, delay_var, y, train_sets, d_max)
 
 
 ####### rolling stock circulation #######
@@ -368,7 +360,7 @@ def delay_varibles(train_sets, d_max):
 
 
 
-def create_linear_problem(train_sets, timetable, d_max, μ):
+def create_linear_problem(train_sets, timetable, d_max):
     "creates the linear problem model"
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
@@ -376,20 +368,20 @@ def create_linear_problem(train_sets, timetable, d_max, μ):
     y = order_variables(train_sets, d_max)
 
     # following conditions are added
-    minimal_span(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
+    minimal_span(prob, timetable, secondary_delays_var, y, train_sets, d_max)
     minimal_stay(prob, timetable, secondary_delays_var, train_sets)
-    single_line(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
-    track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
+    single_line(prob, timetable, secondary_delays_var, y, train_sets, d_max)
+    track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max)
     rolling_stock_circ(prob, timetable, secondary_delays_var, train_sets, d_max)
-    switch_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max, μ)
+    switch_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max)
 
     # objective is added
     objective(prob, timetable, secondary_delays_var, train_sets, d_max)
     return prob
 
-def solve_linear_problem(train_sets, timetable, d_max, μ):
+def solve_linear_problem(train_sets, timetable, d_max):
     "solves the linear problem returns the pulp object"
-    prob = create_linear_problem(train_sets, timetable, d_max, μ)
+    prob = create_linear_problem(train_sets, timetable, d_max)
     start_time = time.time()
     prob.solve()
     print("optimisation, time = ", time.time() - start_time, "seconds")
