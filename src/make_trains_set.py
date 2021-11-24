@@ -63,6 +63,7 @@ def check_common_station(train1,train2):
 def check_common_blocks_elements(train1,train2):
     return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
 
+# get common blocks between stations, in order of the time table
 def get_block_b2win_station4train(train,station1,station2):
     station1,station2 = '"'+station1,'"'+station2
     blocks_list = train_time_table(train1)['path'].tolist()
@@ -76,7 +77,14 @@ def get_block_b2win_station4train(train,station1,station2):
         block = blocks_list[i]
         i+=1
         blocksb2win.append(block)
-    return blockb2win
+    return blocksb2win
+
+# get subsequent station for a given train
+def subsequent_station(train,station):
+    sts = get_Paths(data)[train]
+    assert station in sts, "The train does not pass trought this station!"
+    return sts[sts.index(station)+1]
+
 # check shared stations between trains, does not check order
 def get_trains_with_same_stations(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
