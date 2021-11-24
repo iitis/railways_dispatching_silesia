@@ -20,6 +20,14 @@ def get_y_j_jp_s_sp(y, j, jp, s, sp):
 
 ############  below particular dispatching conditions #######################
 
+def get_μ(LHS, RHS, d_max):
+    """computes minimal value of large number for
+
+      LHS + delay >= RHS + delay - μ y
+
+      to always hold if y = 1"""
+    return np.max([RHS + d_max - LHS, 1.])
+
 
 ##############  minimal span ###################
 
@@ -32,8 +40,7 @@ def minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train
     RHS = earliest_dep_time(S, timetable, j, s)
     RHS += tau(timetable, 'blocks', first_train=j, second_train = jp, first_station=s, second_station=sp)
 
-    μ = np.max([RHS + d_max - LHS, 1.])
-    #print("minimal span", μ_max)
+    μ = get_μ(LHS, RHS, d_max)
 
     if LHS - d_max < RHS:  #otherwise always fulfilled  (redundant)
         LHS += delay_var[jp][s]
@@ -68,7 +75,7 @@ def single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_
     RHS = earliest_dep_time(S, timetable, jp, sp)
     RHS += tau(timetable, 'pass', first_train=jp, first_station=sp, second_station=s)
 
-    μ = np.max([RHS + d_max - LHS, 1.])
+    μ = get_μ(LHS, RHS, d_max)
 
     if LHS - d_max < RHS:  # otherwise always fulfilled (redundant)
         LHS += delay_var[j][s]
@@ -155,7 +162,7 @@ def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets
         if s in train_sets["add_swithes_at_s"]:  # this is the approximation used in  ArXiv:2107.03234,
             RHS += tau(timetable, "res")
 
-    μ = np.max([RHS + d_max - LHS, 1.])
+    μ = get_μ(LHS, RHS, d_max)
 
     if LHS - d_max < RHS:
 
@@ -203,7 +210,7 @@ def switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets
     if s != spp:
         RHS += tau(timetable, 'pass', first_train=jpp, first_station=spp, second_station=s)
 
-    μ = np.max([RHS + d_max - LHS, 1.])  
+    μ = get_μ(LHS, RHS, d_max)
 
     if LHS < RHS + d_max:
         if sp == spp:
