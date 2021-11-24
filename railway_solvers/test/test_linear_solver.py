@@ -50,7 +50,7 @@ def test_two_trains_going_one_way_simplest():
     }
 
     ####   simple problem #####
-    prob = solve_linear_problem(train_sets, timetable, 5, 30)
+    prob = solve_linear_problem(train_sets, timetable, 5, 10)
 
     for v in prob.variables():
 
@@ -132,7 +132,7 @@ def test_rolling_stock_circulation():
 
     ####   simple problem #####
 
-    prob = solve_linear_problem(train_sets, timetable, 10, 30)
+    prob = solve_linear_problem(train_sets, timetable, 10, 10)
 
 
     for v in prob.variables():
@@ -171,7 +171,7 @@ def test_track_occupation_simplest():
 
     ####   simple problem #####
 
-    prob = solve_linear_problem(train_sets, timetable, 5, 30)
+    prob = solve_linear_problem(train_sets, timetable, 5, 8)
 
     for v in prob.variables():
         if v.name == "Delays_0_0":
@@ -194,7 +194,7 @@ def test_linear_solver_default_problem():
                  "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
 
     d_max = 10
-    μ = 30
+    μ = 26
 
     train_sets = {
         "skip_station": {
@@ -273,7 +273,7 @@ def test_constraint_labels():
                  "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
 
     d_max = 10
-    μ = 30
+    μ = 26
 
     train_sets = {
         "skip_station": {
