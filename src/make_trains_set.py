@@ -65,8 +65,10 @@ def check_common_blocks_elements(train1,train2):
 
 # get common blocks between stations, in order of the time table
 def get_block_b2win_station4train(train,station1,station2):
-    station1,station2 = '"'+station1,'"'+station2
-    blocks_list = train_time_table(train1)['path'].tolist()
+    station1 = '"'+station1
+    if station2 != '"KO", "ST-M"':
+        station2 = '"'+station2
+    blocks_list = train_time_table(train)['path']
     i = 0
     block = blocks_list[i]
     blocksb2win = []
@@ -74,9 +76,10 @@ def get_block_b2win_station4train(train,station1,station2):
         i+=1
         block = blocks_list[i]
     while block[0:len(station2)] != station2:
-        block = blocks_list[i]
         i+=1
+        block = blocks_list[i]
         blocksb2win.append(block)
+    blocksb2win.pop(-1)
     return blocksb2win
 
 # get subsequent station for a given train
