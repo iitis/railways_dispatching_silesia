@@ -10,7 +10,7 @@ timetable = {"tau": taus,
              "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
              "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
 
-# testing particular QUBO element cration
+# testing particular QUBO element creation
 
 
 def energy(v, Q):

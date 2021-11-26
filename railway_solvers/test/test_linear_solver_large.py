@@ -82,7 +82,7 @@ def test_5_trains_all_cases():
 
     sol = np.load("test/files/solution_5trains.npz")
 
-    # ofset = (2*3+1+2)*2.5 = -22.5
+    # offset = (2*3+1+2)*2.5 = -22.5
 
     assert energy(sol, Q) == pytest.approx(-22.5+1.01)
 
