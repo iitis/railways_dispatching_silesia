@@ -16,12 +16,15 @@ def getSizeOfNestedList(listOfElem):
         else:
             count += 1
     return count
+
 # make a single list of lists of lists
 def flatten(t):
     return [item for sublist in t for item in sublist]
+
 # get common elements, but without order
 def common_elements(list1, list2):
     return [element for element in list1 if element in list2]
+
 # generate sublists in order
 def sub_lists(l,no_single = False):
     lists = []
@@ -33,13 +36,13 @@ def sub_lists(l,no_single = False):
                     continue
             lists.append(subsl)
     return lists
+
 # check if sequential items from a short list (short) is in the bigger list (bigger)
 def check_sequential_elements(short,bigger):
     if re.search("".join(short),"".join(short)):
         return True
     else:
         return False
-# def train_blocks_b2win_stations(train,station1,station2):
 
 # return a dictionary of trains
 def get_J(data):
@@ -101,6 +104,35 @@ def get_trains_with_same_stations(data):
                 nextstation_dict[path[path.index(station)+1]] =[trains]
         jdict[station] = nextstation_dict
     return jdict
+# get list of train with pairs containing a train number and train number+9
+def get_trains_pair9(data):
+    rains = get_J(data)
+    pair_lists = []
+    for train in trains:
+        if train*10+9 in trains:
+            pair_lists+=[[train,train*10+9]]
+    return pair_lists
+
+def get_jround():
+    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    pair_lists = get_trains_pair9(data)
+    jround = {}
+    for pair in pair_lists:
+        a = train_time_table(pair[0])['path'].tolist()[0] == train_time_table(pair[1])['path'].tolist()[-1]
+        b = train_time_table(pair[1])['path'].tolist()[0] == train_time_table(pair[0])['path'].tolist()[-1]
+        if a:
+            block = (train_time_table(pair[0])['path'].tolist()[0])
+        elif b:
+            block = (train_time_table(pair[1])['path'].tolist()[0])
+        else:
+            print("Something is wrong")
+            exit(1)
+        station = [key for key, value in important_stations.items() if block in value][0]
+        if station in jround.keys():
+            jround[station].append(pair)
+        else:
+            jround[station]=[pair]
+    return jround
 # train_sets = {
 #
 # }
