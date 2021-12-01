@@ -1,7 +1,7 @@
 from time_table_check import *
 import re
 
-data = pd.read_csv("../data/train_schedule1.csv", sep = ";")
+data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
 # return total number of elements in list of lists
 def getSizeOfNestedList(listOfElem):
