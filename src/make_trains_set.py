@@ -116,15 +116,16 @@ def get_trains_pair9(data):
 def get_jround():
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     pair_lists = get_trains_pair9(data)
+    print(pair_lists)
     jround = {}
     for pair in pair_lists:
         a = train_time_table(pair[0])['path'].tolist()[0] == train_time_table(pair[1])['path'].tolist()[-1]
         b = train_time_table(pair[1])['path'].tolist()[0] == train_time_table(pair[0])['path'].tolist()[-1]
         if a:
             block = (train_time_table(pair[0])['path'].tolist()[0])
+            pair = list(reversed(pair))
         elif b:
             block = (train_time_table(pair[1])['path'].tolist()[0])
-            pair = list(reversed(pair))
         else:
             print("Something is wrong")
             exit(1)
