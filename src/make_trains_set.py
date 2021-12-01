@@ -124,6 +124,7 @@ def get_jround():
             block = (train_time_table(pair[0])['path'].tolist()[0])
         elif b:
             block = (train_time_table(pair[1])['path'].tolist()[0])
+            pair = list(reversed(pair))
         else:
             print("Something is wrong")
             exit(1)
