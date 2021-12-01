@@ -43,6 +43,8 @@ important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 '"GLC", "ST", 9, "(4)"',
 '"GLC", "ST", 11, "(4)"'],
 
+"GLC_BM": ['"GLC", "B-M", 200, "(N/A)"'],
+
 "CM":['"CM", "ST", 1, "(1)"',
 '"CM", "ST", 2, "(1)"'],
 
@@ -84,5 +86,5 @@ aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
 np.savez('important_stations',important_stations)
 np.savez('aditional_stations',aditional_stations)
 
-# npzfile = np.load('./important_stations.npz')
-# print(npzfile.files)
+npzfile = np.load('./important_stations.npz')
+print(npzfile.files)
