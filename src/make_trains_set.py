@@ -104,6 +104,7 @@ def get_trains_with_same_stations(data):
                 nextstation_dict[path[path.index(station)+1]] =[trains]
         jdict[station] = nextstation_dict
     return jdict
+
 # get list of train with pairs containing a train number and train number+9
 def get_trains_pair9(data):
     trains = get_J(data)
@@ -138,9 +139,3 @@ def get_jround():
 # train_sets = {
 #
 # }
-if __name__ == "__main__":
-    train1,train2 = 94766,26103
-    print('"J":',get_J(data),'\n')
-    print('"Paths":',get_Paths(data))
-    print('Common station for trains {} and {}:'.format(train1,train2),check_common_station(train1,train2))
-    print('Jround',get_jround())
