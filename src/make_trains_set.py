@@ -66,6 +66,11 @@ def check_common_station(train1,train2):
 def check_common_blocks_elements(train1,train2):
     return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
 
+# check which important station the block belongs to
+def get_block_station(block):
+    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    return [key for key, value in important_stations.items() if block in value][0]
+
 # get common blocks between stations, in order of the time table
 def get_block_b2win_station4train(train,station1,station2):
     station1 = '"'+station1
