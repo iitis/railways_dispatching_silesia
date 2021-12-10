@@ -87,6 +87,7 @@ def get_block_b2win_station4train(train,station1,station2):
         i+=1
         block = blocks_list[i]
         blocksb2win.append(block)
+    blocksb2win.pop(0)
     blocksb2win.pop(-1)
     return blocksb2win
 
