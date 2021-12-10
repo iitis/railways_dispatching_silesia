@@ -60,8 +60,8 @@ important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 "Mi":['"Mi", "ST", 1, "(2)"',
 '"Mi", "ST", 2, "(1)"'],
 
-"MJ":['"MJ", "ST", 1, "(1)"',
-'"MJ", "ST", 3, "(2)"'],
+"MJ":['"MJ", "ST", 2, "(1)"',
+'"MJ", "ST", 1, "(1)"'],
 }
 
 aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
