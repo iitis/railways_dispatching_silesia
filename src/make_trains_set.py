@@ -1,7 +1,6 @@
 from time_table_check import *
 import re
-
-data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+import pandas as pd
 
 # return total number of elements in list of lists
 def getSizeOfNestedList(listOfElem):
@@ -92,7 +91,7 @@ def get_block_b2win_station4train(train,station1,station2):
     return blocksb2win
 
 # get subsequent station for a given train
-def subsequent_station(train,station):
+def subsequent_station(train, station):
     sts = get_Paths(data)[train]
     assert station in sts, "The train does not pass trought this station!"
     return sts[sts.index(station)+1]
@@ -100,6 +99,7 @@ def subsequent_station(train,station):
 # check shared stations between trains, does not check order
 def get_trains_with_same_stations(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    path_dict  = get_Paths(data)
     jdict = {}
     for station in list(important_stations.keys()):
         nextstation_dict = {}
@@ -107,7 +107,7 @@ def get_trains_with_same_stations(data):
         for train, path in list(path_dict.items()):
             if station in path and path.index(station)!=len(path)-1:
                 trains += [train]
-                nextstation_dict[path[path.index(station)+1]] =[trains]
+                nextstation_dict[path[path.index(station)+1]] = trains
         jdict[station] = nextstation_dict
     return jdict
 
@@ -123,7 +123,6 @@ def get_trains_pair9(data):
 def get_jround():
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     pair_lists = get_trains_pair9(data)
-    print(pair_lists)
     jround = {}
     for pair in pair_lists:
         a = train_time_table(pair[0])['path'].tolist()[0] == train_time_table(pair[1])['path'].tolist()[-1]
@@ -145,3 +144,11 @@ def get_jround():
 # train_sets = {
 #
 # }
+if __name__ == "__main__":
+
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    x = get_trains_with_same_stations(data)
+    print(x)
+    print('-------------')
+    for station, train in x.items():
+        print(station, train)

@@ -55,7 +55,7 @@ def get_path_type_colunm(path_type,block_dir):
             path_column = 'time_inter_city_B-A'
     else:
         print('Path type not found!')
-        error(1)
+        exit(1)
     return path_column
 
 # check path default
@@ -106,7 +106,7 @@ def check_important_stations(train):
     return station_list
 
 # check paths time
-def check_path_time(train, scheme = 'complete', show_warning = True):
+def check_path_time(train, data, scheme = 'complete', show_warning = True):
     train_dict = timetable_to_train_dict(data)
     data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
     time_table = train_dict[train][1]
