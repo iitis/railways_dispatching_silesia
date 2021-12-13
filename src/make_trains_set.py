@@ -57,7 +57,7 @@ def get_Paths(data):
     return paths_per_train
 
 # get common station betwenn two trains, does not check order
-def check_common_station(train1,train2):
+def check_common_station(train1,train2,data):
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
@@ -120,7 +120,7 @@ def get_trains_pair9(data):
             pair_lists+=[[train,train*10+9]]
     return pair_lists
 
-def get_jround():
+def get_jround(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     pair_lists = get_trains_pair9(data)
     jround = {}
