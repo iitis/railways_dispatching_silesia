@@ -37,8 +37,10 @@ def sub_lists(l,no_single = False):
     return lists
 
 # check if sequential items from a short list (short) is in the bigger list (bigger)
-def check_sequential_elements(short,bigger):
-    if re.search("".join(short),"".join(short)):
+def sublist(l1,l2):
+    s1=" ".join(str(i) for i in l1)
+    s2=" ".join(str(i) for i in l2)
+    if s1 in s2:
         return True
     else:
         return False
@@ -71,31 +73,56 @@ def get_block_station(block):
     return [key for key, value in important_stations.items() if block in value][0]
 
 # get common blocks between stations, in order of the time table
-def get_block_b2win_station4train(train,station1,station2):
+def get_blocks_b2win_station4train(train,station1,station2):
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     sts = get_Paths(data)[train]
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-
+    blocksb2win = []
+    rev = False
     assert station1 in sts, 'station {} not in the train set'.format(station1)
     assert station2 in sts, 'station {} not in the train set'.format(station2)
-    assert sts.index(station1) < sts.index(station2), "stations out of order"
+    if sts.index(station1) > sts.index(station2):
+        print("Warning: stations out of order")
+        rev = True
+        return blocksb2win,reversed
+    else:
+        blocks_list = train_time_table(train)['path'].tolist()
+        i = 0
+        block = blocks_list[i]
+        while block not in important_stations[station1]:
+            i+=1
+            block = blocks_list[i]
+        while block not in important_stations[station2] and i<len(blocks_list)-1:
+            blocksb2win.append(block)
+            i+=1
+            block = blocks_list[i]
+        if blocksb2win[0] in important_stations[station1]:
+            blocksb2win.pop(0)
+        if blocksb2win[-1] in important_stations[station2]:
+            blocksb2win.pop(-1)
+        return blocksb2win,rev
 
-    blocks_list = train_time_table(train)['path'].tolist()
+def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2):
+    for train in [train1,train2]:
+        blocks,rev = get_blocks_b2win_station4train(train,station1,station2)
+        if rev:
+            blocks,_ = get_blocks_b2win_station4train(train,station2,station1)
+        blocks_order[train] = [blocks,rev]
+    blocks_2check = blocks_order[train1][0]
+    common_blocks = []
     i = 0
-    block = blocks_list[i]
-    blocksb2win = []
-    while block not in important_stations[station1]:
+    while i in range(len(blocks_2check)):
+        short = []
+        if blocks_2check[i] in blocks_order[train2][0]:
+            short.append(blocks_2check[i])
+            if sublist(short,blocks_order[train2][0]):
+                common_blocks.append(short)
         i+=1
-        block = blocks_list[i]
-    while block not in important_stations[station2] and i<len(blocks_list)-1:
-        blocksb2win.append(block)
-        i+=1
-        block = blocks_list[i]
-    if blocksb2win[0] in important_stations[station1]:
-        blocksb2win.pop(0)
-    if blocksb2win[-1] in important_stations[station2]:
-        blocksb2win.pop(-1)
-    return blocksb2win
+    if blocks_order[train1][1] == blocks_order[train2][1]:
+        direction = 'same'
+    else:
+        direction = 'opposite'
+    return common_blocks,direction
 
 def is_train_passing_trh_station(train,station):
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
