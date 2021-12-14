@@ -158,7 +158,7 @@ def get_trains_pair9(data):
         if train*10+9 in trains:
             pair_lists+=[[train,train*10+9]]
     return pair_lists
-
+# return dict
 def get_jround(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     pair_lists = get_trains_pair9(data)
