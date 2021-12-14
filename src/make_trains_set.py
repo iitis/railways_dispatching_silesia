@@ -72,22 +72,28 @@ def get_block_station(block):
 
 # get common blocks between stations, in order of the time table
 def get_block_b2win_station4train(train,station1,station2):
+    sts = get_Paths(data)[train]
+    assert station1 in sts, 'station {} not in the train set'.format(station1)
+    assert station2 in sts, 'station {} not in the train set'.format(station2)
+    assert sts.index(station1) < sts.index(station2), "stations out of order"
     station1 = '"'+station1
     if station2 != '"KO", "ST-M"':
         station2 = '"'+station2
-    blocks_list = train_time_table(train)['path']
+    blocks_list = train_time_table(train)['path'].tolist()
     i = 0
     block = blocks_list[i]
     blocksb2win = []
     while block[0:len(station1)] != station1:
         i+=1
         block = blocks_list[i]
-    while block[0:len(station2)] != station2:
+    while block[0:len(station2)] != station2 and i<len(blocks_list)-1:
         i+=1
         block = blocks_list[i]
         blocksb2win.append(block)
+    print(blocksb2win)
     blocksb2win.pop(0)
-    blocksb2win.pop(-1)
+    if len(blocksb2win)>=1:
+        blocksb2win.pop(-1)
     return blocksb2win
 
 # get subsequent station for a given train
