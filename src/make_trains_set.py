@@ -74,28 +74,33 @@ def get_block_station(block):
 def get_block_b2win_station4train(train,station1,station2):
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     sts = get_Paths(data)[train]
+    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+
     assert station1 in sts, 'station {} not in the train set'.format(station1)
     assert station2 in sts, 'station {} not in the train set'.format(station2)
     assert sts.index(station1) < sts.index(station2), "stations out of order"
-    station1 = '"'+station1
-    if station2 != '"KO", "ST-M"':
-        station2 = '"'+station2
+
     blocks_list = train_time_table(train)['path'].tolist()
     i = 0
     block = blocks_list[i]
     blocksb2win = []
-    while block[0:len(station1)] != station1:
+    while block not in important_stations[station1]:
         i+=1
         block = blocks_list[i]
-    while block[0:len(station2)] != station2 and i<len(blocks_list)-1:
-        i+=1
-        block = blocks_list[i]
+    while block not in important_stations[station2] and i<len(blocks_list)-1:
         blocksb2win.append(block)
-    print(blocksb2win)
-    blocksb2win.pop(0)
-    if len(blocksb2win)>=1:
+        i+=1
+        block = blocks_list[i]
+    if blocksb2win[0] in important_stations[station1]:
+        blocksb2win.pop(0)
+    if blocksb2win[-1] in important_stations[station2]:
         blocksb2win.pop(-1)
     return blocksb2win
+
+def is_train_passing_trh_station(train,station):
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    stations = get_Paths(data)[train]
+    return station in stations
 
 # get subsequent station for a given train
 def subsequent_station(train, station):
