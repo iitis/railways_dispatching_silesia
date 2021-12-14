@@ -72,6 +72,7 @@ def get_block_station(block):
 
 # get common blocks between stations, in order of the time table
 def get_block_b2win_station4train(train,station1,station2):
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     sts = get_Paths(data)[train]
     assert station1 in sts, 'station {} not in the train set'.format(station1)
     assert station2 in sts, 'station {} not in the train set'.format(station2)
