@@ -43,11 +43,11 @@ def get_parameters(real_anneal_var_dict):
 def annealing(prob, method, train_route, input_name, pdict=None, real_anneal_var_dict=None):
     """ Inputs:==
         prob: The problem,
-        method: 'sim', 'real',
+        method: 'sim', 'real', 'hyb', 'cqm'
         train_route: 'default' , 'rerouted'
         pdict: Dictionary of penalties
         real_anneal_var_dict: dictionary containing 'num_reads', 'annealing_time' and 'chain_strength' i.e. real annealing variables
-        Returns:==  Dict of feasible solution
+        Returns:==  Dict of solutions
     """
     assert method in ["sim", "real", "hyb", "cqm"]
     file_name = get_file_name(input_name, method, train_route)
