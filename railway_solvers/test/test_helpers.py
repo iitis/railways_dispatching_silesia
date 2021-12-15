@@ -47,7 +47,7 @@ def test_auxiliary_timetable_functions():
     assert tau(timetable, "pass", first_train=0, first_station=0, second_station=1) == 5
     assert tau(timetable, "res") == 3
 
-    assert initial_conditions(timetable, 0, 0) == 4
+    #assert initial_conditions(timetable, 0, 0) == 4
     assert penalty_weights(timetable, 1, 0) == 1
     assert penalty_weights(timetable, 1, 1) == 0
     assert penalty_weights(timetable, 2, 1) == 1
