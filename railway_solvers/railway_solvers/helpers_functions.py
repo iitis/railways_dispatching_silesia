@@ -99,7 +99,7 @@ def penalty_weights(timetable, train, station):
     if train_station in timetable["penalty_weights"]:
         return timetable["penalty_weights"][train_station]
     else:
-        return 0.
+        return 0.0
 
 
 def earliest_dep_time(S, timetable, train, station):
@@ -128,6 +128,7 @@ def earliest_dep_time(S, timetable, train, station):
         unavoidable = earliest_dep_time(S, timetable, train, s) + τ_pass
         unavoidable += τ_stop
         return np.maximum(sched, unavoidable)
+
 
 # helpers for trains set
 
