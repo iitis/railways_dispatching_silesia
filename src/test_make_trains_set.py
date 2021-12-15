@@ -10,4 +10,4 @@ print('Common station for trains {} and {}:'.format(train1,train2),check_common_
 print('Jround',get_jround(data))
 print('block between stations {} and {} for train {}'.format(station1,station2,train1), get_blocks_b2win_station4train(train1,station1,station2))
 # the last is not yet working
-print(get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2))
+print('common blocks between stations {} and {} for train {} and train {}'.format(station1,station2,train1,train2), get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2))

@@ -196,13 +196,19 @@ def penalty_for_minimal_stay_condition(timetable, k, k1, jsd_dicts , S):
 
 
 
-#####  single track occupation  at station condition #####
+# single track occupation at station condition
 
 
 def z_indices(train_sets, d_max):
-    "returns a vector of dicts consisten with auxiliary variable used to decompose 3'rd order terms"
-    "used to handle track occupancy condition, dicts contains two trains, a station where the condition is checked"
-    "and delays of this two trains"
+    """ returns vector of dicts of two trains (j, j1), one  stations (s)
+    and two delays (d, d1) in the form :
+    {"j": j, "j1": j1, "s": s, "d": d, "d1": d1}
+    indexing is consitent with auxiliary variable used to decompose 3'rd
+     order terms
+    used to handle track occupancy condition, dicts contains two trains, 
+    a station where the condition is checked
+    and delays of this two trains
+    """
     jsd_dicts = []
     for s in train_sets["Jtrack"].keys():
         for js in train_sets["Jtrack"][s]:
