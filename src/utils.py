@@ -114,18 +114,20 @@ def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2
     blocks_2check = blocks_order[train1][0]
     common_blocks = []
     i = 0
+    short = []
     while i in range(len(blocks_2check)):
-        short = []
         if blocks_2check[i] in blocks_order[train2][0]:
             short.append(blocks_2check[i])
             if sublist(short,blocks_order[train2][0]):
                 common_blocks.append(short)
+            else:
+                short = []
         i+=1
     if blocks_order[train1][1] == blocks_order[train2][1]:
         direction = 'same'
     else:
         direction = 'opposite'
-    return common_blocks,direction
+    return flatten(common_blocks),direction
 
 def is_train_passing_trh_station(train,station):
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
