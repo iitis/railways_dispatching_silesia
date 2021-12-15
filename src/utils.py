@@ -96,10 +96,11 @@ def get_blocks_b2win_station4train(train,station1,station2):
             blocksb2win.append(block)
             i+=1
             block = blocks_list[i]
-        if blocksb2win[0] in important_stations[station1]:
-            blocksb2win.pop(0)
-        if blocksb2win[-1] in important_stations[station2]:
-            blocksb2win.pop(-1)
+        if len(blocksb2win)>0:
+            if blocksb2win[0] in important_stations[station1]:
+                blocksb2win.pop(0)
+            if len(blocksb2win) > 0 and blocksb2win[-1] in important_stations[station2]:
+                blocksb2win.pop(-1)
         return blocksb2win,rev
 
 def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2):
