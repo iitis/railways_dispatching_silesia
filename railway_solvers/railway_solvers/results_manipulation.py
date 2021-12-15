@@ -62,7 +62,7 @@ def get_results(sampleset: dimod.SampleSet, prob: pulp.LpProblem) -> List[Dict[s
 
     Statistics includes energy (as provided by D'Wave), objective function
     value, feasibility analysis, the samples itself. Samples are sorted
-    according to energy (not objective function value!)
+    according to value of the objetive function
 
     :param sampleset: analyzed samples
     :type sampleset: dimod.SampleSet
@@ -81,7 +81,7 @@ def get_results(sampleset: dimod.SampleSet, prob: pulp.LpProblem) -> List[Dict[s
         rdict['sample'] = sample
         rdict['feas_constraints'] = analyze_constraints(prob, sample)
         dict_list.append(rdict)
-    return sorted(dict_list, key=lambda d: d['energy'])
+    return sorted(dict_list, key=lambda d: d['objective'])
 
 
 def store_result(file_name: str, sampleset: dimod.SampleSet):
