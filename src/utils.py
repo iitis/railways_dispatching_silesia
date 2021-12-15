@@ -73,7 +73,7 @@ def get_block_station(block):
     return [key for key, value in important_stations.items() if block in value][0]
 
 # get common blocks between stations, in order of the time table
-def get_blocks_b2win_station4train(train,station1,station2):
+def get_blocks_b2win_station4train(train,station1,station2, verbose = True):
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     sts = get_Paths(data)[train]
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
@@ -82,7 +82,8 @@ def get_blocks_b2win_station4train(train,station1,station2):
     assert station1 in sts, 'station {} not in the train set'.format(station1)
     assert station2 in sts, 'station {} not in the train set'.format(station2)
     if sts.index(station1) > sts.index(station2):
-        print("Warning: stations out of order")
+        if verbose == True:
+            print("Warning: stations out of order")
         rev = True
         return blocksb2win,reversed
     else:
@@ -103,12 +104,12 @@ def get_blocks_b2win_station4train(train,station1,station2):
                 blocksb2win.pop(-1)
         return blocksb2win,rev
 
-def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2):
+def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2,verbose = False):
     blocks_order = {}
     for train in [train1,train2]:
-        blocks,rev = get_blocks_b2win_station4train(train,station1,station2)
+        blocks,rev = get_blocks_b2win_station4train(train,station1,station2,verbose)
         if rev:
-            blocks,_ = get_blocks_b2win_station4train(train,station2,station1)
+            blocks,_ = get_blocks_b2win_station4train(train,station2,station1,verbose)
         blocks_order[train] = [blocks,rev]
     blocks_2check = blocks_order[train1][0]
     common_blocks = []
