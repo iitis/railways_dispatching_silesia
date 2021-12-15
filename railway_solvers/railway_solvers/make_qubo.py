@@ -25,11 +25,13 @@ def indexing4qubo(train_sets, d_max):
     return inds, len(inds)
 
 
-# sum to one constrain
+# constrains
 
 def Psum(k, k1, jsd_dicts):
-    """given two indices of Q matrix, namelly k and k1 returns the not wieghted
-     contribution from the  ∑_i x_i  = 1 constrain
+    """sum to one constrain
+
+    given two indices of Q matrix, namelly k and k1 returns the not wieghted
+    contribution from the  ∑_i x_i  = 1 constrain
 
     Input:
     k, k1 -- indexes on the Q matrix
@@ -43,19 +45,16 @@ def Psum(k, k1, jsd_dicts):
     return 0.0
 
 
-# constrains from dispatching
-
-# minimal span constrain
-
-
 def Pspan(timetable, k, k1, jsd_dicts, train_sets):
-    """returns not weighted contribution to Qmat from the minimal span condition
+    """minimal span constrain
+
+    returns not weighted contribution to Qmat from the minimal span condition
 
     Input:
     timetable -- time timetable
     k, k1 -- indexes on the Q matrix
     jsd_dicts -- vector of {"j": j, "s": s, "d": d}  form indexing4qubo
-    train_sets -- train set dict containing train path to get subsequent_station
+    train_sets -- train set dict containing trains paths
 
 
     here additionaly train paths are necessary
@@ -104,17 +103,17 @@ def Pspan(timetable, k, k1, jsd_dicts, train_sets):
     return 0.0
 
 
-# single track line and deadlock constrain
-
 def P1track(timetable, k, k1, jsd_dicts, train_sets):
-    """returns not weighted contribution to Qmat from the single track line
+    """single track line and deadlock constrain
+
+    returns not weighted contribution to Qmat from the single track line
     constrain. Symmetrised Qmat approach
 
     Input:
     timetable -- time timetable
     k, k1 -- indexes on the Q matrix
     jsd_dicts -- vector of {"j": j, "s": s, "d": d}  form indexing4qubo
-    train_sets -- train set dict containing train path to get subsequent_station
+    train_sets -- train set dict containing trains paths
 
          ......                            ........
     [s1]       \                          /          [s2]
@@ -154,16 +153,16 @@ def penalty_single_track_condition(timetable, k, k1, jsd_dicts, train_sets):
     return 0.0
 
 
-# minimal stay constrain
-
 def Pstay(timetable, k, k1, jsd_dicts, train_sets):
-    """returns not weighted contribution to Qmat from the minimal stay constrain
+    """minimal stay constrain
+
+    returns not weighted contribution to Qmat from the minimal stay constrain
 
     Input:
     timetable -- time timetable
     k, k1 -- indexes on the Q matrix
     jsd_dicts -- vector of {"j": j, "s": s, "d": d}  form indexing4qubo
-    train_sets -- train set dict containing train path to get subsequent_station
+    train_sets -- train set dict containing trains paths
 
     """
     S = train_sets["Paths"]
@@ -173,7 +172,7 @@ def Pstay(timetable, k, k1, jsd_dicts, train_sets):
 
 
 def penalty_for_minimal_stay_condition(timetable, k, k1, jsd_dicts , S):
-
+    """ helper for Pstay(timetable, k, k1, jsd_dicts, train_sets)"""
     j = jsd_dicts[k]["j"]
 
     if j == jsd_dicts[k1]["j"]:
@@ -195,19 +194,109 @@ def penalty_for_minimal_stay_condition(timetable, k, k1, jsd_dicts , S):
     return 0.0
 
 
+def Pcirc(timetable, k, k1, inds, train_sets):
+    """ rolling stock circulation condition
+
+    returns not weighted penalty for circulation condition"""
+
+    p = p_circ(timetable, k, k1, inds, train_sets)
+    p += p_circ(timetable, k1, k, inds, train_sets)
+    return p
+
+
+
+
+def p_circ(timetable, k, k1, inds, train_sets):
+    """helper for Pcirc(timetable, k, k1, inds, train_sets) """
+    S = train_sets["Paths"]
+    j = inds[k]["j"]
+    j1 = inds[k1]["j"]
+    s = inds[k]["s"]
+    s1 = inds[k1]["s"]
+
+    if s1 in train_sets["Jround"].keys():
+        if previous_station(S[j], s1) == s:
+            if [j, j1] in train_sets["Jround"][s1]:
+                LHS = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
+                LHS += tau(timetable, "prep", first_train=j1, first_station=s1)
+                LHS += tau(
+                    timetable, "pass", first_train=j, first_station=s, second_station=s1
+                )
+                RHS = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
+                if LHS > RHS:
+                    return 1.0
+    return 0.0
+
+
+def Pswitch(timetable, k, k1, inds, train_sets):
+    """switch occupancy condition
+
+    j1 -> --------------    
+    [s1]                \
+    j2 -> -------------- c ----
+                          \  [s2]
+                           .......
+    """
+
+    S = train_sets["Paths"]
+    jp = inds[k]["j"]
+    jpp = inds[k1]["j"]
+    sp = inds[k]["s"]
+    spp = inds[k1]["s"]
+
+    if not_the_same_rolling_stock(jp, jpp, train_sets):
+
+        for s in train_sets["Jswitch"].keys():
+            for pairs_of_switch in train_sets["Jswitch"][s]:
+                if [jp, jpp] == list(pairs_of_switch.keys()) or [jpp, jp] == list(
+                    pairs_of_switch.keys()
+                ):  # here is symmetrisation
+                    if sp == departure_station4switches(
+                        s, jp, pairs_of_switch, train_sets
+                    ):
+                        if spp == departure_station4switches(
+                            s, jpp, pairs_of_switch, train_sets
+                        ):
+
+                            p = p_switch(
+                                s, sp, spp, jp, jpp, timetable, k, k1, inds, train_sets
+                            )
+                            if p > 0:
+                                return p
+
+    return 0.0
+
+
+
+def p_switch(s, sp, spp, jp, jpp, timetable, k, k1, inds, train_sets):
+
+    S = train_sets["Paths"]
+
+    t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
+    if s != sp:
+        t += tau(timetable, "pass", first_train=jp, first_station=sp, second_station=s)
+
+    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
+    if s != spp:
+        t1 += tau(
+            timetable, "pass", first_train=jpp, first_station=spp, second_station=s
+        )
+
+    if -tau(timetable, "res") < t1 - t < tau(timetable, "res"):
+        return 1.0
+    return 0.0
+
 
 # single track occupation at station condition
 
-
 def z_indices(train_sets, d_max):
-    """ returns vector of dicts of two trains (j, j1), one  stations (s)
-    and two delays (d, d1) in the form :
+    """ returns vector of dicts of two trains (j, j1)  at common stations (s)
+    at delays (d, d1) in the form :
     {"j": j, "j1": j1, "s": s, "d": d, "d1": d1}
+
     indexing is consitent with auxiliary variable used to decompose 3'rd
-     order terms
-    used to handle track occupancy condition, dicts contains two trains, 
-    a station where the condition is checked
-    and delays of this two trains
+    order terms used to handle track occupancy condition
+
     """
     jsd_dicts = []
     for s in train_sets["Jtrack"].keys():
@@ -219,27 +308,40 @@ def z_indices(train_sets, d_max):
                             jsd_dicts.append({"j": j, "j1": j1, "s": s, "d": d, "d1": d1})
     return jsd_dicts, len(jsd_dicts)
 
+def P1qubic(timetable, k, k1, jsd_dicts, train_sets):
+    """
+    Single track occupation at station condition, part 1 with no interactions with
+    auxiliary variables
 
-def one_track_constrains(jx, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable):
+    Returns not weighted contribution to Qmat from the single track occupancy
 
+    Input:
+    timetable -- time timetable
+
+    k, k1 -- indexes on the Q matrix
+
+    jsd_dicts -- vector of {"j": j, "j1": j1, "s": s, "d": d, "d1": d1}
+    form z_indices and {"j": j, "s": s, "d": d}  form indexing4qubo
+
+    train_sets -- train set dict containing trains paths
+
+    """
     S = train_sets["Paths"]
+    # if trains have the same rolling stock we are not checking
+    if not not_the_same_rolling_stock(jsd_dicts[k]["j"], jsd_dicts[k1]["j"], train_sets):
+        return 0.0
 
-    tx = d + earliest_dep_time(S, timetable, jx, sx)
-    tx += tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz)
-    if "add_swithes_at_s" in train_sets.keys():
-        if (
-            sz in train_sets["add_swithes_at_s"]
-        ):  # this is the approximation used in  ArXiv:2107.03234,
-            tx -= tau(timetable, "res")
-    tz = d1 + earliest_dep_time(S, timetable, jz, sz)
-    tz1 = d2 + earliest_dep_time(S, timetable, jz1, sz)
+    if len(jsd_dicts[k].keys()) == 3 and len(jsd_dicts[k1].keys()) == 5:
+        return pair_of_one_track_constrains(jsd_dicts, k, k1, train_sets, timetable)
 
-    if tx < tz1 <= tz:
-        return 1.0
+    elif len(jsd_dicts[k].keys()) == 5 and len(jsd_dicts[k1].keys()) == 3:
+        return pair_of_one_track_constrains(jsd_dicts, k1, k, train_sets, timetable)
+
     return 0.0
 
 
 def pair_of_one_track_constrains(jsd_dicts, k, k1, train_sets, timetable):
+    """ hepler for P1qubic(timetable, k, k1, jsd_dicts, train_sets) """
 
     S = train_sets["Paths"]
 
@@ -278,24 +380,46 @@ def pair_of_one_track_constrains(jsd_dicts, k, k1, train_sets, timetable):
     return 0
 
 
-def P1qubic(timetable, k, k1, jsd_dicts, train_sets):
-    "returns not weighted contribution to Q from the single track occupancy conditions constrains, auxiliary variables are included"
+def one_track_constrains(jx, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable):
+    """ hepler to
+    pair_of_one_track_constrains(jsd_dicts, k, k1, train_sets, timetable)
+    """
     S = train_sets["Paths"]
-    # if trains have the same rolling stock we are not checking
-    if not not_the_same_rolling_stock(jsd_dicts[k]["j"], jsd_dicts[k1]["j"], train_sets):
-        return 0.0
 
-    if len(jsd_dicts[k].keys()) == 3 and len(jsd_dicts[k1].keys()) == 5:
-        return pair_of_one_track_constrains(jsd_dicts, k, k1, train_sets, timetable)
+    tx = d + earliest_dep_time(S, timetable, jx, sx)
+    tx += tau(timetable, "pass", first_train=jx, first_station=sx, second_station=sz)
+    if "add_swithes_at_s" in train_sets.keys():
+        if (
+            sz in train_sets["add_swithes_at_s"]
+        ):  # this is the approximation used in  ArXiv:2107.03234,
+            tx -= tau(timetable, "res")
+    tz = d1 + earliest_dep_time(S, timetable, jz, sz)
+    tz1 = d2 + earliest_dep_time(S, timetable, jz1, sz)
 
-    elif len(jsd_dicts[k].keys()) == 5 and len(jsd_dicts[k1].keys()) == 3:
-        return pair_of_one_track_constrains(jsd_dicts, k1, k, train_sets, timetable)
-
+    if tx < tz1 <= tz:
+        return 1.0
     return 0.0
 
 
 def P2qubic(k, k1, jsd_dicts, train_sets):
-    "returns not weighted contribution to Q from constrains inposed on the auxilairy variables by the Rosenberg polynomial approach "
+    """
+    Single track occupation at station condition, part 2
+    the Rosenberg polynomial approach
+
+    Returns not weighted contribution to Qmat from the single track occupancy
+
+    Input:
+    timetable -- time timetable
+
+    k, k1 -- indexes on the Q matrix
+
+    jsd_dicts -- vector of {"j": j, "j1": j1, "s": s, "d": d, "d1": d1}
+
+    form z_indices and {"j": j, "s": s, "d": d}  form indexing4qubo
+
+    train_sets -- train set dict containing trains paths
+
+    """
     S = train_sets["Paths"]
 
     # diagonal for z-ts
@@ -346,92 +470,8 @@ def P2qubic(k, k1, jsd_dicts, train_sets):
     return 0.0
 
 
-def p_circ(timetable, k, k1, inds, train_sets):
 
-    S = train_sets["Paths"]
-    j = inds[k]["j"]
-    j1 = inds[k1]["j"]
-    s = inds[k]["s"]
-    s1 = inds[k1]["s"]
-
-    if s1 in train_sets["Jround"].keys():
-        if previous_station(S[j], s1) == s:
-            if [j, j1] in train_sets["Jround"][s1]:
-                LHS = inds[k]["d"] + earliest_dep_time(S, timetable, j, s)
-                LHS += tau(timetable, "prep", first_train=j1, first_station=s1)
-                LHS += tau(
-                    timetable, "pass", first_train=j, first_station=s, second_station=s1
-                )
-                RHS = inds[k1]["d"] + earliest_dep_time(S, timetable, j1, s1)
-                if LHS > RHS:
-                    return 1.0
-    return 0.0
-
-
-def Pcirc(timetable, k, k1, inds, train_sets):
-    "returns not weighted penalty for circulation condition"
-
-    p = p_circ(timetable, k, k1, inds, train_sets)
-    p += p_circ(timetable, k1, k, inds, train_sets)
-    return p
-
-
-####  common switch condition #####
-
-
-def p_switch(s, sp, spp, jp, jpp, timetable, k, k1, inds, train_sets):
-
-    S = train_sets["Paths"]
-
-    t = inds[k]["d"] + earliest_dep_time(S, timetable, jp, sp)
-    if s != sp:
-        t += tau(timetable, "pass", first_train=jp, first_station=sp, second_station=s)
-
-    t1 = inds[k1]["d"] + earliest_dep_time(S, timetable, jpp, spp)
-    if s != spp:
-        t1 += tau(
-            timetable, "pass", first_train=jpp, first_station=spp, second_station=s
-        )
-
-    if -tau(timetable, "res") < t1 - t < tau(timetable, "res"):
-        return 1.0
-    return 0.0
-
-
-def Pswitch(timetable, k, k1, inds, train_sets):
-    "switch occupancy condition"
-    "  ------         "
-    "         \       "
-    "---------  c ----"
-
-    S = train_sets["Paths"]
-    jp = inds[k]["j"]
-    jpp = inds[k1]["j"]
-    sp = inds[k]["s"]
-    spp = inds[k1]["s"]
-
-    if not_the_same_rolling_stock(jp, jpp, train_sets):
-
-        for s in train_sets["Jswitch"].keys():
-            for pairs_of_switch in train_sets["Jswitch"][s]:
-                if [jp, jpp] == list(pairs_of_switch.keys()) or [jpp, jp] == list(
-                    pairs_of_switch.keys()
-                ):  # here is symmetrisation
-                    if sp == departure_station4switches(
-                        s, jp, pairs_of_switch, train_sets
-                    ):
-                        if spp == departure_station4switches(
-                            s, jpp, pairs_of_switch, train_sets
-                        ):
-
-                            p = p_switch(
-                                s, sp, spp, jp, jpp, timetable, k, k1, inds, train_sets
-                            )
-                            if p > 0:
-                                return p
-
-    return 0.0
-
+# panalties and objective
 
 def penalty(timetable, k, inds, d_max):
     "returns weighted contribution to Q from the objective penalties"
