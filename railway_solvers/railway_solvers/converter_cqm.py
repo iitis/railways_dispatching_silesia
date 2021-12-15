@@ -1,18 +1,39 @@
 from copy import deepcopy
-from dimod.sampleset import SampleSet
-import pulp
+from typing import Callable, Tuple
+
 import dimod
+import pulp
+from dimod import ConstrainedQuadraticModel
+from dimod.constrained import ConstrainedQuadraticModel
+from dimod.sampleset import SampleSet
 from pulp import LpProblem
 
 
-def _is_binary(var):
+def _is_binary(var: pulp.LpVariable) -> bool:
+    """Checks if var is a bit. This means that it is an Integer, with bounds 0
+and 1
+
+    :param var: checked variable
+    :type var: pulp.LpVariable
+    :return: flag if variable is bit
+    :rtype: bool
+    """
     result = var.cat == pulp.LpInteger
     result = result and var.lowBound == 0
     return result and var.upBound == 1
 
 
-def convert_to_cqm(model: LpProblem):
-    cqm = dimod.ConstrainedQuadraticModel()
+def convert_to_cqm(model: LpProblem) -> Tuple[ConstrainedQuadraticModel, Callable]:
+    """Converts Integer program into ConstrainedQuadraticModel. As second object
+outputs function interpreting the results. Works only if all variables are
+bounded integers.
+
+    :param model: model to be converted
+    :type model: LpProblem
+    :return: the same integer model for dimod, and function interpreting the results
+    :rtype: Tuple[ConstrainedQuadraticModel, Callable]
+    """
+    cqm = ConstrainedQuadraticModel()
 
     # vars translator
     vars_trans = dict()
