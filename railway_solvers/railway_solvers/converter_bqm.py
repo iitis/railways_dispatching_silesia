@@ -1,12 +1,27 @@
-import pulp
+import re
+from typing import Callable, Dict, List, Tuple
+
 import dimod
+import pulp
+import pyqubo
 from pulp import LpProblem
 from pulp.constants import LpMinimize
-from .converter_cqm import _is_binary
 from pyqubo import Binary, LogEncInteger, Placeholder
-import re
 
-def _get_placeholder(cname):
+from .converter_cqm import _is_binary
+
+
+def _get_placeholder(cname: str) -> Placeholder:
+    """Output placeholder (penalty constant) of the name appropriate to the
+constraint name. Typically Placeholder is chosen based on the beginning of the
+name of the constraint name.
+
+    :param cname: name of the constraint
+    :type cname: str
+    :raises ValueError: if the constraint name does not match any known placeholder
+    :return: appropriate placeholder 
+    :rtype: Placeholder
+    """
     if re.match("minimal_span_", cname):
         return Placeholder("minimal_span")
     if re.match("circulation_", cname):
@@ -24,15 +39,34 @@ def _get_placeholder(cname):
     raise ValueError(f"{cname} not handled")
 
 
-# for LE
-def _get_slack_ub(data, offset):
+def _get_slack_ub(data: List[int], offset: int) -> int:
+    """Generate the lowerbound of the slack variable xi, which appears when
+transforming a*x <= b with a*x + xi <= b. slack variable is negative. all
+arguments should be integers. Assumes argument
+
+    :param data: List of integers a for a*x <= b
+    :type data: List[int]
+    :param offset: offset b for a*x <= b
+    :type offset: int
+    :return: lowerbound of the slack variable
+    :rtype: int
+    """
     ub = sum(val*(var.upBound if val<0 else var.lowBound) for var, val in data)
     result = -(ub + offset)
     assert int(result) == result
     return int(result)
 
 
-def convert_to_pyqubo(model: LpProblem):
+def convert_to_pyqubo(model: LpProblem) -> pyqubo.Model:
+    """Converts Integer program into pyqubo.Model. Placeholders (penalty
+parameters) are NOT set up. Names of placeholders can be found in the code of
+_get_placeholder function, and for objective there is extra Placeholder called "objective".
+
+    :param model: model to be converted
+    :type model: LpProblem
+    :return: the same compiled integer model for pyqubo
+    :rtype: pyqubo.Model
+    """
     H = 0
 
     # vars translator
@@ -74,7 +108,18 @@ def convert_to_pyqubo(model: LpProblem):
     return H.compile()
 
 
-def convert_to_bqm(model: LpProblem, pdict):
+def convert_to_bqm(model: LpProblem, pdict: Dict[str,float]) -> Tuple[dimod.BinaryQuadraticModel,Callable]:
+    """Converts Integer program into pyqubo.Model. Placeholders (penalty
+parameters) are set up based on pdict. Names of placeholders can be found in the code of
+_get_placeholder function, and for objective there is extra Placeholder called "objective".
+
+    :param model: model to be converted
+    :type model: LpProblem
+    :param pdict: dictionary with penalty values
+    :type pdict: Dict[str,float]
+    :return: the same integer model for dimod, and function interpreting the results
+    :rtype: Tuple[dimod.BinaryQuadraticModel,Callable]
+    """
     pyqubo_model = convert_to_pyqubo(model)
 
     def interpreter(sampleset):

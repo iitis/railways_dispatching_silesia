@@ -43,6 +43,7 @@ important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 '"GLC", "ST", 9, "(4)"',
 '"GLC", "ST", 11, "(4)"'],
 
+
 "CM":['"CM", "ST", 1, "(1)"',
 '"CM", "ST", 2, "(1)"'],
 
@@ -59,8 +60,8 @@ important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 "Mi":['"Mi", "ST", 1, "(2)"',
 '"Mi", "ST", 2, "(1)"'],
 
-"MJ":['"MJ", "ST", 1, "(1)"',
-'"MJ", "ST", 3, "(2)"'],
+"MJ":['"MJ", "ST", 2, "(1)"',
+'"MJ", "ST", 1, "(1)"'],
 }
 
 aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
@@ -84,5 +85,5 @@ aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
 np.savez('important_stations',important_stations)
 np.savez('aditional_stations',aditional_stations)
 
-# npzfile = np.load('./important_stations.npz')
-# print(npzfile.files)
+npzfile = np.load('./important_stations.npz')
+print(npzfile.files)

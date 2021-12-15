@@ -89,8 +89,8 @@ def test_single_file(file, method, train_route = "default", pdict=None, real_ann
 
 
 if __name__ == "__main__":
-    file = "test_linear_solver"
-    file = "test_5_trains_all_cases"
+    file = "linear_solver"
+    file = "5_trains_all_cases"
     real_anneal_var = {"num_reads": 1000, "annealing_time": 20, "chain_strength": 4}
     method = 'sim'
     pdict = {"minimal_span": 2.5, "single_line": 2.5, "minimal_stay": 2.5, "track_occupation": 2.5, "switch": 2.5,
