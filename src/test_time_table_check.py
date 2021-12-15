@@ -1,4 +1,4 @@
-from time_table_check import *
+from utils import *
 import sys
 import random
 
