@@ -104,6 +104,7 @@ def get_blocks_b2win_station4train(train,station1,station2):
         return blocksb2win,rev
 
 def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2):
+    blocks_order = {}
     for train in [train1,train2]:
         blocks,rev = get_blocks_b2win_station4train(train,station1,station2)
         if rev:
