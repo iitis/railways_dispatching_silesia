@@ -1,7 +1,7 @@
 from utils import *
 
 train1,train2 = 44862, 44717
-station1,station2 = 'KO', '"KO", "ST-M"'
+station1,station2 = 'MJ', 'KL'
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
 #print('"J":',get_J(data),'\n')
@@ -10,4 +10,4 @@ print('Common station for trains {} and {}:'.format(train1,train2),check_common_
 print('Jround',get_jround(data))
 print('block between stations {} and {} for train {}'.format(station1,station2,train1), get_blocks_b2win_station4train(train1,station1,station2))
 # the last is not yet working
-#print(get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2))
+print(get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2))
