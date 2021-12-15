@@ -6,12 +6,18 @@ from .helpers_functions import *
 
 
 def get_y_j_jp_s(y, j, jp, s):
+    """reads two trains (j,jp) and one station (s) order variable, if there
+    exist one for reversed trains (jp,j) return 1-y
+    """
     try:
         return y[j][jp][s]
     except:
         return 1-y[jp][j][s]
 
 def get_y_j_jp_s_sp(y, j, jp, s, sp):
+    """reads two trains (j,jp) and two stations (s, sp) order variable, if there
+    exist one for reversed trains (jp,j) and stations (sp,s) return 1-y
+    """
     try:
         return y[j][jp][s][sp]
     except:
@@ -24,7 +30,7 @@ def get_y_j_jp_s_sp(y, j, jp, s, sp):
 ##############  minimal span ###################
 
 def minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
-    """ ecnoding constrains for minimal span condition"""
+    """ecnoding constrains for minimal span condition"""
     S = train_sets["Paths"]
 
     LHS = earliest_dep_time(S, timetable, jp, s)
@@ -43,10 +49,11 @@ def minimal_span_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train
 
 
 def minimal_span(problem, timetable, delay_var, y, train_sets, d_max):
-    "adds the minimum span condition to the pulp problem"
+    """adds the minimum span condition to the pulp problem
 
-    " ..... j1 -> ....... j2 -> ....."
-    "              span              "
+    [s1] ..... j1 -> ....... j2 -> ..... [s2]
+                      span
+    """
 
     S = train_sets["Paths"]
     for s in train_sets["Jd"].keys():
@@ -60,7 +67,7 @@ def minimal_span(problem, timetable, delay_var, y, train_sets, d_max):
 ################  single track line - deadlock ####################
 
 def single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
-    """ encoding constrsains for the single line condition """
+    """encoding constrsains for the single line condition """
     S = train_sets["Paths"]
 
     LHS = earliest_dep_time(S, timetable, j, s)
@@ -79,11 +86,13 @@ def single_line_constrain(s, sp, j, jp, problem, timetable, delay_var, y, train_
 
 
 def single_line(problem, timetable, delay_var, y, train_sets, d_max):
-    " adds single line condition to the pulp problem"
+    """adds single line condition to the pulp problem
 
-    " ......                            ......  "
-    "       \                          /        "
-    " .j1 ->............................. <-j2.."
+    .......                            ... <-j2 ..
+    [s1]   \                          /       [s2]
+    ..j1 ->.......................................
+
+    """
 
 
     for (s, sp) in train_sets["Josingle"].keys():
@@ -97,7 +106,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max):
 ###### minimal stay   ######
 
 def minimal_stay_constrin(j, s, problem, timetable, delay_var, train_sets):
-
+    """encoding constrsains for minimal stay condition """
     S = train_sets["Paths"]
 
     sp = previous_station(S[j], s)
@@ -118,7 +127,7 @@ def minimal_stay_constrin(j, s, problem, timetable, delay_var, train_sets):
 
 
 def minimal_stay(problem, timetable, delay_var, train_sets):
-    "minimal stay on the staiton"
+    """adds minimal stay on the staiton to the pulp problem """
 
     for j in train_sets["J"]:
         for s in train_sets["Paths"][j]:
@@ -128,7 +137,17 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
 ######         station   -- track occupation      #######
 
 def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
-    """  if two trains follow each other from s′ to s, i.e. j,j′∈Jd and (s′,s)∈Cj,j′, we also required y(j,j′,s′) = y(j,j′,s)"""
+    """Helper for single track occupation at the station constrain
+
+    if two trains follow each other s′ -> s, i.e. j,j′∈ Jd and (s′,s)∈ Cjj′
+     we requires y(j,j′,s′) = y(j,j′,s)
+
+     .................
+                       \
+                        \   [s]
+     ....j1 -> ...j2 ->..............
+     [s']
+     """
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
             #if both trains goes sp -> s and have common path
@@ -138,6 +157,7 @@ def keep_trains_order(sp, s, j, jp, problem, timetable, delay_var, y, train_sets
 
 
 def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max):
+    """helper for track occupation condition """
 
     S = train_sets["Paths"]
 
@@ -168,7 +188,12 @@ def trains_order_at_s(sp, s, j, jp, problem, timetable, delay_var, y, train_sets
 
 
 def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
-    "adds track occupation condition to the pulp problem"
+    """adds track occupation condition to the pulp problem
+    ..j1 ->.....
+                \   [s]
+    ..j2 ->..............
+
+    """
 
     S = train_sets["Paths"]
     for s in train_sets["Jtrack"].keys():
@@ -221,11 +246,15 @@ def switch_occ(s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets
 
 
 def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
-    " adds switch occupation condition to the pulp problem"
+    """adds switch occupation condition to the pulp problem
 
-    "  ------         "
-    "         \       "
-    "---------  c ----"
+    j1 -> --------------
+    [s1]                \
+    j2 -> -------------- c ----
+                          \  [s2]
+                           .......
+
+    """
 
     S = train_sets["Paths"]
 
@@ -244,7 +273,7 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
 ####### rolling stock circulation #######
 
 def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
-    " adds rolling stock circulation condition to the pulp problem"
+    """adds rolling stock circulation condition to the pulp problem"""
     S = train_sets["Paths"]
 
     for s in train_sets["Jround"].keys():
@@ -265,7 +294,7 @@ def rolling_stock_circ(problem, timetable, delay_var, train_sets, d_max):
 
 
 def objective(problem, timetable, delay_var, train_sets, d_max):
-    "adds objective function to the pulp problem"
+    """adds objective function to the pulp problem"""
     S = train_sets["Paths"]
     problem += pus.lpSum([delay_var[i][j] * penalty_weights(timetable, i, j) /
                          d_max for i in train_sets["J"] for j in S[i] if penalty_weights(timetable, i, j) != 0])
@@ -342,7 +371,9 @@ def order_variables(train_sets, d_max):
 
 
 def delay_varibles(train_sets, d_max):
-    " returns all linear variables for the optimisation problem, i.e. secondary_delays_vars and order_vars"
+    """returns all linear variables for the optimisation problem, i.e.
+    secondary_delays_vars and order_vars
+    """
     S = train_sets["Paths"]
 
     secondary_delays_vars = dict()
@@ -361,7 +392,7 @@ def delay_varibles(train_sets, d_max):
 
 
 def create_linear_problem(train_sets, timetable, d_max):
-    "creates the linear problem model"
+    """creates the linear problem model"""
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
     secondary_delays_var = delay_varibles(train_sets, d_max)
@@ -380,7 +411,7 @@ def create_linear_problem(train_sets, timetable, d_max):
     return prob
 
 def solve_linear_problem(train_sets, timetable, d_max):
-    "solves the linear problem returns the pulp object"
+    """solves the linear problem returns the pulp object"""
     prob = create_linear_problem(train_sets, timetable, d_max)
     start_time = time.time()
     prob.solve()
@@ -392,7 +423,9 @@ def solve_linear_problem(train_sets, timetable, d_max):
 # auxiliary functions for visualisation
 
 def return_delay_and_acctual_time(S, timetable, prob, j, s):
-    "given the solution of the optimisation problem returns secondary delay and actual time of leaving given station"
+    """given the solution of the optimisation problem returns secondary delay
+    and actual time of leaving given station
+    """
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
             delay = v.varValue
@@ -402,7 +435,9 @@ def return_delay_and_acctual_time(S, timetable, prob, j, s):
 
 
 def impact_to_objective(prob, timetable, j, s, d_max):
-    "return the impact to the objective of the particular secondary delay of particular train at particular station"
+    """return the impact to the objective of the particular secondary delay
+    of particular train at particular station
+    """
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
             return penalty_weights(timetable, j, s)/d_max*v.varValue

@@ -56,9 +56,6 @@ def Pspan(timetable, k, k1, jsd_dicts, train_sets):
     jsd_dicts -- vector of {"j": j, "s": s, "d": d}  form indexing4qubo
     train_sets -- train set dict containing trains paths
 
-
-    here additionaly train paths are necessary
-
     [s1] ..... j1 -> ....... j2 -> ..... [s2]
                       span
     """
