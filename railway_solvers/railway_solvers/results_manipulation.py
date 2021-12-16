@@ -6,7 +6,9 @@ import pulp
 from pulp.pulp import LpProblem
 
 
-def analyze_constraints(prob: LpProblem, sample: Dict[str,int]) -> Tuple[Dict[str,bool], int]:
+def analyze_constraints(
+    prob: LpProblem, sample: Dict[str, int]
+) -> Tuple[Dict[str, bool], int]:
     """check which constraints were satisfied
 
     :param prob: analyzed integer model
@@ -46,7 +48,7 @@ def get_objective(prob: pulp.LpProblem, sample) -> float:
     return result
 
 
-def get_best_feasible_sample(dict_list: List[Dict[str,Any]]) -> Dict[str,Any]:
+def get_best_feasible_sample(dict_list: List[Dict[str, Any]]) -> Dict[str, Any]:
     """output first feasible sample in the list
 
     :param dict_list: list of analyzed samples
@@ -54,10 +56,12 @@ def get_best_feasible_sample(dict_list: List[Dict[str,Any]]) -> Dict[str,Any]:
     :return: first feasible sample
     :rtype: Dict[str,Any]
     """
-    return next((l for l in dict_list if l['feasible']),None)
+    return next((l for l in dict_list if l["feasible"]), None)
 
 
-def get_results(sampleset: dimod.SampleSet, prob: pulp.LpProblem) -> List[Dict[str,Any]]:
+def get_results(
+    sampleset: dimod.SampleSet, prob: pulp.LpProblem
+) -> List[Dict[str, Any]]:
     """Check samples one by one, and computes it statistics.
 
     Statistics includes energy (as provided by D'Wave), objective function
@@ -75,13 +79,13 @@ def get_results(sampleset: dimod.SampleSet, prob: pulp.LpProblem) -> List[Dict[s
     for data in sampleset.data():
         rdict = {}
         sample = data.sample
-        rdict['energy'] = data.energy
-        rdict['objective'] = round(get_objective(prob, sample), 2)
-        rdict['feasible'] = all(analyze_constraints(prob, sample)[0].values())
-        rdict['sample'] = sample
-        rdict['feas_constraints'] = analyze_constraints(prob, sample)
+        rdict["energy"] = data.energy
+        rdict["objective"] = round(get_objective(prob, sample), 2)
+        rdict["feasible"] = all(analyze_constraints(prob, sample)[0].values())
+        rdict["sample"] = sample
+        rdict["feas_constraints"] = analyze_constraints(prob, sample)
         dict_list.append(rdict)
-    return sorted(dict_list, key=lambda d: d['objective'])
+    return sorted(dict_list, key=lambda d: d["objective"])
 
 
 def store_result(file_name: str, sampleset: dimod.SampleSet):
@@ -93,12 +97,12 @@ def store_result(file_name: str, sampleset: dimod.SampleSet):
     :type sampleset: dimod.SampleSet
     """
     sdf = sampleset.to_serializable()
-    with open(file_name, 'wb') as handle:
+    with open(file_name, "wb") as handle:
         pickle.dump(sdf, handle)
 
 
 def load_results(file_name: str) -> dimod.SampleSet:
-    """Load samples from the file 
+    """Load samples from the file
 
     :param file_name: name of the file
     :type file_name: str
