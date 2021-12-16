@@ -23,7 +23,7 @@ def test_linear_varibles_creations():
     assert str(
         dv) == "{0: {0: Delays_0_0, 1: Delays_0_1}, 1: {0: Delays_1_0, 1: Delays_1_1}}"
 
-    y = order_variables(train_sets, 5)
+    y = order_variables(train_sets)
 
     assert str(y) == "{0: {1: {0: y_0_1_0}}}"
 
