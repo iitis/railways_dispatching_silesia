@@ -13,14 +13,14 @@ from .converter_cqm import _is_binary
 
 def _get_placeholder(cname: str) -> Placeholder:
     """Output placeholder (penalty constant) of the name appropriate to the
-constraint name. Typically Placeholder is chosen based on the beginning of the
-name of the constraint name.
+    constraint name. Typically Placeholder is chosen based on the beginning of the
+    name of the constraint name.
 
-    :param cname: name of the constraint
-    :type cname: str
-    :raises ValueError: if the constraint name does not match any known placeholder
-    :return: appropriate placeholder 
-    :rtype: Placeholder
+        :param cname: name of the constraint
+        :type cname: str
+        :raises ValueError: if the constraint name does not match any known placeholder
+        :return: appropriate placeholder
+        :rtype: Placeholder
     """
     if re.match("minimal_span_", cname):
         return Placeholder("minimal_span")
@@ -41,17 +41,17 @@ name of the constraint name.
 
 def _get_slack_ub(data: List[int], offset: int) -> int:
     """Generate the lowerbound of the slack variable xi, which appears when
-transforming a*x <= b with a*x + xi <= b. slack variable is negative. all
-arguments should be integers. Assumes argument
+    transforming a*x <= b with a*x + xi <= b. slack variable is nonnegative. all
+    arguments should be integers.
 
-    :param data: List of integers a for a*x <= b
-    :type data: List[int]
-    :param offset: offset b for a*x <= b
-    :type offset: int
-    :return: lowerbound of the slack variable
-    :rtype: int
+        :param data: List of integers a for a*x <= b
+        :type data: List[int]
+        :param offset: offset b for a*x <= b
+        :type offset: int
+        :return: lowerbound of the slack variable
+        :rtype: int
     """
-    ub = sum(val*(var.upBound if val<0 else var.lowBound) for var, val in data)
+    ub = sum(val * (var.upBound if val < 0 else var.lowBound) for var, val in data)
     result = -(ub + offset)
     assert int(result) == result
     return int(result)
@@ -59,13 +59,13 @@ arguments should be integers. Assumes argument
 
 def convert_to_pyqubo(model: LpProblem) -> pyqubo.Model:
     """Converts Integer program into pyqubo.Model. Placeholders (penalty
-parameters) are NOT set up. Names of placeholders can be found in the code of
-_get_placeholder function, and for objective there is extra Placeholder called "objective".
+    parameters) are NOT set up. Names of placeholders can be found in the code of
+    _get_placeholder function, and for objective there is extra Placeholder called "objective".
 
-    :param model: model to be converted
-    :type model: LpProblem
-    :return: the same compiled integer model for pyqubo
-    :rtype: pyqubo.Model
+        :param model: model to be converted
+        :type model: LpProblem
+        :return: the same compiled integer model for pyqubo
+        :rtype: pyqubo.Model
     """
     H = 0
 
@@ -83,19 +83,25 @@ _get_placeholder function, and for objective there is extra Placeholder called "
     # constraints
     for cname, c in model.constraints.items():
         sense = c.sense
-        expr = sum(val*vars_trans[var] for var, val in c.items())
+        expr = sum(val * vars_trans[var] for var, val in c.items())
         expr += c.constant
 
         values = [val for _, val in c.items()]
         ph = _get_placeholder(cname)
         if sense == pulp.LpConstraintEQ:
-            H += ph * expr**2
+            H += ph * expr ** 2
         elif sense == pulp.LpConstraintLE:
             slack = LogEncInteger(cname, (0, _get_slack_ub(c.items(), c.constant)))
-            H += ph * (expr+slack)**2
+            H += ph * (expr + slack) ** 2
         elif sense == pulp.LpConstraintGE:
-            slack = LogEncInteger(cname, (0, _get_slack_ub([(var,-val) for var, val in c.items()], -c.constant)))
-            H += ph * (expr-slack)**2
+            slack = LogEncInteger(
+                cname,
+                (
+                    0,
+                    _get_slack_ub([(var, -val) for var, val in c.items()], -c.constant),
+                ),
+            )
+            H += ph * (expr - slack) ** 2
 
     # # objective
     if model.objective:
@@ -103,22 +109,24 @@ _get_placeholder function, and for objective there is extra Placeholder called "
         obj = model.objective
         pyqubo_obj = 0
         pyqubo_obj += obj.constant
-        pyqubo_obj += sum(val*vars_trans[var] for var, val in obj.items())
+        pyqubo_obj += sum(val * vars_trans[var] for var, val in obj.items())
         H += Placeholder("objective") * pyqubo_obj
     return H.compile()
 
 
-def convert_to_bqm(model: LpProblem, pdict: Dict[str,float]) -> Tuple[dimod.BinaryQuadraticModel,Callable]:
+def convert_to_bqm(
+    model: LpProblem, pdict: Dict[str, float]
+) -> Tuple[dimod.BinaryQuadraticModel, Callable]:
     """Converts Integer program into pyqubo.Model. Placeholders (penalty
-parameters) are set up based on pdict. Names of placeholders can be found in the code of
-_get_placeholder function, and for objective there is extra Placeholder called "objective".
+    parameters) are set up based on pdict. Names of placeholders can be found in the code of
+    _get_placeholder function, and for objective there is extra Placeholder called "objective".
 
-    :param model: model to be converted
-    :type model: LpProblem
-    :param pdict: dictionary with penalty values
-    :type pdict: Dict[str,float]
-    :return: the same integer model for dimod, and function interpreting the results
-    :rtype: Tuple[dimod.BinaryQuadraticModel,Callable]
+        :param model: model to be converted
+        :type model: LpProblem
+        :param pdict: dictionary with penalty values
+        :type pdict: Dict[str,float]
+        :return: the same integer model for dimod, and function interpreting the results
+        :rtype: Tuple[dimod.BinaryQuadraticModel,Callable]
     """
     pyqubo_model = convert_to_pyqubo(model)
 
@@ -126,9 +134,13 @@ _get_placeholder function, and for objective there is extra Placeholder called "
         result = []
         energies = [d.energy for d in sampleset.data()]
         for sample in sampleset.samples():
-            decoded = (pyqubo_model.decode_sample(dict(sample), vartype='BINARY', feed_dict=pdict))
+            decoded = pyqubo_model.decode_sample(
+                dict(sample), vartype="BINARY", feed_dict=pdict
+            )
             decoded_dict = {**decoded.subh, **decoded.sample}
             result.append({v: decoded_dict[v] for v in map(str, model.variables())})
-        return dimod.SampleSet.from_samples(dimod.as_samples(result), 'BINARY', energies)
+        return dimod.SampleSet.from_samples(
+            dimod.as_samples(result), "BINARY", energies
+        )
 
     return pyqubo_model.to_bqm(feed_dict=pdict), lambda ss: interpreter(ss)
