@@ -1,7 +1,7 @@
 from utils import *
 
-train1,train2 = 94611, 14006
-station1,station2 = 'KO', 'KL'
+train1,train2 =  44717, 44862
+station1,station2 = "Mi", "KL"
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
 #print('"J":',get_J(data),'\n')
