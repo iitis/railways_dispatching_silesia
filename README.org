@@ -1,0 +1,29 @@
+#+OPTIONS: ^:nil
+#+TITLE: Railway Dispatching project with Silesian data
+#+AUTHOR: The Quantum Railway Team
+
+This is just a brief, incomplete README with minor notes. To be
+extended. 
+
+Please edit the org which is in [[https://orgmode.org/guide/Markup.html][Emacs org markup]]. The md5 will be
+generated from that.
+
+* Files
+
+** ~data~ subdirectory
+
+These are the raw input data.
+
+** ~src~ subdirectory
+
+Scripts to parse the input data and generate inputs in the required
+format. Ongoing work.
+
+** ~railway_solvers~ subdirectory
+
+These are the actual solvers. A test can be run like that:
+#+BEGIN_SRC bash
+python3 -m pytest
+#+END_SRC
+in this directory. The ~railway_solvers~ subdirectory (same name as
+its parent) is the solver module.
