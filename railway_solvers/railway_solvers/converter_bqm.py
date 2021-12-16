@@ -41,8 +41,8 @@ name of the constraint name.
 
 def _get_slack_ub(data: List[int], offset: int) -> int:
     """Generate the lowerbound of the slack variable xi, which appears when
-transforming a*x <= b with a*x + xi <= b. slack variable is negative. all
-arguments should be integers. Assumes argument
+transforming a*x <= b with a*x + xi <= b. slack variable is nonnegative. all
+arguments should be integers.
 
     :param data: List of integers a for a*x <= b
     :type data: List[int]
