@@ -72,7 +72,7 @@ def get_results(
     :type sampleset: dimod.SampleSet
     :param prob: integer problem according to which samples are analyzed
     :type prob: pulp.LpProblem
-    :return: analyzed samples, sorted according to energy
+    :return: analyzed samples, sorted according to objective
     :rtype: List[Dict[str,Any]]
     """
     dict_list = []
