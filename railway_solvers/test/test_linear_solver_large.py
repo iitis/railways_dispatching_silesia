@@ -9,18 +9,28 @@ def energy(v, Q):
     return V @ X @ V.transpose()
 
 def test_5_trains_all_cases():
+    """
+    We have the following trains: 21,22,23,24,25
+    and stations: A,B,C,D    [  ] - corresponds to the platform
+    and tracks: ----  \    .....
+                       \
+    the way trains go ->
+    22 <-> 23 means that 22 ends, and then starts back as 23
+    (rolling stock circ)
 
-    "                                           <- 24    "
-    "                                         ......     "
-    "    21, 22, ->                          /  21 ->    "
-    "   -----------------------------------------        "
-    "   [  A   ]           [ B  ]      \ /  [ C ] 22 <-> 23 "
-    "   -----------------------------------------         "
-    "                           <-- 23 /                  "
-    "        / -- 25-> -\             /                   "
-    "   -----  [ D  ]   /------------                     "
-    "        \ ------ /         <-- 24                    "
+    the example sitation map is following:
 
+
+
+       -21, 22, -> --------------------------21 ->-- <-24--
+       [  A   ]        [ B  ]         \ /       [ C ]
+       -------------------------<- 23------- 22 <-> 23 ---
+                                      /
+            /-- 25-> --\             /
+       -----  [ D  ]    ----<- 24---
+            \ ------- /
+
+    """
 
 
     taus = {"pass": {"21_A_B": 4, "22_A_B": 8, "21_B_C": 4, "22_B_C": 8, '23_C_B':6, '23_B_A':6, '24_C_D':3, '25_D_C':3},
@@ -28,8 +38,10 @@ def test_5_trains_all_cases():
                  "stop": {"21_B": 1, "22_B": 1, "21_C": 1, "22_C": 1, '23_B': 1, '23_A':1},
                  "prep": {"23_C": 3}, "res": 1}
     timetable = {"tau": taus,
-                 "initial_conditions": {"21_A": 6, "22_A": 1, "23_C": 26, "24_C": 25, "25_D": 28},
-                 "penalty_weights": {"21_B": 2, "22_B": 0.5, "21_A": 2, "22_A": 0.5, "23_B":0.8, "24_C":0.5, "25_D":0.5}}
+                 "initial_conditions": {"21_A": 6, "22_A": 1, "23_C": 26,
+                    "24_C": 25, "25_D": 28},
+                 "penalty_weights": {"21_B": 2, "22_B": 0.5, "21_A": 2,
+                    "22_A": 0.5, "23_B":0.8, "24_C":0.5, "25_D":0.5}}
 
     train_sets = {
         "skip_station": {
@@ -39,13 +51,20 @@ def test_5_trains_all_cases():
             24: "D",
             25: "C"
         },
-        "Paths": {21: ['A', 'B', 'C'], 22: ['A', 'B', 'C'], 23: ['C', 'B', 'A'], 24: ['C', 'D'], 25: ['D', 'C']},
+        "Paths": {21: ['A', 'B', 'C'], 22: ['A', 'B', 'C'], 23: ['C', 'B', 'A'],
+        24: ['C', 'D'], 25: ['D', 'C']},
         "J": [21, 22, 23, 24, 25],
         "Jd": {'A': {'B': [[21, 22]]}, 'B': {'C': [[21, 22]]}},
         "Josingle": {('C', 'D'): [[24, 25]]},
         "Jround": {'C': [[22, 23]]},
-        "Jtrack": {'B': [[21, 22]], 'C':[[21,24], [22, 23]]},
-        "Jswitch": {'B':[{21:"out", 22:"out"}, {21:"in", 22:"in"}], 'C': [{23:"out", 24:"out"}, {22:"in", 24:"out"}, {22:"in", 23:"out"}, {21:"in", 24:"out"}], 'D': [{24:"in", 25:"out"}]}
+        "Jtrack": {'B': [[21, 22]], 'C':[[21, 24], [22, 23]]},
+        "Jswitch": {'B':[{21:"out", 22:"out"}, {21:"in", 22:"in"}],
+                    'C': [{23:"out", 24:"out"}, {22:"in", 24:"out"},
+                          {22:"in", 23:"out"}, {21:"in", 24:"out"}],
+                    'D': [{24:"in", 25:"out"}]},
+        "add_swithes_at_s": []   #it adss automatically swithes at stations in
+                                 #bracket if two trains are in "Jtrack"
+                                 # if empty performs no action
     }
 
     d_max = 10
@@ -87,12 +106,17 @@ def test_5_trains_all_cases():
     assert energy(sol, Q) == pytest.approx(-22.5+1.01)
 
 def test_many_trains_single_line():
+    """
+    the simple exapme with many trains between stations A and B
+    trains number according to PLK rules (add one way, even another)
 
-    "   10, 12, 14, 16 -->                             "
-    "  ----------------------------------------       "
-    "    [ A ]    /                  \    [ B ]         "
-    "   ---------                      -----------     "
-    "                                   <- 11,13,15,17 "
+
+      --10, 12, 14, 16 --> -----------------------------------------
+             [ A ]         /                  \           [ B ]
+       -------------------                     --<- 11, 13, 15, 17--
+
+
+    """
 
     taus = {"pass": {"10_A_B": 4, "12_A_B": 4, "14_A_B": 4, "16_A_B": 4, "11_B_A": 4, "13_B_A": 4, "15_B_A": 4, "17_B_A": 4},
           "blocks": {"10_12_A_B": 2, "10_14_A_B": 2, "10_16_A_B": 2, "12_14_A_B": 2, "12_16_A_B": 2, "14_16_A_B": 2,

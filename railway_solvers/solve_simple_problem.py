@@ -53,8 +53,12 @@ def toy_problem_variables(train_sets, timetable, d_max):
         prob, timetable, 2, 1, d_max))
 
 
-taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
-                                                                }, "stop": {"0_1": 1, "1_1": 1}, "res": 1}
+taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8},
+        "blocks": {"0_1_0_1": 2, "1_0_0_1": 6},
+        "stop": {"0_1": 1, "1_1": 1},
+        "res": 1
+        }
+
 timetable = {"tau": taus,
              "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
              "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
