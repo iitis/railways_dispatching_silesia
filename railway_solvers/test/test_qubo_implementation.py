@@ -144,6 +144,14 @@ def test_pspan_pstay_p1track():
 
 def test_pswith():
 
+    """
+    ..........                                .... <- 2 ..
+    [ A ]     \                              /    [ B ]
+    .. 1 -> .. c .......................... c ... .......
+
+    swithes at A (1 out, 2 in) and B (1 in 12out )
+    """
+
     taus = {"pass": {"1_A_B": 8, "2_B_A": 8}, "res": 1}
 
 
@@ -167,8 +175,6 @@ def test_pswith():
                  "penalty_weights": {"1_A": 1, "2_B": 1}}
 
     inds, q_bits = indexing4qubo(train_sets_r, 10)
-
-    # .....  1 track  ......
 
     k = inds.index({'j': 1, 's': "A", 'd': 0})
     k1 = inds.index({'j': 2, 's': "B", 'd': 0})
@@ -196,6 +202,12 @@ def test_pswith():
 
 
 def test_rolling_stock_circulation():
+
+    """
+     [ A ]                                            [ B ]
+    .....0 -> ......................................0 <-> 1......
+    """
+
     train_sets = {
         "skip_station": {
             0: None,
@@ -359,7 +371,7 @@ def test_penalties_and_couplings():
     ..................................c...........
     0 ->
     1 ->
-    """    
+    """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
             "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
