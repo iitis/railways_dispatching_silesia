@@ -24,7 +24,6 @@ def test_linear_varibles_creations():
     }
 
     dv = delay_varibles(train_sets, 5)
-    print((dv))
 
     assert str(
         dv) == "{0: {'A': Delays_0_A, 'B': Delays_0_B}, 1: {'A': Delays_1_A, 'B': Delays_1_B}}"
@@ -69,18 +68,14 @@ def test_minimal_span_two_trains():
     ####   simple problem #####
     prob = solve_linear_problem(train_sets, timetable, 5)
 
-    for v in prob.variables():
-        print(v)
+    v = prob.variables()
 
-        if v.name == "Delays_0_A":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_1_A":
-            delay = v.varValue
-            assert delay == 4
-        if v.name == "y_0_1_A":
-            assert v.varValue == 1.
-
+    assert v[0].name == "Delays_0_A"
+    assert v[0].varValue == 0
+    assert v[2].name == "Delays_1_A"
+    assert v[2].varValue == 4
+    assert v[4].name == "y_0_1_A"
+    assert v[4].varValue == 1.
     assert prob.objective.value() == 0.4
 
     assert return_delay_and_acctual_time(
@@ -127,103 +122,136 @@ def test_deadlock_and_switches_two_trains():
 
     prob = solve_linear_problem(train_sets, timetable, 10)
 
-    for v in prob.variables():
-        if v.name == "Delays_0_0":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_1_1":
-            delay = v.varValue
-            assert delay == 7
-        if v.name == "y_0_1_0":
-            delay = v.varValue
-            assert delay == 1.
+    v = prob.variables()
+    assert v[0].name == "Delays_0_A"
+    assert v[0].varValue == 0
+    assert v[3].name == "Delays_1_B"
+    assert v[3].varValue == 7
+    assert v[4].name == "y_0_1_A_B"
+    assert v[4].varValue == 1.
 
     assert prob.objective.value() == pytest.approx(0.35)
 
 
 
 def test_rolling_stock_circulation():
+
+    """
+    At station B train 0 terminates and turns intro train 1 that starts there
+
+    ....0 -> ..................................0 <-> 1.......
+    A                                            B
+
+    """
+
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [1, 0]},
+        "Paths": {0: ["A", "B"], 1: ["B", "A"]},
         "J": [0, 1],
         "Jd": dict(),
         "Josingle": dict(),
-        "Jround": {1: [[0,1]]},
+        "Jround": {"B": [[0,1]]},
         "Jtrack": dict(),
         "Jswitch": dict()
     }
 
-    taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "prep": {"1_1": 2}, "stop":{"1_0": 0, "0_1": 0}}
+    taus = {"pass": {"0_A_B": 4, "1_B_A": 8}, "prep": {"1_B": 2},
+            "stop":{"1_A": 0, "0_B": 0}}
     timetable = {"tau": taus,
-                 "initial_conditions": {"0_0": 3, "1_1": 1},
-                 "penalty_weights": {"0_0": 2, "1_1": 0.5}}
+                 "initial_conditions": {"0_A": 3, "1_B": 1},
+                 "penalty_weights": {"0_A": 2, "1_B": 0.5}}
 
-    ####   simple problem #####
 
     prob = solve_linear_problem(train_sets, timetable, 10)
 
+    v = prob.variables()
+    assert v[0].name == "Delays_0_A"
+    assert v[0].varValue == 0
+    assert v[3].name == "Delays_1_B"
+    assert v[3].varValue == 8
 
-    for v in prob.variables():
-        if v.name == "Delays_0_0":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_1_1":
-            delay = v.varValue
-            assert delay == 8
-
-        assert prob.objective.value() == pytest.approx(0.4)
+    assert prob.objective.value() == pytest.approx(0.4)
 
 
 
-def test_track_occupation_simplest():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 4}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 2,
-                                                         }, "stop": {"0_1": 1, "1_1": 1}, "res": 2}
+def  test_station_track_and_switches_two_trains():
+    """
+    Test single track at station and swithes constrain, switches simplified
+
+    swith - c
+
+    tracks - ......  \
+
+
+                                                  /
+      1 ->                                       /
+    ..0 -> ...................................  c  .0-> ..  1->.....
+
+      A                                                  B
+                                            simplifies swith condition
+
+    """
+
+    taus = {"pass": {"0_A_B": 4, "1_A_B": 4},
+            "blocks": {"0_1_A_B": 2, "1_0_B_A": 4},
+            "stop": {"0_B": 1, "1_B": 1}, "res": 2}
     timetable = {"tau": taus,
-                 "initial_conditions": {"0_0": 1, "1_0": 1},
-                 "penalty_weights": {"0_0": 2, "1_0": 0.5}}
+                 "initial_conditions": {"0_A": 1, "1_A": 1},
+                 "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [0, 1]},
+        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": dict(),
         "Josingle": dict(),
         "Jround": dict(),
-        "Jtrack": {1: [[0, 1], []]},
-        "Jswitch": {1: [{0:"in", 1:"in"}, {0:"out", 1:"out"}]},
-        "add_swithes_at_s": [1]
+        "Jtrack": {"B": [[0, 1]]},
+        "Jswitch": dict(),
+        "add_swithes_at_s": ["B"]
     }
-
-    ####   simple problem #####
 
     prob = solve_linear_problem(train_sets, timetable, 5)
 
-    for v in prob.variables():
-        if v.name == "Delays_0_0":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_1_0":
-            delay = v.varValue
-            assert delay == 3
-        if v.name == "y_0_1_0":
-            assert v.varValue == 1.
+    vs = prob.variables()
+
+    assert vs[0].name == "Delays_0_A"
+    assert vs[2].name == "Delays_1_A"
+    assert vs[4].name == "y_0_1_B"
+
+    assert vs[0].varValue == 0
+    assert vs[2].varValue == 3
+    assert vs[4].varValue == 1
 
     assert prob.objective.value() == pytest.approx(0.3)
 
 
 def test_linear_solver_default_problem():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6
-                                                                    }, "stop": {"0_1": 1, "1_1": 1}, "res": 1}
+
+    """
+                                            <- 2
+    ...............................................
+     [ A ]                              \ /    [ B ]
+    .....................................c.........
+    0 ->
+    1 ->
+    """
+
+    taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
+            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "stop": {"0_B": 1, "1_B": 1},
+            "res": 1
+            }
+
     timetable = {"tau": taus,
-                 "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
-                 "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
+                 "initial_conditions": {"0_A": 4, "1_A": 1, "2_B": 8},
+                 "penalty_weights": {"0_A": 2, "1_A": 1, "2_B": 1}}
 
     d_max = 10
 
@@ -231,74 +259,80 @@ def test_linear_solver_default_problem():
         "skip_station": {
             0: None,
             1: None,
-            2: 0,
+            2: "A",
         },
-        "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
+        "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
-        "Jd": {0: {1: [[0, 1]]}, 1: {0: [[2]]}},
+        "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
         "Josingle": dict(),
         "Jround": dict(),
-        "Jtrack": {1: [[0, 1]]},
+        "Jtrack": {"B": [[0, 1]]},
         "Jswitch": dict(),
-        "add_swithes_at_s": [1]
+        "add_swithes_at_s": ["B"]
     }
+
+    """
+    1 ->                                       <- 2
+    ...............................................
+     [ A ]                              \ /    [ B ]
+    .....................................c.........
+    0 ->
+    """
+
 
     train_sets_rerouted = {
         "skip_station": {
             0: None,
             1: None,
-            2: 0,
+            2: "A",
         },
-        "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
+        "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": dict(),
-        "Josingle": {(0,1): [[1,2]]},
+        "Josingle": {("A", "B"): [[1,2]]},
         "Jround": dict(),
-        "Jtrack": {1: [[0, 1]]},
-        "Jswitch": {0: [{1:"out", 2:"in"}], 1: [{1:"in", 2:"out"}]},
-        "add_swithes_at_s": [1]
+        "Jtrack": {"B": [[0, 1]]},
+        "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
+        "add_swithes_at_s": ["B"]
     }
 
     prob = solve_linear_problem(train_sets, timetable, d_max)
 
-    for v in prob.variables():
-        if v.name == "Delays_0_0":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_0_1":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_1_0":
-            delay = v.varValue
-            assert delay == 5
-        if v.name == "Delays_2_1":
-            delay = v.varValue
-            assert delay == 0
+    v = prob.variables()
+
+    assert v[0].name == "Delays_0_A"
+    assert v[0].varValue == 0
+    assert v[1].name == "Delays_0_B"
+    assert v[1].varValue == 0
+    assert v[2].name == "Delays_1_A"
+    assert v[2].varValue == 5
+    assert v[4].name == "Delays_2_B"
+    assert v[4].varValue == 0
 
     assert prob.objective.value() == 0.5
 
     prob = solve_linear_problem(train_sets_rerouted, timetable, d_max)
 
-    for v in prob.variables():
-        if v.name == "Delays_0_0":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_0_1":
-            delay = v.varValue
-            assert delay == 0
-        if v.name == "Delays_1_0":
-            delay = v.varValue
-            assert delay == 1
-        if v.name == "Delays_2_1":
-            delay = v.varValue
-            assert delay == 3
+    v = prob.variables()
+
+    assert v[0].name == "Delays_0_A"
+    assert v[0].varValue == 0
+    assert v[1].name == "Delays_0_B"
+    assert v[1].varValue == 0
+    assert v[2].name == "Delays_1_A"
+    assert v[2].varValue == 1
+    assert v[4].name == "Delays_2_B"
+    assert v[4].varValue == 3
+
 
     assert prob.objective.value() == 0.4
 
 # @pytest.mark.skip(reason="Note satisfied one, wait for Ozlem to finish")
 def test_constraint_labels():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
-                                                                    }, "stop": {"0_1": 1, "1_1": 1}, "res": 1}
+    taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8},
+            "blocks": {"0_1_0_1": 2, "1_0_0_1": 6},
+            "stop": {"0_1": 1, "1_1": 1}, "res": 1}
+
     timetable = {"tau": taus,
                  "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
                  "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
