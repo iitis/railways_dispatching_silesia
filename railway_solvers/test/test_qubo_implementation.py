@@ -355,21 +355,32 @@ def test_penalties_and_couplings():
     assert penalty(timetable, 1, inds, d_max) == 0.2
 
 
-def test_two_trains_going_one_way_simple():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
-                                                         }, "stop": {"0_1": 1, "1_1": 1}, "res": 1}
+def test_minimal_span_two_trains():
+
+    """
+    two trains, 0 and 1 are going one way A -> B test minimal span
+
+        A                            B
+     1 ->
+     0 ->  --------------------------
+    """
+
+
+    taus = {"pass": {"0_A_B": 4, "1_A_B": 8},
+            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "stop": {"0_B": 1, "1_B": 1}, "res": 1}
     timetable_1 = {"tau": taus,
-                 "initial_conditions": {"0_0": 3, "1_0": 1},
-                 "penalty_weights": {"0_0": 2, "1_0": 0.5}}
+                 "initial_conditions": {"0_A": 3, "1_A": 1},
+                 "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [0, 1]},
+        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
-        "Jd": {0: {1: [[0, 1]]}},
+        "Jd": {"A": {"B": [[0, 1]]}},
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": dict(),
@@ -392,26 +403,43 @@ def test_two_trains_going_one_way_simple():
     assert energy(sol, Q) == -8+0.4
 
 
-def test_track_occupation_simple():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 4}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 4,
-                                                         }, "stop": {"0_1": 1, "1_1": 1}, "res": 2}
+def  test_station_track_and_switches_two_trains():
+    """
+    Test single track at station and swithes constrain, switches simplified
+
+    swith - c
+
+    tracks - ......  \
+                      \
+
+                                                  /
+      1 ->                                       /
+    ..0 -> ...................................  c  .0-> ..  1->.....
+
+      A                                                  B
+
+    """
+
+    taus = {"pass": {"0_A_B": 4, "1_A_B": 4},
+            "blocks": {"0_1_A_B": 2, "1_0_B_A": 4},
+            "stop": {"0_B": 1, "1_B": 1}, "res": 2}
     timetable_2 = {"tau": taus,
-                 "initial_conditions": {"0_0": 1, "1_0": 1},
-                 "penalty_weights": {"0_0": 2, "1_0": 0.5}}
+                 "initial_conditions": {"0_A": 1, "1_A": 1},
+                 "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [0, 1]},
+        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": dict(),
         "Josingle": dict(),
         "Jround": dict(),
-        "Jtrack": {1: [[0, 1]]},
+        "Jtrack": {"B": [[0, 1]]},
         "Jswitch": dict(),
-        "add_swithes_at_s": [1]
+        "add_swithes_at_s": ["B"]
     }
 
     p_sum = 2
@@ -430,26 +458,42 @@ def test_track_occupation_simple():
     assert energy(sol, Q) == -8+0.3
 
 
-def test_two_trains_going_opposite_ways_simple():
-    taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
-                                                         }, "stop": {"0_1": 1, "1_0": 1}, "res": 1}
-    timetable_3 = {"tau": taus,
-                 "initial_conditions": {"0_0": 3, "1_1": 1},
-                 "penalty_weights": {"0_0": 2., "1_1": 0.5}}
+def test_deadlock_and_switches_two_trains():
+    """
+    Two trains going opposite direction on single track line
+    and swithes constrain
 
+    swith - c
+
+    tracks - ......  \
+                      \
+
+
+    ..........                                        .. <- 1 ....
+        A       \                                    /      B
+    ..0 -> .... c ................................  c  ..........
+
+    """
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [1, 0]},
+        "Paths": {0: ["A", "B"], 1: ["B", "A"]},
         "J": [0, 1],
         "Jd": dict(),
-        "Josingle": {(0,1): [[0,1]]},
+        "Josingle": {("A","B"): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        "Jswitch": {0: [{0:"out", 1:"in"}], 1: [{0:"in", 1:"out"}]}
+        "Jswitch": {"A": [{0: "out", 1: "in"}], "B": [{0: "in", 1: "out"}]}
     }
+
+    taus = {"pass": {"0_A_B": 4, "1_B_A": 8},
+            "stop": {"0_B": 1, "1_A": 1}, "res": 1}
+
+    timetable_3 = {"tau": taus,
+                "initial_conditions": {"0_A": 3, "1_B": 1},
+                "penalty_weights": {"0_A": 2, "1_B": 0.5}}
 
     p_sum = 2.
     p_pair = 1.

@@ -4,14 +4,19 @@ from railway_solvers import *
 
 
 def test_linear_varibles_creations():
+    """
+        A                            B
+     1 ->
+     0 ->  --------------------------
+    """
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [0, 1]},
+        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
-        "Jd": {0: {1: [[0, 1]]}},
+        "Jd": {"A": {"B": [[0, 1]]}},
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": dict(),
@@ -19,30 +24,42 @@ def test_linear_varibles_creations():
     }
 
     dv = delay_varibles(train_sets, 5)
+    print((dv))
 
     assert str(
-        dv) == "{0: {0: Delays_0_0, 1: Delays_0_1}, 1: {0: Delays_1_0, 1: Delays_1_1}}"
+        dv) == "{0: {'A': Delays_0_A, 'B': Delays_0_B}, 1: {'A': Delays_1_A, 'B': Delays_1_B}}"
 
     y = order_variables(train_sets)
 
-    assert str(y) == "{0: {1: {0: y_0_1_0}}}"
+    assert str(y) == "{0: {1: {'A': y_0_1_A}}}"
 
 
-def test_two_trains_going_one_way_simplest():
-    taus = {"pass": {"0_0_1": 4, "1_0_1": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
-                                                         }, "stop": {"0_1": 1, "1_1": 1}, "res": 1}
+def test_minimal_span_two_trains():
+
+    """
+    two trains, 0 and 1 are going one way A -> B test minimal span
+
+        A                            B
+     1 ->
+     0 ->  --------------------------
+    """
+
+
+    taus = {"pass": {"0_A_B": 4, "1_A_B": 8},
+            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "stop": {"0_B": 1, "1_B": 1}, "res": 1}
     timetable = {"tau": taus,
-                 "initial_conditions": {"0_0": 3, "1_0": 1},
-                 "penalty_weights": {"0_0": 2, "1_0": 0.5}}
+                 "initial_conditions": {"0_A": 3, "1_A": 1},
+                 "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [0, 1]},
+        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
-        "Jd": {0: {1: [[0, 1]]}},
+        "Jd": {"A": {"B": [[0, 1]]}},
         "Josingle": dict(),
         "Jround": dict(),
         "Jtrack": dict(),
@@ -53,45 +70,60 @@ def test_two_trains_going_one_way_simplest():
     prob = solve_linear_problem(train_sets, timetable, 5)
 
     for v in prob.variables():
+        print(v)
 
-        if v.name == "Delays_0_0":
+        if v.name == "Delays_0_A":
             delay = v.varValue
             assert delay == 0
-        if v.name == "Delays_1_0":
+        if v.name == "Delays_1_A":
             delay = v.varValue
             assert delay == 4
-        if v.name == "y_0_1_0":
+        if v.name == "y_0_1_A":
             assert v.varValue == 1.
 
     assert prob.objective.value() == 0.4
 
     assert return_delay_and_acctual_time(
-        train_sets["Paths"], timetable, prob, 1, 0) == (4.0, 5.0)
-    assert impact_to_objective(prob, timetable, 1, 0, 5) == 0.4
+        train_sets["Paths"], timetable, prob, 1, "A") == (4.0, 5.0)
+    assert impact_to_objective(prob, timetable, 1, "A", 5) == 0.4
 
 
-def test_two_trains_going_opposite_ways_simplest():
+def test_deadlock_and_switches_two_trains():
+    """
+    Two trains going opposite direction on single track line
+    and swithes constrain
+
+    swith - c
+
+    tracks - ......  \
+                      \
+
+
+    ..........                                        .. <- 1 ....
+        A       \                                    /      B
+    ..0 -> .... c ................................  c  ..........
+
+    """
     train_sets = {
         "skip_station": {
             0: None,
             1: None,
         },
-        "Paths": {0: [0, 1], 1: [1, 0]},
+        "Paths": {0: ["A", "B"], 1: ["B", "A"]},
         "J": [0, 1],
         "Jd": dict(),
-        "Josingle": {(0,1): [[0,1]]},
+        "Josingle": {("A","B"): [[0,1]]},
         "Jround": dict(),
         "Jtrack": dict(),
-        "Jswitch": {0: [{0: "out", 1: "in"}], 1: [{0: "in", 1: "out"}]}
+        "Jswitch": {"A": [{0: "out", 1: "in"}], "B": [{0: "in", 1: "out"}]}
     }
 
-    taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "blocks": {"0_1_0_1": 2, "1_0_0_1": 6,
-                                                         }, "stop": {"0_1": 1, "1_0": 1}, "res": 1}
+    taus = {"pass": {"0_A_B": 4, "1_B_A": 8},
+            "stop": {"0_B": 1, "1_A": 1}, "res": 1}
     timetable = {"tau": taus,
-                 "initial_conditions": {"0_0": 3, "1_1": 1},
-                 "penalty_weights": {"0_0": 2, "1_1": 0.5}}
+                 "initial_conditions": {"0_A": 3, "1_B": 1},
+                 "penalty_weights": {"0_A": 2, "1_B": 0.5}}
 
-    ####   simple problem #####
 
     prob = solve_linear_problem(train_sets, timetable, 10)
 
