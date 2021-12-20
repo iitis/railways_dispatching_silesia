@@ -304,7 +304,7 @@ def test_linear_solver_default_problem():
 
     assert prob.objective.value() == 0.4
 
-# @pytest.mark.skip(reason="Note satisfied one, wait for Ozlem to finish")
+
 def test_constraint_labels():
     """
                                             <- 2
