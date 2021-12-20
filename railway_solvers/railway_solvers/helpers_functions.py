@@ -161,3 +161,16 @@ def get_μ(LHS, RHS, d_max):
       The inequality should be checked for y = 0 and always hold for y = 1
       """
     return np.max([RHS + d_max - LHS, 1.0])
+
+
+def skip_station(j,s, train_sets):
+    """ determines whether the station s should be skipped for train j
+    while construtiong constrains, or delay variables
+     """
+    if "skip_station" not in train_sets:
+        return False
+    elif j not in train_sets["skip_station"]:
+        return False
+    elif s != train_sets["skip_station"][j]:
+        return False
+    return True

@@ -42,11 +42,7 @@ def test_pspan_pstay_p1track():
 
     # default
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-            2: "A",
-        },
+        "skip_station": {2: "A"},
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
@@ -95,11 +91,7 @@ def test_pspan_pstay_p1track():
     """
 
     train_sets_r = {
-        "skip_station": {
-            0: None,
-            1: None,
-            2: "A",
-        },
+        "skip_station": {2: "A"},
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": dict(),
@@ -156,11 +148,7 @@ def test_pswith():
 
 
     train_sets_r = {
-        "skip_station": {
-            0: None,
-            1: None,
-            2: "A",
-        },
+        "skip_station": {2: "A"},
         "Paths": {1: ["A", "B"], 2: ["B", "A"]},
         "J": [1, 2],
         "Jd": dict(),
@@ -209,10 +197,6 @@ def test_rolling_stock_circulation():
     """
 
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-        },
         "Paths": {0: ["A", "B"], 1: ["B", "A"]},
         "J": [0, 1],
         "Jd": dict(),
@@ -278,11 +262,7 @@ def test_qubic():
                  "penalty_weights": {"0_A": 2, "1_A": 1, "2_B": 1}}
 
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-            2: "A",
-        },
+        "skip_station": {2: "A"},
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": dict(),
@@ -385,11 +365,7 @@ def test_penalties_and_couplings():
 
 
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-            2: "A",
-        },
+        "skip_station": {2: "A"},
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
@@ -442,10 +418,6 @@ def test_minimal_span_two_trains():
                  "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-        },
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": {"A": {"B": [[0, 1]]}},
@@ -496,10 +468,6 @@ def  test_station_track_and_switches_two_trains():
                  "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-        },
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": dict(),
@@ -543,10 +511,6 @@ def test_deadlock_and_switches_two_trains():
 
     """
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-        },
         "Paths": {0: ["A", "B"], 1: ["B", "A"]},
         "J": [0, 1],
         "Jd": dict(),
@@ -654,11 +618,7 @@ def test_performing_Qmat():
     d_max = 10
 
     train_sets = {
-        "skip_station": {
-            0: None,
-            1: None,
-            2: "A",
-        },
+        "skip_station": {2: "A"},
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
@@ -692,11 +652,7 @@ def test_performing_Qmat():
 
 
     train_sets_rerouted = {
-        "skip_station": {
-            0: None,
-            1: None,
-            2: "A",
-        },
+        "skip_station": {2: "A"},
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": dict(),

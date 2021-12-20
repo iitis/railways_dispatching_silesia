@@ -13,6 +13,7 @@ from .helpers_functions import not_the_same_rolling_stock
 from .helpers_functions import previous_station
 from .helpers_functions import occurs_as_pair
 from .helpers_functions import penalty_weights
+from .helpers_functions import skip_station
 # variables
 
 # order variables
@@ -69,7 +70,7 @@ def order_var4track_occuparion_at_stations(order_vars, train_sets):
 
     order_var(j,jp,s) = 1
 
-       \              /
+
         \            /
          \   [s]    /
    ..jp-> ... j -> ............
@@ -210,7 +211,7 @@ def delay_varibles(train_sets, d_max):
     secondary_delays_vars = dict()
     for j in train_sets["J"]:
         for s in train_sets["Paths"][j]:
-            if s != train_sets["skip_station"][j]:
+            if not skip_station(j,s, train_sets):
 
                 dvar = pus.LpVariable.dicts(
                     "Delays", ([j], [s]), 0, d_max, cat="Integer"
@@ -338,7 +339,7 @@ def minimal_stay_constrin(j, s, problem, timetable, delay_var, train_sets):
 
     sp = previous_station(S[j], s)
     if sp is not None:
-        if s != train_sets["skip_station"][j]:
+        if s in delay_var[j]: #all provided delay var exists:
 
             LHS = delay_var[j][s]
             LHS += earliest_dep_time(S, timetable, j, s)

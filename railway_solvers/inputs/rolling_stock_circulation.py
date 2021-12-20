@@ -1,20 +1,29 @@
+"""
+At station B train 0 terminates and turns intro train 1 that starts there
+
+....0 -> ..................................0 <-> 1.......
+A                                            B
+
+"""
+
 train_sets = {
     "skip_station": {
         0: None,
         1: None,
     },
-    "Paths": {0: [0, 1], 1: [1, 0]},
+    "Paths": {0: ["A", "B"], 1: ["B", "A"]},
     "J": [0, 1],
     "Jd": dict(),
     "Josingle": dict(),
-    "Jround": {1: [[0,1]]},
+    "Jround": {"B": [[0,1]]},
     "Jtrack": dict(),
     "Jswitch": dict()
 }
 
-taus = {"pass": {"0_0_1": 4, "1_1_0": 8}, "prep": {"1_1": 2}, "stop":{"1_0": 0, "0_1": 0}}
+taus = {"pass": {"0_A_B": 4, "1_B_A": 8}, "prep": {"1_B": 2},
+        "stop":{"1_A": 0, "0_B": 0}}
 timetable = {"tau": taus,
-             "initial_conditions": {"0_0": 3, "1_1": 1},
-             "penalty_weights": {"0_0": 2, "1_1": 0.5}}
+             "initial_conditions": {"0_A": 3, "1_B": 1},
+             "penalty_weights": {"0_A": 2, "1_B": 0.5}}
 
 d_max = 10

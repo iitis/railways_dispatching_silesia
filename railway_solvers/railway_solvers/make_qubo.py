@@ -19,7 +19,7 @@ def indexing4qubo(train_sets, d_max):
     inds = []
     for j in train_sets["J"]:
         for s in S[j]:
-            if s != train_sets["skip_station"][j]:
+            if not skip_station(j,s, train_sets):
                 for d in range(d_max + 1):
                     inds.append({"j": j, "s": s, "d": d})
     return inds, len(inds)

@@ -33,9 +33,9 @@ def toy_problem_variables(train_sets, timetable, d_max):
     prob = solve_linear_problem(train_sets, timetable, d_max)
     S = train_sets["Paths"]
 
-    print("d_1, t_1", return_delay_and_acctual_time(S, timetable, prob, 0, 0))
-    print("d_2, t_2", return_delay_and_acctual_time(S, timetable, prob, 1, 0))
-    print("d_3, t_3", return_delay_and_acctual_time(S, timetable, prob, 2, 1))
+    print("d_1, t_1", return_delay_and_acctual_time(S, timetable, prob, 0, "A"))
+    print("d_2, t_2", return_delay_and_acctual_time(S, timetable, prob, 1, "A"))
+    print("d_3, t_3", return_delay_and_acctual_time(S, timetable, prob, 2, "B"))
     print(
         "d_1', t_1'",
         return_delay_and_acctual_time(
@@ -43,57 +43,74 @@ def toy_problem_variables(train_sets, timetable, d_max):
             timetable,
             prob,
             0,
-            1))
+            "B"))
 
     print("impact to objective t_1", impact_to_objective(
-        prob, timetable, 0, 0, d_max))
+        prob, timetable, 0, "A", d_max))
     print("impact to objective t_2", impact_to_objective(
-        prob, timetable, 1, 0, d_max))
+        prob, timetable, 1, "A", d_max))
     print("impact to objective t_3", impact_to_objective(
-        prob, timetable, 2, 1, d_max))
+        prob, timetable, 2, "B", d_max))
 
 
-taus = {"pass": {"0_0_1": 4, "1_0_1": 8, "2_1_0": 8},
-        "blocks": {"0_1_0_1": 2, "1_0_0_1": 6},
-        "stop": {"0_1": 1, "1_1": 1},
+"""
+                                        <- 2
+...............................................
+ [ A ]                              \ /    [ B ]
+.....................................c.........
+0 ->
+1 ->
+"""
+
+taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
+        "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+        "stop": {"0_B": 1, "1_B": 1},
         "res": 1
         }
 
 timetable = {"tau": taus,
-             "initial_conditions": {"0_0": 4, "1_0": 1, "2_1": 8},
-             "penalty_weights": {"0_0": 2, "1_0": 1, "2_1": 1}}
+             "initial_conditions": {"0_A": 4, "1_A": 1, "2_B": 8},
+             "penalty_weights": {"0_A": 2, "1_A": 1, "2_B": 1}}
 
+d_max = 10
 
 train_sets = {
     "skip_station": {
-        0: None,
-        1: None,
-        2: 0,
+        2: "A",  # we do not count train 2 leaving A
     },
-    "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
+    "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
     "J": [0, 1, 2],
-    "Jd": {0: {1: [[0, 1]]}, 1: {0: [[2]]}},
+    "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
     "Josingle": dict(),
     "Jround": dict(),
-    "Jtrack": {1: [[0, 1]]},
+    "Jtrack": {"B": [[0, 1]]},
     "Jswitch": dict(),
-    "add_swithes_at_s": [1]
+    "add_swithes_at_s": ["B"]
 }
+
+#rerouting
+
+"""
+1 ->                                       <- 2
+...............................................
+ [ A ]                              \ /    [ B ]
+.....................................c.........
+0 ->
+"""
+
 
 train_sets_rerouted = {
     "skip_station": {
-        0: None,
-        1: None,
-        2: 0,
+        2: "A",
     },
-    "Paths": {0: [0, 1], 1: [0, 1], 2: [1, 0]},
+    "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
     "J": [0, 1, 2],
     "Jd": dict(),
-    "Josingle": {(0,1): [[1,2]]},
+    "Josingle": {("A", "B"): [[1,2]]},
     "Jround": dict(),
-    "Jtrack": {1: [[0, 1]]},
-    "Jswitch": {0: [{1:"out", 2:"in"}], 1: [{1:"in", 2:"out"}]},
-    "add_swithes_at_s": [1]
+    "Jtrack": {"B": [[0, 1]]},
+    "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
+    "add_swithes_at_s": ["B"]
 }
 
 d_max = 10
