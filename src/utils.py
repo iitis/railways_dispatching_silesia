@@ -133,7 +133,7 @@ def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2
     # return common_blocks,direction
     return flatten(common_blocks),direction
 
-def is_train_passing_trh_station(train,station):
+def is_train_passing_thru_station(train,station):
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     stations = get_Paths(data)[train]
     return station in stations
@@ -144,20 +144,6 @@ def subsequent_station(train, station):
     assert station in sts, "The train does not pass trought this station!"
     return sts[sts.index(station)+1]
 
-# check shared stations between trains, does not check order
-def get_trains_with_same_stations(data):
-    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    path_dict  = get_Paths(data)
-    jdict = {}
-    for station in list(important_stations.keys()):
-        nextstation_dict = {}
-        trains = []
-        for train, path in list(path_dict.items()):
-            if station in path and path.index(station)!=len(path)-1:
-                trains += [train]
-                nextstation_dict[path[path.index(station)+1]] = trains
-        jdict[station] = nextstation_dict
-    return jdict
 
 # get list of train with pairs containing a train number and train number+9
 def get_trains_pair9(data):
@@ -199,7 +185,7 @@ def get_trains_depart_from_station():
     for station in important_stations.keys():
         trains_from_station[station] = []
         for train in trains_infor.keys():
-            if trains_infor[train][1]['path'].isin(important_stations[station]).any():
+            if trains_infor[train][1]['path'].isin(important_stations[station]).any() and trains_infor[train][1]['path'].isin(important_stations[station]).tolist()[-1]!=True:
                 trains_from_station[station].append(train)
     return trains_from_station
 # train_sets = {
