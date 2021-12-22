@@ -144,7 +144,6 @@ def subsequent_station(train, station):
     assert station in sts, "The train does not pass trought this station!"
     return sts[sts.index(station)+1]
 
-
 # get list of train with pairs containing a train number and train number+9
 def get_trains_pair9(data):
     trains = get_J(data)
