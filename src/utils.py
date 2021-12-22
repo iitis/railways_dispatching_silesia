@@ -187,14 +187,3 @@ def get_trains_depart_from_station():
             if trains_infor[train][1]['path'].isin(important_stations[station]).any() and trains_infor[train][1]['path'].isin(important_stations[station]).tolist()[-1]!=True:
                 trains_from_station[station].append(train)
     return trains_from_station
-# train_sets = {
-#
-# }
-if __name__ == "__main__":
-
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-    x = get_trains_with_same_stations(data)
-    print(x)
-    print('-------------')
-    for station, train in x.items():
-        print(station, train)
