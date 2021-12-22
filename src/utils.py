@@ -145,6 +145,9 @@ def is_train_passing_thru_station(train,station):
 def subsequent_station(train, station):
     sts = get_Paths(data)[train]
     assert station in sts, "The train does not pass trought this station!"
+    if sts.index(station)=len(sts)-1:
+        print('This is the last station')
+        return []
     return sts[sts.index(station)+1]
 
 # get list of train with pairs containing a train number and train number+9
