@@ -1,9 +1,11 @@
 """
 two trains, 0 and 1 are going one way A -> B test minimal span
 
-    A                            B
  1 ->
- 0 ->  --------------------------
+ 0 ->
+ ...................................
+  [ A  ]                    [ B ]
+
 """
 
 
@@ -15,10 +17,6 @@ timetable = {"tau": taus,
              "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
 train_sets = {
-    "skip_station": {
-        0: None,
-        1: None,
-    },
     "Paths": {0: ["A", "B"], 1: ["A", "B"]},
     "J": [0, 1],
     "Jd": {"A": {"B": [[0, 1]]}},

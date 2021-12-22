@@ -1,17 +1,20 @@
 """
 Test single track at station and swithes constrain, switches simplified
 
+stations [A]
+
 swith - c
 
-tracks - ......  \
+tracks - ......
 
 
-                                              /
-  1 ->                                       /
-..0 -> ...................................  c  .0-> ..  1->.....
+                                                  .
+  1 ->                                          .
+ 0 ->                                         .
+..........................................  c  .0-> ..  1->.....
+ [ A ]                                           [  B  ]
 
-  A                                                  B
-                                        simplifies swith condition
+                                simplifies swith condition at B
 
 """
 
@@ -22,10 +25,6 @@ timetable = {"tau": taus,
              "penalty_weights": {"0_A": 2, "1_A": 0.5}}
 
 train_sets = {
-    "skip_station": {
-        0: None,
-        1: None,
-    },
     "Paths": {0: ["A", "B"], 1: ["A", "B"]},
     "J": [0, 1],
     "Jd": dict(),

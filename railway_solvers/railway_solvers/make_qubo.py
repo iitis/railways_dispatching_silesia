@@ -112,8 +112,8 @@ def P1track(timetable, k, k1, jsd_dicts, train_sets):
     train_sets -- train set dict containing trains paths
 
          ......                            ... <-j2 ..
-    [s1]       \                          /          [s2]
-       ..j1 ->.....................................
+        [s1]    .                        .      [s2]
+       ..j1 ->.......................................
 
      """
 
@@ -245,9 +245,9 @@ def Pswitch(timetable, k, k1, inds, train_sets):
     train_sets -- train set dict containing trains paths
 
     j1 -> --------------
-    [s1]                \
+    [s1]                .
     j2 -> -------------- c ----
-                          \  [s2]
+                          .  [s2]
                            .......
     """
 

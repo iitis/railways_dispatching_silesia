@@ -2,15 +2,11 @@
 At station B train 0 terminates and turns intro train 1 that starts there
 
 ....0 -> ..................................0 <-> 1.......
-A                                            B
+ [ A ]                                      [  B  ]
 
 """
 
 train_sets = {
-    "skip_station": {
-        0: None,
-        1: None,
-    },
     "Paths": {0: ["A", "B"], 1: ["B", "A"]},
     "J": [0, 1],
     "Jd": dict(),

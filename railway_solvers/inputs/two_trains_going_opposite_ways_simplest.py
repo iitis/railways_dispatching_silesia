@@ -2,22 +2,19 @@
 Two trains going opposite direction on single track line
 and swithes constrain
 
+stations - [ A ]
+
 swith - c
 
-tracks - ......  \
-                  \
+tracks - ......
 
 
-..........                                        .. <- 1 ....
-    A       \                                    /      B
+..........                                        .. <- 1 ...
+  [ A ]    .                                     .    [  B ]
 ..0 -> .... c ................................  c  ..........
 
 """
 train_sets = {
-    "skip_station": {
-        0: None,
-        1: None,
-    },
     "Paths": {0: ["A", "B"], 1: ["B", "A"]},
     "J": [0, 1],
     "Jd": dict(),

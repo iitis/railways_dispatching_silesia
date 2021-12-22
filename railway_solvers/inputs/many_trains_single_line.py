@@ -4,7 +4,7 @@ trains number according to PLK rules (add one way, even another)
 
 
   --10, 12, 14, 16 --> -----------------------------------------
-         [ A ]         /                  \           [ B ]
+         [ A ]         .                  .           [ B ]
    -------------------                     --<- 11, 13, 15, 17--
 
 
