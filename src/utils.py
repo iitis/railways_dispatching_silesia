@@ -50,7 +50,7 @@ def get_J(data):
     train_dict = timetable_to_train_dict(data)
     return list(train_dict.keys())
 
-def get_all_station():
+def get_all_important_station():
     return list(np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()].keys())
 
 # return a dictonary of important stations
