@@ -15,8 +15,8 @@ def test_5_trains_all_cases():
     """
     We have the following trains: 21,22,23,24,25
     and stations: A,B,C,D    [  ] - corresponds to the platform
-    and tracks: ----  \    .....
-                       \
+    and tracks: ----     .....
+
     the way trains go ->
     22 <-> 23 means that 22 ends, and then starts back as 23
     (rolling stock circ)
@@ -26,12 +26,12 @@ def test_5_trains_all_cases():
 
 
        -21, 22, -> --------------------------21 ->-- <-24--
-       [  A   ]        [ B  ]         \ /       [ C ]
-       -------------------------<- 23------- 22 <-> 23 ---
-                                      /
-            /-- 25-> --\             /
-       -----  [ D  ]    ----<- 24---
-            \ ------- /
+       [  A   ]        [ B  ]         .   .       [ C ]
+       -------------------------<- 23--c ---- 22 <-> 23 ---
+                                      .
+          . -- 25-> - .             .
+      --- .  [ D  ]   . ----<- 24---
+            .........
 
     """
 
@@ -162,7 +162,7 @@ def test_many_trains_single_line():
 
 
       --10, 12, 14, 16 --> -----------------------------------------
-             [ A ]         /                  \           [ B ]
+             [ A ]         .                  .           [ B ]
        -------------------                     --<- 11, 13, 15, 17--
 
 

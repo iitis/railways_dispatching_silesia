@@ -37,7 +37,7 @@ def order_var4single_line_constrain(order_vars, train_sets):
 
     order_var(j,jp,s,sp) = 1
     .......                            ... <-jp ..
-    [s]    \                          /       [sp]
+    [s]     .                        .       [sp]
     ...........j ->..............................
 
     """
@@ -71,8 +71,8 @@ def order_var4track_occuparion_at_stations(order_vars, train_sets):
     order_var(j,jp,s) = 1
 
 
-        \            /
-         \   [s]    /
+        .            .
+         .   [s]    .
    ..jp-> ... j -> ............
     """
     for s in train_sets["Jtrack"].keys():
@@ -90,9 +90,9 @@ def order_var4switch_occuparion(order_vars, train_sets):
     order_var(j,jp,s) = 1  (j goes first)
 
                  ..........
-                /
+                .
     ..jp ->....c ....
-       [s]   /
+       [s]   .
     ...... j
 
 
@@ -102,11 +102,11 @@ def order_var4switch_occuparion(order_vars, train_sets):
 
     [sp]
     .............jp->...
-                        \   .......
-                         \ /  [s]
+                        .   .......
+                         . .  [s]
                           c........
-    [spp]                /
-    .jpp ->.............
+    [spp]                .
+    .jpp ->..............
 
     """
 
@@ -175,13 +175,13 @@ def get_y_j_jp_s_sp(y, j, jp, s, sp):
 
     order_var(j,jp,s,sp) = 1
     .......                            ... <-jp ..
-    [s]    \                          /       [sp]
+    [s]    .                          .       [sp]
     ...........j ->..............................
 
 
     order_var(j,jp,s,sp) = 0 = 1 - order_var(jp,j,sp,s)
     .......                            ...........
-    [s]    \                          /       [sp]
+    [s]    .                          .       [sp]
     ...j ->...................<- jp ..............
 
     """
@@ -316,7 +316,7 @@ def single_line(problem, timetable, delay_var, y, train_sets, d_max):
     """adds single line condition to the pulp problem
 
     .......                            ... <-j2 ..
-    [s1]   \                          /       [s2]
+    [s1]   .                          .       [s2]
     ..j1 ->.......................................
 
     """
@@ -377,8 +377,8 @@ def keep_trains_order(
      we requires y(j,j′,s′) = y(j,j′,s)
 
      .................
-                       \
-                        \   [s]
+                       .
+                        .   [s]
      ....j1 -> ...j2 ->..............
      [s']
      """
@@ -435,7 +435,7 @@ def trains_order_at_s(
 def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
     """adds track occupation condition to the pulp problem
     ..j1 ->.....
-                \   [s]
+                .   [s]
     ..j2 ->..............
 
     """
@@ -531,9 +531,9 @@ def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
     """adds switch occupation condition to the pulp problem
 
     j1 -> --------------
-    [s1]                \
+    [s1]                .
     j2 -> -------------- c ----
-                          \  [s2]
+                          .  [s2]
                            .......
 
     """

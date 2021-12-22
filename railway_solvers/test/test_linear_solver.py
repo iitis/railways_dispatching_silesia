@@ -80,15 +80,17 @@ def test_deadlock_and_switches_two_trains():
     Two trains going opposite direction on single track line
     and swithes constrain
 
+    station - [ A ]
+
     swith - c
 
-    tracks - ......  \
-                      \
+    tracks - ......
 
 
-    ..........                                        .. <- 1 ....
-        A       \                                    /      B
-    ..0 -> .... c ................................  c  ..........
+
+    ..........                                        .. <- 1 ..
+     [ A ]     .                                    .     [ B ]
+    .. 0 -> .... c ..............................  c  ..........
 
     """
     train_sets = {
@@ -128,7 +130,7 @@ def test_rolling_stock_circulation():
     At station B train 0 terminates and turns intro train 1 that starts there
 
     ....0 -> ..................................0 <-> 1.......
-    A                                            B
+    [ A ]                                       [  B  ]
 
     """
 
@@ -165,17 +167,19 @@ def  test_station_track_and_switches_two_trains():
     """
     Test single track at station and swithes constrain, switches simplified
 
+    station [ A ]
+
     swith - c
 
-    tracks - ......  \
+    tracks - ......
 
-
-                                                  /
-      1 ->                                       /
+                                                   .
+                                                  .
+      1 ->                                       .
     ..0 -> ...................................  c  .0-> ..  1->.....
-
-      A                                                  B
-                                            simplifies swith condition
+                                                         [ B ]
+     [ A  ]
+                                 simplifies swith condition at B
 
     """
 
@@ -216,7 +220,7 @@ def test_linear_solver_default_problem():
     """
                                             <- 2
     ...............................................
-     [ A ]                              \ /    [ B ]
+     [ A ]                             .   .  [ B ]
     .....................................c.........
     0 ->
     1 ->
@@ -253,7 +257,7 @@ def test_linear_solver_default_problem():
     """
     1 ->                                       <- 2
     ...............................................
-     [ A ]                              \ /    [ B ]
+     [ A ]                             .   .  [ B ]
     .....................................c.........
     0 ->
     """
@@ -309,7 +313,7 @@ def test_constraint_labels():
     """
                                             <- 2
     ...............................................
-     [ A ]                              \ /    [ B ]
+     [ A ]                             .   .  [ B ]
     .....................................c.........
     0 ->
     1 ->
@@ -346,7 +350,7 @@ def test_constraint_labels():
     """
     1 ->                                       <- 2
     ...............................................
-     [ A ]                              \ /    [ B ]
+     [ A ]                             .   .    [ B ]
     .....................................c.........
     0 ->
     """
