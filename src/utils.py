@@ -83,13 +83,13 @@ def get_blocks_b2win_station4train(train,station1,station2, verbose = True):
     blocksb2win = []
     rev = False
     if station1 not in sts and station2 in sts:
-        print{'Warning: station {} not in the train set'.format(station1)}
+        print('Warning: station {} not in the train set'.format(station1))
         return [],None
     if station2 not in sts and station1 in sts:
-        print{'Warning: station {} not in the train set'.format(station2)}
+        print('Warning: station {} not in the train set'.format(station2))
         return [],None
     if station2 not in sts and station1 not in sts:
-        print{'Warning: station {} and {} not in the train set'.format(station1,station2)}
+        print('Warning: station {} and {} not in the train set'.format(station1,station2))
         return [],None
     # assert station1 in sts, 'station {} not in the train set'.format(station1)
     # assert station2 in sts, 'station {} not in the train set'.format(station2)
@@ -152,6 +152,7 @@ def is_train_passing_thru_station(train,station):
 
 # get subsequent station for a given train
 def subsequent_station(train, station):
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     sts = get_Paths(data)[train]
     if station not in sts:
         print( "The train does not pass trought this station!")
