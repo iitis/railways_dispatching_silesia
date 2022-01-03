@@ -82,8 +82,17 @@ def get_blocks_b2win_station4train(train,station1,station2, verbose = True):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     blocksb2win = []
     rev = False
-    assert station1 in sts, 'station {} not in the train set'.format(station1)
-    assert station2 in sts, 'station {} not in the train set'.format(station2)
+    if station1 not in sts and station2 in sts:
+        print{'Warning: station {} not in the train set'.format(station1)}
+        return [],None
+    if station2 not in sts and station1 in sts:
+        print{'Warning: station {} not in the train set'.format(station2)}
+        return [],None
+    if station2 not in sts and station1 not in sts:
+        print{'Warning: station {} and {} not in the train set'.format(station1,station2)}
+        return [],None
+    # assert station1 in sts, 'station {} not in the train set'.format(station1)
+    # assert station2 in sts, 'station {} not in the train set'.format(station2)
     if sts.index(station1) > sts.index(station2):
         if verbose == True:
             print("Warning: stations out of order")
