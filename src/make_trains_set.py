@@ -2,7 +2,7 @@ from time_table_check import *
 import pandas as pd
 from utils import *
 
-def josingle(imp_stations = None):
+def josingle(path_to_data, imp_stations = None):
 
     init_josingle = {}
 
@@ -12,26 +12,26 @@ def josingle(imp_stations = None):
         imp_stations_list = get_all_important_station()
 
 
-    trains_at_stations = get_trains_depart_from_station()
+    trains_at_stations = get_trains_depart_from_station(path_to_data)
 
     for s in imp_stations_list:
 
         for j in trains_at_stations[s]:
 
-            s_prime = subsequent_station(j, s)
+            s_prime = subsequent_station(path_to_data, j, s)
 
             if s_prime in imp_stations_list:
 
                 for j_prime in trains_at_stations[s]:
 
-                    if j_prime != j and s == subsequent_station(j_prime, s_prime):
+                    if j_prime != j and s == subsequent_station(path_to_data, j_prime, s_prime):
 
 
                         if (s_prime , s) not in init_josingle.keys():
                             # oterwise the pair has already been added in the previous steps
 
-                            path = get_blocks_b2win_station4train(j, s, s_prime, verbose = False)[0]
-                            path_j_prime = get_blocks_b2win_station4train(j_prime, s_prime, s, verbose = False)[0]
+                            path = get_blocks_b2win_station4train(path_to_data, j, s, s_prime, verbose = False)[0]
+                            path_j_prime = get_blocks_b2win_station4train(path_to_data, j_prime, s_prime, s, verbose = False)[0]
 
 
                             if len(path) != 0 and path == list(reversed(path_j_prime)):
@@ -51,7 +51,7 @@ def josingle(imp_stations = None):
 
 if __name__ == "__main__":
 
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-
+    path_to_data = "../data/train_schedule.csv"
+    data = pd.read_csv(path_to_data, sep = ";")
     imp_stations = ['KL', 'Mi', 'MJ']
-    print(josingle(imp_stations))
+    print(josingle(path_to_data, imp_stations))

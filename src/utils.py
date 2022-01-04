@@ -62,7 +62,8 @@ def get_Paths(data):
     return paths_per_train
 
 # get common station betwenn two trains, does not check order
-def check_common_station(train1,train2,data):
+def check_common_station(path_to_data, train1, train2):
+    data = pd.read_csv(path_to_data, sep = ";")
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
@@ -76,8 +77,8 @@ def get_block_station(block):
     return [key for key, value in important_stations.items() if block in value][0]
 
 # get common blocks between stations, in order of the time table
-def get_blocks_b2win_station4train(train,station1,station2, verbose = True):
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def get_blocks_b2win_station4train(path_to_data, train,station1,station2, verbose = True):
+    data = pd.read_csv(path_to_data, sep = ";")
     sts = get_Paths(data)[train]
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     blocksb2win = []
@@ -145,15 +146,17 @@ def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2
     # return common_blocks,direction
     return flatten(common_blocks),direction
 
-def is_train_passing_thru_station(train,station):
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def is_train_passing_thru_station(path_to_data, train, station):
+    data = pd.read_csv(path_to_data, sep = ";")
     stations = get_Paths(data)[train]
     return station in stations
 
 # get subsequent station for a given train
-def subsequent_station(train, station):
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def subsequent_station(path_to_data, train, station):
+    data = pd.read_csv(path_to_data, sep = ";")
+    
     sts = get_Paths(data)[train]
+
     if station not in sts:
         print( "The train does not pass trought this station!")
         return None
@@ -163,7 +166,8 @@ def subsequent_station(train, station):
     return sts[sts.index(station)+1]
 
 # get list of train with pairs containing a train number and train number+9
-def get_trains_pair9(data):
+def get_trains_pair9(path_to_data):
+    data = pd.read_csv(path_to_data, sep = ";")
     trains = get_J(data)
     pair_lists = []
     for train in trains:
@@ -171,7 +175,8 @@ def get_trains_pair9(data):
             pair_lists+=[[train,train*10+9]]
     return pair_lists
 # return dict
-def get_jround(data):
+def get_jround(path_to_data):
+    data = pd.read_csv(path_to_data, sep = ";")
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     pair_lists = get_trains_pair9(data)
     jround = {}
@@ -193,8 +198,8 @@ def get_jround(data):
             jround[station]=[pair]
     return jround
 
-def get_trains_depart_from_station():
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def get_trains_depart_from_station(path_to_data):
+    data = pd.read_csv(path_to_data, sep = ";")
     trains_infor = timetable_to_train_dict(data)
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
 
@@ -205,3 +210,9 @@ def get_trains_depart_from_station():
             if trains_infor[train][1]['path'].isin(important_stations[station]).any() and trains_infor[train][1]['path'].isin(important_stations[station]).tolist()[-1]!=True:
                 trains_from_station[station].append(train)
     return trains_from_station
+
+
+if __name__ == "__main__":
+
+    path_to_data = "../data/train_schedule.csv"
+    print(get_J(path_to_data))
