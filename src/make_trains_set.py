@@ -54,4 +54,5 @@ if __name__ == "__main__":
     path_to_data = "../data/train_schedule.csv"
     data = pd.read_csv(path_to_data, sep = ";")
     imp_stations = ['KL', 'Mi', 'MJ']
+    #imp_stations = ['KO', 'CB']
     print(josingle(path_to_data, imp_stations))
