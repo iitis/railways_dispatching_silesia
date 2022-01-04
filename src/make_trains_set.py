@@ -51,7 +51,8 @@ def josingle(data, imp_stations = None):
 
 if __name__ == "__main__":
 
-    data = pd.read_csv("../data/train_schedule_1.csv", sep = ";")
-    # imp_stations = ['KL', 'Mi', 'MJ']
-    imp_stations = ['KO', 'CB']
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    #imp_stations = ['KL', 'Mi', 'MJ', 'KO', 'CB']
+    imp_stations = ['KL', 'Mi', 'MJ']
+
     print(josingle(data, imp_stations))
