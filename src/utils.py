@@ -96,7 +96,7 @@ def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True
         if verbose == True:
             print("Warning: stations out of order")
         rev = True
-        return blocksb2win,reversed
+        return blocksb2win, reversed
     else:
         blocks_list = train_time_table(data, train)['path'].tolist()
         i = 0
@@ -115,12 +115,12 @@ def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True
                 blocksb2win.pop(-1)
         return blocksb2win,rev
 
-def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2,verbose = False):
+def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,station2,verbose = False):
     blocks_order = {}
     for train in [train1,train2]:
-        blocks,rev = get_blocks_b2win_station4train(train,station1,station2,verbose)
+        blocks,rev = get_blocks_b2win_station4train(data,train,station1,station2,verbose)
         if rev:
-            blocks,_ = get_blocks_b2win_station4train(train,station2,station1,verbose)
+            blocks,_ = get_blocks_b2win_station4train(data, train,station2,station1,verbose)
         blocks_order[train] = [blocks,rev]
     blocks_2check = blocks_order[train1][0]
     common_blocks = []
@@ -154,10 +154,10 @@ def subsequent_station(data, train, station):
     sts = get_Paths(data)[train]
 
     if station not in sts:
-        print( "The train does not pass trought this station!")
+        # print( "The train does not pass trought this station!")
         return None
     if sts.index(station)==len(sts)-1:
-        print('This is the last station')
+        # print('This is the last station')
         return None
     return sts[sts.index(station)+1]
 
