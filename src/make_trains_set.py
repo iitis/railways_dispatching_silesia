@@ -17,7 +17,7 @@ def dict_generate(data, j, j_prime, s, s_prime, init_josingle):
         assert 'partial common path is not supported'
 
 
-def station_and_train_detail(imp_stations):
+def station_and_train_detail(data, imp_stations):
     if imp_stations != None:
         imp_stations_list = imp_stations
     else:
@@ -29,7 +29,7 @@ def station_and_train_detail(imp_stations):
 def josingle(data, imp_stations = None):
 
     init_josingle = {}
-    imp_stations_list, trains_at_stations = station_and_train_detail(imp_stations)
+    imp_stations_list, trains_at_stations = station_and_train_detail(data, imp_stations)
 
     for s in imp_stations_list:
 
