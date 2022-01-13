@@ -58,17 +58,17 @@ def get_Paths(data):
     trains = get_J(data)
     paths_per_train = {}
     for train in trains:
-        paths_per_train[train] = check_important_stations(train)
+        paths_per_train[train] = check_important_stations(data, train)
     return paths_per_train
 
 # get common station betwenn two trains, does not check order
-def check_common_station(train1,train2,data):
+def check_common_station(data, train1, train2):
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
 # get common blocks between trains, does not check order
-def check_common_blocks_elements(train1,train2):
-    return common_elements(list(train_time_table(train1)['path']),list(train_time_table(train2)['path']))
+def check_common_blocks_elements(data , train1, train2):
+    return common_elements(list(train_time_table(data, train1)['path']),list(train_time_table(data, train2)['path']))
 
 # check which important station the block belongs to
 def get_block_station(block):
@@ -85,20 +85,19 @@ def blocks_list_4station(train,station,data):
     return common_elements(station_blocks,time_table_blocks)
 
 # get common blocks between stations, in order of the time table
-def get_blocks_b2win_station4train(train,station1,station2, verbose = True):
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True):
     sts = get_Paths(data)[train]
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     blocksb2win = []
     rev = False
     if station1 not in sts and station2 in sts:
-        print{'Warning: station {} not in the train set'.format(station1)}
+        print('Warning: station {} not in the train set'.format(station1))
         return [],None
     if station2 not in sts and station1 in sts:
-        print{'Warning: station {} not in the train set'.format(station2)}
+        print('Warning: station {} not in the train set'.format(station2))
         return [],None
     if station2 not in sts and station1 not in sts:
-        print{'Warning: station {} and {} not in the train set'.format(station1,station2)}
+        print('Warning: station {} and {} not in the train set'.format(station1,station2))
         return [],None
     # assert station1 in sts, 'station {} not in the train set'.format(station1)
     # assert station2 in sts, 'station {} not in the train set'.format(station2)
@@ -106,9 +105,9 @@ def get_blocks_b2win_station4train(train,station1,station2, verbose = True):
         if verbose == True:
             print("Warning: stations out of order")
         rev = True
-        return blocksb2win,reversed
+        return blocksb2win, reversed
     else:
-        blocks_list = train_time_table(train)['path'].tolist()
+        blocks_list = train_time_table(data, train)['path'].tolist()
         i = 0
         block = blocks_list[i]
         while block not in important_stations[station1]:
@@ -125,12 +124,12 @@ def get_blocks_b2win_station4train(train,station1,station2, verbose = True):
                 blocksb2win.pop(-1)
         return blocksb2win,rev
 
-def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2,verbose = False):
+def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,station2,verbose = False):
     blocks_order = {}
     for train in [train1,train2]:
-        blocks,rev = get_blocks_b2win_station4train(train,station1,station2,verbose)
+        blocks,rev = get_blocks_b2win_station4train(data,train,station1,station2,verbose)
         if rev:
-            blocks,_ = get_blocks_b2win_station4train(train,station2,station1,verbose)
+            blocks,_ = get_blocks_b2win_station4train(data, train,station2,station1,verbose)
         blocks_order[train] = [blocks,rev]
     blocks_2check = blocks_order[train1][0]
     common_blocks = []
@@ -154,19 +153,20 @@ def get_common_blocks_and_direction_b2win_trains(train1,train2,station1,station2
     # return common_blocks,direction
     return flatten(common_blocks),direction
 
-def is_train_passing_thru_station(train,station):
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def is_train_passing_thru_station(data, train, station):
     stations = get_Paths(data)[train]
     return station in stations
 
 # get subsequent station for a given train
-def subsequent_station(train, station):
+def subsequent_station(data, train, station):
+    
     sts = get_Paths(data)[train]
+
     if station not in sts:
-        print( "The train does not pass trought this station!")
+        # print( "The train does not pass trought this station!")
         return None
     if sts.index(station)==len(sts)-1:
-        print('This is the last station')
+        # print('This is the last station')
         return None
     return sts[sts.index(station)+1]
 
@@ -184,13 +184,13 @@ def get_jround(data):
     pair_lists = get_trains_pair9(data)
     jround = {}
     for pair in pair_lists:
-        a = train_time_table(pair[0])['path'].tolist()[0] == train_time_table(pair[1])['path'].tolist()[-1]
-        b = train_time_table(pair[1])['path'].tolist()[0] == train_time_table(pair[0])['path'].tolist()[-1]
+        a = train_time_table(data, pair[0])['path'].tolist()[0] == train_time_table(data, pair[1])['path'].tolist()[-1]
+        b = train_time_table(data, pair[1])['path'].tolist()[0] == train_time_table(data, pair[0])['path'].tolist()[-1]
         if a:
-            block = (train_time_table(pair[0])['path'].tolist()[0])
+            block = (train_time_table(data, pair[0])['path'].tolist()[0])
             pair = list(reversed(pair))
         elif b:
-            block = (train_time_table(pair[1])['path'].tolist()[0])
+            block = (train_time_table(data, pair[1])['path'].tolist()[0])
         else:
             print("Something is wrong")
             exit(1)
@@ -201,8 +201,8 @@ def get_jround(data):
             jround[station]=[pair]
     return jround
 
-def get_trains_depart_from_station():
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def get_trains_depart_from_station(data):
+
     trains_infor = timetable_to_train_dict(data)
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
 
@@ -213,3 +213,10 @@ def get_trains_depart_from_station():
             if trains_infor[train][1]['path'].isin(important_stations[station]).any() and trains_infor[train][1]['path'].isin(important_stations[station]).tolist()[-1]!=True:
                 trains_from_station[station].append(train)
     return trains_from_station
+
+
+if __name__ == "__main__":
+
+    path_to_data = "../data/train_schedule.csv"
+    data = pd.read_csv(path_to_data, sep = ";")
+    print(get_J(data))

@@ -66,19 +66,18 @@ def get_default_dir(path_column):
         default_dir = 'default_B-A'
     return default_dir
 
-def train_time_table(train):
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+def train_time_table(data, train):
     train_dict = timetable_to_train_dict(data)
     time_table = train_dict[train][1]
     return time_table
 
-def get_arrdep(train):
-    time_table = train_time_table(train)
+def get_arrdep(data, train):
+    time_table = train_time_table(data, train)
     arrdep = time_table.loc[:,['Arr','Dep','Approx_enter']]
     return arrdep
 
-def get_schmes(train,return_index = False):
-    arrdep = get_arrdep(train)
+def get_schmes(data, train, return_index = False):
+    arrdep = get_arrdep(data, train)
     indexs = list(arrdep.dropna(how='all').index)
     a = indexs.copy()
     b_list = []
@@ -88,17 +87,17 @@ def get_schmes(train,return_index = False):
         return b_list, indexs
     return b_list
 
-def get_arr_dep_vals(train):
-    arrdep = get_arrdep(train)
+def get_arr_dep_vals(data, train):
+    arrdep = get_arrdep(data, train)
     short_list = arrdep.dropna(how='all')
     arr_dep_vals = []
     for i in range(len(short_list)):
         arr_dep_vals+=[short_list.iloc[i].tolist()]
     return arr_dep_vals
 
-def check_important_stations(train):
+def check_important_stations(data, train):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    time_table = train_time_table(train)
+    time_table = train_time_table(data, train)
     blocks = time_table['path']
     station_list = []
     for block in blocks:
