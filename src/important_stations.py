@@ -1,6 +1,8 @@
 import numpy as np
 
-important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
+important_stations = {
+    
+"KZ":['"KZ", "ST", 1, "(1)"',
 '"KZ", "ST", 2, "(1)"',
 '"KZ", "ST", 3, "(2)"',
 '"KZ", "ST", 4, "(2)"'],
@@ -43,7 +45,6 @@ important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 '"GLC", "ST", 9, "(4)"',
 '"GLC", "ST", 11, "(4)"'],
 
-
 "CM":['"CM", "ST", 1, "(1)"',
 '"CM", "ST", 2, "(1)"'],
 
@@ -61,7 +62,7 @@ important_stations = {"KZ":['"KZ", "ST", 1, "(1)"',
 '"Mi", "ST", 2, "(1)"'],
 
 "MJ":['"MJ", "ST", 2, "(1)"',
-'"MJ", "ST", 1, "(1)"'],
+'"MJ", "ST", 1, "(1)"']
 }
 
 aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',

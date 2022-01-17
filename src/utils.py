@@ -75,13 +75,13 @@ def get_block_station(block):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     return [key for key, value in important_stations.items() if block in value][0]
 
-def blocks_list_4station(train,station,data):
+def blocks_list_4station(data, train,station):
     sts = get_Paths(data)[train]
     if station not in sts:
         print('Warning: this train does not pass through this station!')
         return []
     station_blocks = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()][station]
-    time_table_blocks = train_time_table(train)['path'].tolist()
+    time_table_blocks = train_time_table(data, train)['path'].tolist()
     return common_elements(station_blocks,time_table_blocks)
 
 # get common blocks between stations, in order of the time table
@@ -220,3 +220,4 @@ if __name__ == "__main__":
     path_to_data = "../data/train_schedule.csv"
     data = pd.read_csv(path_to_data, sep = ";")
     print(get_J(data))
+    print(len(data['Unnamed: 0']))
