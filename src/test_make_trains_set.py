@@ -16,6 +16,10 @@ print(f'\nblock between stations {station1} and {station2} for train {train1}', 
 # the last is not yet working (now working)
 print(f'\ncommon blocks between stations {station1} and {station2} for train {train1} and train {train2}', get_common_blocks_and_direction_b2win_trains(data,train1, train2,station1,station2))
 print(f'\ntrains departuring from station {station1}',get_trains_depart_from_station(data)[station1])
-print(f'\nbetween stations {station1} and {station2} the following trains shares a single track while going in opposite direction as follows:')
+print(f'\nbetween stations {imp_stations} the following trains shares a single track while going in opposite direction as follows:')
 
 print(josingle(data, imp_stations))
+print()
+print(f'\nfor important station {imp_stations} the list of trains that occupy particular station block is given below:')
+print(jtrack(data, imp_stations))
+print()

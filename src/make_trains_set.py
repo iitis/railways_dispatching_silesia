@@ -75,10 +75,8 @@ def jtrack(data, imp_stations = None):
             current_blocks = []
 
             for j in trains_at_stations[s]:
-    
                 b = blocks_list_4station(data,j,s)
                 if b not in block_exclusion_list:
-
                     if b in current_blocks:
                         i = current_blocks.index(b)+1
                         vs[i].append(j)  
