@@ -401,6 +401,7 @@ def previous_train_from_Jround(set, s, j):
         if j in leave_trains:
             i = leave_trains.index(j)
             previous_train = set[s][i][0]
+    return previous_train 
 
 
 
