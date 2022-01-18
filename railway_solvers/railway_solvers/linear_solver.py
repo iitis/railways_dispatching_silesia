@@ -394,12 +394,12 @@ def keep_trains_order(
                 )
 
 
-def previous_train_from_Jround(set, s, jp):
+def previous_train_from_Jround(set, s, j):
     previous_train = None
     if s in set:
         leave_trains = [el[1] for el in set[s]]
-        if jp in leave_trains:
-            i = leave_trains.index(jp)
+        if j in leave_trains:
+            i = leave_trains.index(j)
             previous_train = set[s][i][0]
 
 
