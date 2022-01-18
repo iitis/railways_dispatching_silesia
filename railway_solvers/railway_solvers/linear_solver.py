@@ -27,7 +27,7 @@ def order_variables(train_sets):
     order_var4single_line_constrain(order_vars, train_sets)
     order_var4minimal_span_constrain(order_vars, train_sets)
     order_var4track_occuparion_at_stations(order_vars, train_sets)
-    order_var4switch_occuparion(order_vars, train_sets)
+    order_var4switch_occupation(order_vars, train_sets)
     return order_vars
 
 
@@ -81,7 +81,7 @@ def order_var4track_occuparion_at_stations(order_vars, train_sets):
                 update_y_j_jp_s(order_vars, j, jp, s)
 
 
-def order_var4switch_occuparion(order_vars, train_sets):
+def order_var4switch_occupation(order_vars, train_sets):
     """add to nested order_vars dict order variables for track occupation
     c - switch
 
@@ -394,6 +394,16 @@ def keep_trains_order(
                 )
 
 
+def previous_train_from_Jround(set, s, jp):
+    previous_train = None
+    if s in set:
+        leave_trains = [el[1] for el in set[s]]
+        if jp in leave_trains:
+            i = leave_trains.index(jp)
+            previous_train = set[s][i][0]
+
+
+
 def trains_order_at_s(
     sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max
 ):
@@ -401,12 +411,22 @@ def trains_order_at_s(
 
     S = train_sets["Paths"]
 
+    j_r = previous_train_from_Jround(train_sets["Jround"], s, jp)
+    if j_r is not None: # this is to deal with the occupyin station and round
+        print("aaaaaaaaaaaaaa")
+        spp = previous_station(S[j_r], s)
+        LHS = earliest_dep_time(S, timetable, j_r, spp)
+        LHS += tau(
+                timetable, "pass", first_train=j_r, first_station=spp, second_station=s
+                )
+
     # getting t in
-    if sp is not None:
+    elif sp is not None:
         LHS = earliest_dep_time(S, timetable, jp, sp)
         LHS += tau(
             timetable, "pass", first_train=jp, first_station=sp, second_station=s
         )
+
     else:
         # this means that we do not have a previous station
         LHS = earliest_dep_time(S, timetable, jp, s)
@@ -527,7 +547,7 @@ def switch_occ(
         problem += LHS >= RHS, f"switch_{jp}_{jpp}_{s}_{sp}_{spp}"
 
 
-def switch_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
+def switch_occupation(problem, timetable, delay_var, y, train_sets, d_max):
     """adds switch occupation condition to the pulp problem
 
     j1 -> --------------
@@ -622,7 +642,7 @@ def create_linear_problem(train_sets, timetable, d_max):
     single_line(prob, timetable, secondary_delays_var, y, train_sets, d_max)
     track_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max)
     rolling_stock_circ(prob, timetable, secondary_delays_var, train_sets, d_max)
-    switch_occuparion(prob, timetable, secondary_delays_var, y, train_sets, d_max)
+    switch_occupation(prob, timetable, secondary_delays_var, y, train_sets, d_max)
 
     # objective is added
     objective(prob, timetable, secondary_delays_var, train_sets, d_max)

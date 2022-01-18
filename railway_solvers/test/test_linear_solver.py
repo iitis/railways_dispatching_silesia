@@ -215,6 +215,141 @@ def  test_station_track_and_switches_two_trains():
     assert prob.objective.value() == pytest.approx(0.3)
 
 
+
+def  test_station_track_and_circulation():
+    """
+    test station trach and circulation
+
+    station [ A ]
+
+    swith - c
+
+    tracks - ......
+
+                                    < -- 1
+    .............................................
+                                                  .
+    .. 0 -> ........................................   0  <--->  1  ...
+       2 ->                                                [ B ]
+     [ A  ]
+
+
+    """
+
+    taus = {"pass": {"0_A_B": 4, "1_B_A": 4, "2_A_B": 4},
+            "stop": {"0_B": 0, "1_A": 1, "2_B": 1}, "res": 1,
+            "blocks": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 5}}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_A": 1, "1_B": 2, "2_A": 2},
+                 "penalty_weights": {"0_A": 2, "1_B": 0.5, "2_A": 1}}
+
+    train_sets = {
+        "Paths": {0: ["A", "B"], 1: ["B", "A"], 2: ["A", "B"]},
+        "J": [0, 1, 2],
+        "Jd": {"A": {"B": [[0, 2]]}, "B": {"A": [[1]]}},
+        "Jtrack": {"B": [[0,1,2]]},
+        "Jswitch": dict(),
+        "Josingle": dict(),
+        "Jround": {"B": [[0,1]]}
+    }
+
+    prob = solve_linear_problem(train_sets, timetable, 10)
+
+    vs = prob.variables()
+
+    assert vs[0].name == "Delays_0_A"
+    assert vs[3].name == "Delays_1_B"
+    assert vs[4].name == "Delays_2_A"
+    assert vs[6].name == "y_0_2_A"
+    assert vs[7].name == "y_0_2_B"
+    assert vs[8].name == "y_1_2_B"
+
+    assert vs[0].varValue == 0
+    assert vs[3].varValue == 8
+    assert vs[4].varValue == 4
+
+    S = train_sets["Paths"]
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 1.)
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (8.0, 10.0)
+
+    assert  return_delay_and_acctual_time(S, timetable, prob, 2, "A") == (4.0, 6.0)
+    assert  return_delay_and_acctual_time(S, timetable, prob, 2, "B") == (4.0, 11.0)
+
+    assert prob.objective.value() == pytest.approx(0.8)
+
+
+
+def  test_station_track_and_circulation2():
+    """
+    test station trach and circulation
+
+    station [ A ]
+
+    swith - c
+
+    tracks - ......
+
+                                    < -- 1
+    .............................................
+                                                  .
+    .. 0 -> ........................................   0  <--->  1  ...
+       2 ->                                                [ B ]
+     [ A  ]
+
+
+    """
+
+    taus = {"pass": {"0_A_B": 4, "1_B_A": 4, "2_A_B": 4},
+            "stop": {"0_B": 0, "1_A": 1, "2_B": 1}, "res": 1,
+            "blocks": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 10}}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_A": 5, "1_B": 2, "2_A": 2},
+                 "penalty_weights": {"0_A": .5, "1_B": .5, "2_A": 10.}}
+
+    train_sets = {
+        "Paths": {0: ["A", "B"], 1: ["B", "A"], 2: ["A", "B"]},
+        "J": [0, 1, 2],
+        "Jd": {"A": {"B": [[0, 2]]}, "B": {"A": [[1]]}},
+        "Jtrack": {"B": [[0,1,2]]},
+        "Jswitch": dict(),
+        "Josingle": dict(),
+        "Jround": {"B": [[0,1]]}
+    }
+
+    prob = solve_linear_problem(train_sets, timetable, 20)
+
+    vs = prob.variables()
+
+    assert vs[0].name == "Delays_0_A"
+    assert vs[3].name == "Delays_1_B"
+    assert vs[4].name == "Delays_2_A"
+    assert vs[6].name == "y_0_2_A"
+    #assert vs[7].name == "y_0_2_B"
+    #assert vs[8].name == "y_1_2_B"
+    print(vs)
+
+    print(vs[0].varValue)
+    print(vs[3].varValue)
+    print(vs[4].varValue)
+
+    print(vs[6].varValue)
+    print(vs[7].varValue)
+
+
+    S = train_sets["Paths"]
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 5.)
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (17.0, 19.0)
+    assert  return_delay_and_acctual_time(S, timetable, prob, 2, "A") == (13.0, 15.0)
+
+
+    #assert prob.objective.value() == pytest.approx(1.5)
+
+
+
 def test_linear_solver_default_problem():
 
     """
