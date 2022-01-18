@@ -341,12 +341,13 @@ def  test_station_track_and_circulation2():
     S = train_sets["Paths"]
 
     assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 5.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0., 9.)
 
     assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (17.0, 19.0)
     assert  return_delay_and_acctual_time(S, timetable, prob, 2, "A") == (0., 2.)
 
 
-    #assert prob.objective.value() == pytest.approx(1.5)
+    assert prob.objective.value() == pytest.approx(0.425)
 
 
 
