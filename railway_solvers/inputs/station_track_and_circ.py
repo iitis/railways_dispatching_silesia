@@ -33,3 +33,6 @@
       "Josingle": dict(),
       "Jround": {"B": [[0,1]]}
   }
+
+
+d_max = 20
