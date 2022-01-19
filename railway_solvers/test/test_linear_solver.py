@@ -156,8 +156,8 @@ def test_rolling_stock_circulation():
     v = prob.variables()
     assert v[0].name == "Delays_0_A"
     assert v[0].varValue == 0
-    assert v[3].name == "Delays_1_B"
-    assert v[3].varValue == 8
+    assert v[2].name == "Delays_1_B"
+    assert v[2].varValue == 8
 
     assert prob.objective.value() == pytest.approx(0.4)
 
@@ -257,16 +257,14 @@ def  test_station_track_and_circulation():
 
     vs = prob.variables()
 
-    assert vs[0].name == "Delays_0_A"
-    assert vs[3].name == "Delays_1_B"
-    assert vs[4].name == "Delays_2_A"
-    assert vs[6].name == "y_0_2_A"
-    assert vs[7].name == "y_0_2_B"
-    assert vs[8].name == "y_1_2_B"
 
-    assert vs[0].varValue == 0
-    assert vs[3].varValue == 8
-    assert vs[4].varValue == 4
+    assert vs[5].name == "y_0_2_A"
+    assert vs[6].name == "y_0_2_B"
+    assert vs[7].name == "y_1_2_B"
+
+    assert vs[5].varValue == 1.
+    assert vs[6].varValue == 1.
+    assert vs[7].varValue == 1.
 
     S = train_sets["Paths"]
 
@@ -305,8 +303,8 @@ def  test_station_track_and_circulation2():
             "stop": {"0_B": 0, "1_A": 1, "2_B": 1}, "res": 1,
             "blocks": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 10}}
     timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 5, "1_B": 2, "2_A": 2},
-                 "penalty_weights": {"0_A": .5, "1_B": .5, "2_A": 10.}}
+                 "initial_conditions": {"0_A": 1, "1_B": 2, "2_A": 2},
+                 "penalty_weights": {"0_A": 1., "1_B": 1., "2_A": 1.}}
 
     train_sets = {
         "Paths": {0: ["A", "B"], 1: ["B", "A"], 2: ["A", "B"]},
@@ -318,36 +316,31 @@ def  test_station_track_and_circulation2():
         "Jround": {"B": [[0,1]]}
     }
 
+
     prob = solve_linear_problem(train_sets, timetable, 20)
 
     vs = prob.variables()
 
-    assert vs[0].name == "Delays_0_A"
-    assert vs[3].name == "Delays_1_B"
-    assert vs[4].name == "Delays_2_A"
-    assert vs[6].name == "y_0_2_A"
-    #assert vs[7].name == "y_0_2_B"
-    #assert vs[8].name == "y_1_2_B"
-    print(vs)
 
-    print(vs[0].varValue)
-    print(vs[3].varValue)
-    print(vs[4].varValue)
+    assert vs[5].name == "y_0_2_A"
+    assert vs[6].name == "y_0_2_B"
+    assert vs[7].name == "y_1_2_B"
+    assert vs[5].varValue == 0.
+    assert vs[6].varValue == 0.
+    assert vs[7].varValue == 0.
 
-    print(vs[6].varValue)
-    print(vs[7].varValue)
 
 
     S = train_sets["Paths"]
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 5.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0., 9.)
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (17.0, 19.0)
-    assert  return_delay_and_acctual_time(S, timetable, prob, 2, "A") == (0., 2.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (3., 4.)
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (16.0, 18.0)
+    assert return_delay_and_acctual_time(S, timetable, prob, 2, "A") == (0., 2.)
 
 
-    assert prob.objective.value() == pytest.approx(0.425)
+    assert prob.objective.value() == pytest.approx(0.95)
 
 
 

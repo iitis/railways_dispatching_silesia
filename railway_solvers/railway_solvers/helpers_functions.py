@@ -174,3 +174,36 @@ def skip_station(j,s, train_sets):
     elif s != train_sets["skip_station"][j]:
         return False
     return True
+
+#####   the round specific cases for track occupation ####
+
+def previous_train_from_Jround(train_sets,j, s):
+    """
+    returns the id of the train from which j gets a train set at station s if j
+    starts at s as an continuation of some other train
+    """
+    previous_train = None
+    Jround = train_sets["Jround"]
+    if s in Jround:
+        pairs = Jround[s]
+        leave_trains = [el[1] for el in pairs]
+        if j in leave_trains:
+            i = leave_trains.index(j)
+            previous_train = pairs[i][0]
+    return previous_train
+
+
+def subsequent_train_at_Jround(train_sets, j, s):
+    """
+    returns the id of the train to which j gives a train set at station s if j
+    terminates at s and is continiued be the other train
+    """
+    next_train = None
+    Jround = train_sets["Jround"]
+    if s in Jround:
+        pairs = Jround[s]
+        enter_trains = [el[0] for el in pairs]
+        if j in enter_trains:
+            i = enter_trains.index(j)
+            next_train = pairs[i][1]
+    return next_train

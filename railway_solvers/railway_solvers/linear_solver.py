@@ -14,6 +14,8 @@ from .helpers_functions import previous_station
 from .helpers_functions import occurs_as_pair
 from .helpers_functions import penalty_weights
 from .helpers_functions import skip_station
+from .helpers_functions import previous_train_from_Jround
+from .helpers_functions import subsequent_train_at_Jround
 # variables
 
 # order variables
@@ -212,12 +214,13 @@ def delay_varibles(train_sets, d_max):
     for j in train_sets["J"]:
         for s in train_sets["Paths"][j]:
             if not skip_station(j,s, train_sets):
+                if subsequent_train_at_Jround(train_sets, j, s) is None:
 
-                dvar = pus.LpVariable.dicts(
-                    "Delays", ([j], [s]), 0, d_max, cat="Integer"
-                )
+                    dvar = pus.LpVariable.dicts(
+                        "Delays", ([j], [s]), 0, d_max, cat="Integer"
+                    )
 
-                update_dictofdicts(secondary_delays_vars, dvar)
+                    update_dictofdicts(secondary_delays_vars, dvar)
 
     return secondary_delays_vars
 
@@ -369,7 +372,7 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
 
 
 def keep_trains_order(
-    sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max
+    s, j, jp, problem, timetable, delay_var, y, train_sets, d_max
 ):
     """Helper for single track occupation at the station constrain
 
@@ -382,6 +385,9 @@ def keep_trains_order(
      ....j1 -> ...j2 ->..............
      [s']
      """
+
+    S = train_sets["Paths"]
+    sp = previous_station(S[j], s)
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
             # if both trains goes sp -> s and have common path
@@ -394,63 +400,71 @@ def keep_trains_order(
                 )
 
 
-def previous_train_from_Jround(set, s, j):
-    previous_train = None
-    if s in set:
-        leave_trains = [el[1] for el in set[s]]
-        if j in leave_trains:
-            i = leave_trains.index(j)
-            previous_train = set[s][i][0]
-    return previous_train 
-
-
 
 def trains_order_at_s(
-    sp, s, j, jp, problem, timetable, delay_var, y, train_sets, d_max
+    s, j, jp, problem, timetable, delay_var, y, train_sets, d_max
 ):
     """helper for track occupation condition """
 
     S = train_sets["Paths"]
 
-    j_r = previous_train_from_Jround(train_sets["Jround"], s, jp)
-    if j_r is not None: # this is to deal with the occupyin station and round
-        print("aaaaaaaaaaaaaa")
-        spp = previous_station(S[j_r], s)
-        LHS = earliest_dep_time(S, timetable, j_r, spp)
-        LHS += tau(
-                timetable, "pass", first_train=j_r, first_station=spp, second_station=s
+    j_rr = subsequent_train_at_Jround(train_sets, j, s)
+    if j_rr is not None:
+        problem +=  (
+                get_y_j_jp_s(y, jp, j, s) == get_y_j_jp_s(y, jp, j_rr, s),
+                f"track_occupation_{j}_{jp}_{j_rr}_{s}",
                 )
-
-    # getting t in
-    elif sp is not None:
-        LHS = earliest_dep_time(S, timetable, jp, sp)
-        LHS += tau(
-            timetable, "pass", first_train=jp, first_station=sp, second_station=s
-        )
-
     else:
-        # this means that we do not have a previous station
-        LHS = earliest_dep_time(S, timetable, jp, s)
 
-    RHS = earliest_dep_time(S, timetable, j, s)
+        j_r = previous_train_from_Jround(train_sets, jp, s)
+        sp = previous_station(S[jp], s)
 
-    if "add_swithes_at_s" in train_sets.keys():
-        if (
-            s in train_sets["add_swithes_at_s"]
-        ):  # this is the approximation used in  ArXiv:2107.03234,
-            RHS += tau(timetable, "res")
 
-    μ = get_μ(LHS, RHS, d_max)
+        if j_r is not None: # the previous station is of other trains j_r
+            spp = previous_station(S[j_r], s)
 
-    if LHS - d_max < RHS:
+            LHS = earliest_dep_time(S, timetable, j_r, spp)
+            LHS += tau(
+                    timetable, "pass", first_train=j_r, first_station=spp, second_station=s
+                    )
 
-        if sp is not None:
-            LHS += delay_var[jp][sp]
+        elif sp is not None: # previous station in the route of j
 
-        RHS -= μ * get_y_j_jp_s(y, jp, j, s)
-        LHS -= delay_var[j][s]
+            LHS = earliest_dep_time(S, timetable, jp, sp)
+            LHS += tau(
+                timetable, "pass", first_train=jp, first_station=sp, second_station=s
+            )
 
-        problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
+        else:
+
+            # this means that we do not have a previous station
+            LHS = earliest_dep_time(S, timetable, jp, s)
+
+        RHS = earliest_dep_time(S, timetable, j, s)
+
+        if "add_swithes_at_s" in train_sets.keys():
+            if (
+                s in train_sets["add_swithes_at_s"]
+            ):  # this is the approximation used in  ArXiv:2107.03234,
+                RHS += tau(timetable, "res")
+
+        μ = get_μ(LHS, RHS, d_max)
+
+        if LHS - d_max < RHS:
+
+            if j_r is not None:
+                spp = previous_station(S[j_r], s)
+                LHS += delay_var[j_r][spp]
+
+            elif sp is not None:
+                LHS += delay_var[jp][sp]
+
+            RHS -= μ * get_y_j_jp_s(y, jp, j, s)
+            LHS -= delay_var[j][s]
+
+            problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
+
+
 
 
 def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
@@ -465,13 +479,10 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
     for s in train_sets["Jtrack"].keys():
         for js in train_sets["Jtrack"][s]:
             for (j, jp) in itertools.combinations(js, 2):
-                sp = previous_station(S[j], s)
-                spp = previous_station(S[jp], s)
 
                 if not_the_same_rolling_stock(j, jp, train_sets):
 
                     keep_trains_order(
-                        sp,
                         s,
                         j,
                         jp,
@@ -483,7 +494,6 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
                         d_max,
                     )
                     trains_order_at_s(
-                        spp,
                         s,
                         j,
                         jp,
@@ -495,7 +505,6 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
                         d_max,
                     )
                     trains_order_at_s(
-                        sp,
                         s,
                         jp,
                         j,
@@ -647,6 +656,7 @@ def create_linear_problem(train_sets, timetable, d_max):
 
     # objective is added
     objective(prob, timetable, secondary_delays_var, train_sets, d_max)
+
     return prob
 
 
