@@ -370,27 +370,54 @@ def pair_of_one_track_constrains(jsd_dicts, k, k1, train_sets, timetable):
         jz = jsd_dicts[k1]["j"]
         jz1 = jsd_dicts[k1]["j1"]
 
-        if (jx == jz) and occurs_as_pair(jx, jz1, train_sets["Jtrack"][sz]):
-            # jz, jz1, tx => j', j, j', according to Eq 32
-            # tz, tz1, tx => t', t,  t'' according to Eq 32
-            # sx, sz -> s', s
+        j_rr = previous_train_from_Jround(train_sets, jz, sz)
+
+        if j_rr is None: # this is sophasticated exclusion, perhaps we will remove it
+
+            if (jx == jz) and occurs_as_pair(jx, jz1, train_sets["Jtrack"][sz]):
+                # jz, jz1, jx => j', j, j', according to Eq 32
+                # tz, tz1, tx => t', t,  t'' according to Eq 32
+                # sx, sz -> s', s
+
+                p = one_track_constrains(
+                    jx, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable
+                )
+                if p > 0:
+                    return p
+
+        elif (j_rr == jz) and occurs_as_pair(j_rr, jz1, train_sets["Jtrack"][sz]):
 
             p = one_track_constrains(
-                jx, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable
+                    j_rr, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable
             )
             if p > 0:
                 return p
 
-        if (jx == jz1) and occurs_as_pair(jx, jz, train_sets["Jtrack"][sz]):
-            # jz1, jz, tx => j', j, j', according to Eq 32
-            # tz1, tz, tx => t', t,  t'' according to Eq 32
-            # sx, sz -> s', s
+        j_rr = previous_train_from_Jround(train_sets, jz1, sz)
+
+        if j_rr is None: # this is sophasticated exclusion, perhaps we will remove it
+
+            if (jx == jz1) and occurs_as_pair(jx, jz, train_sets["Jtrack"][sz]):
+                # jz1, jz, tx => j', j, j', according to Eq 32
+                # tz1, tz, tx => t', t,  t'' according to Eq 32
+                # sx, sz -> s', s
+
+                p = one_track_constrains(
+                    jx, jz1, jz, sx, sz, d, d2, d1, train_sets, timetable
+                )
+                if p > 0:
+                    return p
+
+
+        elif (j_rr == jz1) and occurs_as_pair(j_rr, jz, train_sets["Jtrack"][sz]):
+
 
             p = one_track_constrains(
-                jx, jz1, jz, sx, sz, d, d2, d1, train_sets, timetable
+                    j_rr, jz1, jz, sx, sz, d, d2, d1, train_sets, timetable
             )
             if p > 0:
                 return p
+
     return 0
 
 
@@ -413,6 +440,8 @@ def one_track_constrains(jx, jz, jz1, sx, sz, d, d1, d2, train_sets, timetable):
     if tx < tz1 <= tz:
         return 1.0
     return 0.0
+
+
 
 
 def P2qubic(k, k1, jsd_dicts, train_sets):

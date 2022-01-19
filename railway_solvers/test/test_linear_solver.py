@@ -217,8 +217,9 @@ def  test_station_track_and_switches_two_trains():
 
 
 def  test_station_track_and_circulation():
+
     """
-    test station trach and circulation
+    test station track and circulation
 
     station [ A ]
 
@@ -281,7 +282,7 @@ def  test_station_track_and_circulation():
 
 def  test_station_track_and_circulation2():
     """
-    test station trach and circulation
+    test station track and circulation
 
     station [ A ]
 

@@ -13,10 +13,25 @@ def energy(v, Q):
     return V @ X @ V.transpose()
 
 
+def visualise_Qubo_solution(solution, timetable, train_sets, d_max):
+    inds, q_bits = indexing4qubo(train_sets, d_max)
+    l = q_bits
+    print("x vars", l)
+
+    S = train_sets["Paths"]
+    for i in range(l):
+        if solution[i] == 1:
+            j = inds[i]["j"]
+            s = inds[i]["s"]
+            d = inds[i]["d"]
+            t = d + earliest_dep_time(S, timetable, j, s)
+            print("train", j, "station", s, "delay", d, "time", t)
+
 def test_helpers():
     v = [-1, 1, 1]
     Q = [[1. for _ in range(3)] for _ in range(3)]
     assert energy(v, Q) == 4.
+
 
 
 def test_pspan_pstay_p1track():
@@ -24,7 +39,7 @@ def test_pspan_pstay_p1track():
     """
                                           <- 2
     .............................................
-    [ A ]                            \ /    [ B ]
+    [ A ]                            . .    [ B ]
     ..................................c...........
     0 ->
     1 ->
@@ -85,7 +100,7 @@ def test_pspan_pstay_p1track():
     """
     1 ->                                    <- 2
     .............................................
-    [ A ]                            \ /    [ B ]
+    [ A ]                            . .    [ B ]
     ..................................c...........
     0 ->
     """
@@ -138,7 +153,7 @@ def test_pswith():
 
     """
     ..........                                .... <- 2 ..
-    [ A ]     \                              /    [ B ]
+    [ A ]     .                              .    [ B ]
     .. 1 -> .. c .......................... c ... .......
 
     swithes at A (1 out, 2 in) and B (1 in 12out )
@@ -246,7 +261,7 @@ def test_qubic():
     """
     1 ->                                    <- 2
     .............................................
-    [ A ]                            \ /    [ B ]
+    [ A ]                            . .    [ B ]
     ..................................c...........
     0 ->
     """
@@ -347,7 +362,7 @@ def test_penalties_and_couplings():
     """
                                           <- 2
     .............................................
-    [ A ]                            \ /    [ B ]
+    [ A ]                            . .    [ B ]
     ..................................c...........
     0 ->
     1 ->
@@ -449,11 +464,11 @@ def  test_station_track_and_switches_two_trains():
 
     swith - c
 
-    tracks - ......  \
+    tracks - ......
 
 
-                                                  /
-      1 ->                                       /
+                                                  .
+      1 ->                                       .
     ..0 -> ...................................  c  .0-> ..  1->.....
 
       A                                                  B
@@ -501,12 +516,12 @@ def test_deadlock_and_switches_two_trains():
 
     swith - c
 
-    tracks - ......  \
-                      \
+    tracks - ......
+
 
 
     ..........                                        .. <- 1 ....
-        A       \                                    /      B
+        A      .                                    .      B
     ..0 -> .... c ................................  c  ..........
 
     """
@@ -594,12 +609,13 @@ def test_circ_Qmat():
 
 
 
+
 def test_performing_Qmat():
     #####   dispatching problem that was solved on D-Wave   ########
     """
                                             <- 2
     ...............................................
-     [ A ]                              \ /    [ B ]
+     [ A ]                              . .    [ B ]
     .....................................c.........
     0 ->
     1 ->
@@ -645,7 +661,7 @@ def test_performing_Qmat():
     """
     1 ->                                      <- 2
     ...............................................
-     [ A ]                              \ /    [ B ]
+     [ A ]                              . .    [ B ]
     .....................................c.........
     0 ->
     """

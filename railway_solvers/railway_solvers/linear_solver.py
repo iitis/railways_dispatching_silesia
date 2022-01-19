@@ -409,23 +409,23 @@ def trains_order_at_s(
     S = train_sets["Paths"]
 
     j_rr = subsequent_train_at_Jround(train_sets, j, s)
-    if j_rr is not None:
+    if j_rr is not None: # train under investigation terminates at s and goes
+    #to the subseguent train that uses the same rolling stock
         problem +=  (
                 get_y_j_jp_s(y, jp, j, s) == get_y_j_jp_s(y, jp, j_rr, s),
                 f"track_occupation_{j}_{jp}_{j_rr}_{s}",
                 )
-    else:
+    else: #train goes further, if incuded in track occupation it has to go further
 
         j_r = previous_train_from_Jround(train_sets, jp, s)
         sp = previous_station(S[jp], s)
 
+        if j_r is not None: #first station, but train tied with j_r
+            s_rp = previous_station(S[j_r], s)
 
-        if j_r is not None: # the previous station is of other trains j_r
-            spp = previous_station(S[j_r], s)
-
-            LHS = earliest_dep_time(S, timetable, j_r, spp)
+            LHS = earliest_dep_time(S, timetable, j_r, s_rp)
             LHS += tau(
-                    timetable, "pass", first_train=j_r, first_station=spp, second_station=s
+                    timetable, "pass", first_train=j_r, first_station=s_rp, second_station=s
                     )
 
         elif sp is not None: # previous station in the route of j
@@ -435,9 +435,7 @@ def trains_order_at_s(
                 timetable, "pass", first_train=jp, first_station=sp, second_station=s
             )
 
-        else:
-
-            # this means that we do not have a previous station
+        else: # this means first station
             LHS = earliest_dep_time(S, timetable, jp, s)
 
         RHS = earliest_dep_time(S, timetable, j, s)
@@ -452,11 +450,10 @@ def trains_order_at_s(
 
         if LHS - d_max < RHS:
 
-            if j_r is not None:
-                spp = previous_station(S[j_r], s)
-                LHS += delay_var[j_r][spp]
+            if j_r is not None: #first station, but train tied with j_r
+                LHS += delay_var[j_r][s_rp]
 
-            elif sp is not None:
+            elif sp is not None: #previous station existis
                 LHS += delay_var[jp][sp]
 
             RHS -= μ * get_y_j_jp_s(y, jp, j, s)
