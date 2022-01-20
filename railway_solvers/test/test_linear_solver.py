@@ -343,6 +343,121 @@ def  test_station_track_and_circulation2():
 
     assert prob.objective.value() == pytest.approx(0.95)
 
+def  test_station_followed_by_station_KO_STMcase():
+    """
+    test station track and circulation
+
+    station [ A ]
+
+    swith - c
+
+    tracks - ......
+
+   .........                                 .......
+    .. 0 -> ........................................
+       1 ->
+     [ A  ]   [ B ]                           [ C  ]
+
+
+    """
+
+    taus = {"pass": {"0_A_B": 0, "1_A_B": 0, "0_B_C": 4, "1_B_C": 4},
+            "stop": {"0_B": 3, "1_B": 1, "0_C": 1, "1_C": 1},
+            "blocks": {"0_1_B_C": 2, "1_0_B_C": 2, "0_1_A_B": 0, "1_0_A_B": 0}}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_A": 1, "1_A": 2},
+                 "penalty_weights": {"0_C": 2., "1_C": 1.}}
+
+    train_sets = {
+        "Paths": {0: ["A", "B", "C"], 1: ["A", "B", "C"]},
+        "J": [0, 1],
+        "Jd": {"A": {"B": [[0, 1]]}, "B": {"C": [[0, 1]]}},
+        "Jtrack": {"B": [[0,1]]},
+        "Jswitch": dict(),
+        "Josingle": dict(),
+        "Jround": dict()
+    }
+
+    prob = solve_linear_problem(train_sets, timetable, 5)
+
+    vs = prob.variables()
+
+    print(vs)
+
+
+
+    S = train_sets["Paths"]
+
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 1.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0., 4.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "C") == (0., 9.)
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "A") == (2., 4.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (3., 6.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "C") == (3., 11.)
+
+    assert prob.objective.value() == pytest.approx(0.6)
+
+def  test_3stationsIC_STM_KO_case():
+    """
+    test station track and circulation
+
+    station [ A ]
+
+    swith - c
+
+    tracks - ......
+
+    ......
+    .. 0 -> ...............
+       1 ->
+     [ KO(IC)]  [ KOSTM ]  [ KO  ]
+
+
+    """
+
+    taus = {"pass": {"0_KO(IC)_KO(STM)": 0, "1_KO(IC)_KO(STM)": 0,
+                    "0_KO(STM)_KO": 0, "1_KO(STM)_KO": 0},
+            "stop": {"0_KO(STM)": 3, "1_KO(STM)": 1, "0_KO": 1, "1_KO": 1},
+            "blocks": {"0_1_KO(STM)_KO": 0, "1_0_KO(STM)_KO": 0,
+                        "0_1_KO(IC)_KO(STM)": 0, "1_0_KO(IC)_KO(STM)": 0}}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_KO(IC)": 1, "1_KO(IC)": 2},
+                 "penalty_weights": {"0_KO": 2., "1_KO": 1.}}
+
+    train_sets = {
+        "Paths": {0: ["KO(IC)", "KO(STM)", "KO"], 1: ["KO(IC)", "KO(STM)", "KO"]},
+        "J": [0, 1],
+        "Jd": {"KO(IC)": {"KO(STM)": [[0, 1]]}, "KO(STM)": {"KO": [[0, 1]]}},
+        "Jtrack": {"KO(STM)": [[0,1]], "KO": [[0,1]]},
+        "Jswitch": dict(),
+        "Josingle": dict(),
+        "Jround": dict()
+    }
+
+    prob = solve_linear_problem(train_sets, timetable, 5)
+
+    vs = prob.variables()
+
+    print(vs)
+
+
+
+    S = train_sets["Paths"]
+
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "KO(IC)") == (0., 1.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "KO(STM)") == (0., 4.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "KO") == (0., 5.)
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "KO(IC)") == (2., 4.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "KO(STM)") == (2., 5.)
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "KO") == (2., 6.)
+
+    assert prob.objective.value() == pytest.approx(0.4)
+
+
 
 
 def test_linear_solver_default_problem():
