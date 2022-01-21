@@ -75,8 +75,9 @@ def get_block_station(block):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     return [key for key, value in important_stations.items() if block in value][0]
 
-def blocks_list_4station(data, train,station):
+def blocks_list_4station(data, train, station):
     sts = get_Paths(data)[train]
+    # print(sts)
     if station not in sts:
         print('Warning: this train does not pass through this station!')
         return []
@@ -161,7 +162,6 @@ def is_train_passing_thru_station(data, train, station):
 def subsequent_station(data, train, station):
     
     sts = get_Paths(data)[train]
-
     if station not in sts:
         # print( "The train does not pass trought this station!")
         return None
@@ -178,6 +178,7 @@ def get_trains_pair9(data):
         if train*10+9 in trains:
             pair_lists+=[[train,train*10+9]]
     return pair_lists
+
 # return dict
 def get_jround(data):
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
@@ -219,5 +220,8 @@ if __name__ == "__main__":
 
     path_to_data = "../data/train_schedule.csv"
     data = pd.read_csv(path_to_data, sep = ";")
+    print(blocks_list_4station(data, 34319, 'KO'))
+    x = get_trains_depart_from_station(data)
+    print(check_important_stations(data, 34319))
+    # print(x['KO'])
     print(get_J(data))
-    print(len(data['Unnamed: 0']))
