@@ -224,7 +224,7 @@ def get_trains_at_station(data,only_departue = False):
     for station in important_stations.keys():
         trains_from_station[station] = []
         for train in trains_infor.keys():
-            if only_departue == False
+            if only_departue == False:
                 if trains_infor[train][1]['path'].isin(important_stations[station]).any():
                     trains_from_station[station].append(train)
             else:
@@ -237,7 +237,8 @@ if __name__ == "__main__":
     path_to_data = "../data/train_schedule.csv"
     data = pd.read_csv(path_to_data, sep = ";")
     print(blocks_list_4station(data, 34319, 'KO'))
-    x = get_trains_depart_from_station(data)
-    print(check_important_stations(data, 34319))
+    x = get_trains_at_station(data, False)
+    # print(check_important_stations(data, 34319))
     # print(x['KO'])
+    print(x)
     print(get_J(data))

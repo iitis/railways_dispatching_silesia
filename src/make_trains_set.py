@@ -27,12 +27,12 @@ def jtrack_dict_generation(Jtrack_dict):
     return Jtrack_mod
 
 
-def important_trains_and_stations(data, imp_stations):
+def important_trains_and_stations(data, imp_stations, only_departue):
     if imp_stations != None:
         imp_stations_list = imp_stations
     else:
         imp_stations_list = get_all_important_station()
-    trains_at_stations = get_trains_depart_from_station(data)
+    trains_at_stations = get_trains_at_station(data, only_departue)
     return imp_stations_list, trains_at_stations
 
 
@@ -46,7 +46,7 @@ def exclusion_list_jtrack():
 def josingle(data, imp_stations = None):
 
     init_josingle = {}
-    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations)
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, True)
 
     for s in imp_stations_list:
         for j in trains_at_stations[s]:
@@ -65,7 +65,7 @@ def josingle(data, imp_stations = None):
 def jtrack(data, imp_stations = None):
 
     init_jtrack = {}
-    imp_stations_list, _ = important_trains_and_stations(data, imp_stations)
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
     station_exclusion_list, block_exclusion_list = exclusion_list_jtrack()
 
     for s in imp_stations_list:
@@ -74,7 +74,7 @@ def jtrack(data, imp_stations = None):
             vs = [[]]
             current_blocks = []
 
-            for j in get_J(data):
+            for j in trains_at_stations[s]:
 
                 b = blocks_list_4station(data,j,s)
 
