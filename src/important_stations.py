@@ -16,7 +16,7 @@ important_stations = {
 '"KO", "ST", 8, "(4)"',
 '"KO", "ST", 10, "(4)"'],
 
-'"KO", "ST-M"':['"KO", "ST", 117, "(N/A)"',
+'KO(STM)':['"KO", "ST", 117, "(N/A)"',
 '"KO", "ST", 115, "(N/A)"',
 '"KO", "ST", 113, "(N/A)"',
 '"KO", "ST", 118, "(N/A)"',
@@ -27,7 +27,7 @@ important_stations = {
 '"KO", "ST-M", 1118, "(N/A)"',
 '"KO", "ST", 120, "(5)"'],
 
-"Rac(KS)":['"Rac(KS)", "B-M", 200, "(N/A)"'],
+"KO(KS)":['"Rac(KS)", "B-M", 200, "(N/A)"'],
 
 "KO(IC)":['"KO(IC)", "B-M", 500, "(N/A)"'],
 
