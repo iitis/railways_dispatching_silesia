@@ -412,7 +412,7 @@ def  test_3stationsIC_STM_KO_case():
     ......
     .. 0 -> ...............
        1 ->
-     [ KO(IC)]  [ KOSTM ]  [ KO  ]
+     [ KO(IC)]  [ KO(STM) ]  [ KO  ]
 
 
     """

@@ -1,7 +1,7 @@
 import numpy as np
 
 important_stations = {
-    
+
 "KZ":['"KZ", "ST", 1, "(1)"',
 '"KZ", "ST", 2, "(1)"',
 '"KZ", "ST", 3, "(2)"',
