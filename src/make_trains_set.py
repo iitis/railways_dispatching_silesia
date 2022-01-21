@@ -37,7 +37,7 @@ def important_trains_and_stations(data, imp_stations):
 
 
 
-def exclusioon_list_jtrack():
+def exclusion_list_jtrack():
     station_exclusion_list = ['Rac(KS)', 'KO(IC)']
     block_exclusion_list = ['"KO", "ST-M", 1114, "(N/A)"', '"KO", "ST-M", 1113, "(N/A)"', '"KO", "ST-M", 1118, "(N/A)"']
     return station_exclusion_list, block_exclusion_list
@@ -65,8 +65,8 @@ def josingle(data, imp_stations = None):
 def jtrack(data, imp_stations = None):
 
     init_jtrack = {}
-    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations)
-    station_exclusion_list, block_exclusion_list = exclusioon_list_jtrack()
+    imp_stations_list, _ = important_trains_and_stations(data, imp_stations)
+    station_exclusion_list, block_exclusion_list = exclusion_list_jtrack()
 
     for s in imp_stations_list:
     
@@ -74,10 +74,14 @@ def jtrack(data, imp_stations = None):
             vs = [[]]
             current_blocks = []
 
-            for j in trains_at_stations[s]:
+            for j in get_J(data):
+
                 b = blocks_list_4station(data,j,s)
+
                 if b not in block_exclusion_list:
+
                     if b in current_blocks:
+
                         i = current_blocks.index(b)+1
                         vs[i].append(j)  
                     else:
@@ -94,7 +98,7 @@ if __name__ == "__main__":
 
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     #imp_stations = ['KL', 'Mi', 'MJ', 'KO', 'CB']
-    imp_stations = ['KL', 'Mi', 'MJ']
+    imp_stations = ['KO']
 
     # print(josingle(data, imp_stations))
-    print(jtrack(data, imp_stations = None))
+    print(jtrack(data, imp_stations))
