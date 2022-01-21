@@ -160,7 +160,7 @@ def is_train_passing_thru_station(data, train, station):
 
 # get subsequent station for a given train
 def subsequent_station(data, train, station):
-    
+
     sts = get_Paths(data)[train]
     if station not in sts:
         # print( "The train does not pass trought this station!")
@@ -202,7 +202,20 @@ def get_jround(data):
             jround[station]=[pair]
     return jround
 
-def get_trains_depart_from_station(data):
+# def get_trains_depart_from_station(data):
+#
+#     trains_infor = timetable_to_train_dict(data)
+#     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+#
+#     trains_from_station = {}
+#     for station in important_stations.keys():
+#         trains_from_station[station] = []
+#         for train in trains_infor.keys():
+#             if trains_infor[train][1]['path'].isin(important_stations[station]).any() and trains_infor[train][1]['path'].isin(important_stations[station]).tolist()[-1]!=True:
+#                 trains_from_station[station].append(train)
+#     return trains_from_station
+
+def get_trains_at_station(data,only_departue = False):
 
     trains_infor = timetable_to_train_dict(data)
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
@@ -211,10 +224,13 @@ def get_trains_depart_from_station(data):
     for station in important_stations.keys():
         trains_from_station[station] = []
         for train in trains_infor.keys():
-            if trains_infor[train][1]['path'].isin(important_stations[station]).any() and trains_infor[train][1]['path'].isin(important_stations[station]).tolist()[-1]!=True:
-                trains_from_station[station].append(train)
+            if only_departue == False
+                if trains_infor[train][1]['path'].isin(important_stations[station]).any():
+                    trains_from_station[station].append(train)
+            else:
+                if trains_infor[train][1]['path'].isin(important_stations[station]).any() and trains_infor[train][1]['path'].isin(important_stations[station]).tolist()[-1]!=True:
+                    trains_from_station[station].append(train)
     return trains_from_station
-
 
 if __name__ == "__main__":
 
