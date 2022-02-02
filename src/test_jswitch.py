@@ -99,9 +99,9 @@ def z_out(data, j, s):
 
 if __name__ == "__main__":
 
-    j = 26103
-    s1 = 'GLC'
-    s2 = 'KZ'
+    j = 44862
+    s1 = 'Mi'
+    s2 = 'KL'
     print(j, s1)
     print('-------')
     print(z_in(data, j, s1))
