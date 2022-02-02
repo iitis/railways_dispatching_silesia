@@ -78,7 +78,7 @@ def z_out(data, j, s):
             for s in switch_position:
                 switch =  data_path_check['switches'][s]
                 switch = eval(str(switch).replace('.', ','))
-                
+
 
     return list(switch)
 
@@ -87,11 +87,11 @@ if __name__ == "__main__":
 
     j = 26103
     s1 = 'GLC'
-    s2 = 'CB'
-    print('--- we should have switches on the enterence to GLC -----')
+    s2 = 'KZ'
+    print(j, s1)
     print(z_in(data, j, s1))
     print(z_out(data, j, s1))
-    print('--- parsing two switch numbers as Floats, see CB case -----')
+    print(j, s2)
 
     print(z_in(data, j, s2))
     print(z_out(data, j, s2))
