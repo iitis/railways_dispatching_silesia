@@ -1,4 +1,4 @@
-from numpy import indices
+from numpy import float32, indices
 import pandas as pd
 from utils import *
 
@@ -50,9 +50,13 @@ def z_in(data, j, s):
 
             for s in switch_position:
                 switch = data_path_check['switches'][s]
-                switch = eval(str(switch).replace('.', ','))
+                if type(switch) is float:
+                    switch = eval(str(switch).replace('.', ','))
+                    switch = list(switch)
+                else:
+                    switch = '[' + ','.join([switch]) + ']'
 
-    return list(switch)
+    return switch
 
 
 
@@ -77,10 +81,15 @@ def z_out(data, j, s):
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
             for s in switch_position:
                 switch =  data_path_check['switches'][s]
-                switch = eval(str(switch).replace('.', ','))
+                if type(switch) is float:
+                    switch = eval(str(switch).replace('.', ','))
+                    switch = list(switch)
+                else:
+                    switch = '[' + ','.join([switch]) + ']'
 
 
-    return list(switch)
+
+    return switch
 
 
 if __name__ == "__main__":
