@@ -19,14 +19,14 @@ def block_indices_to_interprete_switches(previous_block, next_block):
         if el == next_block:
             list_pos_next_block.append(i)
         i+= 1
-    
+
     for el in data_path_check['next_block']:
         if el == previous_block:
             list_pos_previous_block.append(j)
         if el == next_block:
             list_pos_next_block.append(j)
         j+= 1
-    
+
     return list_pos_previous_block, list_pos_next_block
 
 
@@ -40,23 +40,23 @@ def z_in(data, j, s):
     sts = get_Paths(data)[train]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
-        
+
         if block_list_el == station_block[0]:
-            previous_block = blocks_list[block_list_el_no-1] 
+            previous_block = blocks_list[block_list_el_no-1]
             if sts.index(in_station)==len(sts)-1:
                 return []
             else:
                 next_block = blocks_list[block_list_el_no]
-            
+
             list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(previous_block, next_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
-            
+
             for s in switch_position:
                 switch = data_path_check['switches'][s]
 
     return switch
 
-        
+
 
 def z_out(data, j, s):
 
@@ -79,17 +79,19 @@ def z_out(data, j, s):
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
             for s in switch_position:
                 switch =  data_path_check['switches'][s]
-        
+
     return switch
 
 
 if __name__ == "__main__":
 
-    j = 94766
-    s1 = 'KO'
-    s2 = 'KO(STM)'
+    j = 26103
+    s1 = 'GLC'
+    s2 = 'CB'
+    print('--- we should have switches on the enterence to GLC -----')
     print(z_in(data, j, s1))
     print(z_out(data, j, s1))
-    print('----------')
+    print('--- parsing two switch numbers as Floats, see CB case -----')
+
     print(z_in(data, j, s2))
     print(z_out(data, j, s2))
