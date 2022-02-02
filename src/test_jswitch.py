@@ -38,13 +38,17 @@ def z_in(data, j, s):
     in_station = s
     station_block = blocks_list_4station(data, train, in_station)
     blocks_list = train_time_table(data, train)['path'].tolist()
+    sts = get_Paths(data)[train]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
 
         if block_list_el == station_block[0]:
-            previous_block = blocks_list[block_list_el_no-1]
             next_block = blocks_list[block_list_el_no]
-
+            if sts.index(in_station)==0:
+                print('this is first station')
+                return []
+            else:
+                previous_block = blocks_list[block_list_el_no-1]
             list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(previous_block, next_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
 
@@ -72,6 +76,7 @@ def z_out(data, j, s):
         if block_list_el == station_block[0]:
             previous_block = blocks_list[block_list_el_no]
             if sts.index(out_station)==len(sts)-1:
+                print('this is last station')
                 return []
             else:
                 next_block = blocks_list[block_list_el_no+1]
@@ -98,9 +103,11 @@ if __name__ == "__main__":
     s1 = 'GLC'
     s2 = 'KZ'
     print(j, s1)
+    print('-------')
     print(z_in(data, j, s1))
     print(z_out(data, j, s1))
+    print()
     print(j, s2)
-
+    print('-------')
     print(z_in(data, j, s2))
     print(z_out(data, j, s2))
