@@ -1,6 +1,8 @@
+from pytest import skip
 from time_table_check import *
 import pandas as pd
 from utils import *
+from test_jswitch import *
 
 
 def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
@@ -42,6 +44,9 @@ def exclusion_list_jtrack():
     block_exclusion_list = [['"KO", "ST-M", 1114, "(N/A)"'], ['"KO", "ST-M", 1113, "(N/A)"'], ['"KO", "ST-M", 1118, "(N/A)"']]
     return station_exclusion_list, block_exclusion_list
 
+def non_repeating_pair_for_jswitch():
+    non_repeating_pair = [ ['KO', 'KO(STM)'] , ['KO(IC)', 'KO(STM)'] , ['KO', 'KO(KS)'] ]
+    return non_repeating_pair
 
 def josingle(data, imp_stations = None):
 
@@ -95,21 +100,83 @@ def jtrack(data, imp_stations = None):
     return jtrack_dict_generation(init_jtrack)
 
 
+
+def jswitch(data, data_switch, imp_stations = None):
+
+    jswitch = {}
+
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
+    non_repeat_pair = non_repeating_pair_for_jswitch()
+
+    for s in imp_stations_list:
+
+        vec_of_pairs = []
+
+        for j in trains_at_stations[s]:
+
+            for jprime in trains_at_stations[s]:
+
+                if jprime != j:
+
+                    # if [s, jprime] in non_repeat_pair:
+                    #     jprime = j
+
+                    in_switch_sequence_j = z_in(data, data_switch, j, s)
+                    out_switch_sequence_j = z_out(data, data_switch, j, s)
+                    in_switch_sequence_jprime = z_in(data, data_switch, jprime, s)
+                    out_switch_sequence_jprime = z_out(data, data_switch, jprime, s)
+                    
+                    
+                    if ( len(in_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and
+
+                        len( list( set(in_switch_sequence_j) & set(in_switch_sequence_jprime) ) ) != 0 ):
+
+                        vec_of_pairs.append( { j : "in" , jprime : "in" } )
+                    
+
+                    elif ( len(in_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0 and
+                        
+                        len( list( set(in_switch_sequence_j) & set(out_switch_sequence_jprime) ) ) != 0 ):
+
+                        vec_of_pairs.append( { j : "in" , jprime : "out" } )
+
+
+                    elif  ( len(out_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and
+
+                        len( list( set(out_switch_sequence_j) & set(in_switch_sequence_jprime) ) ) != 0 ):
+
+                        vec_of_pairs.append( { j : "out" , jprime : "in" } )
+
+
+                    elif ( len(out_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0  and
+                        
+                        len( list( set(out_switch_sequence_j) & set(out_switch_sequence_jprime) ) ) != 0 ):
+
+                        vec_of_pairs.append( { j : "out" , jprime : "out" } )
+
+                    print(vec_of_pairs)
+
+
+        jswitch[s] = vec_of_pairs
+
+    return jswitch
+
+
+
+
 if __name__ == "__main__":
-
-    # x = ['"1"', '"2"', '"3"']
-
-    # for k in ['"2"', '"3"', '"4"']:
-
-    #     if k not in x:
-    #         print(k)
-
 
     # exit()
 
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
     #imp_stations = ['KL', 'Mi', 'MJ', 'KO', 'CB']
     imp_stations = ['KO(STM)']
 
     # print(josingle(data, imp_stations))
-    print(jtrack(data, imp_stations))
+    # print(jtrack(data, imp_stations))
+            
+
+    switch = jswitch(data, data_switch, imp_stations = ['KZ'])
+
+    print(switch)

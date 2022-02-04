@@ -1,14 +1,11 @@
 from numpy import float32, indices
 import pandas as pd
 from utils import *
-
-path_to_data = "../data/train_schedule.csv"
-data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-data = pd.read_csv(path_to_data, sep = ";")
+from time_table_check import *
 
 
 
-def block_indices_to_interprete_switches(previous_block, next_block):
+def block_indices_to_interprete_switches(data_path_check, previous_block, next_block):
 
     i = 0
     j = 0
@@ -32,7 +29,7 @@ def block_indices_to_interprete_switches(previous_block, next_block):
 
 
 
-def z_in(data, j, s):
+def z_in(data, data_path_check, j, s):
 
     train = j
     in_station = s
@@ -41,7 +38,7 @@ def z_in(data, j, s):
     sts = get_Paths(data)[train]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
-
+        
         if block_list_el == station_block[0]:
             next_block = blocks_list[block_list_el_no]
             if sts.index(in_station)==0:
@@ -49,7 +46,7 @@ def z_in(data, j, s):
                 return []
             else:
                 previous_block = blocks_list[block_list_el_no-1]
-            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(previous_block, next_block)
+            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
 
             for s in switch_position:
@@ -64,7 +61,7 @@ def z_in(data, j, s):
 
 
 
-def z_out(data, j, s):
+def z_out(data, data_path_check, j, s):
 
     train = j
     out_station = s
@@ -81,7 +78,7 @@ def z_out(data, j, s):
             else:
                 next_block = blocks_list[block_list_el_no+1]
 
-            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(previous_block, next_block)
+            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
             # print(list_pos_next_block, list_pos_previous_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
             for s in switch_position:
@@ -97,11 +94,12 @@ def z_out(data, j, s):
     return switch
 
 
+
 if __name__ == "__main__":
 
     j = 44862
-    s1 = 'Mi'
-    s2 = 'KL'
+    s1 = 'KO'
+    s2 = 'KO(STM)'
     print(j, s1)
     print('-------')
     print(z_in(data, j, s1))
