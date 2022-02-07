@@ -38,7 +38,7 @@ def z_in(data, data_path_check, j, s):
     sts = get_Paths(data)[train]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
-        
+
         if block_list_el == station_block[0]:
             next_block = blocks_list[block_list_el_no]
             if sts.index(in_station)==0:
@@ -96,7 +96,6 @@ def z_out(data, data_path_check, j, s):
 
 
 if __name__ == "__main__":
-
     j = 44862
     s1 = 'KO'
     s2 = 'KO(STM)'
