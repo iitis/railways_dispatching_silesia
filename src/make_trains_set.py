@@ -118,9 +118,6 @@ def jswitch(data, data_switch, imp_stations = None):
 
                 if jprime != j:
 
-                    # if [s, jprime] in non_repeat_pair:
-                    #     jprime = j
-
                     in_switch_sequence_j = z_in(data, data_switch, j, s)
                     out_switch_sequence_j = z_out(data, data_switch, j, s)
                     in_switch_sequence_jprime = z_in(data, data_switch, jprime, s)
