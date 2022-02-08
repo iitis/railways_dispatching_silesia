@@ -6,8 +6,9 @@ train1 = 44717
 train2 =  44862
 station1 = "KL"
 station2 =  "MJ"
-imp_stations = ["KL", "MJ", "Mi"]
+imp_stations = ["KZ"]#["KL", "MJ", "Mi"]
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
 #print('"J":',get_J(data),'\n')
 #print('"Paths":',get_Paths(data))
@@ -24,3 +25,6 @@ print()
 print(f'\nfor important station {imp_stations} the list of trains that occupy particular station block is given below:')
 print(jtrack(data))
 print()
+print(f'\nfor important station {imp_stations} the jswitches are:')
+switch = jswitch(data, data_switch, imp_stations)
+print(switch)
