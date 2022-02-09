@@ -77,7 +77,7 @@ def get_block_station(block):
 
 def blocks_list_4station(data, train, station):
     sts = get_Paths(data)[train]
-    # print(sts)
+    
     if station not in sts:
         print('Warning: this train does not pass through this station!')
         return []
@@ -236,9 +236,20 @@ if __name__ == "__main__":
 
     path_to_data = "../data/train_schedule.csv"
     data = pd.read_csv(path_to_data, sep = ";")
-    print(blocks_list_4station(data, 34319, 'KO'))
-    x = get_trains_at_station(data, False)
-    # print(check_important_stations(data, 34319))
-    # print(x['KO'])
-    print(x)
-    print(get_J(data))
+
+    train = 26103
+    station = 'KO(STM)'
+    # for train in trains_at_stations[s]:
+    # get subsequent station for a given train
+    def subsequent_station_test(data, train, station):
+
+        sts = get_Paths(data)[train]
+        if station not in sts:
+            # print( "The train does not pass trought this station!")
+            return None
+        if sts.index(station)==len(sts)-1:
+            # print('This is the last station')
+            return None
+        return sts[sts.index(station)-1]
+    
+    print(subsequent_station_test(data, train, station))
