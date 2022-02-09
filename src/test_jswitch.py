@@ -48,7 +48,7 @@ def z_in(data_path_check, j, s, paths, station_blocks, blocks_lists):
                 previous_block = blocks_list[block_list_el_no-1]
             list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
-            
+
             if len(switch_position) != 0:
                 for s in switch_position:
                     switch = data_path_check['switches'][s]
@@ -82,9 +82,9 @@ def z_out(data_path_check, j, s, paths, station_blocks, blocks_lists):
             else:
                 next_block = blocks_list[block_list_el_no+1]
 
-            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)  
+            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
-            
+
             if len(switch_position) != 0:
                 for s in switch_position:
                     switch =  data_path_check['switches'][s]
@@ -97,7 +97,7 @@ def z_out(data_path_check, j, s, paths, station_blocks, blocks_lists):
                         switch = set(switch)
             else:
                 switch = set()
-    
+
     return switch
 
 
@@ -109,10 +109,10 @@ if __name__ == "__main__":
 
     paths = get_Paths(data)
 
-    j = 64350
-    j2 = 34319
-    s1 = 'KZ'
-    s2 = 'KZ'
+    j = 44717
+    j2 =  44862
+    s1 = 'Mi'
+    s2 = 'Mi'
     print(j, s1)
     print('-------')
     station_block = {j: blocks_list_4station(data, j, s1)}

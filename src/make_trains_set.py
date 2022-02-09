@@ -132,17 +132,19 @@ def jswitch(data, data_switch, imp_stations = None):
 
 
                     if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
-                        
+
 
                         vec_of_pairs.append( { j : "in" , jprime : "in" } )
 
 
                     elif bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
+
                         vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
 
                     elif bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
+
 
                         vec_of_pairs.append( { j : "out" , jprime : "in" } )
 
