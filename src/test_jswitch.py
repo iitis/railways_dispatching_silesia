@@ -39,7 +39,7 @@ def z_in(data_path_check, j, s, paths, station_blocks, blocks_lists):
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
 
-        
+
         if block_list_el == station_block[0]:
             next_block = blocks_list[block_list_el_no]
             if sts.index(in_station)==0:
@@ -48,7 +48,7 @@ def z_in(data_path_check, j, s, paths, station_blocks, blocks_lists):
                 previous_block = blocks_list[block_list_el_no-1]
 
             list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
-            
+
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
 
             if len(switch_position) != 0:
@@ -119,17 +119,16 @@ if __name__ == "__main__":
 
     paths = get_Paths(data)
 
-<<<<<<< HEAD
     j = 44717
     j2 =  44862
     s1 = 'Mi'
     s2 = 'Mi'
-=======
+
     j = 44862
     j2 = 44717
     s1 = 'MJ'
     s2 = 'MJ'
->>>>>>> d5c57880e8f048afe19993dabcf525465102489f
+
     print(j, s1)
     print('-------')
     station_block = {j: blocks_list_4station(data, j, s1)}
