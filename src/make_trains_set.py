@@ -5,6 +5,7 @@ from time_table_check import *
 import pandas as pd
 from utils import *
 from test_jswitch import *
+import itertools
 
 
 def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
@@ -106,7 +107,7 @@ def jswitch(data, data_switch, imp_stations = None):
 
     jswitch = {}
 
-    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, True)
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
     non_repeat_pair = non_repeating_pair_for_jswitch()
 
     paths = get_Paths(data)
@@ -118,31 +119,38 @@ def jswitch(data, data_switch, imp_stations = None):
         station_block = {j: blocks_list_4station(data, j, s) for j in trains_at_stations[s]}
         blocks_list  = {j: train_time_table(data, j)['path'].tolist() for j in trains_at_stations[s]}
 
+        for j, jprime in itertools.combinations(trains_at_stations[s], 2):
 
-        for j in trains_at_stations[s]:
+            in_switch_sequence_j = z_in(data_switch, j, s, paths, station_block, blocks_list)
+            out_switch_sequence_j = z_out(data_switch, j, s, paths, station_block, blocks_list)
+            in_switch_sequence_jprime = z_in(data_switch, jprime, s, paths, station_block, blocks_list)
+            out_switch_sequence_jprime = z_out(data_switch, jprime, s, paths, station_block, blocks_list)
 
-            for jprime in trains_at_stations[s]:
-
-                if j != jprime:
-
-                    in_switch_sequence_j = z_in(data_switch, j, s, paths, station_block, blocks_list)
-                    out_switch_sequence_j = z_out(data_switch, j, s, paths, station_block, blocks_list)
-                    in_switch_sequence_jprime = z_in(data_switch, jprime, s, paths, station_block, blocks_list)
-                    out_switch_sequence_jprime = z_out(data_switch, jprime, s, paths, station_block, blocks_list)
-
-
+<<<<<<< HEAD
                     if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
 
+=======
+            if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
+                
+                vec_of_pairs.append( { j : "in" , jprime : "in" } )
+>>>>>>> d5c57880e8f048afe19993dabcf525465102489f
 
-                        vec_of_pairs.append( { j : "in" , jprime : "in" } )
+            if bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
+                print(j, jprime)
 
-                    elif bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
+                vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
+<<<<<<< HEAD
 
                         vec_of_pairs.append( { j : "in" , jprime : "out" } )
+=======
+            if bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
+>>>>>>> d5c57880e8f048afe19993dabcf525465102489f
 
+                print(j, jprime)
 
+<<<<<<< HEAD
                     elif bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
 
 
@@ -152,8 +160,13 @@ def jswitch(data, data_switch, imp_stations = None):
                     elif bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
                         vec_of_pairs.append( { j : "out" , jprime : "out" } )
+=======
+                vec_of_pairs.append( { j : "out" , jprime : "in" } )
+>>>>>>> d5c57880e8f048afe19993dabcf525465102489f
 
+            if bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
+                vec_of_pairs.append( { j : "out" , jprime : "out" } )
 
         jswitch[s] = vec_of_pairs
 
@@ -169,11 +182,15 @@ if __name__ == "__main__":
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
     #imp_stations = ['KL', 'Mi', 'MJ', 'KO', 'CB']
-    imp_stations = ['KO(STM)']
 
     # print(josingle(data, imp_stations))
     # print(jtrack(data, imp_stations))
+    
+    imp_stations = ['MJ']
 
-    switch = jswitch(data, data_switch, imp_stations = ['KZ'])
+    mp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, True)
+    non_repeat_pair = non_repeating_pair_for_jswitch()
 
+
+    switch = jswitch(data, data_switch, imp_stations)
     print(switch)
