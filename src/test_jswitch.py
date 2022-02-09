@@ -89,10 +89,7 @@ def z_out(data_path_check, j, s, paths, station_blocks, blocks_lists):
 
             list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
-<<<<<<< HEAD
 
-=======
->>>>>>> d5c57880e8f048afe19993dabcf525465102489f
             if len(switch_position) != 0:
                 for s in switch_position:
                     switch =  data_path_check['switches'][s]

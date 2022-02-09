@@ -126,14 +126,10 @@ def jswitch(data, data_switch, imp_stations = None):
             in_switch_sequence_jprime = z_in(data_switch, jprime, s, paths, station_block, blocks_list)
             out_switch_sequence_jprime = z_out(data_switch, jprime, s, paths, station_block, blocks_list)
 
-<<<<<<< HEAD
-                    if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
 
-=======
             if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
-                
+
                 vec_of_pairs.append( { j : "in" , jprime : "in" } )
->>>>>>> d5c57880e8f048afe19993dabcf525465102489f
 
             if bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
@@ -141,28 +137,12 @@ def jswitch(data, data_switch, imp_stations = None):
 
                 vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
-<<<<<<< HEAD
-
-                        vec_of_pairs.append( { j : "in" , jprime : "out" } )
-=======
             if bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
->>>>>>> d5c57880e8f048afe19993dabcf525465102489f
+
 
                 print(j, jprime)
 
-<<<<<<< HEAD
-                    elif bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
-
-
-                        vec_of_pairs.append( { j : "out" , jprime : "in" } )
-
-
-                    elif bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
-
-                        vec_of_pairs.append( { j : "out" , jprime : "out" } )
-=======
                 vec_of_pairs.append( { j : "out" , jprime : "in" } )
->>>>>>> d5c57880e8f048afe19993dabcf525465102489f
 
             if bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
@@ -185,7 +165,7 @@ if __name__ == "__main__":
 
     # print(josingle(data, imp_stations))
     # print(jtrack(data, imp_stations))
-    
+
     imp_stations = ['MJ']
 
     mp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, True)

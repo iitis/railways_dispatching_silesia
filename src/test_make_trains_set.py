@@ -6,7 +6,7 @@ train1 = 44717
 train2 =  44862
 station1 = "KL"
 station2 =  "MJ"
-imp_stations = ["Mi"]#["KL", "MJ", "Mi"]
+imp_stations = ["MJ"]#["KL", "MJ", "Mi"]
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
