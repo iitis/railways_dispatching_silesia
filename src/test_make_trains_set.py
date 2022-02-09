@@ -22,8 +22,8 @@ print(f'\nbetween stations {imp_stations} the following trains shares a single t
 
 print(josingle(data, imp_stations))
 print()
-print(f'\nfor important station {imp_stations} the list of trains that occupy particular station block is given below:')
-print(jtrack(data))
+# print(f'\nfor important station {imp_stations} the list of trains that occupy particular station block is given below:')
+# print(jtrack(data))
 print()
 print(f'\nfor important station {imp_stations} the jswitches are:')
 switch = jswitch(data, data_switch, imp_stations)

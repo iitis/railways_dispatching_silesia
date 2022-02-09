@@ -1,4 +1,6 @@
+from tkinter.tix import Tree
 from pytest import skip
+from sympy import intersection
 from time_table_check import *
 import pandas as pd
 from utils import *
@@ -121,48 +123,34 @@ def jswitch(data, data_switch, imp_stations = None):
 
             for jprime in trains_at_stations[s]:
 
-                if jprime != j:
+                if j != jprime:
 
-                    in_switch_sequence_j = z_in(data, data_switch, j, s, paths, station_block, blocks_list)
-                    out_switch_sequence_j = z_out(data, data_switch, j, s, paths, station_block, blocks_list)
-                    in_switch_sequence_jprime = z_in(data, data_switch, jprime, s, paths, station_block, blocks_list)
-                    out_switch_sequence_jprime = z_out(data, data_switch, jprime, s, paths, station_block, blocks_list)
+                    in_switch_sequence_j = z_in(data_switch, j, s, paths, station_block, blocks_list)
+                    out_switch_sequence_j = z_out(data_switch, j, s, paths, station_block, blocks_list)
+                    in_switch_sequence_jprime = z_in(data_switch, jprime, s, paths, station_block, blocks_list)
+                    out_switch_sequence_jprime = z_out(data_switch, jprime, s, paths, station_block, blocks_list)
 
 
-                    if ( len(in_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and
-
-                        len( in_switch_sequence_j & in_switch_sequence_jprime ) != 0 ):
-
-                        print(len(in_switch_sequence_j), len(in_switch_sequence_jprime))
+                    if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
+                        
 
                         vec_of_pairs.append( { j : "in" , jprime : "in" } )
 
 
-                    elif ( len(in_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0 and
-
-                        len( in_switch_sequence_j & out_switch_sequence_jprime) != 0 ):
+                    elif bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
                         vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
-                        print(len(in_switch_sequence_j), len(out_switch_sequence_jprime))
 
-
-                    elif  ( len(out_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and
-
-                        len( out_switch_sequence_j & in_switch_sequence_jprime ) != 0 ):
+                    elif bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
 
                         vec_of_pairs.append( { j : "out" , jprime : "in" } )
-                        print(len(out_switch_sequence_j), len(in_switch_sequence_jprime))
 
 
-                    elif ( len(out_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0  and
-
-                        len( out_switch_sequence_j & out_switch_sequence_jprime ) != 0 ):
+                    elif bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
                         vec_of_pairs.append( { j : "out" , jprime : "out" } )
-                        print(len(out_switch_sequence_j), len(out_switch_sequence_jprime))
 
-                    print(vec_of_pairs)
 
 
         jswitch[s] = vec_of_pairs
@@ -183,7 +171,6 @@ if __name__ == "__main__":
 
     # print(josingle(data, imp_stations))
     # print(jtrack(data, imp_stations))
-
 
     switch = jswitch(data, data_switch, imp_stations = ['KZ'])
 

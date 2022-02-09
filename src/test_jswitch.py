@@ -29,7 +29,7 @@ def block_indices_to_interprete_switches(data_path_check, previous_block, next_b
 
 
 
-def z_in(data, data_path_check, j, s, paths, station_blocks, blocks_lists):
+def z_in(data_path_check, j, s, paths, station_blocks, blocks_lists):
 
     train = j
     in_station = s
@@ -42,28 +42,31 @@ def z_in(data, data_path_check, j, s, paths, station_blocks, blocks_lists):
         if block_list_el == station_block[0]:
             next_block = blocks_list[block_list_el_no]
             if sts.index(in_station)==0:
-                print('this is first station')
+                # print('this is first station')
                 return set()
             else:
                 previous_block = blocks_list[block_list_el_no-1]
             list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
-
-            for s in switch_position:
-                switch = data_path_check['switches'][s]
-                if type(switch) is float:
-                    switch = eval(str(switch).replace('.', ','))
-                    switch = set(switch)
-                else:
-                    #TODO: this is problem
-                    #switch = '[' + ','.join([switch]) + ']'
-                    switch = set(switch)
+            
+            if len(switch_position) != 0:
+                for s in switch_position:
+                    switch = data_path_check['switches'][s]
+                    if type(switch) is float:
+                        switch = eval(str(switch).replace('.', ','))
+                        switch = set(switch)
+                    else:
+                        switch = eval(switch)
+                        #TODO: this is problem : done
+                        switch = set(switch)
+            else:
+                switch = set()
 
     return switch
 
 
 
-def z_out(data, data_path_check, j, s, paths, station_blocks, blocks_lists):
+def z_out(data_path_check, j, s, paths, station_blocks, blocks_lists):
 
     train = j
     out_station = s
@@ -75,26 +78,26 @@ def z_out(data, data_path_check, j, s, paths, station_blocks, blocks_lists):
         if block_list_el == station_block[0]:
             previous_block = blocks_list[block_list_el_no]
             if sts.index(out_station)==len(sts)-1:
-                print('this is last station')
                 return set()
             else:
                 next_block = blocks_list[block_list_el_no+1]
 
-            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
-            # print(list_pos_next_block, list_pos_previous_block)
+            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)  
             switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
-            for s in switch_position:
-                switch =  data_path_check['switches'][s]
-                if type(switch) is float:
-                    switch = eval(str(switch).replace('.', ','))
-                    switch = set(switch)
-                else:
-                    #TODO: this is problem
-                    #switch = '[' + ','.join([switch]) + ']'
-                    switch = set(switch)
-
-
-
+            
+            if len(switch_position) != 0:
+                for s in switch_position:
+                    switch =  data_path_check['switches'][s]
+                    if type(switch) is float:
+                        switch = eval(str(switch).replace('.', ','))
+                        switch = set(switch)
+                    else:
+                        switch = eval(switch)
+                        #TODO: this is problem: done
+                        switch = set(switch)
+            else:
+                switch = set()
+    
     return switch
 
 
@@ -115,12 +118,12 @@ if __name__ == "__main__":
     station_block = {j: blocks_list_4station(data, j, s1)}
     blocks_list = {j: train_time_table(data, j)['path'].tolist()}
 
-    print(z_in(data, data_path_check, j, s1, paths, station_block, blocks_list))
-    print(z_out(data, data_path_check, j, s1, paths, station_block, blocks_list))
+    print(z_in(data_path_check, j, s1, paths, station_block, blocks_list))
+    print(z_out(data_path_check, j, s1, paths, station_block, blocks_list))
     print()
     print(j2, s2)
     print('-------')
     station_block = {j2: blocks_list_4station(data, j2, s2)}
     blocks_list = {j2: train_time_table(data, j2)['path'].tolist()}
-    print(z_in(data, data_path_check, j2, s2, paths, station_block, blocks_list))
-    print(z_out(data, data_path_check, j2, s2, paths,  station_block, blocks_list))
+    print(z_in(data_path_check, j2, s2, paths, station_block, blocks_list))
+    print(z_out(data_path_check, j2, s2, paths,  station_block, blocks_list))
