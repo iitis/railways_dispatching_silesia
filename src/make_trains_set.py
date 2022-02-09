@@ -72,9 +72,9 @@ def jtrack(data, imp_stations = None):
     init_jtrack = {}
     imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
     station_exclusion_list, block_exclusion_list = exclusion_list_jtrack()
-    
+
     for s in imp_stations_list:
-    
+
         if s not in station_exclusion_list:
             vs = [[]]
             current_blocks = []
@@ -82,17 +82,17 @@ def jtrack(data, imp_stations = None):
             for j in trains_at_stations[s]:
 
                 b = blocks_list_4station(data, j, s)
-                
+
                 if b not in block_exclusion_list:
-                    
+
                     if b in current_blocks:
 
                         i = current_blocks.index(b)+1
-                        vs[i].append(j)  
+                        vs[i].append(j)
                     else:
                         vs.append([j])
                         current_blocks.append(b)
-                
+
             if len(vs) != 0:
                 init_jtrack[s] = vs
 
@@ -121,23 +121,23 @@ def jswitch(data, data_switch, imp_stations = None):
                     out_switch_sequence_j = z_out(data, data_switch, j, s)
                     in_switch_sequence_jprime = z_in(data, data_switch, jprime, s)
                     out_switch_sequence_jprime = z_out(data, data_switch, jprime, s)
-                    
-                    
+
+
                     if ( len(in_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and
 
                         len( list( set(in_switch_sequence_j) & set(in_switch_sequence_jprime) ) ) != 0 ):
-                        
+
                         print(len(in_switch_sequence_j), len(in_switch_sequence_jprime))
 
                         vec_of_pairs.append( { j : "in" , jprime : "in" } )
-                    
+
 
                     elif ( len(in_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0 and
-                        
+
                         len( list( set(in_switch_sequence_j) & set(out_switch_sequence_jprime) ) ) != 0 ):
 
                         vec_of_pairs.append( { j : "in" , jprime : "out" } )
-                        
+
                         print(len(in_switch_sequence_j), len(out_switch_sequence_jprime))
 
 
@@ -150,7 +150,7 @@ def jswitch(data, data_switch, imp_stations = None):
 
 
                     elif ( len(out_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0  and
-                        
+
                         len( list( set(out_switch_sequence_j) & set(out_switch_sequence_jprime) ) ) != 0 ):
 
                         vec_of_pairs.append( { j : "out" , jprime : "out" } )
@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
     # print(josingle(data, imp_stations))
     # print(jtrack(data, imp_stations))
-            
+
 
     switch = jswitch(data, data_switch, imp_stations = ['KZ'])
 

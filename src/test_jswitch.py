@@ -100,15 +100,16 @@ if __name__ == "__main__":
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
-    j = 44862
-    s1 = 'KO'
-    s2 = 'KO(STM)'
+    j = 64350
+    j2 = 34319
+    s1 = 'KZ'
+    s2 = 'KZ'
     print(j, s1)
     print('-------')
-    print(z_in(data, data_path_check, j, s1))
-    print(z_out(data, data_path_check, j, s1))
+    print(set(z_in(data, data_path_check, j, s1)))
+    print(set(z_out(data, data_path_check, j, s1)))
     print()
-    print(j, s2)
+    print(j2, s2)
     print('-------')
-    print(z_in(data, data_path_check, j, s2))
-    print(z_out(data, data_path_check, j, s2))
+    print(set(z_in(data, data_path_check, j2, s2)))
+    print(set(z_out(data, data_path_check, j2, s2)))

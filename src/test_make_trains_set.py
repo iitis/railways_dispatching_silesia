@@ -10,8 +10,8 @@ imp_stations = ["KZ"]#["KL", "MJ", "Mi"]
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
-#print('"J":',get_J(data),'\n')
-#print('"Paths":',get_Paths(data))
+print('"J":',get_J(data),'\n')
+print('"Paths":',get_Paths(data))
 print(f'\nCommon station for trains {train1} and {train2}:', check_common_station(data, train1,train2))
 print('\nJround', get_jround(data))
 print(f'\nblock between stations {station1} and {station2} for train {train1}', get_blocks_b2win_station4train(data, train1, station1, station2))
