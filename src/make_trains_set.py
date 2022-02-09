@@ -123,10 +123,10 @@ def jswitch(data, data_switch, imp_stations = None):
 
                 if jprime != j:
 
-                    in_switch_sequence_j = z_in(data, data_switch, j, s, paths, station_block[j], blocks_list[j])
-                    out_switch_sequence_j = z_out(data, data_switch, j, s, paths, station_block[j], blocks_list[j])
-                    in_switch_sequence_jprime = z_in(data, data_switch, jprime, s, paths, station_block[j], blocks_list[j])
-                    out_switch_sequence_jprime = z_out(data, data_switch, jprime, s, paths, station_block[j], blocks_list[j])
+                    in_switch_sequence_j = z_in(data, data_switch, j, s, paths, station_block, blocks_list)
+                    out_switch_sequence_j = z_out(data, data_switch, j, s, paths, station_block, blocks_list)
+                    in_switch_sequence_jprime = z_in(data, data_switch, jprime, s, paths, station_block, blocks_list)
+                    out_switch_sequence_jprime = z_out(data, data_switch, jprime, s, paths, station_block, blocks_list)
 
 
                     if ( len(in_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and

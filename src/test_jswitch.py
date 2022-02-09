@@ -29,11 +29,13 @@ def block_indices_to_interprete_switches(data_path_check, previous_block, next_b
 
 
 
-def z_in(data, data_path_check, j, s, paths, station_block, blocks_list):
+def z_in(data, data_path_check, j, s, paths, station_blocks, blocks_lists):
 
     train = j
     in_station = s
     sts = paths[train]
+    station_block = station_blocks[j]
+    blocks_list = blocks_lists[j]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
 
@@ -61,11 +63,13 @@ def z_in(data, data_path_check, j, s, paths, station_block, blocks_list):
 
 
 
-def z_out(data, data_path_check, j, s, paths, station_block, blocks_list):
+def z_out(data, data_path_check, j, s, paths, station_blocks, blocks_lists):
 
     train = j
     out_station = s
     sts = paths[train]
+    station_block = station_blocks[j]
+    blocks_list = blocks_lists[j]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
         if block_list_el == station_block[0]:
@@ -108,15 +112,15 @@ if __name__ == "__main__":
     s2 = 'KZ'
     print(j, s1)
     print('-------')
-    station_block = blocks_list_4station(data, j, s1)
-    blocks_list = train_time_table(data, j)['path'].tolist()
+    station_block = {j: blocks_list_4station(data, j, s1)}
+    blocks_list = {j: train_time_table(data, j)['path'].tolist()}
 
     print(z_in(data, data_path_check, j, s1, paths, station_block, blocks_list))
     print(z_out(data, data_path_check, j, s1, paths, station_block, blocks_list))
     print()
     print(j2, s2)
     print('-------')
-    station_block = blocks_list_4station(data, j2, s2)
-    blocks_list = train_time_table(data, j2)['path'].tolist()
+    station_block = {j2: blocks_list_4station(data, j2, s2)}
+    blocks_list = {j2: train_time_table(data, j2)['path'].tolist()}
     print(z_in(data, data_path_check, j2, s2, paths, station_block, blocks_list))
     print(z_out(data, data_path_check, j2, s2, paths,  station_block, blocks_list))
