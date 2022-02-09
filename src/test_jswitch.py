@@ -29,13 +29,11 @@ def block_indices_to_interprete_switches(data_path_check, previous_block, next_b
 
 
 
-def z_in(data, data_path_check, j, s):
+def z_in(data, data_path_check, j, s, paths, station_block, blocks_list):
 
     train = j
     in_station = s
-    station_block = blocks_list_4station(data, train, in_station)
-    blocks_list = train_time_table(data, train)['path'].tolist()
-    sts = get_Paths(data)[train]
+    sts = paths[train]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
 
@@ -43,7 +41,7 @@ def z_in(data, data_path_check, j, s):
             next_block = blocks_list[block_list_el_no]
             if sts.index(in_station)==0:
                 print('this is first station')
-                return []
+                return set()
             else:
                 previous_block = blocks_list[block_list_el_no-1]
             list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
@@ -53,28 +51,28 @@ def z_in(data, data_path_check, j, s):
                 switch = data_path_check['switches'][s]
                 if type(switch) is float:
                     switch = eval(str(switch).replace('.', ','))
-                    switch = list(switch)
+                    switch = set(switch)
                 else:
-                    switch = '[' + ','.join([switch]) + ']'
+                    #TODO: this is problem
+                    #switch = '[' + ','.join([switch]) + ']'
+                    switch = set(switch)
 
     return switch
 
 
 
-def z_out(data, data_path_check, j, s):
+def z_out(data, data_path_check, j, s, paths, station_block, blocks_list):
 
     train = j
     out_station = s
-    station_block = blocks_list_4station(data, train, out_station)
-    blocks_list = train_time_table(data, train)['path'].tolist()
-    sts = get_Paths(data)[train]
+    sts = paths[train]
 
     for block_list_el_no, block_list_el in enumerate(blocks_list):
         if block_list_el == station_block[0]:
             previous_block = blocks_list[block_list_el_no]
             if sts.index(out_station)==len(sts)-1:
                 print('this is last station')
-                return []
+                return set()
             else:
                 next_block = blocks_list[block_list_el_no+1]
 
@@ -85,9 +83,11 @@ def z_out(data, data_path_check, j, s):
                 switch =  data_path_check['switches'][s]
                 if type(switch) is float:
                     switch = eval(str(switch).replace('.', ','))
-                    switch = list(switch)
+                    switch = set(switch)
                 else:
-                    switch = '[' + ','.join([switch]) + ']'
+                    #TODO: this is problem
+                    #switch = '[' + ','.join([switch]) + ']'
+                    switch = set(switch)
 
 
 
@@ -100,16 +100,23 @@ if __name__ == "__main__":
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
+    paths = get_Paths(data)
+
     j = 64350
     j2 = 34319
     s1 = 'KZ'
     s2 = 'KZ'
     print(j, s1)
     print('-------')
-    print(set(z_in(data, data_path_check, j, s1)))
-    print(set(z_out(data, data_path_check, j, s1)))
+    station_block = blocks_list_4station(data, j, s1)
+    blocks_list = train_time_table(data, j)['path'].tolist()
+
+    print(z_in(data, data_path_check, j, s1, paths, station_block, blocks_list))
+    print(z_out(data, data_path_check, j, s1, paths, station_block, blocks_list))
     print()
     print(j2, s2)
     print('-------')
-    print(set(z_in(data, data_path_check, j2, s2)))
-    print(set(z_out(data, data_path_check, j2, s2)))
+    station_block = blocks_list_4station(data, j2, s2)
+    blocks_list = train_time_table(data, j2)['path'].tolist()
+    print(z_in(data, data_path_check, j2, s2, paths, station_block, blocks_list))
+    print(z_out(data, data_path_check, j2, s2, paths,  station_block, blocks_list))

@@ -107,9 +107,15 @@ def jswitch(data, data_switch, imp_stations = None):
     imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, True)
     non_repeat_pair = non_repeating_pair_for_jswitch()
 
+    paths = get_Paths(data)
+
     for s in imp_stations_list:
 
         vec_of_pairs = []
+
+        station_block = {j: blocks_list_4station(data, j, s) for j in trains_at_stations[s]}
+        blocks_list  = {j: train_time_table(data, j)['path'].tolist() for j in trains_at_stations[s]}
+
 
         for j in trains_at_stations[s]:
 
@@ -117,15 +123,15 @@ def jswitch(data, data_switch, imp_stations = None):
 
                 if jprime != j:
 
-                    in_switch_sequence_j = z_in(data, data_switch, j, s)
-                    out_switch_sequence_j = z_out(data, data_switch, j, s)
-                    in_switch_sequence_jprime = z_in(data, data_switch, jprime, s)
-                    out_switch_sequence_jprime = z_out(data, data_switch, jprime, s)
+                    in_switch_sequence_j = z_in(data, data_switch, j, s, paths, station_block[j], blocks_list[j])
+                    out_switch_sequence_j = z_out(data, data_switch, j, s, paths, station_block[j], blocks_list[j])
+                    in_switch_sequence_jprime = z_in(data, data_switch, jprime, s, paths, station_block[j], blocks_list[j])
+                    out_switch_sequence_jprime = z_out(data, data_switch, jprime, s, paths, station_block[j], blocks_list[j])
 
 
                     if ( len(in_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and
 
-                        len( list( set(in_switch_sequence_j) & set(in_switch_sequence_jprime) ) ) != 0 ):
+                        len( in_switch_sequence_j & in_switch_sequence_jprime ) != 0 ):
 
                         print(len(in_switch_sequence_j), len(in_switch_sequence_jprime))
 
@@ -134,7 +140,7 @@ def jswitch(data, data_switch, imp_stations = None):
 
                     elif ( len(in_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0 and
 
-                        len( list( set(in_switch_sequence_j) & set(out_switch_sequence_jprime) ) ) != 0 ):
+                        len( in_switch_sequence_j & out_switch_sequence_jprime) != 0 ):
 
                         vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
@@ -143,7 +149,7 @@ def jswitch(data, data_switch, imp_stations = None):
 
                     elif  ( len(out_switch_sequence_j) != 0 and len(in_switch_sequence_jprime) != 0 and
 
-                        len( list( set(out_switch_sequence_j) & set(in_switch_sequence_jprime) ) ) != 0 ):
+                        len( out_switch_sequence_j & in_switch_sequence_jprime ) != 0 ):
 
                         vec_of_pairs.append( { j : "out" , jprime : "in" } )
                         print(len(out_switch_sequence_j), len(in_switch_sequence_jprime))
@@ -151,7 +157,7 @@ def jswitch(data, data_switch, imp_stations = None):
 
                     elif ( len(out_switch_sequence_j) != 0 and len(out_switch_sequence_jprime) != 0  and
 
-                        len( list( set(out_switch_sequence_j) & set(out_switch_sequence_jprime) ) ) != 0 ):
+                        len( out_switch_sequence_j & out_switch_sequence_jprime ) != 0 ):
 
                         vec_of_pairs.append( { j : "out" , jprime : "out" } )
                         print(len(out_switch_sequence_j), len(out_switch_sequence_jprime))
