@@ -76,7 +76,21 @@ def josingle(data, imp_stations = None):
 
     return init_josingle
 
+def jtrack_subroutine(data, s, trains_at_stations, block_exclusion_list, current_blocks, vs):
 
+    for j in trains_at_stations[s]:
+
+        b = blocks_list_4station(data, j, s)
+
+        if b not in block_exclusion_list:
+
+            if b in current_blocks:
+
+                i = current_blocks.index(b)+1
+                vs[i].append(j)
+            else:
+                vs.append([j])
+                current_blocks.append(b)
 
 def jtrack(data, imp_stations = None):
 
@@ -90,19 +104,7 @@ def jtrack(data, imp_stations = None):
             vs = [[]]
             current_blocks = []
 
-            for j in trains_at_stations[s]:
-
-                b = blocks_list_4station(data, j, s)
-
-                if b not in block_exclusion_list:
-
-                    if b in current_blocks:
-
-                        i = current_blocks.index(b)+1
-                        vs[i].append(j)
-                    else:
-                        vs.append([j])
-                        current_blocks.append(b)
+            jtrack_subroutine(data, s, trains_at_stations, block_exclusion_list, current_blocks, vs)
 
             if len(vs) != 0:
                 init_jtrack[s] = vs
@@ -110,7 +112,7 @@ def jtrack(data, imp_stations = None):
     return jtrack_dict_generation(init_jtrack)
 
 
-def make_jswitch_dict(s, j, jprime, in_switch_sequence_j, in_switch_sequence_jprime, out_switch_sequence_j, out_switch_sequence_jprime, vec_of_pairs, non_repeating_pair):
+def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequence_jprime, out_switch_sequence_j, out_switch_sequence_jprime, vec_of_pairs, non_repeating_pair):
 
     if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
 
@@ -172,7 +174,7 @@ def jswitch(data, data_switch, imp_stations = None):
             in_switch_sequence_jprime = z_in(data_switch, jprime, s, paths, station_block, blocks_list)
             out_switch_sequence_jprime = z_out(data_switch, jprime, s, paths, station_block, blocks_list)
 
-            make_jswitch_dict(s, j, jprime, in_switch_sequence_j, in_switch_sequence_jprime, out_switch_sequence_j, out_switch_sequence_jprime, vec_of_pairs, non_repeating_pair)
+            make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequence_jprime, out_switch_sequence_j, out_switch_sequence_jprime, vec_of_pairs, non_repeating_pair)
 
         jswitch[s] = vec_of_pairs
 
