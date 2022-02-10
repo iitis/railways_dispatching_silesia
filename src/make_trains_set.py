@@ -1,5 +1,6 @@
 from tkinter.tix import Tree
 from pytest import skip
+from pytools import download_from_web_if_not_present
 from sympy import intersection
 from time_table_check import *
 import pandas as pd
@@ -44,11 +45,18 @@ def important_trains_and_stations(data, imp_stations, only_departue):
 
 def exclusion_list_jtrack():
     station_exclusion_list = ['KO(KS)', 'KO(IC)']
-    block_exclusion_list = [['"KO", "ST-M", 1114, "(N/A)"'], ['"KO", "ST-M", 1113, "(N/A)"'], ['"KO", "ST-M", 1118, "(N/A)"']]
+
+    block_exclusion_list = [    ['"KO", "ST-M", 1114, "(N/A)"'], 
+                                ['"KO", "ST-M", 1113, "(N/A)"'], 
+                                ['"KO", "ST-M", 1118, "(N/A)"']
+                            ]
     return station_exclusion_list, block_exclusion_list
 
 def non_repeating_pair_for_jswitch():
-    non_repeating_pair = [ ['KO', 'KO(STM)'] , ['KO(IC)', 'KO(STM)'] , ['KO', 'KO(KS)'] ]
+    non_repeating_pair =    [   ['KO', 'KO(STM)'] , 
+                                ['KO(STM)', 'KO(IC)'] , 
+                                ['KO', 'KO(KS)'] 
+                            ]
     return non_repeating_pair
 
 def josingle(data, imp_stations = None):
@@ -108,7 +116,7 @@ def jswitch(data, data_switch, imp_stations = None):
     jswitch = {}
 
     imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
-    non_repeat_pair = non_repeating_pair_for_jswitch()
+    non_repeating_pair =  ['KO', 'KO(STM)']
 
     paths = get_Paths(data)
 
@@ -131,22 +139,25 @@ def jswitch(data, data_switch, imp_stations = None):
 
                 vec_of_pairs.append( { j : "in" , jprime : "in" } )
 
-            if bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
-                print(j, jprime)
+            if bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
                 vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
+
             if bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
 
+                if s == non_repeating_pair[1]:
+                    vec_of_pairs.append( { j : "out" , jprime : "in" } )
 
-                print(j, jprime)
+                elif subsequent_station(data, j, s) == non_repeating_pair[0] or subsequent_station(data, jprime, non_repeating_pair[1]) == s:
+                    vec_of_pairs.append( { j : "out" , jprime : "in" } )
 
-                vec_of_pairs.append( { j : "out" , jprime : "in" } )
 
             if bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
                 vec_of_pairs.append( { j : "out" , jprime : "out" } )
+
 
         jswitch[s] = vec_of_pairs
 
@@ -157,20 +168,13 @@ def jswitch(data, data_switch, imp_stations = None):
 
 if __name__ == "__main__":
 
-    # exit()
-
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-    #imp_stations = ['KL', 'Mi', 'MJ', 'KO', 'CB']
 
-    # print(josingle(data, imp_stations))
-    # print(jtrack(data, imp_stations))
+    imp_stations = [ 'KO(STM)' ]
 
-    imp_stations = ['MJ']
-
-    mp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, True)
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
     non_repeat_pair = non_repeating_pair_for_jswitch()
-
 
     switch = jswitch(data, data_switch, imp_stations)
     print(switch)
