@@ -4,9 +4,9 @@ from make_trains_set import *
 
 train1 = 44717
 train2 =  44862
-station1 = "KL"
+station1 = "Mi"
 station2 =  "MJ"
-imp_stations = ["GLC"]#["KL", "MJ", "Mi"]
+imp_stations = ["MJ"]
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
@@ -20,10 +20,11 @@ print(f'\ncommon blocks between stations {station1} and {station2} for train {tr
 print(f'\ntrains departuring from station {station1}', get_trains_at_station(data, True)[station1])
 print(f'\nbetween stations {imp_stations} the following trains shares a single track while going in opposite direction as follows:')
 
-print(josingle(data, imp_stations))
+imp_stations_s = ["KL", "MJ", "Mi"]
+print(josingle(data, imp_stations_s))
 print()
-# print(f'\nfor important station {imp_stations} the list of trains that occupy particular station block is given below:')
-# print(jtrack(data))
+print(f'\n the list of trains that occupy particular station block is given below:')
+print(jtrack(data))
 print()
 print(f'\nfor important station {imp_stations} the jswitches are:')
 switch = jswitch(data, data_switch, imp_stations)

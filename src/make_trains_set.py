@@ -46,16 +46,16 @@ def important_trains_and_stations(data, imp_stations, only_departue):
 def exclusion_list_jtrack():
     station_exclusion_list = ['KO(KS)', 'KO(IC)']
 
-    block_exclusion_list = [    ['"KO", "ST-M", 1114, "(N/A)"'], 
-                                ['"KO", "ST-M", 1113, "(N/A)"'], 
+    block_exclusion_list = [    ['"KO", "ST-M", 1114, "(N/A)"'],
+                                ['"KO", "ST-M", 1113, "(N/A)"'],
                                 ['"KO", "ST-M", 1118, "(N/A)"']
                             ]
     return station_exclusion_list, block_exclusion_list
 
 def non_repeating_pair_for_jswitch():
-    non_repeating_pair =    [   ['KO', 'KO(STM)'] , 
-                                ['KO(STM)', 'KO(IC)'] , 
-                                ['KO', 'KO(KS)'] 
+    non_repeating_pair =    [   ['KO', 'KO(STM)'] ,
+                                ['KO(STM)', 'KO(IC)'] ,
+                                ['KO', 'KO(KS)']
                             ]
     return non_repeating_pair
 
@@ -119,16 +119,16 @@ def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequen
         if s != non_repeating_pair[1]:
             vec_of_pairs.append( { j : "in" , jprime : "in" } )
 
-        elif subsequent_station(data, j, s) == non_repeating_pair[0] or subsequent_station(data, jprime, non_repeating_pair[1]) == s:
+        elif subsequent_station(data, j, non_repeating_pair[0]) != s and subsequent_station(data, jprime, non_repeating_pair[0]) != s:
             vec_of_pairs.append( { j : "in" , jprime : "in" } )
 
 
     if bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
-        
+
         if s != non_repeating_pair[1]:
             vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
-        elif subsequent_station(data, j, s) == non_repeating_pair[0] or subsequent_station(data, jprime, non_repeating_pair[1]) == s:
+        elif subsequent_station(data, j, non_repeating_pair[0]) != s and subsequent_station(data, jprime, s) != non_repeating_pair[0]:
             vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
 
@@ -137,7 +137,7 @@ def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequen
         if s != non_repeating_pair[1]:
             vec_of_pairs.append( { j : "out" , jprime : "in" } )
 
-        elif subsequent_station(data, j, s) == non_repeating_pair[0] or subsequent_station(data, jprime, non_repeating_pair[1]) == s:
+        elif subsequent_station(data, j, s) != non_repeating_pair[0] and subsequent_station(data, jprime, non_repeating_pair[0]) != s:
             vec_of_pairs.append( { j : "out" , jprime : "in" } )
 
 
@@ -146,10 +146,10 @@ def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequen
         if s != non_repeating_pair[1]:
             vec_of_pairs.append( { j : "out" , jprime : "out" } )
 
-        elif subsequent_station(data, j, s) == non_repeating_pair[0] or subsequent_station(data, jprime, non_repeating_pair[1]) == s:
+        elif subsequent_station(data, j, s) != non_repeating_pair[0] and subsequent_station(data, jprime, s) != non_repeating_pair[0]:
             vec_of_pairs.append( { j : "out" , jprime : "out" } )
 
-    
+
 
 
 def jswitch(data, data_switch, imp_stations = None):
