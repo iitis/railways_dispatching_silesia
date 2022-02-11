@@ -173,7 +173,7 @@ def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequen
 
     if bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
-        if s != non_repeating_pair[0] or (s not in non_repeating_single) :
+        if s != non_repeating_pair[0] :
             vec_of_pairs.append( { j : "out" , jprime : "out" } )
         elif subsequent_station(data, j, s) != non_repeating_pair[0] and subsequent_station(data, jprime, s) != non_repeating_pair[0]:
             vec_of_pairs.append( { j : "out" , jprime : "out" } )
