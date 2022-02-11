@@ -151,21 +151,21 @@ def jtrack(data, imp_stations = None):
 def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequence_jprime, out_switch_sequence_j, out_switch_sequence_jprime, vec_of_pairs, non_repeating_pair):
     
     if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
-        if s != non_repeating_pair[0] :
+        if s != non_repeating_pair[1] :
             vec_of_pairs.append( { j : "in" , jprime : "in" } )
         elif subsequent_station(data, j, non_repeating_pair[0]) != s and subsequent_station(data, jprime, non_repeating_pair[0]) != s:
             vec_of_pairs.append( { j : "in" , jprime : "in" } )
 
 
     if bool( in_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
-        if s != non_repeating_pair[0] :
+        if s != non_repeating_pair[1] :
             vec_of_pairs.append( { j : "in" , jprime : "out" } )
         elif subsequent_station(data, j, non_repeating_pair[0]) != s and subsequent_station(data, jprime, s) != non_repeating_pair[0]:
             vec_of_pairs.append( { j : "in" , jprime : "out" } )
 
 
     if bool( out_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
-        if s != non_repeating_pair[0] :
+        if s != non_repeating_pair[1] :
             vec_of_pairs.append( { j : "out" , jprime : "in" } )
         elif subsequent_station(data, j, s) != non_repeating_pair[0] and subsequent_station(data, jprime, non_repeating_pair[0]) != s:
             vec_of_pairs.append( { j : "out" , jprime : "in" } )
@@ -173,7 +173,7 @@ def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequen
 
     if bool( out_switch_sequence_j.intersection( out_switch_sequence_jprime ) ) != False :
 
-        if s != non_repeating_pair[0] :
+        if s != non_repeating_pair[1] :
             vec_of_pairs.append( { j : "out" , jprime : "out" } )
         elif subsequent_station(data, j, s) != non_repeating_pair[0] and subsequent_station(data, jprime, s) != non_repeating_pair[0]:
             vec_of_pairs.append( { j : "out" , jprime : "out" } )
@@ -187,8 +187,6 @@ def jswitch(data, data_switch, imp_stations = None):
 
     imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
     non_repeating_pair, non_repeating_single =  non_repeating_pair_for_jswitch()
-
-
     paths = get_Paths(data)
 
     for s in imp_stations_list:
