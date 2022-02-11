@@ -10,6 +10,19 @@ import itertools
 
 
 def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
+
+    """
+    Return:
+    -------
+    Josingle dictionary (finalized version)
+
+    Inputs:
+    -------
+    --> data, j, j', s, s', 
+    --> init_josingle (the dictionary that initially considered)
+
+    """
+
     path = get_blocks_b2win_station4train(data, j, s, s_prime, verbose = False)[0]
     path_j_prime = get_blocks_b2win_station4train(data, j_prime, s_prime, s, verbose = False)[0]
     if len(path) != 0 and path == list(reversed(path_j_prime)):
@@ -23,6 +36,18 @@ def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
         assert 'partial common path is not supported'
 
 def jtrack_dict_generation(Jtrack_dict):
+
+    """
+    Return:
+    -------
+    Jtrack dictionary (finalized version)
+
+    Inputs:
+    -------
+    ---> Jtrack_dict (the dictionary that initially considered)
+
+    """
+
     Jtrack_mod = {}
     for key in Jtrack_dict.keys():
         Jtrack_mod[key] = []
@@ -34,6 +59,26 @@ def jtrack_dict_generation(Jtrack_dict):
 
 
 def important_trains_and_stations(data, imp_stations, only_departue):
+
+    """
+    Return:
+    -------
+    --> All the importation stations
+    --> Trains corresponding to a particular station
+
+    Inputs:
+    -------
+    --> data,
+    --> 
+    (1) imp_stations = None, return a list of all important stations,
+    (2) imp_station = list of particular stations (as per requirement)
+         
+    -->
+    (1) Only departure = True, returns all the trains that departs from station
+    (2) Only departure = False, returns all the trains (i.e. departing + incoming)
+
+    """
+
     if imp_stations != None:
         imp_stations_list = imp_stations
     else:
@@ -53,9 +98,9 @@ def exclusion_list_jtrack():
     return station_exclusion_list, block_exclusion_list
 
 def non_repeating_pair_for_jswitch():
-    non_repeating_pair =    [   ['KO', 'KO(STM)'] ,
-                                ['KO(STM)', 'KO(IC)'] ,
-                                ['KO', 'KO(KS)']
+    non_repeating_pair =    [   ['KO', 'KO(STM)'], 
+                                ['KO(IC)'], 
+                                ['KO(KS)'] 
                             ]
     return non_repeating_pair
 
@@ -142,7 +187,7 @@ def jswitch(data, data_switch, imp_stations = None):
     jswitch = {}
 
     imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
-    non_repeating_pair =  [ ['KO', 'KO(STM)'], ['KO(IC)'], ['KO(KS)'] ]
+    non_repeating_pair =  non_repeating_pair_for_jswitch()
 
 
     paths = get_Paths(data)
