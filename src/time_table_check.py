@@ -1,3 +1,4 @@
+from os import pathsep
 import pandas as pd
 import numpy as np
 
@@ -103,6 +104,16 @@ def check_important_stations(data, train):
     for block in blocks:
         station_list += [key for key, value in important_stations.items() if block in value]
     return station_list
+
+def check_path_continuity(train,data):
+    paths = train_time_table(data, train)['path']
+    data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf").iloc[:,:2]
+    for i in range(len(paths)-1):
+        if data_path_check.isin([paths[i],paths[i+1]]).all(1).any() == False:
+            if data_path_check.isin([paths[i]]).any(1).any() == False:
+                print(paths[i], 'not present')
+            if data_path_check.isin([paths[i+1]]).any(1).any() == False:
+                print(paths[i+1], 'not present')
 
 # check paths time
 def check_path_time(train, data, scheme = 'complete', show_warning = True):
