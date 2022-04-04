@@ -104,37 +104,3 @@ def z_out(data_path_check, j, s, paths, station_blocks, blocks_lists):
                 switch = set()
 
     return switch
-
-
-
-if __name__ == "__main__":
-
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-    data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-
-    paths = get_Paths(data)
-
-    j = 44717
-    j2 =  44862
-    s1 = 'Mi'
-    s2 = 'Mi'
-
-    j = 44862
-    j2 = 44717
-    s1 = 'MJ'
-    s2 = 'MJ'
-
-    print(j, s1)
-    print('-------')
-    station_block = {j: blocks_list_4station(data, j, s1)}
-    blocks_list = {j: train_time_table(data, j)['path'].tolist()}
-
-    print(z_in(data_path_check, j, s1, paths, station_block, blocks_list))
-    print(z_out(data_path_check, j, s1, paths, station_block, blocks_list))
-    print()
-    print(j2, s2)
-    print('-------')
-    station_block = {j2: blocks_list_4station(data, j2, s2)}
-    blocks_list = {j2: train_time_table(data, j2)['path'].tolist()}
-    print(z_in(data_path_check, j2, s2, paths, station_block, blocks_list))
-    print(z_out(data_path_check, j2, s2, paths,  station_block, blocks_list))

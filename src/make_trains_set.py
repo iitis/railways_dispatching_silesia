@@ -5,7 +5,7 @@ from sympy import intersection
 from time_table_check import *
 import pandas as pd
 from utils import *
-from test_jswitch import *
+from make_switch_set import *
 import itertools
 
 
@@ -18,7 +18,7 @@ def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
 
     Inputs:
     -------
-    --> data, j, j', s, s', 
+    --> data, j, j', s, s',
     --> init_josingle (the dictionary that initially considered)
 
     """
@@ -69,10 +69,10 @@ def important_trains_and_stations(data, imp_stations, only_departue):
     Inputs:
     -------
     --> data,
-    --> 
+    -->
     (1) imp_stations = None, return a list of all important stations,
     (2) imp_station = list of particular stations (as per requirement)
-         
+
     -->
     (1) Only departure = True, returns all the trains that departs from station
     (2) Only departure = False, returns all the trains (i.e. departing + incoming)
@@ -98,10 +98,10 @@ def exclusion_list_jtrack():
     return station_exclusion_list, block_exclusion_list
 
 def non_repeating_pair_for_jswitch():
-    
+
     non_repeating_pairs =    ['KO', 'KO(STM)']
-    non_repeating_singles =  ['KO(IC)', 'KO(KS)'] 
-                            
+    non_repeating_singles =  ['KO(IC)', 'KO(KS)']
+
     return non_repeating_pairs, non_repeating_singles
 
 def josingle(data, imp_stations = None):
@@ -149,7 +149,7 @@ def jtrack(data, imp_stations = None):
 
 
 def make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequence_jprime, out_switch_sequence_j, out_switch_sequence_jprime, vec_of_pairs, non_repeating_pair):
-    
+
     if bool( in_switch_sequence_j.intersection( in_switch_sequence_jprime ) ) != False :
         if s != non_repeating_pair[1] :
             vec_of_pairs.append( { j : "in" , jprime : "in" } )
@@ -199,10 +199,10 @@ def jswitch(data, data_switch, imp_stations = None):
             out_switch_sequence_j = z_out(data_switch, j, s, paths, station_block, blocks_list)
             in_switch_sequence_jprime = z_in(data_switch, jprime, s, paths, station_block, blocks_list)
             out_switch_sequence_jprime = z_out(data_switch, jprime, s, paths, station_block, blocks_list)
-            
+
             if s not in non_repeating_single:
                 make_jswitch_dict(data, s, j, jprime, in_switch_sequence_j, in_switch_sequence_jprime, out_switch_sequence_j, out_switch_sequence_jprime, vec_of_pairs, non_repeating_pair)
-        
+
         jswitch[s] = vec_of_pairs
 
     return jswitch

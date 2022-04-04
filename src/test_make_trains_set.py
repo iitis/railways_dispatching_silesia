@@ -2,35 +2,63 @@ from tkinter.tix import Tree
 from utils import *
 from make_trains_set import *
 
-train1 = 44717
-train2 =  44862
-station1 = "Mi"
-station2 =  "MJ"
 
-data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
+def test_Jhelpers(data, data_switch):
 
-print('"J":',get_J(data),'\n')
-print('"Paths":',get_Paths(data))
-print(f'\nCommon station for trains {train1} and {train2}:', check_common_station(data, train1,train2))
-print(f'\nblock between stations {station1} and {station2} for train {train1}', get_blocks_b2win_station4train(data, train1, station1, station2))
-# the last is not yet working (now working)
-print(f'\ncommon blocks between stations {station1} and {station2} for train {train1} and train {train2}', get_common_blocks_and_direction_b2win_trains(data,train1, train2,station1,station2))
-print(f'\ntrains departuring from station {station1}', get_trains_at_station(data, True)[station1])
+    # vector of all trains
+    assert get_J(data) == [94766, 26103, 421009, 42100, 5312, 40518, 34319, 343199, 14006, 94611, 40150, 41004, 94113, 40673, 54101, 541019, 40477, 4500, 94317, 44717, 64350, 94717, 44862, 40628, 40675, 73000, 4120]
 
-print()
-print(" #####################  Js ######################")
+    # trains routes determined by stations
+    assert get_Paths(data)[94766] == ['Ty', 'KL', 'KO', 'KO(STM)']
+    assert get_Paths(data)[26103] == ['KZ', 'KO(STM)', 'KO', 'CB', 'GLC']
+    assert get_Paths(data)[421009] == ['KO(IC)', 'KO(STM)', 'KO']
 
-print(f'\ntrains that share the same rolling stock:')
-print('\nJround ', get_jround(data))
 
-imp_stations_s = ["CM", "CB"]
-print(f'\nbetween stations {imp_stations_s} the following trains shares a single track while going in opposite direction:')
-print('\nJsingle ', josingle(data, imp_stations_s))
+    train1 = 44717  # goes KL - MJ - Mi
+    train2 =  44862  # goes Mi - MJ - Kl
 
-print(f'\nthe lists of trains that occupy the same station block:')
-print('\nJtrack ', jtrack(data))
+    # common stations of given trains' pair
+    assert 'KO(STM)' in check_common_station(data, train1,train2)
+    assert 'KO' in check_common_station(data, train1,train2)
+    assert 'MJ' in check_common_station(data, train1,train2)
+    assert 'Mi' in check_common_station(data, train1,train2)
+    assert 'KL' in check_common_station(data, train1,train2)
 
-imp_stations = ["KO(STM)"]
-print(f'\nfor important station {imp_stations} lists of trains that occupy the same switches:')
-print('\nJswitch ', jswitch(data, data_switch, imp_stations))
+    # blocks between stations and determine whether trains goes in the same or opposite directions
+    # there is one block '"MJ-Mi", "Sem(odstep)", 1, "1", "(1)"' between Mi and MJ
+    assert get_blocks_b2win_station4train(data, train1, "MJ", "Mi") == (['"MJ-Mi", "Sem(odstep)", 1, "1", "(1)"'], False)
+    assert get_common_blocks_and_direction_b2win_trains(data,train1, train2,"MJ", "Mi") == (['"MJ-Mi", "Sem(odstep)", 1, "1", "(1)"'], 'opposite')
+
+    # trains departuring from particular station
+    assert get_trains_at_station(data, True)["Mi"] == [44717, 44862]
+
+    print("J helpers tested")
+
+
+if __name__ == "__main__":
+
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
+
+    test_Jhelpers(data, data_switch)
+
+
+    #######    particulat Js #####
+
+    # rolling stock circulation J
+    assert get_jround(data) == {'KO': [[421009, 42100], [34319, 343199], [54101, 541019]]}
+
+    # single track occupation
+    assert josingle(data, ["CM", "CB"]) == {}
+    assert josingle(data, ["Mi", "MJ"]) == {('Mi', 'MJ'): [[44862, 44717]]}
+    # specific dict format
+
+    #print(f'\nbetween stations {imp_stations_s} the following trains shares a single track while going in opposite direction:')
+    #print('\nJsingle ', josingle(data, imp_stations_s))
+
+    print(f'\nthe lists of trains that occupy the same station block:')
+    print('\nJtrack ', jtrack(data))
+
+    imp_stations = ["KO(STM)"]
+    print(f'\nfor important station {imp_stations} lists of trains that occupy the same switches:')
+    print('\nJswitch ', jswitch(data, data_switch, imp_stations))
