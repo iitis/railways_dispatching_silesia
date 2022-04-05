@@ -398,13 +398,21 @@ def keep_trains_order(
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
             # if both trains goes sp -> s and have common path
-            if occurs_as_pair(j, jp, train_sets["Jd"][sp][s]):
+            if occurs_as_pair(j, jp, train_sets["Jd"][sp][s]) and occurs_as_pair(j, jp, train_sets["Jtrack"][s]):
                 # the order on station y[j][jp][s] must be the same as
                 # on the path y[j][jp][sp] (previous station)
                 problem += (
                     y[j][jp][s] == y[j][jp][sp],
                     f"track_occupation_{j}_{jp}_{s}_{sp}",
                 )
+            elif can_MP_on_line(j, jp, s, train_sets):
+                try:
+                    problem += (
+                        get_y4(y, j, jp, s, "in") == y[j][jp][s],
+                        f"track_occupation_{j}_{jp}_{s}_{sp}",
+                                )
+                except:
+                    0.
 
                 # TODO there also should be the swithch case.
                 # if there is y-in and then trains uses the same track, there should be y-out
@@ -556,7 +564,7 @@ def switch_occ(
         if spp == sp != s:
             if can_MP_on_line(jp, jpp, s, train_sets):
                 RHS -= μ * get_y4(y, jp, jpp, sp, "in")
-            # TODO check the condition
+            # TODO check the condition later
 
         if sp == spp:
             RHS -= μ * get_y3(y, jp, jpp, sp)
