@@ -75,7 +75,7 @@ def test_helpers_of_train_sets():
 
     assert departure_station4switches("B", 1, {1: "out", 3: "out"}, train_sets) == "B"
     assert departure_station4switches("B", 1, {1: "in", 3: "in"}, train_sets) == "A"
-    assert get_μ(2, 3, 4) == 5
+    assert get_M(2, 3, 4) == 5
     assert skip_station(1, "A", train_sets) == False
 
     assert previous_train_from_Jround(train_sets, 2, "B") == 1

@@ -153,11 +153,11 @@ def departure_station4switches(s, j, place_of_switch, train_sets):
         return previous_station(S[j], s)
 
 
-def get_μ(LHS, RHS, d_max):
-    """computes minimal value of the large number μ for the order variable
+def get_M(LHS, RHS, d_max):
+    """computes minimal value of the large number M for the order variable
     y ∈ [0,1] conditional inequality such that:
 
-      LHS + delay >= RHS + delay - μ y
+      LHS + delay >= RHS + delay - M y
 
       The inequality should be checked for y = 0 and always hold for y = 1
       """

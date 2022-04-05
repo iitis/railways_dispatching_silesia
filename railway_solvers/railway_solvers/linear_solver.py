@@ -7,7 +7,7 @@ import pulp as pus
 from .helpers_functions import departure_station4switches
 from .helpers_functions import update_dictofdicts
 from .helpers_functions import earliest_dep_time
-from .helpers_functions import get_μ
+from .helpers_functions import get_M
 from .helpers_functions import tau
 from .helpers_functions import not_the_same_rolling_stock
 from .helpers_functions import previous_station
@@ -139,6 +139,7 @@ def update_y3(order_var, j, jp, s):
         update_dictofdicts(order_var, y)
 
 
+
 def update_y4(order_var, j, jp, s, sp):
     """checks if there is an order variable for (j,jp,s,sp) or for (jp,j,sp,s)
     if not creates one
@@ -260,13 +261,13 @@ def minimal_span_constrain(
         second_station=sp,
     )
 
-    μ = get_μ(LHS, RHS, d_max)
+    M = get_M(LHS, RHS, d_max)
 
     if LHS - d_max < RHS:  # otherwise always fulfilled  (redundant)
         LHS += delay_var[jp][s]
         RHS += delay_var[j][s]
 
-        RHS -= μ * get_y3(y, jp, j, s)
+        RHS -= M * get_y3(y, jp, j, s)
         problem += LHS >= RHS, f"minimal_span_{jp}_{j}_{s}_{sp}"
 
 
@@ -318,13 +319,13 @@ def single_line_constrain(
     RHS = earliest_dep_time(S, timetable, jp, sp)
     RHS += tau(timetable, "pass", first_train=jp, first_station=sp, second_station=s)
 
-    μ = get_μ(LHS, RHS, d_max)
+    M = get_M(LHS, RHS, d_max)
 
     if LHS - d_max < RHS:  # otherwise always fulfilled (redundant)
         LHS += delay_var[j][s]
 
         RHS += delay_var[jp][sp]
-        RHS -= μ * get_y4(y, j, jp, s, sp)
+        RHS -= M * get_y4(y, j, jp, s, sp)
 
         problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
 
@@ -471,7 +472,7 @@ def trains_order_at_s(
             ):  # this is the approximation used in  ArXiv:2107.03234,
                 RHS += tau(timetable, "res")
 
-        μ = get_μ(LHS, RHS, d_max)
+        M = get_M(LHS, RHS, d_max)
 
         if LHS - d_max < RHS:
 
@@ -481,7 +482,7 @@ def trains_order_at_s(
             elif sp is not None: #previous station existis
                 LHS += delay_var[jp][sp]
 
-            RHS -= μ * get_y3(y, jp, j, s)
+            RHS -= M * get_y3(y, jp, j, s)
             LHS -= delay_var[j][s]
 
             problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
@@ -564,20 +565,20 @@ def switch_occ(
             timetable, "pass", first_train=jpp, first_station=spp, second_station=s
         )
 
-    μ = get_μ(LHS, RHS, d_max)
+    M = get_M(LHS, RHS, d_max)
 
     if LHS < RHS + d_max:
 
         if spp == sp != s:
             if can_MP_on_line(jp, jpp, s, train_sets):
-                RHS -= μ * get_y4v2(y, "in", jp, jpp, s)
+                RHS -= M * get_y4v2(y, "in", jp, jpp, s)
             # TODO check the condition later
 
         if sp == spp:
-            RHS -= μ * get_y3(y, jp, jpp, sp)
+            RHS -= M * get_y3(y, jp, jpp, sp)
 
         else:
-            RHS -= μ * get_y4(y, jp, jpp, sp, spp)
+            RHS -= M * get_y4(y, jp, jpp, sp, spp)
 
         LHS += delay_var[jp][sp]
         RHS += delay_var[jpp][spp]
