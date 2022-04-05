@@ -46,7 +46,7 @@ def order_var4single_line_constrain(order_vars, train_sets):
     """
     for s in train_sets["Josingle"].keys():
         for (j, jp) in train_sets["Josingle"][s]:
-            update_y_j_jp_s_ps(order_vars, j, jp, s[0], s[1])
+            update_y4(order_vars, j, jp, s[0], s[1])
 
 
 def order_var4minimal_span_constrain(order_vars, train_sets):
@@ -63,7 +63,7 @@ def order_var4minimal_span_constrain(order_vars, train_sets):
         for all_js in train_sets["Jd"][s].values():
             for js in all_js:
                 for (j, jp) in itertools.combinations(js, 2):
-                    update_y_j_jp_s(order_vars, j, jp, s)
+                    update_y3(order_vars, j, jp, s)
 
 
 def order_var4track_occuparion_at_stations(order_vars, train_sets):
@@ -81,7 +81,7 @@ def order_var4track_occuparion_at_stations(order_vars, train_sets):
     for s in train_sets["Jtrack"].keys():
         for js in train_sets["Jtrack"][s]:
             for (j, jp) in itertools.combinations(js, 2):
-                update_y_j_jp_s(order_vars, j, jp, s)
+                update_y3(order_vars, j, jp, s)
 
 
 def order_var4switch_occupation(order_vars, train_sets):
@@ -121,26 +121,16 @@ def order_var4switch_occupation(order_vars, train_sets):
             spp = departure_station4switches(s, jpp, pair, train_sets)
             if sp == spp != s:
                 if can_MP_on_line(jp, jpp, s, train_sets):
-                    update_y_in_j_jp_s(order_var, j, jp, s)
+                    update_y4(order_var, j, jp, s, "in")
                 # todo check later
 
             if sp == spp:
-                update_y_j_jp_s(order_vars, jp, jpp, sp)
+                update_y3(order_vars, jp, jpp, sp)
             else:
-                update_y_j_jp_s_ps(order_vars, jp, jpp, sp, spp)
+                update_y4(order_vars, jp, jpp, sp, spp)
 
-# TODO - to be tested
-def update_y_in_j_jp_s(order_var, j, jp, s):
-    """checks if there is an order variable for (j,jp,s) or for (jp,j,s)
-    if not creates one
-    """
-    check1 = check_order_var_4arg(order_var, j, jp, s, "in")
-    check2 = check_order_var_4arg(order_var, jp, j, s, "in")
-    if not (check1 or check2):
-        y = pus.LpVariable.dicts("y", ([j], [jp], [s], ["in"]), 0, 1, cat="Integer")
-        update_dictofdicts(order_var, y)
 
-def update_y_j_jp_s(order_var, j, jp, s):
+def update_y3(order_var, j, jp, s):
     """checks if there is an order variable for (j,jp,s) or for (jp,j,s)
     if not creates one
     """
@@ -151,7 +141,7 @@ def update_y_j_jp_s(order_var, j, jp, s):
         update_dictofdicts(order_var, y)
 
 
-def update_y_j_jp_s_ps(order_var, j, jp, s, sp):
+def update_y4(order_var, j, jp, s, sp):
     """checks if there is an order variable for (j,jp,s,sp) or for (jp,j,sp,s)
     if not creates one
     """
