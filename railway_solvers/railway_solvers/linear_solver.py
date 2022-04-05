@@ -176,7 +176,7 @@ def get_y3(order_var, j, jp, s):
         return 1 - order_var[jp][j][s]
 
 
-def get_y3_sp(y, j, jp, s, sp):
+def get_y4(y, j, jp, s, sp):
     """gets order variable for two trains (j,jp) and two stations (s, sp)
      if there exist no such order variable, read one for reversed order (jp,j)
      and ans (sp,s) and return 1-order_var
@@ -317,7 +317,7 @@ def single_line_constrain(
         LHS += delay_var[j][s]
 
         RHS += delay_var[jp][sp]
-        RHS -= μ * get_y3_sp(y, j, jp, s, sp)
+        RHS -= μ * get_y4(y, j, jp, s, sp)
 
         problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
 
@@ -555,14 +555,14 @@ def switch_occ(
 
         if spp == sp != s:
             if can_MP_on_line(jp, jpp, s, train_sets):
-                RHS -= μ * get_y3_sp(y, jp, jpp, sp, "in")
+                RHS -= μ * get_y4(y, jp, jpp, sp, "in")
             # TODO check the condition
 
         if sp == spp:
             RHS -= μ * get_y3(y, jp, jpp, sp)
 
         else:
-            RHS -= μ * get_y3_sp(y, jp, jpp, sp, spp)
+            RHS -= μ * get_y4(y, jp, jpp, sp, spp)
 
         LHS += delay_var[jp][sp]
         RHS += delay_var[jpp][spp]
