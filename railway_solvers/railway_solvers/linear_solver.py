@@ -134,8 +134,8 @@ def update_y_in_j_jp_s(order_var, j, jp, s):
     """checks if there is an order variable for (j,jp,s) or for (jp,j,s)
     if not creates one
     """
-    check1 = check_order_var_3arg(order_var, j, jp, s)
-    check2 = check_order_var_3arg(order_var, jp, j, s)
+    check1 = check_order_var_4arg(order_var, j, jp, s, "in")
+    check2 = check_order_var_4arg(order_var, jp, j, s, "in")
     if not (check1 or check2):
         y = pus.LpVariable.dicts("y", ([j], [jp], [s], ["in"]), 0, 1, cat="Integer")
         update_dictofdicts(order_var, y)
@@ -209,10 +209,10 @@ def get_y_j_jp_s_sp(y, j, jp, s, sp):
         return 1 - y[jp][j][sp][s]
 
 
-# todo this may be confused with the below one
+
 def check_order_var_3arg(y, j, jp, s):
     """checks if in y there is an order variable for (j,jp,s) """
-    return j in y and jp in y[j] and s in y[j][jp]
+    return j in y and jp in y[j] and s in y[j][jp] and (type(y[j][jp][s]) is not dict)
 
 
 def check_order_var_4arg(y, j, jp, s, sp):
@@ -565,9 +565,8 @@ def switch_occ(
 
         if spp == sp != s:
             if can_MP_on_line(jp, jpp, s, train_sets):
-                0
-                #RHS -= μ * get_y_j_jp_s(y, jp, jpp, sp, "in")
-            # TODO add the condition
+                RHS -= μ * get_y_j_jp_s_sp(y, jp, jpp, sp, "in")
+            # TODO check the condition
 
         if sp == spp:
             RHS -= μ * get_y_j_jp_s(y, jp, jpp, sp)
