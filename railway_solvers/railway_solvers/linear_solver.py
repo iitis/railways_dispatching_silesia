@@ -154,7 +154,7 @@ def update_y4(order_var, j, jp, s, sp):
         update_dictofdicts(order_var, y)
 
 
-def get_y_j_jp_s(order_var, j, jp, s):
+def get_y3(order_var, j, jp, s):
     """gets order variable for two trains (j,jp) and one station (s)
      if there exist no such order variable, read one for reversed order (jp,j)
      and return 1-order_var
@@ -176,7 +176,7 @@ def get_y_j_jp_s(order_var, j, jp, s):
         return 1 - order_var[jp][j][s]
 
 
-def get_y_j_jp_s_sp(y, j, jp, s, sp):
+def get_y3_sp(y, j, jp, s, sp):
     """gets order variable for two trains (j,jp) and two stations (s, sp)
      if there exist no such order variable, read one for reversed order (jp,j)
      and ans (sp,s) and return 1-order_var
@@ -259,7 +259,7 @@ def minimal_span_constrain(
         LHS += delay_var[jp][s]
         RHS += delay_var[j][s]
 
-        RHS -= μ * get_y_j_jp_s(y, jp, j, s)
+        RHS -= μ * get_y3(y, jp, j, s)
         problem += LHS >= RHS, f"minimal_span_{jp}_{j}_{s}_{sp}"
 
 
@@ -317,7 +317,7 @@ def single_line_constrain(
         LHS += delay_var[j][s]
 
         RHS += delay_var[jp][sp]
-        RHS -= μ * get_y_j_jp_s_sp(y, j, jp, s, sp)
+        RHS -= μ * get_y3_sp(y, j, jp, s, sp)
 
         problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
 
@@ -422,7 +422,7 @@ def trains_order_at_s(
     if j_rr is not None: # train under investigation terminates at s and goes
     #to the subseguent train that uses the same rolling stock
         problem +=  (
-                get_y_j_jp_s(y, jp, j, s) == get_y_j_jp_s(y, jp, j_rr, s),
+                get_y3(y, jp, j, s) == get_y3(y, jp, j_rr, s),
                 f"track_occupation_{j}_{jp}_{j_rr}_{s}",
                 )
     else: #train goes further, if incuded in track occupation it has to go further
@@ -466,7 +466,7 @@ def trains_order_at_s(
             elif sp is not None: #previous station existis
                 LHS += delay_var[jp][sp]
 
-            RHS -= μ * get_y_j_jp_s(y, jp, j, s)
+            RHS -= μ * get_y3(y, jp, j, s)
             LHS -= delay_var[j][s]
 
             problem += LHS >= RHS, f"track_occupation_{j}_{jp}_{s}_p"
@@ -555,14 +555,14 @@ def switch_occ(
 
         if spp == sp != s:
             if can_MP_on_line(jp, jpp, s, train_sets):
-                RHS -= μ * get_y_j_jp_s_sp(y, jp, jpp, sp, "in")
+                RHS -= μ * get_y3_sp(y, jp, jpp, sp, "in")
             # TODO check the condition
 
         if sp == spp:
-            RHS -= μ * get_y_j_jp_s(y, jp, jpp, sp)
+            RHS -= μ * get_y3(y, jp, jpp, sp)
 
         else:
-            RHS -= μ * get_y_j_jp_s_sp(y, jp, jpp, sp, spp)
+            RHS -= μ * get_y3_sp(y, jp, jpp, sp, spp)
 
         LHS += delay_var[jp][sp]
         RHS += delay_var[jpp][spp]
