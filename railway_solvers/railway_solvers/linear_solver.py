@@ -119,13 +119,11 @@ def order_var4switch_occupation(order_vars, train_sets):
 
             sp = departure_station4switches(s, jp, pair, train_sets)
             spp = departure_station4switches(s, jpp, pair, train_sets)
-            if sp == spp != s:
-                if can_MP_on_line(jp, jpp, s, train_sets):
-                    update_y4(order_var, j, jp, s, "in")
-                # todo check later
-
             if sp == spp:
-                update_y3(order_vars, jp, jpp, sp)
+                if (sp != s and can_MP_on_line(jp, jpp, s, train_sets)):
+                    update_y4(order_vars, "in", jp, jpp, s)
+                else:
+                    update_y3(order_vars, jp, jpp, sp)
             else:
                 update_y4(order_vars, jp, jpp, sp, spp)
 
@@ -198,6 +196,15 @@ def get_y4(y, j, jp, s, sp):
     else:
         return 1 - y[jp][j][sp][s]
 
+
+def get_y4v2(y, a, j, jp, s):
+    """
+    as get_y4 but does not permute first pair
+    """
+    if check_order_var_4arg(y, a, j, jp, s):
+        return y[a][j][jp][s]
+    else:
+        return 1 - y[a][jp][j][s]
 
 
 def check_order_var_3arg(y, j, jp, s):
@@ -408,7 +415,7 @@ def keep_trains_order(
             elif can_MP_on_line(j, jp, s, train_sets):
                 try:
                     problem += (
-                        get_y4(y, j, jp, s, "in") == y[j][jp][s],
+                        get_y4(y, "in", j, jp, s) == y[j][jp][s],
                         f"track_occupation_{j}_{jp}_{s}_{sp}",
                                 )
                 except:
@@ -563,7 +570,7 @@ def switch_occ(
 
         if spp == sp != s:
             if can_MP_on_line(jp, jpp, s, train_sets):
-                RHS -= μ * get_y4(y, jp, jpp, sp, "in")
+                RHS -= μ * get_y4v2(y, "in", jp, jpp, s)
             # TODO check the condition later
 
         if sp == spp:
