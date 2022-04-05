@@ -16,6 +16,7 @@ from .helpers_functions import penalty_weights
 from .helpers_functions import skip_station
 from .helpers_functions import previous_train_from_Jround
 from .helpers_functions import subsequent_train_at_Jround
+from .helpers_functions import can_MP_on_line
 # variables
 
 # order variables
@@ -118,6 +119,10 @@ def order_var4switch_occupation(order_vars, train_sets):
 
             sp = departure_station4switches(s, jp, pair, train_sets)
             spp = departure_station4switches(s, jpp, pair, train_sets)
+            if sp != s and spp != s:
+                can_MP_on_line(jp, jpp, s, train_sets)
+                # todo add the condition
+
             if sp == spp:
                 update_y_j_jp_s(order_vars, jp, jpp, sp)
             else:
@@ -399,6 +404,9 @@ def keep_trains_order(
                     f"track_occupation_{j}_{jp}_{s}_{sp}",
                 )
 
+                # TODO there also should be the swithch case.
+                # if there is y-in and then trains uses the same track, there should be y-out
+
 
 
 def trains_order_at_s(
@@ -542,6 +550,10 @@ def switch_occ(
     μ = get_μ(LHS, RHS, d_max)
 
     if LHS < RHS + d_max:
+        if sp != s and spp != s:
+            can_MP_on_line(jp, jpp, s, train_sets)
+            # TODO add the condition
+
         if sp == spp:
             RHS -= μ * get_y_j_jp_s(y, jp, jpp, sp)
 

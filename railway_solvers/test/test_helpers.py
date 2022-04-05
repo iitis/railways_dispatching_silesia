@@ -82,3 +82,19 @@ def test_helpers_of_train_sets():
     assert subsequent_train_at_Jround(train_sets, 1, "B") == 2
     assert previous_train_from_Jround(train_sets, 1, "B") == None
     assert subsequent_train_at_Jround(train_sets, 2, "B") == None
+
+    train_sets = {
+        "Paths": {1: ["A", "B"], 2: ["C", "B"], 3: ["A", "B"]},
+        "Jd": {"A":{"B":[[1,3]]}, "C":{"B":[[2]]}},
+    }
+
+    assert can_MP_on_line(1, 3, "B", train_sets) == False
+    assert can_MP_on_line(1, 2, "B", train_sets) == True
+
+    train_sets = {
+        "Paths": {1: ["A", "B"], 2: ["C", "B"], 3: ["A", "B"]},
+        "Jd": {"A":{"B":[[1],[3]]}, "C":{"B":[[2]]}},
+    }
+
+    assert can_MP_on_line(1, 3, "B", train_sets) == True
+    assert can_MP_on_line(1, 2, "B", train_sets) == True

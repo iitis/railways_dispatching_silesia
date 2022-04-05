@@ -9,6 +9,7 @@ def occurs_as_pair(a, b, vecofvec):
     return False
 
 
+
 def update_dictofdicts(d1, d2):
     """updates d1 (nested dict of dict ...)
     by d2 -nested dict of dict ... (with the same structure but single element)
@@ -207,3 +208,18 @@ def subsequent_train_at_Jround(train_sets, j, s):
             i = enter_trains.index(j)
             next_train = pairs[i][1]
     return next_train
+
+
+
+def can_MP_on_line(j, jp, s, train_sets):
+    """ returns true if trains j and j' can M_P in the line between s and  previous sp"""
+    Jd = train_sets["Jd"]
+    S = train_sets["Paths"]
+    sp = previous_station(S[j], s)
+    spp = previous_station(S[jp], s)
+    if sp != spp:
+        return True
+    elif occurs_as_pair(j, jp, Jd[sp][s]):
+        return False
+    else:
+        return True
