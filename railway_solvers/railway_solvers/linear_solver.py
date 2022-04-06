@@ -16,7 +16,7 @@ from .helpers_functions import penalty_weights
 from .helpers_functions import skip_station
 from .helpers_functions import previous_train_from_Jround
 from .helpers_functions import subsequent_train_at_Jround
-from .helpers_functions import can_MP_on_line
+from .helpers_functions import can_MO_on_line
 from .helpers_functions import are_two_trains_entering_via_the_same_switches
 # variables
 
@@ -121,7 +121,7 @@ def order_var4switch_occupation(order_vars, train_sets):
             sp = departure_station4switches(s, jp, pair, train_sets)
             spp = departure_station4switches(s, jpp, pair, train_sets)
             if sp == spp:
-                if (sp != s and can_MP_on_line(jp, jpp, s, train_sets)):
+                if (sp != s and can_MO_on_line(jp, jpp, s, train_sets)):
                     update_y4_in(order_vars, "in", jp, jpp, s)
                 else:
                     update_y3(order_vars, jp, jpp, sp)
@@ -424,7 +424,7 @@ def keep_trains_order(
         if s in train_sets["Jd"][sp].keys():
             # if both trains goes sp -> s and have common path
             if occurs_as_pair(j, jp, train_sets["Jtrack"][s]):
-                if not can_MP_on_line(j, jp, s, train_sets):
+                if not can_MO_on_line(j, jp, s, train_sets):
                     # the order on station y[j][jp][s] must be the same as
                     # on the path y[j][jp][sp] (previous station)
                     problem += (
@@ -581,7 +581,7 @@ def switch_occ(
     if LHS < RHS + d_max:
 
         if spp == sp:
-            if sp != s and can_MP_on_line(jp, jpp, s, train_sets):
+            if sp != s and can_MO_on_line(jp, jpp, s, train_sets):
                 RHS -= M * get_y4_in(y, "in", jp, jpp, s)
             else:
                 RHS -= M * get_y3(y, jp, jpp, sp)

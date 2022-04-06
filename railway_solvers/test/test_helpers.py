@@ -92,13 +92,13 @@ def test_helpers_of_train_sets():
         "Jd": {"A":{"B":[[1,3]]}, "C":{"B":[[2]]}},
     }
 
-    assert can_MP_on_line(1, 3, "B", train_sets) == False
-    assert can_MP_on_line(1, 2, "B", train_sets) == True
+    assert can_MO_on_line(1, 3, "B", train_sets) == False
+    assert can_MO_on_line(1, 2, "B", train_sets) == True
 
     train_sets = {
         "Paths": {1: ["A", "B"], 2: ["C", "B"], 3: ["A", "B"]},
         "Jd": {"A":{"B":[[1],[3]]}, "C":{"B":[[2]]}},
     }
 
-    assert can_MP_on_line(1, 3, "B", train_sets) == True
-    assert can_MP_on_line(1, 2, "B", train_sets) == True
+    assert can_MO_on_line(1, 3, "B", train_sets) == True
+    assert can_MO_on_line(1, 2, "B", train_sets) == True

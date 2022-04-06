@@ -211,8 +211,8 @@ def subsequent_train_at_Jround(train_sets, j, s):
 
 
 
-def can_MP_on_line(j, jp, s, train_sets):
-    """ returns true if trains j and j' can M_P in the line between s and  previous sp"""
+def can_MO_on_line(j, jp, s, train_sets):
+    """ returns true if trains j and j' can M_) in the line between s and  previous sp"""
     Jd = train_sets["Jd"]
     S = train_sets["Paths"]
     sp = previous_station(S[j], s)
