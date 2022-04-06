@@ -2,6 +2,8 @@ from utils import *
 import sys
 import random
 
+### prints the timetable of the train ###
+
 data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 train_dict = timetable_to_train_dict(data)
 trains_list = list(train_dict.keys())
