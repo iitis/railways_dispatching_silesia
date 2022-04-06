@@ -240,8 +240,8 @@ def  test_M_P_with_switches_two_trains():
     taus = {"pass": {"0_A_B": 6, "1_A_B": 2},
             "stop": {"0_B": 1, "1_B": 1}, "res": 1}
     timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 1, "1_A": 3},
-                 "penalty_weights": {"0_A": 1., "1_A": 1.}}
+                 "initial_conditions": {"0_A": 1, "1_A": 5},
+                 "penalty_weights": {"0_A": 1., "1_A": 2.}}
 
     train_sets = {
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
@@ -266,8 +266,8 @@ def  test_M_P_with_switches_two_trains():
     assert vs[5].name == "y_0_1_B"
     assert vs[6].name =="y_in_0_1_B"
 
-    assert vs[0].varValue == 0
-    assert vs[1].varValue == 0
+    assert vs[0].varValue == 1
+    assert vs[1].varValue == 1
     assert vs[2].varValue == 0
     assert vs[3].varValue == 0
 
@@ -275,7 +275,7 @@ def  test_M_P_with_switches_two_trains():
     assert vs[5].varValue == 0
     assert vs[6].varValue == 0
 
-    assert prob.objective.value() == pytest.approx(0.0)
+    assert prob.objective.value() == pytest.approx(0.2)
 
 
 
