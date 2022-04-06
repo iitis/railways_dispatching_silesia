@@ -121,11 +121,12 @@ def order_var4switch_occupation(order_vars, train_sets):
             spp = departure_station4switches(s, jpp, pair, train_sets)
             if sp == spp:
                 if (sp != s and can_MP_on_line(jp, jpp, s, train_sets)):
-                    update_y4(order_vars, "in", jp, jpp, s)
+                    update_y4_in(order_vars, "in", jp, jpp, s)
                 else:
                     update_y3(order_vars, jp, jpp, sp)
             else:
                 update_y4(order_vars, jp, jpp, sp, spp)
+                # TODO this includes single line and the case sp != spp, the second shouls be moved to in
 
 
 def update_y3(order_var, j, jp, s):
@@ -153,6 +154,18 @@ def update_y4(order_var, j, jp, s, sp):
         update_dictofdicts(order_var, y)
 
 
+def update_y4_in(order_var, a, j, jp, s):
+    """checks if there is an order variable for (a,j,jp,s) or for (a,jp,j,s)
+    if not creates one
+    """
+    check1 = check_order_var_4arg(order_var, a, j, jp, s)
+    check2 = check_order_var_4arg(order_var, a, jp, j, s)
+    if not (check1 or check2):
+        y = pus.LpVariable.dicts(
+            "y", ([a], [j], [jp], [s]), 0, 1, cat="Integer"
+            )
+        update_dictofdicts(order_var, y)
+
 def get_y3(order_var, j, jp, s):
     """gets order variable for two trains (j,jp) and one station (s)
      if there exist no such order variable, read one for reversed order (jp,j)
@@ -175,8 +188,8 @@ def get_y3(order_var, j, jp, s):
         return 1 - order_var[jp][j][s]
 
 
-def get_y4(y, j, jp, s, sp):
-    """gets order variable for two trains (j,jp) and two stations (s, sp)
+def get_y4_singleline(y, j, jp, s, sp):
+    """gets order variable for two trains (j,jp) and two stations (s, sp), asingle track line case
      if there exist no such order variable, read one for reversed order (jp,j)
      and ans (sp,s) and return 1-order_var
 
@@ -198,9 +211,9 @@ def get_y4(y, j, jp, s, sp):
         return 1 - y[jp][j][sp][s]
 
 
-def get_y4v2(y, a, j, jp, s):
+def get_y4_in(y, a, j, jp, s):
     """
-    as get_y4 but does not permute first pair
+    as get_y4_singleline but permutes only j and jp
     """
     if check_order_var_4arg(y, a, j, jp, s):
         return y[a][j][jp][s]
@@ -325,7 +338,7 @@ def single_line_constrain(
         LHS += delay_var[j][s]
 
         RHS += delay_var[jp][sp]
-        RHS -= M * get_y4(y, j, jp, s, sp)
+        RHS -= M * get_y4_singleline(y, j, jp, s, sp)
 
         problem += LHS >= RHS, f"single_line_{j}_{jp}_{s}_{sp}"
 
@@ -403,6 +416,7 @@ def keep_trains_order(
 
     S = train_sets["Paths"]
     sp = previous_station(S[j], s)
+    spp = previous_station(S[jp], s)
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
             # if both trains goes sp -> s and have common path
@@ -413,18 +427,14 @@ def keep_trains_order(
                     y[j][jp][s] == y[j][jp][sp],
                     f"track_occupation_{j}_{jp}_{s}_{sp}",
                 )
-            elif can_MP_on_line(j, jp, s, train_sets):
-                try:
-                    problem += (
-                        get_y4(y, "in", j, jp, s) == y[j][jp][s],
-                        f"track_occupation_{j}_{jp}_{s}_{sp}",
-                                )
-                except:
-                    0.
+            elif sp == spp != s and can_MP_on_line(j, jp, s, train_sets) and occurs_as_pair(j, jp, train_sets["Jtrack"][s]):
+                # very particular sityation if two teains have to maintain the same order on the switch and station
 
-                # TODO there also should be the swithch case.
-                # if there is y-in and then trains uses the same track, there should be y-out
-
+                # TODO should also include to trains entering from different stations
+                problem += (
+                    get_y4_in(y, "in", j, jp, s) == y[j][jp][s],
+                    f"track_occupation_{j}_{jp}_{s}_{sp}",
+                            )
 
 
 def trains_order_at_s(
@@ -569,21 +579,22 @@ def switch_occ(
 
     if LHS < RHS + d_max:
 
-        if spp == sp != s:
-            if can_MP_on_line(jp, jpp, s, train_sets):
-                RHS -= M * get_y4v2(y, "in", jp, jpp, s)
-            # TODO check the condition later
+        if spp == sp:
+            if sp != s and can_MP_on_line(jp, jpp, s, train_sets):
+                RHS -= M * get_y4_in(y, "in", jp, jpp, s)
 
-        if sp == spp:
-            RHS -= M * get_y3(y, jp, jpp, sp)
+            else:
+                RHS -= M * get_y3(y, jp, jpp, sp)
 
         else:
-            RHS -= M * get_y4(y, jp, jpp, sp, spp)
+            RHS -= M * get_y4_singleline(y, jp, jpp, sp, spp)
+            # TODO this also inclides sp != spp what is not a single line
 
         LHS += delay_var[jp][sp]
         RHS += delay_var[jpp][spp]
 
         problem += LHS >= RHS, f"switch_{jp}_{jpp}_{s}_{sp}_{spp}"
+
 
 
 def switch_occupation(problem, timetable, delay_var, y, train_sets, d_max):

@@ -238,10 +238,10 @@ def  test_M_P_with_switches_two_trains():
     """
 
     taus = {"pass": {"0_A_B": 6, "1_A_B": 2},
-            "stop": {"0_B": 1, "1_B": 1}, "res": 1}
+            "stop": {"0_B": 1, "1_B": 1}, "res": 2}
     timetable = {"tau": taus,
                  "initial_conditions": {"0_A": 1, "1_A": 5},
-                 "penalty_weights": {"0_A": 1., "1_A": 2.}}
+                 "penalty_weights": {"0_B": 1., "1_B": 2.}}
 
     train_sets = {
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
@@ -266,6 +266,70 @@ def  test_M_P_with_switches_two_trains():
     assert vs[5].name == "y_0_1_B"
     assert vs[6].name =="y_in_0_1_B"
 
+    assert vs[0].varValue == 2
+    assert vs[1].varValue == 2
+    assert vs[2].varValue == 0
+    assert vs[3].varValue == 0
+
+    assert vs[4].varValue == 1
+    assert vs[5].varValue == 0
+    assert vs[6].varValue == 0
+
+    assert prob.objective.value() == pytest.approx(0.4)
+
+
+
+def  test_M_P_with_switches_two_trains_no_station():
+    """
+    Test single track at station and swithes constrain, switches simplified
+
+    station [ A ]
+
+    swith - c
+
+    tracks - ......
+
+                                                                                                     .
+                         .............................
+                        .                              .
+    1 -> .. 0 -> ....  c ..............................  c  . 1 -> . ......
+                                                           .
+                                                             . ... 0 -> ...
+            [ A  ]                                               [ B ]
+
+
+
+    """
+
+    taus = {"pass": {"0_A_B": 6, "1_A_B": 2},
+            "stop": {"0_B": 1, "1_B": 1}, "res": 1}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_A": 1, "1_A": 5},
+                 "penalty_weights": {"0_B": 1., "1_B": 2.}}
+
+    train_sets = {
+        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
+        "J": [0, 1],
+        "Jd": {"A":{"B": [[0], [1]]}},
+        "Josingle": dict(),
+        "Jround": dict(),
+        "Jtrack": {"A": [[0, 1]]},
+        "Jswitch": {"A": [{0:"out", 1:"out"}], "B": [{0:"in", 1:"in"}]}
+    }
+
+    prob = solve_linear_problem(train_sets, timetable, 5)
+
+    vs = prob.variables()
+
+    assert vs[0].name == "Delays_0_A"
+    assert vs[1].name == "Delays_0_B"
+    assert vs[2].name == "Delays_1_A"
+    assert vs[3].name == "Delays_1_B"
+
+    assert vs[4].name == "y_0_1_A"
+    assert vs[5].name =="y_in_0_1_B"
+
+
     assert vs[0].varValue == 1
     assert vs[1].varValue == 1
     assert vs[2].varValue == 0
@@ -273,7 +337,7 @@ def  test_M_P_with_switches_two_trains():
 
     assert vs[4].varValue == 1
     assert vs[5].varValue == 0
-    assert vs[6].varValue == 0
+
 
     assert prob.objective.value() == pytest.approx(0.2)
 
@@ -445,9 +509,6 @@ def  test_station_followed_by_station_KO_STMcase():
 
     vs = prob.variables()
 
-    print(vs)
-
-
 
     S = train_sets["Paths"]
 
@@ -502,9 +563,6 @@ def  test_3stationsIC_STM_KO_case():
     prob = solve_linear_problem(train_sets, timetable, 5)
 
     vs = prob.variables()
-
-    print(vs)
-
 
 
     S = train_sets["Paths"]
