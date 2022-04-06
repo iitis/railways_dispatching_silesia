@@ -343,6 +343,67 @@ def  test_M_P_with_switches_two_trains_no_station():
 
 
 
+def  test_swithes_three_trains():
+    """
+    Test single track at station and swithes constrain, switches simplified
+
+    station [ A ]
+
+    swith - c
+
+.
+                1 ->  .........   .
+                        [ C ]       .
+                                       .
+                                         .
+     0 -> .... .........................  c  . 1 -> .. 0 -> ....
+
+            [ A  ]                                     [ B ]
+
+
+
+    """
+
+    taus = {"pass": {"0_A_B": 4, "1_C_B": 4},
+            "stop": {"0_B": 1, "1_B": 1}, "res": 2}
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_A": 1, "1_C": 1},
+                 "penalty_weights": {"0_B": 1., "1_B": 2.}}
+
+    train_sets = {
+        "Paths": {0: ["A", "B"], 1: ["C", "B"]},
+        "J": [0, 1],
+        "Jd": {"A":{"B": [[0]]}, "C":{"B": [[1]]}},
+        "Josingle": dict(),
+        "Jround": dict(),
+        "Jtrack": {"B": [[0, 1]]},
+        "Jswitch": {"B": [{0:"in", 1:"in"}]}
+    }
+
+    prob = solve_linear_problem(train_sets, timetable, 5)
+
+    vs = prob.variables()
+
+    assert vs[0].name == "Delays_0_A"
+    assert vs[1].name == "Delays_0_B"
+    assert vs[2].name == "Delays_1_B"
+    assert vs[3].name == "Delays_1_C"
+
+    assert vs[4].name == "y_0_1_B"
+    assert vs[5].name =="y_in_0_1_B"
+
+    assert vs[0].varValue == 2
+    assert vs[1].varValue == 2
+    assert vs[2].varValue == 0
+    assert vs[3].varValue == 0
+
+    assert vs[4].varValue == 0
+    assert vs[5].varValue == 0
+
+
+    assert prob.objective.value() == pytest.approx(0.4)
+
+
 def  test_station_track_and_circulation():
 
     """

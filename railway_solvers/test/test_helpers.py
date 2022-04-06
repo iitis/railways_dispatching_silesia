@@ -83,6 +83,10 @@ def test_helpers_of_train_sets():
     assert previous_train_from_Jround(train_sets, 1, "B") == None
     assert subsequent_train_at_Jround(train_sets, 2, "B") == None
 
+    assert are_two_trains_entering_via_the_same_switches(train_sets, "B", 1, 3) == True
+    assert are_two_trains_entering_via_the_same_switches(train_sets, "B", 1, 2) == False
+    assert are_two_trains_entering_via_the_same_switches(train_sets, "A", 1, 3) == False
+
     train_sets = {
         "Paths": {1: ["A", "B"], 2: ["C", "B"], 3: ["A", "B"]},
         "Jd": {"A":{"B":[[1,3]]}, "C":{"B":[[2]]}},

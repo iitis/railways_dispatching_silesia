@@ -1,6 +1,6 @@
 import itertools
 import time
-
+import numpy as np
 import pulp as pus
 
 
@@ -17,6 +17,7 @@ from .helpers_functions import skip_station
 from .helpers_functions import previous_train_from_Jround
 from .helpers_functions import subsequent_train_at_Jround
 from .helpers_functions import can_MP_on_line
+from .helpers_functions import are_two_trains_entering_via_the_same_switches
 # variables
 
 # order variables
@@ -124,9 +125,11 @@ def order_var4switch_occupation(order_vars, train_sets):
                     update_y4_in(order_vars, "in", jp, jpp, s)
                 else:
                     update_y3(order_vars, jp, jpp, sp)
-            else:
+            elif s == sp or s == spp:
                 update_y4(order_vars, jp, jpp, sp, spp)
-                # TODO this includes single line and the case sp != spp, the second shouls be moved to in
+            else: # wh have differen s, sp and spp
+                update_y4_in(order_vars, "in", jp, jpp, s)
+
 
 
 def update_y3(order_var, j, jp, s):
@@ -420,21 +423,19 @@ def keep_trains_order(
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
             # if both trains goes sp -> s and have common path
-            if occurs_as_pair(j, jp, train_sets["Jd"][sp][s]) and occurs_as_pair(j, jp, train_sets["Jtrack"][s]):
-                # the order on station y[j][jp][s] must be the same as
-                # on the path y[j][jp][sp] (previous station)
-                problem += (
-                    y[j][jp][s] == y[j][jp][sp],
-                    f"track_occupation_{j}_{jp}_{s}_{sp}",
-                )
-            elif sp == spp != s and can_MP_on_line(j, jp, s, train_sets) and occurs_as_pair(j, jp, train_sets["Jtrack"][s]):
-                # very particular sityation if two teains have to maintain the same order on the switch and station
-
-                # TODO should also include to trains entering from different stations
-                problem += (
-                    get_y4_in(y, "in", j, jp, s) == y[j][jp][s],
-                    f"track_occupation_{j}_{jp}_{s}_{sp}",
-                            )
+            if occurs_as_pair(j, jp, train_sets["Jtrack"][s]):
+                if not can_MP_on_line(j, jp, s, train_sets):
+                    # the order on station y[j][jp][s] must be the same as
+                    # on the path y[j][jp][sp] (previous station)
+                    problem += (
+                        y[j][jp][s] == y[j][jp][sp],
+                        f"track_occupation_{j}_{jp}_{s}_{sp}",
+                    )
+                elif are_two_trains_entering_via_the_same_switches(train_sets, s, j, jp):
+                    problem += (
+                                get_y4_in(y, "in", j, jp, s) == y[j][jp][s],
+                                f"track_occupation_{j}_{jp}_{s}_{sp}",
+                                )
 
 
 def trains_order_at_s(
@@ -582,13 +583,12 @@ def switch_occ(
         if spp == sp:
             if sp != s and can_MP_on_line(jp, jpp, s, train_sets):
                 RHS -= M * get_y4_in(y, "in", jp, jpp, s)
-
             else:
                 RHS -= M * get_y3(y, jp, jpp, sp)
-
-        else:
+        elif s == spp or s == sp:
             RHS -= M * get_y4_singleline(y, jp, jpp, sp, spp)
-            # TODO this also inclides sp != spp what is not a single line
+        else: # s, sp and spp differs
+            RHS -= M * get_y4_in(y, "in", jp, jpp, s)
 
         LHS += delay_var[jp][sp]
         RHS += delay_var[jpp][spp]

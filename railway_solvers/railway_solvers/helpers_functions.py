@@ -217,9 +217,23 @@ def can_MP_on_line(j, jp, s, train_sets):
     S = train_sets["Paths"]
     sp = previous_station(S[j], s)
     spp = previous_station(S[jp], s)
+
+    if sp == None or spp == None:
+        return False
     if sp != spp:
         return True
     elif occurs_as_pair(j, jp, Jd[sp][s]):
         return False
     else:
         return True
+
+def are_two_trains_entering_via_the_same_switches(train_sets, s, j, jp):
+    if s in train_sets["Jswitch"].keys():
+        v = train_sets["Jswitch"][s]
+        are_swithes = np.array([j in e and jp in e for e in v])
+        if True in are_swithes:
+            return ('in', 'in') in [(v[i][j], v[i][jp]) for i in np.where(are_swithes == True)[0]]
+        else:
+            return False
+    else:
+        return False
