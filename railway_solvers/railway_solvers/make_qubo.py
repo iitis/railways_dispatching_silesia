@@ -79,7 +79,7 @@ def Pspan(timetable, k, k1, jsd_dicts, train_sets):
 
                     A = -tau(
                         timetable,
-                        "blocks",
+                        "headway",
                         first_train=j1,
                         second_train=j,
                         first_station=s,
@@ -88,7 +88,7 @@ def Pspan(timetable, k, k1, jsd_dicts, train_sets):
 
                     B = tau(
                         timetable,
-                        "blocks",
+                        "headway",
                         first_train=j,
                         second_train=j1,
                         first_station=s,

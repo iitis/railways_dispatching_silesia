@@ -29,7 +29,7 @@ def test_trains_paths():
 def test_auxiliary_timetable_functions():
     taus = {
         "pass": {"0_0_1": 5, "1_0_1": 7, "2_1_0": 10},
-        "blocks": {
+        "headway": {
             "0_1_0_1": 2,
             "1_0_0_1": 5,
         },

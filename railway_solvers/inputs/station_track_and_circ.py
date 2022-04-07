@@ -19,7 +19,7 @@
 
 taus = {"pass": {"0_A_B": 4, "1_B_A": 4, "2_A_B": 4},
       "stop": {"0_B": 0, "1_A": 1, "2_B": 1}, "res": 1,
-      "blocks": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 10}}
+      "headway": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 10}}
 timetable = {"tau": taus,
            "initial_conditions": {"0_A": 1, "1_B": 2, "2_A": 2},
            "penalty_weights": {"0_A": 1., "1_B": 1., "2_A": 1.}}

@@ -63,7 +63,7 @@ def toy_problem_variables(train_sets, timetable, d_max):
 """
 
 taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-        "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+        "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
         "stop": {"0_B": 1, "1_B": 1},
         "res": 1
         }

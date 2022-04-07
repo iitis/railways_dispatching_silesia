@@ -270,7 +270,7 @@ def minimal_span_constrain(
     RHS = earliest_dep_time(S, timetable, j, s)
     RHS += tau(
         timetable,
-        "blocks",
+        "headway",
         first_train=j,
         second_train=jp,
         first_station=s,

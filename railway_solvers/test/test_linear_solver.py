@@ -41,7 +41,7 @@ def test_minimal_span_two_trains():
 
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1}, "res": 1}
     timetable = {"tau": taus,
                  "initial_conditions": {"0_A": 3, "1_A": 1},
@@ -427,7 +427,7 @@ def  test_station_track_and_circulation():
 
     taus = {"pass": {"0_A_B": 4, "1_B_A": 4, "2_A_B": 4},
             "stop": {"0_B": 0, "1_A": 1, "2_B": 1}, "res": 1,
-            "blocks": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 5}}
+            "headway": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 5}}
     timetable = {"tau": taus,
                  "initial_conditions": {"0_A": 1, "1_B": 2, "2_A": 2},
                  "penalty_weights": {"0_A": 2, "1_B": 0.5, "2_A": 1}}
@@ -490,7 +490,7 @@ def  test_station_track_and_circulation2():
 
     taus = {"pass": {"0_A_B": 4, "1_B_A": 4, "2_A_B": 4},
             "stop": {"0_B": 0, "1_A": 1, "2_B": 1}, "res": 1,
-            "blocks": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 10}}
+            "headway": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 10}}
     timetable = {"tau": taus,
                  "initial_conditions": {"0_A": 1, "1_B": 2, "2_A": 2},
                  "penalty_weights": {"0_A": 1., "1_B": 1., "2_A": 1.}}
@@ -551,7 +551,7 @@ def  test_station_followed_by_station_KO_STMcase():
 
     taus = {"pass": {"0_A_B": 0, "1_A_B": 0, "0_B_C": 4, "1_B_C": 4},
             "stop": {"0_B": 3, "1_B": 1, "0_C": 1, "1_C": 1},
-            "blocks": {"0_1_B_C": 2, "1_0_B_C": 2, "0_1_A_B": 0, "1_0_A_B": 0}}
+            "headway": {"0_1_B_C": 2, "1_0_B_C": 2, "0_1_A_B": 0, "1_0_A_B": 0}}
     timetable = {"tau": taus,
                  "initial_conditions": {"0_A": 1, "1_A": 2},
                  "penalty_weights": {"0_C": 2., "1_C": 1.}}
@@ -605,7 +605,7 @@ def  test_3stationsIC_STM_KO_case():
     taus = {"pass": {"0_KO(IC)_KO(STM)": 0, "1_KO(IC)_KO(STM)": 0,
                     "0_KO(STM)_KO": 0, "1_KO(STM)_KO": 0},
             "stop": {"0_KO(STM)": 3, "1_KO(STM)": 1, "0_KO": 1, "1_KO": 1},
-            "blocks": {"0_1_KO(STM)_KO": 0, "1_0_KO(STM)_KO": 0,
+            "headway": {"0_1_KO(STM)_KO": 0, "1_0_KO(STM)_KO": 0,
                         "0_1_KO(IC)_KO(STM)": 0, "1_0_KO(IC)_KO(STM)": 0}}
     timetable = {"tau": taus,
                  "initial_conditions": {"0_KO(IC)": 1, "1_KO(IC)": 2},
@@ -654,7 +654,7 @@ def test_linear_solver_default_problem():
     """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1},
             "res": 1
             }
@@ -747,7 +747,7 @@ def test_constraint_labels():
     """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1},
             "res": 1
             }

@@ -50,7 +50,7 @@ def previous_station(path, s):
 # timetable input is extected to be in the following form of dict of dicts
 #  taus are given as
 # taus = {"pass" : {"j_s_si" : τ^pass(j,s,s1), ...},
-# "blocks" : {"j_j1_s_s1" : τ^pass(j,j1,s,s1)  .... },
+# "headway" : {"j_j1_s_s1" : τ^pass(j,j1,s,s1)  .... },
 # "stop": {"j_s_None" : τ^stop(j,s)}, "res": τ^res}
 # τ^res is just one for all situations, it may need to be extended
 
@@ -73,11 +73,11 @@ def tau(
     """given the timetable and the key returns particular time span τ(key)
     for given train and station or stations
 
-    in the key is not in ["blocks", "pass", "stop", "prep", "res"]
+    in the key is not in ["headway", "pass", "stop", "prep", "res"]
     return None
     """
-    if key == "blocks":
-        return timetable["tau"]["blocks"][
+    if key == "headway":
+        return timetable["tau"]["headway"][
             f"{first_train}_{second_train}_{first_station}_{second_station}"
         ]
     elif key == "pass":

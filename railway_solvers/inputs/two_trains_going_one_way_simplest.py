@@ -10,7 +10,7 @@ two trains, 0 and 1 are going one way A -> B test minimal span
 
 
 taus = {"pass": {"0_A_B": 4, "1_A_B": 8},
-        "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+        "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
         "stop": {"0_B": 1, "1_B": 1}, "res": 1}
 timetable = {"tau": taus,
              "initial_conditions": {"0_A": 3, "1_A": 1},

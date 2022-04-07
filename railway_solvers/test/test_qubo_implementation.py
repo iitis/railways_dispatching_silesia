@@ -46,7 +46,7 @@ def test_pspan_pstay_p1track():
     """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1},
             "res": 1
             }
@@ -267,7 +267,7 @@ def test_qubic():
     """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1},
             "res": 1
             }
@@ -369,7 +369,7 @@ def test_penalties_and_couplings():
     """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1},
             "res": 1
             }
@@ -426,7 +426,7 @@ def test_minimal_span_two_trains():
 
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1}, "res": 1}
     timetable_1 = {"tau": taus,
                  "initial_conditions": {"0_A": 3, "1_A": 1},
@@ -476,7 +476,7 @@ def  test_station_track_and_switches_two_trains():
     """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 4},
-            "blocks": {"0_1_A_B": 2, "1_0_B_A": 4},
+            "headway": {"0_1_A_B": 2, "1_0_B_A": 4},
             "stop": {"0_B": 1, "1_B": 1}, "res": 2}
     timetable_2 = {"tau": taus,
                  "initial_conditions": {"0_A": 1, "1_A": 1},
@@ -622,7 +622,7 @@ def test_performing_Qmat():
     """
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "blocks": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
             "stop": {"0_B": 1, "1_B": 1},
             "res": 1
             }
