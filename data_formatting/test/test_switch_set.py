@@ -47,6 +47,3 @@ def test_sets_of_switches():
     station_block = {j: blocks_list_4station(data, j, s)}
     blocks_list = {j: train_time_table(data, j)['path'].tolist()}
     assert z_in(data_path_check, j, s, paths, station_block, blocks_list) == {55, 54, 39}
-
-
-test_sets_of_switches()
