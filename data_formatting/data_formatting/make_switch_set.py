@@ -1,8 +1,6 @@
 from numpy import float32, indices
 import pandas as pd
-from utils import *
-from time_table_check import *
-
+from .utils import common_elements
 
 
 def block_indices_to_interprete_switches(data_path_check, previous_block, next_block):

@@ -2,11 +2,52 @@ from tkinter.tix import Tree
 from pytest import skip
 from pytools import download_from_web_if_not_present
 from sympy import intersection
-from time_table_check import *
 import pandas as pd
-from utils import *
-from make_switch_set import *
+import numpy as np
 import itertools
+from .utils import get_J
+from .time_table_check import train_time_table
+from .utils import get_trains_at_station
+from .utils import subsequent_station
+from .utils import get_blocks_b2win_station4train
+from .utils import get_all_important_station
+from .utils import blocks_list_4station
+from .utils import get_Paths
+from .make_switch_set import z_in
+from .make_switch_set import z_out
+
+# get list of train with pairs containing a train number and train number+9
+def get_trains_pair9(data):
+    trains = get_J(data)
+    pair_lists = []
+    for train in trains:
+        if train*10+9 in trains:
+            pair_lists+=[[train,train*10+9]]
+    return pair_lists
+
+# return dict
+def get_jround(data):
+    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    pair_lists = get_trains_pair9(data)
+    jround = {}
+    for pair in pair_lists:
+        a = train_time_table(data, pair[0])['path'].tolist()[0] == train_time_table(data, pair[1])['path'].tolist()[-1]
+        b = train_time_table(data, pair[1])['path'].tolist()[0] == train_time_table(data, pair[0])['path'].tolist()[-1]
+        if a:
+            block = (train_time_table(data, pair[0])['path'].tolist()[0])
+            pair = list(reversed(pair))
+        elif b:
+            block = (train_time_table(data, pair[1])['path'].tolist()[0])
+        else:
+            print("Something is wrong")
+            exit(1)
+        station = [key for key, value in important_stations.items() if block in value][0]
+        if station in jround.keys():
+            jround[station].append(pair)
+        else:
+            jround[station]=[pair]
+    return jround
+
 
 
 def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
@@ -206,18 +247,3 @@ def jswitch(data, data_switch, imp_stations = None):
         jswitch[s] = vec_of_pairs
 
     return jswitch
-
-
-
-
-if __name__ == "__main__":
-
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-
-    imp_stations = [ 'KO(KS)' ]
-    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
-    non_repeat_pair = non_repeating_pair_for_jswitch()
-
-    switch = jswitch(data, data_switch, imp_stations)
-    print(switch)

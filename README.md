@@ -14,7 +14,7 @@
 </div>
 
 This is just a brief, incomplete README with minor notes. To be
-extended. 
+extended.
 
 Please edit the org which is in [Emacs org markup](https://orgmode.org/guide/Markup.html). The md5 will be
 generated from that.
@@ -25,10 +25,19 @@ generated from that.
 
 These are the raw input data.
 
-## `src` subdirectory<a id="sec-1-2" name="sec-1-2"></a>
+## `data_formatting` subdirectory<a id="sec-1-2" name="sec-1-2"></a>
 
 Scripts to parse the input data and generate inputs in the required
-format. Ongoing work.
+format.
+
+Ongoing work.
+
+A test can be run like that:
+
+    python3 -m pytest
+
+in this directory. The `data_formatting` subdirectory (same name as
+its parent) is the parser module.
 
 ## `railway_solvers` subdirectory<a id="sec-1-3" name="sec-1-3"></a>
 

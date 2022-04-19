@@ -1,9 +1,11 @@
+from data_formatting import *
+import pandas as pd
 from tkinter.tix import Tree
-from utils import *
-from make_trains_set import *
 
+def test_helpers():
 
-def test_helpers(data, data_switch):
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
     # vector of all trains
     assert get_J(data) == [94766, 26103, 421009, 42100, 5312, 40518, 34319, 343199, 14006, 94611, 40150, 41004, 94113, 40673, 54101, 541019, 40477, 4500, 94317, 44717, 64350, 94717, 44862, 40628, 40675, 73000, 4120]
@@ -35,7 +37,10 @@ def test_helpers(data, data_switch):
     print("helpers tested")
 
 
-def test_Js(data, data_switch):
+def test_Js():
+
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
     #######    particulat Js #####
 
@@ -78,15 +83,12 @@ def test_Js(data, data_switch):
 
     assert switches['KO(KS)'] == []
 
+    print("trains sets tested")
+
     ####   Jd   have to be encoded   ########
 
 
 
-if __name__ == "__main__":
 
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-
-    test_helpers(data, data_switch)
-
-    test_Js(data, data_switch)
+test_helpers()
+test_Js()

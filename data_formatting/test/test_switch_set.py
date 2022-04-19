@@ -1,9 +1,6 @@
-from utils import *
-from time_table_check import *
-from make_switch_set import *
+from data_formatting import *
 
-
-if __name__ == "__main__":
+def test_sets_of_switches():
 
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
@@ -50,3 +47,6 @@ if __name__ == "__main__":
     station_block = {j: blocks_list_4station(data, j, s)}
     blocks_list = {j: train_time_table(data, j)['path'].tolist()}
     assert z_in(data_path_check, j, s, paths, station_block, blocks_list) == {55, 54, 39}
+
+
+test_sets_of_switches()

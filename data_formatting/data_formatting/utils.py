@@ -1,6 +1,10 @@
-from time_table_check import *
 import re
 import pandas as pd
+import numpy as np
+
+from .time_table_check import timetable_to_train_dict
+from .time_table_check import check_important_stations
+from .time_table_check import train_time_table
 
 # return total number of elements in list of lists
 def getSizeOfNestedList(listOfElem):
@@ -77,7 +81,7 @@ def get_block_station(block):
 
 def blocks_list_4station(data, train, station):
     sts = get_Paths(data)[train]
-    
+
     if station not in sts:
         print('Warning: this train does not pass through this station!')
         return []
@@ -170,37 +174,7 @@ def subsequent_station(data, train, station):
         return None
     return sts[sts.index(station)+1]
 
-# get list of train with pairs containing a train number and train number+9
-def get_trains_pair9(data):
-    trains = get_J(data)
-    pair_lists = []
-    for train in trains:
-        if train*10+9 in trains:
-            pair_lists+=[[train,train*10+9]]
-    return pair_lists
 
-# return dict
-def get_jround(data):
-    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    pair_lists = get_trains_pair9(data)
-    jround = {}
-    for pair in pair_lists:
-        a = train_time_table(data, pair[0])['path'].tolist()[0] == train_time_table(data, pair[1])['path'].tolist()[-1]
-        b = train_time_table(data, pair[1])['path'].tolist()[0] == train_time_table(data, pair[0])['path'].tolist()[-1]
-        if a:
-            block = (train_time_table(data, pair[0])['path'].tolist()[0])
-            pair = list(reversed(pair))
-        elif b:
-            block = (train_time_table(data, pair[1])['path'].tolist()[0])
-        else:
-            print("Something is wrong")
-            exit(1)
-        station = [key for key, value in important_stations.items() if block in value][0]
-        if station in jround.keys():
-            jround[station].append(pair)
-        else:
-            jround[station]=[pair]
-    return jround
 
 # def get_trains_depart_from_station(data):
 #
@@ -244,6 +218,7 @@ if __name__ == "__main__":
     def subsequent_station_test(data, train, station):
 
         sts = get_Paths(data)[train]
+        print(sts)
         if station not in sts:
             # print( "The train does not pass trought this station!")
             return None
@@ -251,5 +226,5 @@ if __name__ == "__main__":
             # print('This is the last station')
             return None
         return sts[sts.index(station)-1]
-    
+
     print(subsequent_station_test(data, train, station))
