@@ -5,7 +5,13 @@ def test_timetables():
     data_path = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
     t = get_arrdep(data, 42100) # should return arriving and dep times for blocks where they are given
-    print(t)
+    #print(t)
+
+    timetable = timetable_to_train_dict(data)
+    assert timetable[42100][0] == ['IC - IC', 'SZTYGAR', 'from Katowice', 'to Lublin Główny']
+
+    print(timetable[42100][1]['path'][0])
+
 
 
 def test_trains_paths():
