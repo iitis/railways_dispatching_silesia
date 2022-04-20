@@ -11,6 +11,9 @@ def test_Js():
     #######    particulat Js #####
 
     # rolling stock circulation J
+    # helper
+    assert get_trains_pair9(data) == [[42100, 421009], [34319, 343199], [54101, 541019]]
+    # main function
     assert get_jround(data) == {'KO': [[421009, 42100], [34319, 343199], [54101, 541019]]}
 
     # single track occupation

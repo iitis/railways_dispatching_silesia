@@ -18,6 +18,14 @@ from .make_switch_set import z_out
 
 # get list of train with pairs containing a train number and train number+9
 def get_trains_pair9(data):
+    """
+    Returns vector of pairs of train numbers such that the number of second
+    is the number of first with 9 at the end.
+
+    We expect such pairs to have the common rolling stock.
+
+    The one with 9 at the end is shunting
+    """
     trains = get_J(data)
     pair_lists = []
     for train in trains:
@@ -27,6 +35,13 @@ def get_trains_pair9(data):
 
 # return dict
 def get_jround(data):
+    """
+    return dict with stations as keys, and a vector of pairs of trains
+    with the same rolling stock. The change on the number occurs on the station
+    that is the key.
+
+    Order of trains in each pair is such as in real situation
+    """
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     pair_lists = get_trains_pair9(data)
     jround = {}

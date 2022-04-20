@@ -2,6 +2,7 @@ from os import pathsep
 import pandas as pd
 import numpy as np
 
+####   helpers that concers reading timetable and some primary checks
 
 
 # convert csv to dictionary
@@ -12,7 +13,7 @@ def timetable_to_train_dict(data):
     - dict of trains timetable
     keys: 'path', 'speed', 'Arr', 'Dep', 'Approx_enter', 'Label', 'Shunting',
        'Turnaround_time_minutes'
-    values are string, that are parsed later
+    values are strings or NaN if there is nothing corresponding in csv field
     """
     train_dict = {}
     for i in range(len(data['Unnamed: 0'])):
@@ -37,32 +38,30 @@ def timetable_to_train_dict(data):
 
 
 def train_time_table(data, train):
+    """
+    return dict of trains timetable
+    keys: 'path', 'speed', 'Arr', 'Dep', 'Approx_enter', 'Label', 'Shunting',
+       'Turnaround_time_minutes'
+    values are strings or NaN if there is nothing corresponding in csv field
+    """
     train_dict = timetable_to_train_dict(data)
     time_table = train_dict[train][1]
     return time_table
 
 def get_arrdep(data, train):
-    """ returns arriving, dep, approx dep times for blocks.
-    If not given in the timetable file returns NaN
+    """ returns arriving, dep, approx dep times for blocks in the form of dict with
+    keys: 'Arr', 'Dep', 'Approx_enter'
+
+    Values are strings, if not given in the timetable file they are NaN
     """
     time_table = train_time_table(data, train)
     arrdep = time_table.loc[:,['Arr','Dep','Approx_enter']]
     return arrdep
 
-def get_schmes(data, train, return_index = False):
-    arrdep = get_arrdep(data, train)
-    indexs = list(arrdep.dropna(how='all').index)
-    a = indexs.copy()
-    b_list = []
-    for i in range(len(a)-1):
-        b_list+= [list(range(a[i],a[i+1]))]
-    if return_index == True:
-        return b_list, indexs
-    return b_list
 
 def get_arr_dep_vals(data, train):
-    """  reads collumns [Arr, Dep, Approx_enter] from timetable .csv
-         if empty returns nan
+    """  return vector of [Arr, Dep, Approx_enter] at stations given in  .csv file
+         if filed is empty returns nan
     """
     arrdep = get_arrdep(data, train)
     short_list = arrdep.dropna(how='all')

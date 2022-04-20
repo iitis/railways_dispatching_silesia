@@ -10,8 +10,34 @@ def test_timetables():
     timetable = timetable_to_train_dict(data)
     assert timetable[42100][0] == ['IC - IC', 'SZTYGAR', 'from Katowice', 'to Lublin Główny']
 
-    print(timetable[42100][1]['path'][0])
+    #print(timetable[42100][1]['path'][0])
 
+    tt = train_time_table(data, 42100)
+
+    assert 'path' in tt
+    assert 'speed' in tt
+    assert 'Arr' in tt
+    assert 'Dep' in tt
+    assert 'Approx_enter' in tt
+    assert 'Label' in tt
+    assert 'Shunting' in tt
+    assert 'Turnaround_time_minutes' in tt
+
+    assert tt['speed'][0] == "IC"
+    assert tt['speed'][1] == "IC"
+    assert tt['speed'][2] == "IC"
+    assert tt['Dep'][0] == "16:08"
+
+    adtt = get_arrdep(data, 42100)
+
+    assert 'Arr' in adtt
+    assert 'Dep' in adtt
+    assert 'Approx_enter' in adtt
+    assert adtt["Dep"][0] == "16:08"
+
+    assert get_arr_dep_vals(data, 42100)[0][1] == '16:08'
+    assert get_arr_dep_vals(data, 42100)[1][2] == '16:12'
+    # others are nan
 
 
 def test_trains_paths():

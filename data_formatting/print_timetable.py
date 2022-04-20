@@ -10,6 +10,17 @@ data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 train_dict = timetable_to_train_dict(data)
 trains_list = list(train_dict.keys())
 
+# some indexing 
+def get_schmes(data, train, return_index = False):
+    arrdep = get_arrdep(data, train)
+    indexs = list(arrdep.dropna(how='all').index)
+    a = indexs.copy()
+    b_list = []
+    for i in range(len(a)-1):
+        b_list+= [list(range(a[i],a[i+1]))]
+    if return_index == True:
+        return b_list, indexs
+    return b_list
 
 # check path directions and type: A to B or B to A, regional or intercity
 def get_path_type_colunm(path_type,block_dir):
