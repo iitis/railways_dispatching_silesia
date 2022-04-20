@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 from .time_table_check import timetable_to_train_dict
-from .time_table_check import check_important_stations
+from .time_table_check import train_important_stations
 from .time_table_check import train_time_table
 
 # return total number of elements in list of lists
@@ -62,7 +62,7 @@ def get_Paths(data):
     trains = get_J(data)
     paths_per_train = {}
     for train in trains:
-        paths_per_train[train] = check_important_stations(data, train)
+        paths_per_train[train] = train_important_stations(data, train)
     return paths_per_train
 
 # get common station betwenn two trains, does not check order

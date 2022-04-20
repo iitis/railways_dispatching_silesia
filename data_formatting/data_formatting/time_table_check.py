@@ -73,6 +73,9 @@ def train_time_table(data, train):
     return time_table
 
 def get_arrdep(data, train):
+    """ returns arriving, dep, approx dep times for blocks.
+    If not given in the timetable file returns NaN
+    """
     time_table = train_time_table(data, train)
     arrdep = time_table.loc[:,['Arr','Dep','Approx_enter']]
     return arrdep
@@ -89,6 +92,9 @@ def get_schmes(data, train, return_index = False):
     return b_list
 
 def get_arr_dep_vals(data, train):
+    """  reads collumns [Arr, Dep, Approx_enter] from timetable .csv
+         if empty returns nan
+    """
     arrdep = get_arrdep(data, train)
     short_list = arrdep.dropna(how='all')
     arr_dep_vals = []
@@ -96,7 +102,8 @@ def get_arr_dep_vals(data, train):
         arr_dep_vals+=[short_list.iloc[i].tolist()]
     return arr_dep_vals
 
-def check_important_stations(data, train):
+def train_important_stations(data, train):
+    """  return the vector of important stations of given train """
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     time_table = train_time_table(data, train)
     blocks = time_table['path']
@@ -105,9 +112,13 @@ def check_important_stations(data, train):
         station_list += [key for key, value in important_stations.items() if block in value]
     return station_list
 
-def check_path_continuity(train,data):
+def check_path_continuity(data, data_path_check, train):
+    """ for given train checks if its path given in data in continious
+     with regards to possible paths in data_path_check  if not prints not present
+
+     To be completed
+     """
     paths = train_time_table(data, train)['path']
-    data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf").iloc[:,:2]
     for i in range(len(paths)-1):
         if data_path_check.isin([paths[i],paths[i+1]]).all(1).any() == False:
             if data_path_check.isin([paths[i]]).any(1).any() == False:
