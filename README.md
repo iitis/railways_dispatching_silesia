@@ -5,7 +5,7 @@
 <li><a href="#sec-1">1. Files</a>
 <ul>
 <li><a href="#sec-1-1">1.1. <code>data</code> subdirectory</a></li>
-<li><a href="#sec-1-2">1.2. <code>src</code> subdirectory</a></li>
+<li><a href="#sec-1-2">1.2. <code>data_formatting</code> subdirectory</a></li>
 <li><a href="#sec-1-3">1.3. <code>railway_solvers</code> subdirectory</a></li>
 </ul>
 </li>
