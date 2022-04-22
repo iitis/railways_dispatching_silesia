@@ -1,0 +1,81 @@
+Train schedule is in file: '''train_schedule.csv''', the '''train_schedule_1.csv''' is somehow modified schedule for some initial play with re-routing.
+
+The infrastructure (all possible connection of blocks with passing times is in '''KZ-KO-KL-CB_paths.ods''').
+
+Network diagram is in '''railway_network_detailed.pdf''', or the more updated version in article on overlief.
+
+##################### '''train_schedule.csv''' ###########################
+
+First column consist of:
+
+####
+company - train type,
+train number (unique)
+train name or line (not unique)
+starting point of the train (within or outside analysed network part)
+blocks within analysed network part (multi row)
+ending point of the train
+
+blocks are in string divided onto station blocks and line blocks:
+
+station blocks: "station symbol", "ST" or "ST-M", track n.o. "(platform n.o.)"
+
+line block: "one_station-otner_station", "SBL", track id, "block id.", "(number of blocks between stations)"
+
+"SBL" is the symbol of blocking system, may be others
+
+"SBL + PO ..." - the stop within the block
+
+"SBL + sem(ST)" - a station entrance / leaving signal.
+
+
+more details in ```block_description.txt```
+
+Block strings are unique, what is used it train's path comparison.
+
+Block rows correspond with following columns:
+
+speed: IC or R -- it is then used in infrastructure file to read the passing time of the train's type
+There are sometimes semi-fast trains that has R for the part of the trip and IC for the part.
+
+Arr- scheduled arrival time in minute precision
+Dep - scheduled departure time in minute precision
+Approx_enter - estimated from timetable arrival time, for shunting or if the train does not stop
+e.g. KZ case
+
+Label- stations or stop names
+
+Shunting - yes if train enter the block during shunting
+
+Turnaround_time_minutes - additional stay if train turn around at this block
+
+Particular blocks:
+
+"KO(IC)", "B-M", 500, "(N/A)", "Rac(KS)", "B-M", 200, "(N/A)", "KO", "ST-M", 1113, "(N/A)", "KO", "ST-M", 1114, "(N/A)", "KO", "ST-M", 1118, "(N/A)"
+- these are depots, here one do not check for one train on the block
+
+If two trains has the similar number, such as at one there is 9 added at the end, they share the same rolling stock and the one with 9 is the shunting.
+
+######################### '''KZ-KO-KL-CB_paths.ods''' ##########################
+
+All possible trains paths. Colours correspond to particular station or lines.
+
+Columns: previous_block next_block are two neighbours blocks
+
+Column: direction is the corresponding station or line
+
+Columns: default_A-B, Y / N / X - if Y going previous_block -&gt; next_block is possible and it is default (usual) setting of the network; if N going previous_block -&gt; next_block is possible but it is not-default (unusual) setting of the network; if X going previous_block -&gt; next_block is not possible
+
+Column default_B-A the same but for going previous_block <- next_block
+
+Column: switches - numbers of switches to be passed within station if going previous_block -&gt; next_block or previous_block <- next_block. Numbers are unique within given station. If no switches e.g. for line block N/A
+
+Column: time_inter_city_A-B passing time of train with mark IC from previous_block to next_block. It correspond passing of whole previous_block (from entrance signal) to entrance signal of next_block. Minimal stay at station is included here is occurs (it should be occasionally enlarged by Turnaround_time_minutes if appears in train's path).
+
+Column: time_inter_city_B-A passing time of train with mark IC from next_block next_block. It correspond passing of whole next_block !!! (from entrance signal) to entrance signal of previous_block.
+
+Notation previous_block next_block are from first two columns not train direction.
+
+Columns: time_regional_train_A-B and time_regional_train_B-A the same but for trains marked as regional, (in general additional stops ate accounted for).
+
+
