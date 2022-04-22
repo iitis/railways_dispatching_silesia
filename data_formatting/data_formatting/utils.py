@@ -6,9 +6,13 @@ from .time_table_check import timetable_to_train_dict
 from .time_table_check import train_important_stations
 from .time_table_check import train_time_table
 
-# return total number of elements in list of lists
+
 def getSizeOfNestedList(listOfElem):
-    ''' Get number of elements in a nested list'''
+    """
+    Get number of elements in a nested list
+
+    return total number of elements in list of lists
+    """
     count = 0
     # Iterate over the list
     for elem in listOfElem:
@@ -20,12 +24,14 @@ def getSizeOfNestedList(listOfElem):
             count += 1
     return count
 
-# make a single list of lists of lists
+
 def flatten(t):
+    """ make a single list of lists of lists """
     return [item for sublist in t for item in sublist]
 
-# get common elements, but without order
+
 def common_elements(list1, list2):
+    """ get common elements, order such as in list1 """
     return [element for element in list1 if element in list2]
 
 # generate sublists in order
@@ -49,29 +55,16 @@ def sublist(l1,l2):
     else:
         return False
 
-# return a dictionary of trains
-def get_J(data):
-    train_dict = timetable_to_train_dict(data)
-    return list(train_dict.keys())
 
-def get_all_important_station():
-    return list(np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()].keys())
 
-# return a dictonary of important stations
-def get_Paths(data):
-    trains = get_J(data)
-    paths_per_train = {}
-    for train in trains:
-        paths_per_train[train] = train_important_stations(data, train)
-    return paths_per_train
-
-# get common station betwenn two trains, does not check order
 def check_common_station(data, train1, train2):
+    """ get common stations of two trains, does not check order """
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
-# get common blocks between trains, does not check order
+
 def check_common_blocks_elements(data , train1, train2):
+    """ get common blocks between trains, does not check order """
     return common_elements(list(train_time_table(data, train1)['path']),list(train_time_table(data, train2)['path']))
 
 # check which important station the block belongs to
@@ -206,25 +199,21 @@ def get_trains_at_station(data,only_departue = False):
                     trains_from_station[station].append(train)
     return trains_from_station
 
-if __name__ == "__main__":
 
-    path_to_data = "../data/train_schedule.csv"
-    data = pd.read_csv(path_to_data, sep = ";")
+def get_J(data):
+    """  return a dictionary of trains """
+    train_dict = timetable_to_train_dict(data)
+    return list(train_dict.keys())
 
-    train = 26103
-    station = 'KO(STM)'
-    # for train in trains_at_stations[s]:
-    # get subsequent station for a given train
-    def subsequent_station_test(data, train, station):
+def get_all_important_station():
+    """ read important stations from file """
+    return list(np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()].keys())
 
-        sts = get_Paths(data)[train]
-        print(sts)
-        if station not in sts:
-            # print( "The train does not pass trought this station!")
-            return None
-        if sts.index(station)==len(sts)-1:
-            # print('This is the last station')
-            return None
-        return sts[sts.index(station)-1]
 
-    print(subsequent_station_test(data, train, station))
+def get_Paths(data):
+    """ return a dictonary of important stations, keys are trains numbers """
+    trains = get_J(data)
+    paths_per_train = {}
+    for train in trains:
+        paths_per_train[train] = train_important_stations(data, train)
+    return paths_per_train

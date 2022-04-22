@@ -82,14 +82,13 @@ def train_important_stations(data, train):
 
 def check_path_continuity(data, data_path_check, train):
     """ for given train checks if its path given in data in continious
-     with regards to possible paths in data_path_check  if not prints not present
-
-     To be completed
+     with regards to possible paths in data_path_check  if not raise AssertionError
+    `not present`
      """
     paths = train_time_table(data, train)['path']
     for i in range(len(paths)-1):
         if data_path_check.isin([paths[i],paths[i+1]]).all(1).any() == False:
             if data_path_check.isin([paths[i]]).any(1).any() == False:
-                print(paths[i], 'not present')
+                raise AssertionError(paths[i], 'not present in possible paths')
             if data_path_check.isin([paths[i+1]]).any(1).any() == False:
-                print(paths[i+1], 'not present')
+                raise AssertionError(paths[i], 'not present in possible paths')

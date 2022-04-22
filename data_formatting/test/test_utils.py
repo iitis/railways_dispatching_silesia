@@ -18,6 +18,20 @@ def test_helpers():
 
     assert getSizeOfNestedList(t) == 4
 
+def test_helpers4trains_paths():
+
+        path_to_data = "../data/train_schedule.csv"
+        data = pd.read_csv(path_to_data, sep = ";")
+
+        train1 = 42100
+        train2 = 5312
+
+
+        assert 'KZ' in check_common_station(data, train1, train2)
+        assert 'KO(STM)' in check_common_station(data, train1, train2)
+        assert 'KO' in check_common_station(data, train1, train2)
+
+
 
 def test_trains_path():
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
