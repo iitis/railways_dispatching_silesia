@@ -16,22 +16,33 @@ starting point of the train (within or outside analysed network part)
 blocks within analysed network part (multi row)
 ending point of the train
 
-blocks are in string divided onto station blocks and line blocks:
+Blocks are in string divided onto station blocks and line blocks:
 
-station blocks: "station symbol", "ST" or "ST-M", track n.o. "(platform n.o.)"
+- station blocks: "Station symbol", "Type", Track Number; "(Platform number)"
 
-line block: "one_station-otner_station", "SBL", track id, "block id.", "(number of blocks between stations)"
+    Station block symbols:
+    "ST" - station
+    "PODG" - branch junction
+    "ST-M" - shunting area
+    "B-M" - technical maintenance or depot
+       
 
-"SBL" is the symbol of blocking system, may be others
 
-"SBL + PO ..." - the stop within the block
+- line blocks: "Previous Post Symbol - Subsequent Post Symbol - Track Number"; "Type of line block"; Track Number; "Number of block in sequence"; "(Total number of blocks between blocks)"
 
-"SBL + sem(ST)" - a station entrance / leaving signal.
+   Signalling types used in the line blocks:
+   "SBL" is the symbol of blocking system, may be others
+
+   "SBL + PO ..." - the stop for passegers within the block equipped with SBL
+
+   "SBL + sem(ST)" - a station entrance / leaving signal.
 
 
-more details in ```block_description.txt```
+   more details in ```block_description.txt```
 
 Block strings are unique, what is used it train's path comparison.
+
+
 
 Block rows correspond with following columns:
 
