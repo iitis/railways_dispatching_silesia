@@ -40,7 +40,7 @@ Blocks are in string divided onto station blocks and line blocks:
 
    more details in ```block_description.txt```
 
-Block strings are unique, what is used it train's path comparison.
+Block strings are unique, what is used it train's path comparison. 
 
 
 
