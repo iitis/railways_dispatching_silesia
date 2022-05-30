@@ -137,23 +137,6 @@ def test_5_trains_all_cases():
     ) == (2.0, 30.0)
     assert prob.objective.value() == pytest.approx(1.01)
 
-    p_sum = 2.5
-    p_pair = 1.25
-    p_pair_qubic = 1.25
-    p_qubic = 2.1
-
-    Q = make_Q(train_sets, timetable, d_max, p_sum, p_pair, p_pair_qubic,
-               p_qubic
-               )
-
-    # np.savez("test/files/Qfile_5trains.npz", Q=Q)
-
-    sol = np.load("test/files/solution_5trains.npz")
-
-    # offset = (2*3+1+2)*2.5 = -22.5
-
-    assert energy(sol, Q) == pytest.approx(-22.5 + 1.01)
-
 
 def test_many_trains_single_line():
     """
