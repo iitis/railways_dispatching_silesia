@@ -218,6 +218,9 @@ def can_MO_on_line(j, jp, s, train_sets):
     sp = previous_station(S[j], s)
     spp = previous_station(S[jp], s)
 
+    if Jd == dict():
+        return False
+
     if sp == None or spp == None:
         return False
     if sp != spp:
