@@ -793,7 +793,7 @@ def test_constraint_labels():
         "Josingle": {("A", "B"): [[1,2]]},
         "Jround": dict(),
         "Jtrack": {"B": [[0, 1]]},
-        "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
+        "Jswitch": dict(),
         "add_swithes_at_s": ["B"]
     }
 
