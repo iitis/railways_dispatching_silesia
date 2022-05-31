@@ -53,7 +53,7 @@ train_sets_rerouted = {
     "Josingle": {("A", "B"): [[1,2]]},
     "Jround": dict(),
     "Jtrack": {"B": [[0, 1]]},
-    "Jswitch": dict(),
+    "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
     "add_swithes_at_s": ["B"]
 }
 
