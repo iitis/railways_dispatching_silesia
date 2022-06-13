@@ -18,7 +18,6 @@ import importlib
 def get_file_name(
     input_name,
     method,
-    train_route,
     num_reads=None,
     annealing_time=None,
     chain_strength=None,
@@ -29,8 +28,6 @@ def get_file_name(
     :type input_name: str
     :param method: method of execution
     :type method: str
-    :param train_route: Default or rerouted
-    :type train_route: str
     :param num_reads: Number of reads in QA
     :type num_reads: int
     :param annealing_time: Annealing time for QA
@@ -40,10 +37,10 @@ def get_file_name(
     :return: name of the file to be stored
     :rtype: str
     """
-    folder = f"annealing_results\{input_name}"
+    folder = f"annealing_results/{input_name}"
     if not os.path.exists(folder):
         os.mkdir(folder)
-    fname = f"{method}_{train_route}"
+    fname = f"{method}"
     if num_reads != None:
         fname += f"_{num_reads}_{annealing_time}_{chain_strength}"
     return os.path.join(folder, fname)
@@ -63,7 +60,7 @@ def log_experiment(folder, file_name, bqm, dict_list):
     """
 
     logging.basicConfig(
-        filename=os.path.join(f"annealing_results\{folder}", "results.log"),
+        filename=os.path.join(f"annealing_results/{folder}", "results.log"),
         level=logging.INFO,
     )
     logging.info("------------------------new run---------------------")
@@ -96,7 +93,7 @@ def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
 
 
 def annealing(
-    prob, method, train_route, input_name, pdict=None, real_anneal_var_dict=None
+    prob, method, input_name, pdict=None, real_anneal_var_dict=None
 ):
     """Performs the annealing experiment
 
@@ -104,8 +101,6 @@ def annealing(
     :type prob: pulp.pulp.LpProblem
     :param method: 'sim', 'real', 'hyb', 'cqm'
     :type method: str
-    :param train_route: 'deafault' or 'rerouted'
-    :type train_route: str
     :param input_name: name of the input data
     :type input_name: str
     :param pdict: Dictionary containing penalty values
@@ -115,7 +110,7 @@ def annealing(
     """
 
     assert method in ["sim", "real", "hyb", "cqm"]
-    file_name = get_file_name(input_name, method, train_route)
+    file_name = get_file_name(input_name, method)
     if method == "cqm":
         cqm, interpreter = convert_to_cqm(prob)
         sampleset = constrained_solver(cqm)
@@ -130,7 +125,6 @@ def annealing(
             file_name = get_file_name(
                 input_name,
                 method,
-                train_route,
                 num_reads,
                 annealing_time,
                 chain_strength,
@@ -150,13 +144,11 @@ def annealing(
     log_experiment(input_name, file_name, bqm, dict_list)
 
 
-def test_all_files(method, train_route="default", pdict=None, real_anneal_var=None):
+def test_all_files(method, pdict=None, real_anneal_var=None):
     """Runs the annealing experiment for the files inside the inputs folder
 
     :param method: 'sim', 'real', 'hyb', 'cqm'
     :type method: str
-    :param train_route: 'default' or 'rerouted'
-    :type train_route: str
     :param pdict: Dictionary containing penalty values
     :type pdict: Dict[str, float]
     :param real_anneal_var_dict: Parameters for QA
@@ -164,12 +156,12 @@ def test_all_files(method, train_route="default", pdict=None, real_anneal_var=No
 
     """
     for file in os.listdir("inputs"):
-        if "init" not in file and "pycach" not in file:
-            test_single_file(file[:-3], method, train_route, pdict, real_anneal_var)
+        if "init" not in file and "pycach" not in file and ".pytest_cache" not in file:
+            test_single_file(file[:-3], method, pdict, real_anneal_var)
 
 
 def test_single_file(
-    file, method, train_route="default", pdict=None, real_anneal_var=None
+    file, method,  pdict=None, real_anneal_var=None
 ):
     """Runs the annealing experiment for the files inside the inputs folder
 
@@ -177,25 +169,20 @@ def test_single_file(
     :type file: str
     :param method: 'sim', 'real', 'hyb', 'cqm'
     :type method: str
-    :param train_route: 'default' or 'rerouted'
-    :type train_route: str
     :param pdict: Dictionary containing penalty values
     :type pdict: Dict[str, float]
     :param real_anneal_var_dict: Parameters for QA
     :type real_anneal_var_dict: Dict[str, float]
     """
+    print(file)
     file_name = f"inputs.{file}"
     mdl = importlib.import_module(file_name)
     globals().update(mdl.__dict__)
-    if train_route == "default":
-        prob = create_linear_problem(train_sets, timetable, d_max)
-    elif train_route == "rerouted":
-        prob = create_linear_problem(train_sets_rerouted, timetable, d_max)
-    annealing(prob, method, train_route, file_name, pdict, real_anneal_var)
+    prob = create_linear_problem(train_sets, timetable, d_max)
+    annealing(prob, method, file_name, pdict, real_anneal_var)
 
 
 if __name__ == "__main__":
-    file = "linear_solver"
     file = "5_trains_all_cases"
     real_anneal_var = {"num_reads": 1000, "annealing_time": 20, "chain_strength": 4}
     method = "sim"
@@ -209,5 +196,5 @@ if __name__ == "__main__":
         "circulation": 2.5,
         "objective": 1,
     }
-    test_single_file(file, method, pdict=pdict)
-    # test_all_files(method, pdict = pdict) logging not working properly
+    #test_single_file(file, method, pdict=pdict)
+    test_all_files(method, pdict = pdict) #logging not working properly

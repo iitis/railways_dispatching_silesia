@@ -642,7 +642,7 @@ def  test_3stationsIC_STM_KO_case():
 
 
 
-def test_linear_solver_default_problem():
+def test_HOBO_problems():
 
     """
                                             <- 2
@@ -679,6 +679,34 @@ def test_linear_solver_default_problem():
         "add_swithes_at_s": ["B"]
     }
 
+    S = train_sets["Paths"]
+
+    prob = solve_linear_problem(train_sets, timetable, d_max)
+
+    v = prob.variables()
+
+    assert v[0].name == "Delays_0_A"
+    assert v[0].varValue == 0
+    assert v[1].name == "Delays_0_B"
+    assert v[1].varValue == 0
+    assert v[2].name == "Delays_1_A"
+    assert v[2].varValue == 5
+    assert v[4].name == "Delays_2_B"
+    assert v[4].varValue == 0
+
+    assert prob.objective.value() == 0.5
+        
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0,4)
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "A") == (5,6)
+    assert return_delay_and_acctual_time(S, timetable, prob, 2, "B") == (0, 8)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0, 9)
+
+
+    assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
+    assert impact_to_objective(prob, timetable, 1, "A", d_max) == pytest.approx(0.5)
+    assert impact_to_objective(prob, timetable, 2, "B", d_max) == pytest.approx(0)
+
     #rerouting
 
     """
@@ -704,20 +732,6 @@ def test_linear_solver_default_problem():
         "add_swithes_at_s": ["B"]
     }
 
-    prob = solve_linear_problem(train_sets, timetable, d_max)
-
-    v = prob.variables()
-
-    assert v[0].name == "Delays_0_A"
-    assert v[0].varValue == 0
-    assert v[1].name == "Delays_0_B"
-    assert v[1].varValue == 0
-    assert v[2].name == "Delays_1_A"
-    assert v[2].varValue == 5
-    assert v[4].name == "Delays_2_B"
-    assert v[4].varValue == 0
-
-    assert prob.objective.value() == 0.5
 
     prob = solve_linear_problem(train_sets_rerouted, timetable, d_max)
 
@@ -734,6 +748,19 @@ def test_linear_solver_default_problem():
 
 
     assert prob.objective.value() == 0.4
+
+    S = train_sets_rerouted["Paths"]
+
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0,4)
+    assert return_delay_and_acctual_time(S, timetable, prob, 1, "A") == (1,2)
+    assert return_delay_and_acctual_time(S, timetable, prob, 2, "B") == (3, 11)
+    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0, 9)
+
+
+    assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
+    assert impact_to_objective(prob, timetable, 1, "A", d_max) == pytest.approx(0.1)
+    assert impact_to_objective(prob, timetable, 2, "B", d_max) == pytest.approx(0.3)
+
 
 
 def test_constraint_labels():

@@ -30,31 +30,5 @@ train_sets = {
     "add_swithes_at_s": ["B"]
 }
 
-#rerouting
-
-"""
-1 ->                                       <- 2
-...............................................
- [ A ]                              \ /    [ B ]
-.....................................c.........
-0 ->
-"""
-
-
-train_sets_rerouted = {
-    "skip_station": {
-        0: None,
-        1: None,
-        2: "A",
-    },
-    "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
-    "J": [0, 1, 2],
-    "Jd": dict(),
-    "Josingle": {("A", "B"): [[1,2]]},
-    "Jround": dict(),
-    "Jtrack": {"B": [[0, 1]]},
-    "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
-    "add_swithes_at_s": ["B"]
-}
 
 d_max = 10
