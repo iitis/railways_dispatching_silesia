@@ -1,4 +1,4 @@
-from numpy import float32, indices
+from numpy import indices
 import pandas as pd
 from .utils import common_elements
 

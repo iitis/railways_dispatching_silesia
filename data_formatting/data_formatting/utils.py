@@ -1,7 +1,5 @@
-import re
 import pandas as pd
 import numpy as np
-
 from .time_table_check import timetable_to_train_dict
 from .time_table_check import train_important_stations
 from .time_table_check import train_time_table

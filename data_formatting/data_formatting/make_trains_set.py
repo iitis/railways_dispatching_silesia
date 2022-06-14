@@ -1,10 +1,7 @@
-from tkinter.tix import Tree
-from pytest import skip
-from pytools import download_from_web_if_not_present
-from sympy import intersection
 import pandas as pd
 import numpy as np
 import itertools
+from sympy import intersection
 from .utils import get_J
 from .time_table_check import train_time_table
 from .utils import get_trains_at_station

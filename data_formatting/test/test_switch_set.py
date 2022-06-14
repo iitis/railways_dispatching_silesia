@@ -1,4 +1,7 @@
-from data_formatting import *
+import pandas as pd
+from data_formatting import block_indices_to_interprete_switches, z_in, z_out, get_Paths
+from data_formatting import train_time_table, blocks_list_4station
+
 
 def test_sets_of_switches():
 

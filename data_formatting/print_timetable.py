@@ -1,6 +1,8 @@
-from data_formatting import *
+import pandas as pd
 import sys
 import random
+
+from data_formatting import timetable_to_train_dict
 
 ### prints the timetable of the train ###
 
@@ -10,7 +12,7 @@ data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 train_dict = timetable_to_train_dict(data)
 trains_list = list(train_dict.keys())
 
-# some indexing 
+# some indexing
 def get_schmes(data, train, return_index = False):
     arrdep = get_arrdep(data, train)
     indexs = list(arrdep.dropna(how='all').index)

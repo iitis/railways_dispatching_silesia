@@ -1,6 +1,5 @@
-from data_formatting import *
 import pandas as pd
-from tkinter.tix import Tree
+from data_formatting import get_trains_pair9, get_jround, josingle, jswitch, jtrack
 
 
 def test_Js():
@@ -16,6 +15,11 @@ def test_Js():
     # main function
     assert get_jround(data) == {'KO': [[421009, 42100], [34319, 343199], [54101, 541019]]}
 
+
+def test_josingle():
+
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
     # single track occupation
     assert josingle(data, ["CM", "CB"]) == {}
     assert josingle(data, ["Mi", "MJ"]) == {('Mi', 'MJ'): [[44862, 44717]]}
@@ -37,6 +41,11 @@ def test_Js():
     assert trains_same_station_block["Mi"] == [[44717], [44862]]
     assert trains_same_station_block["MJ"] == [[44717], [44862]]
     assert trains_same_station_block["CM"] == [[94317], [64350]]
+
+
+def test_Jswitches():
+    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
     switches = jswitch(data, data_switch, ["GLC", "MJ", "Mi", "CB", "KO(IC)", "KO(KS)"])
 

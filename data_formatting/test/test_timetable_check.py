@@ -1,16 +1,16 @@
-from data_formatting import *
+import pandas as pd
+from data_formatting import get_arrdep, train_time_table, timetable_to_train_dict
+from data_formatting import get_arr_dep_vals, train_important_stations, check_path_continuity
+
 
 def test_timetables():
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     data_path = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
     t = get_arrdep(data, 42100) # should return arriving and dep times for blocks where they are given
-    #print(t)
 
-    timetable = timetable_to_train_dict(data)
-    assert timetable[42100][0] == ['IC - IC', 'SZTYGAR', 'from Katowice', 'to Lublin Główny']
-
-    #print(timetable[42100][1]['path'][0])
+    timetable_dict = timetable_to_train_dict(data)
+    assert timetable_dict[42100][0] == ['IC - IC', 'SZTYGAR', 'from Katowice', 'to Lublin Główny']
 
     tt = train_time_table(data, 42100)
 

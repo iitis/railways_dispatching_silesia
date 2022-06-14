@@ -1,8 +1,8 @@
-from os import pathsep
+"""
+helpers that concers reading timetable and some primary checks
+"""
 import pandas as pd
 import numpy as np
-
-####   helpers that concers reading timetable and some primary checks
 
 
 # convert csv to dictionary
