@@ -5,7 +5,6 @@ from data_formatting import get_trains_pair9, get_jround, josingle, jswitch, jtr
 def test_Js():
 
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
     #######    particulat Js #####
 
@@ -19,7 +18,6 @@ def test_Js():
 def test_josingle():
 
     data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
     # single track occupation
     assert josingle(data, ["CM", "CB"]) == {}
     assert josingle(data, ["Mi", "MJ"]) == {('Mi', 'MJ'): [[44862, 44717]]}

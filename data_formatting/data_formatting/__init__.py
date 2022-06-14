@@ -6,4 +6,4 @@ from .utils import check_common_station, get_blocks_b2win_station4train
 from .utils import get_common_blocks_and_direction_b2win_trains
 from .utils import get_trains_at_station, get_Paths, is_train_passing_thru_station
 from .utils import subsequent_station, get_trains_at_station, get_J, blocks_list_4station
-from .make_trains_set import get_trains_pair9, get_jround, josingle, jswitch, jtrack
+from .make_trains_set import get_trains_pair9, get_jround, josingle, jswitch, jtrack, jd

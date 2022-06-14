@@ -259,3 +259,10 @@ def jswitch(data, data_switch, imp_stations = None):
         jswitch[s] = vec_of_pairs
 
     return jswitch
+
+
+def jd(data):
+    """
+        function that creates Jd has to be encoded here
+    """
+    return 0
