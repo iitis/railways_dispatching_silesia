@@ -1,7 +1,8 @@
 import pytest
 
-from railway_solvers import *
-
+from railway_solvers import delay_varibles, order_variables, solve_linear_problem
+from railway_solvers import create_linear_problem, delay_and_acctual_time
+from railway_solvers import  impact_to_objective
 
 def test_linear_varibles_creations():
     """
@@ -70,7 +71,7 @@ def test_minimal_span_two_trains():
     assert v[4].varValue == 1.
     assert prob.objective.value() == 0.4
 
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 1, "A") == (4.0, 5.0)
     assert impact_to_objective(prob, timetable, 1, "A", 5) == 0.4
 
@@ -457,12 +458,12 @@ def  test_station_track_and_circulation():
 
     S = train_sets["Paths"]
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 1.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 1.)
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (8.0, 10.0)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "B") == (8.0, 10.0)
 
-    assert  return_delay_and_acctual_time(S, timetable, prob, 2, "A") == (4.0, 6.0)
-    assert  return_delay_and_acctual_time(S, timetable, prob, 2, "B") == (4.0, 11.0)
+    assert  delay_and_acctual_time(S, timetable, prob, 2, "A") == (4.0, 6.0)
+    assert  delay_and_acctual_time(S, timetable, prob, 2, "B") == (4.0, 11.0)
 
     assert prob.objective.value() == pytest.approx(0.8)
 
@@ -523,10 +524,10 @@ def  test_station_track_and_circulation2():
     S = train_sets["Paths"]
 
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (3., 4.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "A") == (3., 4.)
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (16.0, 18.0)
-    assert return_delay_and_acctual_time(S, timetable, prob, 2, "A") == (0., 2.)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "B") == (16.0, 18.0)
+    assert delay_and_acctual_time(S, timetable, prob, 2, "A") == (0., 2.)
 
 
     assert prob.objective.value() == pytest.approx(0.95)
@@ -574,13 +575,13 @@ def  test_station_followed_by_station_KO_STMcase():
     S = train_sets["Paths"]
 
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 1.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0., 4.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "C") == (0., 9.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "A") == (0., 1.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "B") == (0., 4.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "C") == (0., 9.)
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "A") == (2., 4.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "B") == (3., 6.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "C") == (3., 11.)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "A") == (2., 4.)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "B") == (3., 6.)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "C") == (3., 11.)
 
     assert prob.objective.value() == pytest.approx(0.6)
 
@@ -629,13 +630,13 @@ def  test_3stationsIC_STM_KO_case():
     S = train_sets["Paths"]
 
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "KO(IC)") == (0., 1.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "KO(STM)") == (0., 4.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "KO") == (0., 5.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "KO(IC)") == (0., 1.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "KO(STM)") == (0., 4.)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "KO") == (0., 5.)
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "KO(IC)") == (2., 4.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "KO(STM)") == (2., 5.)
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "KO") == (2., 6.)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "KO(IC)") == (2., 4.)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "KO(STM)") == (2., 5.)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "KO") == (2., 6.)
 
     assert prob.objective.value() == pytest.approx(0.4)
 
@@ -695,12 +696,12 @@ def test_HOBO_problems():
     assert v[4].varValue == 0
 
     assert prob.objective.value() == 0.5
-        
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0,4)
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "A") == (5,6)
-    assert return_delay_and_acctual_time(S, timetable, prob, 2, "B") == (0, 8)
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0, 9)
+
+    assert delay_and_acctual_time(S, timetable, prob, 0, "A") == (0,4)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "A") == (5,6)
+    assert delay_and_acctual_time(S, timetable, prob, 2, "B") == (0, 8)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "B") == (0, 9)
 
 
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
@@ -751,10 +752,10 @@ def test_HOBO_problems():
 
     S = train_sets_rerouted["Paths"]
 
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "A") == (0,4)
-    assert return_delay_and_acctual_time(S, timetable, prob, 1, "A") == (1,2)
-    assert return_delay_and_acctual_time(S, timetable, prob, 2, "B") == (3, 11)
-    assert return_delay_and_acctual_time(S, timetable, prob, 0, "B") == (0, 9)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "A") == (0,4)
+    assert delay_and_acctual_time(S, timetable, prob, 1, "A") == (1,2)
+    assert delay_and_acctual_time(S, timetable, prob, 2, "B") == (3, 11)
+    assert delay_and_acctual_time(S, timetable, prob, 0, "B") == (0, 9)
 
 
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)

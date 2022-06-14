@@ -1,4 +1,8 @@
-from railway_solvers import *
+from railway_solvers import occurs_as_pair, update_dictofdicts, previous_station
+from railway_solvers import tau, penalty_weights, earliest_dep_time, not_the_same_rolling_stock
+from railway_solvers import departure_station4switches, get_M, skip_station, subsequent_station
+from railway_solvers import previous_train_from_Jround, subsequent_train_at_Jround
+from railway_solvers import are_two_trains_entering_via_the_same_switches, can_MO_on_line
 
 
 def test_pairs():

@@ -1,6 +1,8 @@
 import pytest
 
-from railway_solvers import *
+from railway_solvers import delay_varibles, order_variables, solve_linear_problem
+from railway_solvers import create_linear_problem, delay_and_acctual_time
+from railway_solvers import  impact_to_objective
 
 
 def energy(v, Q):
@@ -108,31 +110,31 @@ def test_5_trains_all_cases():
         print(v)
         print(v.varValue)
 
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 21, "A"
     ) == (0.0, 6.0)
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 22, "A"
     ) == (7.0, 8.0)
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 21, "B"
     ) == (0.0, 11.0)
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 22, "B"
     ) == (7.0, 17.0)
     # 17 + pass + prep = 17+8+3
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 23, "C"
     ) == (2.0, 28.0)
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 23, "B"
     ) == (2.0, 35.0)
 
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 24, "C"
     ) == (1.0, 26.0)
     # 26 + pass + switch = 26 + 3 + 1
-    assert return_delay_and_acctual_time(
+    assert delay_and_acctual_time(
         train_sets["Paths"], timetable, prob, 25, "D"
     ) == (2.0, 30.0)
     assert prob.objective.value() == pytest.approx(1.01)

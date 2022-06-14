@@ -713,7 +713,7 @@ def solve_linear_problem(train_sets, timetable, d_max):
 # auxiliary functions for visualisation
 
 
-def return_delay_and_acctual_time(S, timetable, prob, j, s):
+def delay_and_acctual_time(S, timetable, prob, j, s):
     """given the solution of the optimisation problem returns secondary delay
     and actual time of leaving given station
     """
