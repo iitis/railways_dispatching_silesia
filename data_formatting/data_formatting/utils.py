@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from collections import defaultdict
 from .time_table_check import timetable_to_train_dict
 from .time_table_check import train_important_stations
 from .time_table_check import train_time_table
@@ -22,6 +23,12 @@ def getSizeOfNestedList(listOfElem):
             count += 1
     return count
 
+def reverse_dict_of_lists(d):
+    reversed_dict = defaultdict(list)
+    for key, values in d.items():
+        for value in values:
+            reversed_dict[value].append(key)
+    return reversed_dict
 
 def flatten(t):
     """ make a single list of lists of lists """
@@ -52,7 +59,6 @@ def sublist(l1,l2):
         return True
     else:
         return False
-
 
 
 def check_common_station(data, train1, train2):
