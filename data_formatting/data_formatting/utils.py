@@ -66,6 +66,8 @@ def check_common_station(data, train1, train2):
     paths_dict = get_Paths(data)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
+def get_trains_with_same_stations(data):
+    return reverse_dict_of_lists(get_Paths(data))
 
 def check_common_blocks_elements(data , train1, train2):
     """ get common blocks between trains, does not check order """
