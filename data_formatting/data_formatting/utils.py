@@ -109,7 +109,7 @@ def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True
         if verbose == True:
             print("Warning: stations out of order")
         rev = True
-        return blocksb2win, reversed
+        return blocksb2win, rev
     else:
         blocks_list = train_time_table(data, train)['path'].tolist()
         i = 0
@@ -128,6 +128,23 @@ def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True
                 blocksb2win.pop(-1)
         return blocksb2win,rev
 
+def check_common_specific_elements_lists(list1,list2):
+    common_elements = []
+    i = 0
+    short = []
+    while i in range(len(list1)):
+        if list1[i] in list2:
+            short.append(list1[i])
+            if sublist(short,list2) and i<len(list1)-1:
+                i+=1
+            else:
+                common_elements.append(short)
+                short = []
+                i+=1
+        else:
+            i+=1
+    return common_elements
+
 def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,station2,verbose = False):
     blocks_order = {}
     for train in [train1,train2]:
@@ -135,27 +152,25 @@ def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,sta
         if rev:
             blocks,_ = get_blocks_b2win_station4train(data, train,station2,station1,verbose)
         blocks_order[train] = [blocks,rev]
-    blocks_2check = blocks_order[train1][0]
-    common_blocks = []
-    i = 0
-    short = []
-    while i in range(len(blocks_2check)):
-        if blocks_2check[i] in blocks_order[train2][0]:
-            short.append(blocks_2check[i])
-            if sublist(short,blocks_order[train2][0]) and i<len(blocks_2check)-1:
-                i+=1
-            else:
-                common_blocks.append(short)
-                short = []
-                i+=1
-        else:
-            i+=1
+    common_blocks = check_common_specific_elements_lists(blocks_order[train1][0],blocks_order[train2][0])
     if blocks_order[train1][1] == blocks_order[train2][1]:
         direction = 'same'
     else:
         direction = 'opposite'
     # return common_blocks,direction
     return flatten(common_blocks),direction
+
+def common_path(data,train1,train2,station1,station2,verbose=False):
+    common_path_list = []
+    blocks1,_ = get_blocks_b2win_station4train(data,train1,station1,station2,verbose)
+    blocks2,_ = get_blocks_b2win_station4train(data,train2,station1,station2,verbose)
+    if blocks1 == blocks2:
+        common_path_list = blocks1
+    else:
+        common_path_list = flatten(check_common_specific_elements_lists(blocks1,blocks2))
+    return common_path_list
+
+
 
 def is_train_passing_thru_station(data, train, station):
     stations = get_Paths(data)[train]

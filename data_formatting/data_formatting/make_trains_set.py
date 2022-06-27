@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from sympy import intersection
-from .utils import get_J
+from .utils import flatten, get_J
 from .time_table_check import train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
@@ -265,4 +265,17 @@ def jd(data):
     """
         function that creates Jd has to be encoded here
     """
+    jd = {}
+    for s in get_all_important_station():
+        jd[s]={}
+        for j in get_trains_with_same_stations(data)[s]:
+            s2 = subsequent_station(s,j)
+            if s2!= None:
+                jd[s][s2]=[]
+            v1 = []
+            while j not in flatten(jd[s][s2]):
+                i=1
+                if v1 != [] and common_path(data,v1[0],j,s,s2)==get_blocks_b2win_station4train(data,j,s,s2)[0]:
+
+
     return 0
