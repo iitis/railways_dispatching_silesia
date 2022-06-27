@@ -272,10 +272,19 @@ def jd(data):
             s2 = subsequent_station(s,j)
             if s2!= None:
                 jd[s][s2]=[]
-            v1 = []
+            v = []
             while j not in flatten(jd[s][s2]):
                 i=1
-                if v1 != [] and common_path(data,v1[0],j,s,s2)==get_blocks_b2win_station4train(data,j,s,s2)[0]:
+                if v!= [] and common_path(data,v[0],j,s,s2)==get_blocks_b2win_station4train(data,j,s,s2)[0]:
+                    v.append(j)
+                else:
+                    i+=1
+                    if i < len(jd[s][s2]):
+                        break
+                        #somehow reapeat lines 278 to 281
+                    else:
+                        jd[s][s2].append(v)
+                        
 
 
     return 0
