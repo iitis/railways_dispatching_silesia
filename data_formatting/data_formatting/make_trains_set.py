@@ -275,16 +275,10 @@ def jd(data):
             v = []
             while j not in flatten(jd[s][s2]):
                 i=1
-                if v!= [] and common_path(data,v[0],j,s,s2)==get_blocks_b2win_station4train(data,j,s,s2)[0]:
-                    v.append(j)
-                else:
-                    i+=1
-                    if i < len(jd[s][s2]):
-                        break
-                        #somehow reapeat lines 278 to 281
+                while i < len(jd[s][s2]):
+                    if v!= [] and common_path(data,v[0],j,s,s2)==get_blocks_b2win_station4train(data,j,s,s2)[0]:
+                        v.append(j)
                     else:
-                        jd[s][s2].append(v)
-                        
-
-
-    return 0
+                        i+=1                    
+                jd[s][s2].append(v)
+    return jd
