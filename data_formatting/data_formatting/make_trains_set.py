@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from sympy import intersection
-from .utils import flatten, get_J
+from .utils import common_path, flatten, get_J, get_trains_with_same_stations
 from .time_table_check import train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
