@@ -269,16 +269,24 @@ def jd(data):
     for s in get_all_important_station():
         jd[s]={}
         for j in get_trains_with_same_stations(data)[s]:
-            s2 = subsequent_station(s,j)
-            if s2!= None:
-                jd[s][s2]=[]
-            v = []
+            s2 = subsequent_station(data,j,s)
+            if s2 == None:
+                continue
+            if s2 not in jd[s].keys():
+                jd[s][s2] = []
             while j not in flatten(jd[s][s2]):
-                i=1
+                i = 0
+                v = []
+                added = False
                 while i < len(jd[s][s2]):
-                    if v!= [] and common_path(data,v[0],j,s,s2)==get_blocks_b2win_station4train(data,j,s,s2)[0]:
-                        v.append(j)
+                    path_check = common_path(data,jd[s][s2][i][0],j,s,s2)==get_blocks_b2win_station4train(data,j,s,s2)[0]
+                    if jd[s][s2][i] != [] and path_check== True:
+                        jd[s][s2][i].append(j)
+                        added = True
+                        i+=1
                     else:
-                        i+=1                    
-                jd[s][s2].append(v)
+                        i+=1
+                if added == False:
+                    v.append(j)
+                    jd[s][s2].append(v)
     return jd
