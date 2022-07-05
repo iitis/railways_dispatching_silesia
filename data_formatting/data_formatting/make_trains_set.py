@@ -261,14 +261,15 @@ def jswitch(data, data_switch, imp_stations = None):
     return jswitch
 
 
-def jd(data):
+def jd(data, imp_stations = None):
     """
         function that creates Jd has to be encoded here
     """
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
     jd = {}
-    for s in get_all_important_station():
+    for s in imp_stations_list:
         jd[s]={}
-        for j in get_trains_with_same_stations(data)[s]:
+        for j in trains_at_stations[s]:
             s2 = subsequent_station(data,j,s)
             if s2 == None:
                 continue
