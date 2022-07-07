@@ -1,8 +1,10 @@
+import numpy as np
 import pandas as pd
 import sys
 import random
 
-from data_formatting import timetable_to_train_dict
+from data_formatting import timetable_to_train_dict, get_arrdep, get_arr_dep_vals
+from data_formatting import train_time_table
 
 ### prints the timetable of the train ###
 
@@ -97,8 +99,32 @@ def check_path_time(train, data, data_path_check, scheme = 'complete', show_warn
     return total_time,times
 
 
+# get indexes in dataframe
+def get_indexes(dfObj, value):
+    ''' Get index positions of value in dataframe i.e. dfObj.'''
+    listOfPos = list()
+    # Get bool dataframe with True at positions where the given value exists
+    result = dfObj.isin([value])
+    # Get list of columns that contains the value
+    seriesObj = result.any()
+    columnNames = list(seriesObj[seriesObj == True].index)
+    # Iterate over list of columns and fetch the rows indexes where value exists
+    for col in columnNames:
+        rows = list(result[col][result[col] == True].index)
+        for row in rows:
+            listOfPos.append((row, col))
+    # Return a list of tuples indicating the positions of value in the dataframe
+    return listOfPos
 
-
+# chreck important stations
+def check_important_stations(data, train):
+    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    time_table = train_time_table(data, train)
+    blocks = time_table['path']
+    station_list = []
+    for block in blocks:
+        station_list += [key for key, value in important_stations.items() if block in value]
+    return station_list
 
 
 if len(sys.argv) < 2:
