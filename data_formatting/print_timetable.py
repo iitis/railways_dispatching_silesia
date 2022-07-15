@@ -51,7 +51,8 @@ def get_default_dir(path_column):
         default_dir = 'default_B-A'
     return default_dir
 
-
+def get_time_info(data_path_check,block1,block2):
+    return data_path_check.loc[data_path_check["previous_block"].isin([value1,value2]) & data_path_check["next_block"].isin([value1,value2])]
 
 # check paths time
 def check_path_time(train, data, data_path_check, scheme = 'complete', show_warning = True):
@@ -71,11 +72,6 @@ def check_path_time(train, data, data_path_check, scheme = 'complete', show_warn
         for x in positions_in_table_check:
             if x[0] in [y[0] for y in get_indexes(data_path_check,time_table['path'][i+1])]:
                 position,block_dir = x
-                # print("The position is", position)
-                # print("The block direction is", block_dir)
-            # else:
-            #     print('the entry does not exist!')
-            #     exit()
         path_column  = get_path_type_colunm(path_type,block_dir)
         # print(path_column)
         # print(get_default_dir(path_column))
