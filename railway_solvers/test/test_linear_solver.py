@@ -762,6 +762,53 @@ def test_HOBO_problems():
     assert impact_to_objective(prob, timetable, 1, "A", d_max) == pytest.approx(0.1)
     assert impact_to_objective(prob, timetable, 2, "B", d_max) == pytest.approx(0.3)
 
+    """
+
+                                        <- j3  j4
+    ..........c........................c....c......
+     [ S1 ] .  .                        .  .   [ S2 ]
+    .......c....c........................c.........
+    j1 ->
+    j2 ->
+
+
+
+    S1, S2 - stations
+    j1, j2, j3 - trains
+    .....  - track
+    c - switch
+    """
+
+    taus = {"pass": {"j1_S1_S2": 4, "j2_S1_S2": 8, "j3_S2_S1": 8, "j4_S2_S1": 8},
+                     "headway": {"j1_j2_S1_S2": 2, "j2_j1_S1_S2": 6, "j3_j4_S2_S1": 2, "j4_j3_S2_S1": 2},
+                     "stop": {"j1_S2": 1, "j2_S2": 1},
+                     "res": 1
+                    }
+
+
+    trains_timing = {"tau": taus,
+                     "initial_conditions": {"j1_S1": 4, "j2_S1": 1, "j3_S2": 8, "j4_S2": 9},
+                     "penalty_weights": {"j1_S1": 2, "j2_S1": 1, "j3_S2": 1, "j4_S2": 1}
+                     }
+
+    trains_paths_enlarged = {
+            "skip_station": {
+                "j3": "S1",  "j4": "S1",  # we do not count train j3 leaving S1
+            },
+            "Paths": {"j1": ["S1", "S2"], "j2": ["S1", "S2"], "j3": ["S2", "S1"], "j4": ["S2", "S1"]},
+            "J": ["j1", "j2", "j3", "j4"],
+            "Jd": {"S1": {"S2": [["j1", "j2"]]}, "S2": {"S1": [["j3", "j4"]]}},
+            "Josingle": {},
+            "Jround": {},
+            "Jtrack": {"S2": [["j1", "j2"]]},
+            "Jswitch": {},
+            "add_swithes_at_s": ["S2"]  # additional τ(res.)(j, "B") in Eq. 18
+            }
+
+    prob = solve_linear_problem(trains_paths_enlarged, trains_timing , d_max)
+
+    assert prob.objective.value() == 0.6
+
 
 
 def test_constraint_labels():
