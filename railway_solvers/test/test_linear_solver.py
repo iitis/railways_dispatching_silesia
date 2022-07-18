@@ -809,6 +809,20 @@ def test_HOBO_problems():
 
     assert prob.objective.value() == 0.6
 
+    v = prob.variables()
+
+    assert v[0].name == "Delays_j1_S1"
+    assert v[0].varValue == 0
+    assert v[1].name == "Delays_j1_S2"
+    assert v[1].varValue == 0
+    assert v[2].name == "Delays_j2_S1"
+    assert v[2].varValue == 5
+    assert v[4].name == "Delays_j3_S2"
+    assert v[4].varValue == 0
+    assert v[5].name == "Delays_j4_S2"
+    assert v[5].varValue == 1
+
+
 
 
 def test_constraint_labels():
