@@ -107,18 +107,25 @@ def check_path_continuity(data, data_path_check, train):
                 raise AssertionError(paths[i], "not present in possible paths")
 
 
-def minimal_passing_time(train,station1,station2,data,data_path_check,resolution=1):
-    assert train in get_J(data),"train does not exist"
+def minimal_passing_time(
+    train, station1, station2, data, data_path_check, resolution=1
+):
+    assert train in get_J(data), "train does not exist"
     assert station1 and station2 in train_important_stations(data, train)
-    blocks,_,bl_speed = get_blocks_b2win_station4train(data, train, station1, station2, verbose = True)
+    blocks, _, bl_speed = get_blocks_b2win_station4train(
+        data, train, station1, station2, verbose=True
+    )
     time = 0
-    for i in range(len(blocks)-1):
-        value1,value2 = blocks[i:i+2]
+    for i in range(len(blocks) - 1):
+        value1, value2 = blocks[i : i + 2]
         v1_speed = bl_speed[i]
-        data_check = data_path_check.loc[data_path_check["previous_block"].isin([value1,value2]) & data_path_check["next_block"].isin([value1,value2])]
+        data_check = data_path_check.loc[
+            data_path_check["previous_block"].isin([value1, value2])
+            & data_path_check["next_block"].isin([value1, value2])
+        ]
         assert data_check.empty == False, "this combination is not valid"
-        block_dir = get_indexes(data_check,value1)[0][1]
-        speed_path = get_path_type_colunm(v1_speed,block_dir)
+        block_dir = get_indexes(data_check, value1)[0][1]
+        speed_path = get_path_type_colunm(v1_speed, block_dir)
         time += float(data_check.iloc[0][speed_path])
         if resolution == 1:
             time = round(time)
