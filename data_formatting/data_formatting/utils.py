@@ -257,26 +257,24 @@ def minimal_stay(train,station,data,data_path_check,r=1):
     time_table = train_time_table(data,train)
     st_block = blocks_list_4station(data, train, station)
     time = 0
-    add_to_prep = {f"{train}_{station}":0}
-    prep_flag = False
+    taus_prep1 = {}
     for i in range(len(st_block)):
         id_station = get_indexes(time_table,st_block[i])[0][0]
         blocks_list = time_table.iloc[id_station:id_station+2]["path"].tolist()
         block_speed_list = time_table.iloc[id_station:id_station+2]["speed"].tolist()
         t = get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check)
-        if len(st_block)>1:
-            turn_around = time_table.iloc[id_station]["Turnaround_time_minutes"]
-            if np.isnan(turn_around)==False:
-                if i>1:
-                    t+=float(turn_around)
-                else:
-                    add_to_prep[f"{train}_{station}"] +=turn_around
-                    prep_flag = True
+        turn_around = time_table.iloc[id_station]["Turnaround_time_minutes"]
+        if np.isnan(turn_around)==False:
+            turn_around = float(turn_around)
+            if len(st_block)>1 and i==1:
+                taus_prep1[f"{train}_{station}"] = turn_around
+                turn_around = 0
+            t+=float(turn_around)       
         time+=t 
     if r==1:
         time = round(time)
-    if prep_flag:
-        return time,add_to_prep,prep_flag
+    if len(taus_prep1)>1:
+        return time,taus_prep1
     return time
 
 # check path directions and type: A to B or B to A, regional or intercity
@@ -308,7 +306,6 @@ def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
         block_dir = get_indexes(data_check,value1)[0][1]
         speed_path = get_path_type_colunm(v1_speed,block_dir)
         time += float(data_check.iloc[0][speed_path])
-        print(time)
     return time
 
 

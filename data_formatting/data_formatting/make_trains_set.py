@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from sympy import intersection
-from .utils import common_path, flatten, get_J, get_trains_with_same_stations, minimal_passing_time
+from .utils import common_path, flatten, get_J, get_trains_with_same_stations, minimal_passing_time, minimal_stay
 from .time_table_check import train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
@@ -304,4 +304,17 @@ def get_tauss_pass(data,data_path_check,trains = None):
                 taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check)
     return taus_pass 
 
-
+def get_tauss_prep(data,data_path_check,trains = None):
+    taus_stop = {}
+    taus_prep = {}
+    paths = get_Paths(data)
+    if trains == None:
+        trains = paths.keys()
+    for train in trains:
+        for station in paths[train]:
+            time_flag = minimal_stay(train,station,data,data_path_check)
+            if len(time_flag)==1:
+                taus_stop[f"{train}_{station}"] = time_flag[0]
+            else:
+                taus_prep.update(time_flag[1])
+    return taus_stop,taus_prep
