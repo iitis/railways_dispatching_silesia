@@ -5,6 +5,7 @@ import random
 
 from data_formatting import timetable_to_train_dict, get_arrdep, get_arr_dep_vals
 from data_formatting import train_time_table
+from data_formatting.data_formatting.utils import get_indexes, get_path_type_colunm
 
 ### prints the timetable of the train ###
 
@@ -26,22 +27,6 @@ def get_schmes(data, train, return_index = False):
         return b_list, indexs
     return b_list
 
-# check path directions and type: A to B or B to A, regional or intercity
-def get_path_type_colunm(path_type,block_dir):
-    if path_type in ['R']:
-        if block_dir == 'previous_block':
-            path_column  = 'time_regional_train_A-B'
-        else:
-            path_column  = 'time_regional_train_B-A'
-    elif path_type in ['IC']:
-        if block_dir == 'previous_block':
-            path_column = 'time_inter_city_A-B'
-        else:
-            path_column = 'time_inter_city_B-A'
-    else:
-        print('Path type not found!')
-        exit(1)
-    return path_column
 
 # check path default
 def get_default_dir(path_column):
@@ -52,7 +37,7 @@ def get_default_dir(path_column):
     return default_dir
 
 def get_time_info(data_path_check,block1,block2):
-    return data_path_check.loc[data_path_check["previous_block"].isin([value1,value2]) & data_path_check["next_block"].isin([value1,value2])]
+    return data_path_check.loc[data_path_check["previous_block"].isin([block1,block2]) & data_path_check["next_block"].isin([block1,block2])]
 
 # check paths time
 def check_path_time(train, data, data_path_check, scheme = 'complete', show_warning = True):
@@ -94,23 +79,6 @@ def check_path_time(train, data, data_path_check, scheme = 'complete', show_warn
         times += [[time_table['path'][i], time_table['path'][i+1],time_passed]]
     return total_time,times
 
-
-# get indexes in dataframe
-def get_indexes(dfObj, value):
-    ''' Get index positions of value in dataframe i.e. dfObj.'''
-    listOfPos = list()
-    # Get bool dataframe with True at positions where the given value exists
-    result = dfObj.isin([value])
-    # Get list of columns that contains the value
-    seriesObj = result.any()
-    columnNames = list(seriesObj[seriesObj == True].index)
-    # Iterate over list of columns and fetch the rows indexes where value exists
-    for col in columnNames:
-        rows = list(result[col][result[col] == True].index)
-        for row in rows:
-            listOfPos.append((row, col))
-    # Return a list of tuples indicating the positions of value in the dataframe
-    return listOfPos
 
 # chreck important stations
 def check_important_stations(data, train):
