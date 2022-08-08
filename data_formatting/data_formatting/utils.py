@@ -253,29 +253,38 @@ def minimal_passing_time(train,station1,station2,data,data_path_check,resolution
         time = round(time)
     return time
 
-def minimal_stay(train,station,data,data_path_check,r=1):
+def turn_around_time(data,train,station,r=1):
+    time_table = train_time_table(data,train)
+    st_block = blocks_list_4station(data, train, station)
+    id_station_block = get_indexes(time_table,st_block[0])[0][0]
+    time = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
+    if np.isnan(time):
+        time = 0
+    if r==1:
+        time = round(time)
+    return time
+    
+
+def minimal_stay(train,station,data,data_path_check,first_station = False,r=1):
     time_table = train_time_table(data,train)
     st_block = blocks_list_4station(data, train, station)
     time = 0
     taus_prep1 = {}
-    for i in range(len(st_block)):
-        id_station = get_indexes(time_table,st_block[i])[0][0]
-        blocks_list = time_table.iloc[id_station:id_station+2]["path"].tolist()
-        block_speed_list = time_table.iloc[id_station:id_station+2]["speed"].tolist()
-        t = get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check)
-        turn_around = time_table.iloc[id_station]["Turnaround_time_minutes"]
-        if np.isnan(turn_around)==False:
-            turn_around = float(turn_around)
-            if len(st_block)>1 and i==1:
-                taus_prep1[f"{train}_{station}"] = turn_around
-                turn_around = 0
-            t+=float(turn_around)       
-        time+=t 
+    id_station_block = get_indexes(time_table,st_block[0])[0][0]
+    blocks_list = time_table.iloc[id_station_block:id_station_block+2]["path"].tolist()
+    block_speed_list = time_table.iloc[id_station_block:id_station_block+2]["speed"].tolist()
+    t = get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check)
+    turn_around = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
+    if np.isnan(turn_around)==False:
+        turn_around = float(turn_around)
+        if first_station == True:
+            taus_prep1[f"{train}_{station}"] = turn_around
+            turn_around = 0
+        t+=turn_around       
+    time+=t 
     if r==1:
         time = round(time)
-    if len(taus_prep1)>1:
-        return time,taus_prep1
-    return time
+    return time,taus_prep1
 
 # check path directions and type: A to B or B to A, regional or intercity
 def get_path_type_colunm(path_type,block_dir):

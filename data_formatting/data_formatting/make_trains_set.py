@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from sympy import intersection
-from .utils import common_path, flatten, get_J, get_trains_with_same_stations, minimal_passing_time, minimal_stay
+from .utils import common_path, flatten, get_J, minimal_passing_time, minimal_stay, turn_around_time
 from .time_table_check import train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
@@ -304,17 +304,28 @@ def get_tauss_pass(data,data_path_check,trains = None):
                 taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check)
     return taus_pass 
 
-def get_tauss_prep(data,data_path_check,trains = None):
+def get_tauss_stop(data,data_path_check,trains = None):
     taus_stop = {}
     taus_prep = {}
+    first_station = False
+
     paths = get_Paths(data)
     if trains == None:
         trains = paths.keys()
     for train in trains:
-        for station in paths[train]:
-            time_flag = minimal_stay(train,station,data,data_path_check)
-            if len(time_flag)==1:
-                taus_stop[f"{train}_{station}"] = time_flag[0]
-            else:
-                taus_prep.update(time_flag[1])
+        for i,station in enumerate(paths[train]):
+            if i == 0:
+                first_station = True   
+            time_flag,ts_prep = minimal_stay(train,station,data,data_path_check,first_station=first_station)
+            taus_stop[f"{train}_{station}"] = time_flag
+            taus_prep.update(ts_prep)
     return taus_stop,taus_prep
+
+def get_taus_prep(data):
+    taus_prep={}
+    for train,stations in get_Paths(data).items():
+        s = stations[0]
+        st_prep = turn_around_time(data,train,s,r=1)
+        if st_prep != 0:
+            taus_prep[f"{train}_{s}"] = st_prep
+    return taus_prep
