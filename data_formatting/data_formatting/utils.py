@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from collections import defaultdict
-from .time_table_check import get_passing_time_4blocks, timetable_to_train_dict
+from .time_table_check import timetable_to_train_dict
 from .time_table_check import train_important_stations
 from .time_table_check import train_time_table
 
