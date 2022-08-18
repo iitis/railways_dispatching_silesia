@@ -157,6 +157,8 @@ def non_repeating_pair_for_jswitch():
 
     return non_repeating_pairs, non_repeating_singles
 
+# Js are from here
+
 def josingle(data, imp_stations = None):
 
     init_josingle = {}
@@ -292,7 +294,9 @@ def jd(data, imp_stations = None):
                     jd[s][s2].append(v)
     return jd
 
-def get_tauss_pass(data,data_path_check,trains = None):
+# taus are from here
+
+def get_taus_pass(data,data_path_check,trains = None):
     taus_pass = {}
     paths = get_Paths(data)
     if trains == None:
@@ -302,9 +306,9 @@ def get_tauss_pass(data,data_path_check,trains = None):
             station2 = subsequent_station(data,train,station)
             if station2 != None:
                 taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check)
-    return taus_pass 
+    return taus_pass
 
-def get_tauss_stop(data,data_path_check,trains = None):
+def get_taus_stop(data,data_path_check,trains = None):
     taus_stop = {}
     taus_prep = {}
     first_station = False
@@ -315,7 +319,7 @@ def get_tauss_stop(data,data_path_check,trains = None):
     for train in trains:
         for i,station in enumerate(paths[train]):
             if i == 0:
-                first_station = True   
+                first_station = True
             time_flag,ts_prep = minimal_stay(train,station,data,data_path_check,first_station=first_station)
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
