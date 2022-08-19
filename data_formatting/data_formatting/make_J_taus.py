@@ -1,8 +1,9 @@
+from ast import Dict
 import pandas as pd
 import numpy as np
 import itertools
 from sympy import intersection
-from .utils import common_path, flatten, get_J, minimal_passing_time, minimal_stay, turn_around_time
+from .utils import common_path, flatten, get_J, get_passing_time_4singleblock, minimal_passing_time, minimal_stay, turn_around_time
 from .time_table_check import train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
@@ -12,6 +13,7 @@ from .utils import blocks_list_4station
 from .utils import get_Paths
 from .make_switch_set import z_in
 from .make_switch_set import z_out
+import itertools as it
 
 # get list of train with pairs containing a train number and train number+9
 def get_trains_pair9(data):
@@ -296,7 +298,25 @@ def jd(data, imp_stations = None):
 
 # taus are from here
 
-def get_taus_pass(data,data_path_check,trains = None):
+def get_taus_pass(data,data_path_check,trains = None) -> Dict:
+    """Function to generate taus_pass, a dictionary with
+    information about passing time for a given train between
+    two subsequent stations. It has as key the "train_s1_s2"
+    and value minimal passing time between stations for a 
+    given train.
+
+
+    Arguments:
+        data -- data file containing train time tables
+        data_path_check -- data file containing passing time between blocks
+
+    Keyword Arguments:
+        trains -- list of trains (default: {None})
+
+    Returns:
+        taus_pass - dictionary with key "train_s1_s2"
+        and value minimal_passing_time(train, s1, s2)
+    """
     taus_pass = {}
     paths = get_Paths(data)
     if trains == None:
@@ -309,6 +329,20 @@ def get_taus_pass(data,data_path_check,trains = None):
     return taus_pass
 
 def get_taus_stop(data,data_path_check,trains = None):
+    """Function for getting the mininal stop time for 
+    a train in a station. 
+
+    Arguments:
+        data -- data file containing train time tables
+        data_path_check -- data file containing passing time between blocks
+
+    Keyword Arguments:
+        trains -- list of trains (default: {None})
+
+    Returns:
+        taus_stop -- Dictionary with keys "train_station"
+        and value the minimal_stay(train,station)
+    """
     taus_stop = {}
     taus_prep = {}
     first_station = False
@@ -326,6 +360,18 @@ def get_taus_stop(data,data_path_check,trains = None):
     return taus_stop,taus_prep
 
 def get_taus_prep(data):
+    """ Function that gives the preparation time
+    for a given train at station
+
+    _extended_summary_
+
+    Arguments:
+        data -- data with train time tables
+
+    Returns:
+        taus_prep -- dictionary with key "train_station"
+        and value turn_around_time(train,station)
+    """
     taus_prep={}
     for train,stations in get_Paths(data).items():
         s = stations[0]
@@ -333,3 +379,29 @@ def get_taus_prep(data):
         if st_prep != 0:
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep
+
+def get_taus_headway(data,data_path_check,r=1):
+    jd_ = jd(data)
+    important_stations = get_all_important_station()
+    taus_headway = {}
+    list_of_k1_pairs = {("KO(STM)", 'KZ'), ("CB", "CM"), ("KTC-CB", "via Gt")}
+    for station1 in important_stations:
+        for station2 in jd_[station1].keys():
+            for train1,train2 in [a for a in it.product(flatten(jd_[station1][station2]),repeat=2) if a[0]!= a[1]]:
+                blocks_sequence = common_path(data,train1,train2,station1,station2)
+                t_pass = np.zeros(len(blocks_sequence))
+                deltas_vec = np.zeros(len(blocks_sequence))
+                for i in range(len(blocks_sequence)):
+                    t = lambda i,train: get_passing_time_4singleblock(blocks_sequence[i],train,data,data_path_check,r)
+                    t_pass[i]= t(i,train1)
+                    if i > 0:
+                        deltas_vec[i] = sum([t(j,train2) -t(j,train1) for j in range(i)])
+                    k = 2
+                    if (station1,station2) or (station2,station1) in list_of_k1_pairs:
+                        k=1
+                t_headway = 0
+                if len(blocks_sequence) > 0: 
+                    t_headway = np.max([np.sum([t_pass[:x+k]])+ deltas_vec[x] for x in range(len(deltas_vec))])  
+                    print(t_headway)
+                taus_headway[f"{train1}_{train2}_{station1}_{station2}"] = t_headway
+    return taus_headway

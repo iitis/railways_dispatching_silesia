@@ -1,3 +1,4 @@
+from ast import List
 import pandas as pd
 import numpy as np
 from collections import defaultdict
@@ -190,7 +191,6 @@ def common_path(data,train1,train2,station1,station2,verbose=False):
     return common_path_list
 
 
-
 def is_train_passing_thru_station(data, train, station):
     stations = get_Paths(data)[train]
     return station in stations
@@ -206,6 +206,17 @@ def subsequent_station(data, train, station):
         # print('This is the last station')
         return None
     return sts[sts.index(station)+1]
+
+def subsequent_block(data,train,block):
+    time_table_blocks = train_time_table(data, train)['path'].tolist()
+    assert block in time_table_blocks, "this train does not pass trought this block"
+    return time_table_blocks[time_table_blocks.index(block) + 1]
+
+def get_block_speed(data,train,block):
+    time_table_blocks = train_time_table(data, train)['path'].tolist()
+    time_table_speeds = train_time_table(data, train)['speed'].tolist()
+    block_id = time_table_blocks.index(block)
+    return time_table_speeds[block_id]
 
 
 def get_trains_at_station(data,only_departue = False):
@@ -226,12 +237,12 @@ def get_trains_at_station(data,only_departue = False):
     return trains_from_station
 
 
-def get_J(data):
+def get_J(data) -> List:
     """  return a dictionary of trains """
     train_dict = timetable_to_train_dict(data)
     return list(train_dict.keys())
 
-def get_all_important_station():
+def get_all_important_station() -> List : 
     """ read important stations from file """
     return list(np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()].keys())
 
@@ -286,6 +297,7 @@ def minimal_stay(train,station,data,data_path_check,first_station = False,r=1):
         time = round(time)
     return time,taus_prep1
 
+
 # check path directions and type: A to B or B to A, regional or intercity
 def get_path_type_colunm(path_type,block_dir):
     if path_type in ['R']:
@@ -304,7 +316,7 @@ def get_path_type_colunm(path_type,block_dir):
     return path_column
 
 
-def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
+def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check,r=None):
     assert len(blocks_list) > 1, "only one block? can't continue"
     time = 0
     for i in range(len(blocks_list)-1):
@@ -315,6 +327,8 @@ def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
         block_dir = get_indexes(data_check,value1)[0][1]
         speed_path = get_path_type_colunm(v1_speed,block_dir)
         time += float(data_check.iloc[0][speed_path])
+        if r == 1:
+            time = round(time)
     return time
 
 
