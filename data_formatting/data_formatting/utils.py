@@ -218,6 +218,10 @@ def get_block_speed(data,train,block):
     block_id = time_table_blocks.index(block)
     return time_table_speeds[block_id]
 
+def get_passing_time_4singleblock(block,train,data,data_path_check,r=1):
+    block2 = subsequent_block(data,train,block)
+    block_speed_list = [get_block_speed(data,train,block),get_block_speed(data,train,block2)]
+    return get_passing_time_4blocks([block,block2],block_speed_list,data_path_check,r)
 
 def get_trains_at_station(data,only_departue = False):
 
@@ -236,7 +240,6 @@ def get_trains_at_station(data,only_departue = False):
                     trains_from_station[station].append(train)
     return trains_from_station
 
-
 def get_J(data) -> List:
     """  return a dictionary of trains """
     train_dict = timetable_to_train_dict(data)
@@ -245,7 +248,6 @@ def get_J(data) -> List:
 def get_all_important_station() -> List : 
     """ read important stations from file """
     return list(np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()].keys())
-
 
 def get_Paths(data):
     """ return a dictonary of important stations, keys are trains numbers """
@@ -275,7 +277,6 @@ def turn_around_time(data,train,station,r=1):
         time = round(time)
     return time
     
-
 def minimal_stay(train,station,data,data_path_check,first_station = False,r=1):
     time_table = train_time_table(data,train)
     st_block = blocks_list_4station(data, train, station)
@@ -297,7 +298,6 @@ def minimal_stay(train,station,data,data_path_check,first_station = False,r=1):
         time = round(time)
     return time,taus_prep1
 
-
 # check path directions and type: A to B or B to A, regional or intercity
 def get_path_type_colunm(path_type,block_dir):
     if path_type in ['R']:
@@ -314,7 +314,6 @@ def get_path_type_colunm(path_type,block_dir):
         print('Path type not found!')
         exit(1)
     return path_column
-
 
 def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check,r=None):
     assert len(blocks_list) > 1, "only one block? can't continue"
