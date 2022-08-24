@@ -15,11 +15,12 @@ test_pass = {"94766_Ty_KL": 8, "94766_KL_KO": 6, "94766_KO_KO(STM)": 0,
      "26103_KZ_KO(STM)": 1, "26103_KO(STM)_KO": 0, "26103_KO_CB": 3,
      "26103_CB_GLC": 14, "421009_KO(IC)_KO(STM)": 0, "421009_KO(STM)_KO": 0,
      "42100_KO_KO(STM)": 0, "42100_KO(STM)_KZ": 1}
-     
+
 @pytest.mark.parametrize("key, output",list(test_pass.items()))
 def test_taus_pass(key,output):
-    taus_pass = get_taus_pass(data,data_path_check,trains = None)
-    assert taus_pass[key] == output
+    taus_pass = get_taus_pass(data,data_path_check)
+    assert taus_pass[f"{key}"] == output
+
 
 test_stop =  {"94766_Ty": 2, "94766_KL": 1, "94766_KO": 3, 
                 "26103_KZ": 1, "26103_KO(STM)": 2, "26103_KO": 3,
