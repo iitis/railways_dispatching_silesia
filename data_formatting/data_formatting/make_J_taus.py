@@ -1,4 +1,5 @@
 from ast import Dict
+from tabnanny import verbose
 import pandas as pd
 import numpy as np
 import itertools
@@ -298,7 +299,7 @@ def jd(data, imp_stations = None):
 
 # taus are from here
 
-def get_taus_pass(data,data_path_check,trains = None) -> Dict:
+def get_taus_pass(data,data_path_check,trains = None):
     """Function to generate taus_pass, a dictionary with
     information about passing time for a given train between
     two subsequent stations. It has as key the "train_s1_s2"
@@ -325,7 +326,7 @@ def get_taus_pass(data,data_path_check,trains = None) -> Dict:
         for station in paths[train]:
             station2 = subsequent_station(data,train,station)
             if station2 != None:
-                taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check)
+                taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check,resolution=1, verbose = True)
     return taus_pass
 
 def get_taus_stop(data,data_path_check,trains = None):
@@ -392,7 +393,7 @@ def get_taus_headway(data,data_path_check,r=1):
                 t_pass = np.zeros(len(blocks_sequence))
                 deltas_vec = np.zeros(len(blocks_sequence))
                 for i in range(len(blocks_sequence)):
-                    t = lambda i,train: get_passing_time_4singleblock(blocks_sequence[i],train,data,data_path_check,r)
+                    t = lambda i,train: get_passing_time_4singleblock(blocks_sequence[i],train,data,data_path_check)
                     t_pass[i]= t(i,train1)
                     if i > 0:
                         deltas_vec[i] = sum([t(j,train2) -t(j,train1) for j in range(i)])
@@ -403,5 +404,7 @@ def get_taus_headway(data,data_path_check,r=1):
                 if len(blocks_sequence) > 0: 
                     t_headway = np.max([np.sum([t_pass[:x+k]])+ deltas_vec[x] for x in range(len(deltas_vec))])  
                     print(t_headway)
+                if r==1:
+                    t_headway = round(t_headway)
                 taus_headway[f"{train1}_{train2}_{station1}_{station2}"] = t_headway
     return taus_headway
