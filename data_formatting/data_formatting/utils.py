@@ -326,7 +326,7 @@ def get_passing_time_4singleblock(block,train,data,data_path_check,verbose = Fal
     if block2 == None:
         if verbose == True:
             print("last station")
-        return 0
+        return None
     block_speed_list = [get_block_speed(data,train,block)]
     passing_time = get_passing_time_4blocks([block,block2],block_speed_list,data_path_check)
     return passing_time
