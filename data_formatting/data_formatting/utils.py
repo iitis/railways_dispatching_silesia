@@ -207,21 +207,24 @@ def subsequent_station(data, train, station):
         return None
     return sts[sts.index(station)+1]
 
-def subsequent_block(data,train,block):
+def subsequent_block(data,train,block,verbose=False):
     time_table_blocks = train_time_table(data, train)['path'].tolist()
     assert block in time_table_blocks, "this train does not pass trought this block"
-    return time_table_blocks[time_table_blocks.index(block) + 1]
+    block_id = time_table_blocks.index(block)
+    if block_id == len(time_table_blocks):
+        if verbose == True:
+            print("This is the last station!")
+        return None
+    return time_table_blocks[block_id + 1]
+
+
+
 
 def get_block_speed(data,train,block):
     time_table_blocks = train_time_table(data, train)['path'].tolist()
     time_table_speeds = train_time_table(data, train)['speed'].tolist()
     block_id = time_table_blocks.index(block)
     return time_table_speeds[block_id]
-
-def get_passing_time_4singleblock(block,train,data,data_path_check,r=1):
-    block2 = subsequent_block(data,train,block)
-    block_speed_list = [get_block_speed(data,train,block),get_block_speed(data,train,block2)]
-    return get_passing_time_4blocks([block,block2],block_speed_list,data_path_check,r)
 
 def get_trains_at_station(data,only_departue = False):
 
@@ -257,11 +260,13 @@ def get_Paths(data):
         paths_per_train[train] = train_important_stations(data, train)
     return paths_per_train
 
-def minimal_passing_time(train,station1,station2,data,data_path_check,resolution=1):
+
+def minimal_passing_time(train,station1,station2,data,data_path_check,resolution=1,verbose = False):
     assert train in get_J(data),"train does not exist"
     assert station1 and station2 in train_important_stations(data, train)
-    blocks,_,bl_speed = get_blocks_b2win_station4train(data, train, station1, station2, verbose = False)
-    time = get_passing_time_4blocks(blocks,bl_speed,data_path_check)
+    blocks,_ = get_blocks_b2win_station4train(data, train, station1, station2, verbose = verbose)
+    blocks_times = [get_passing_time_4singleblock(block,train,data,data_path_check) for block in blocks]
+    time = sum(blocks_times)
     if resolution == 1:
         time = round(time)
     return time
@@ -315,7 +320,17 @@ def get_path_type_colunm(path_type,block_dir):
         exit(1)
     return path_column
 
-def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check,r=None):
+
+def get_passing_time_4singleblock(block,train,data,data_path_check,verbose = False):
+    block2 = subsequent_block(data,train,block)
+    if block2 == None:
+        if verbose == True:
+            print("last station")
+        return 0
+    block_speed_list = [get_block_speed(data,train,block)]
+    return get_passing_time_4blocks([block,block2],block_speed_list,data_path_check)
+
+def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
     assert len(blocks_list) > 1, "only one block? can't continue"
     time = 0
     for i in range(len(blocks_list)-1):
@@ -326,8 +341,6 @@ def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check,r=None
         block_dir = get_indexes(data_check,value1)[0][1]
         speed_path = get_path_type_colunm(v1_speed,block_dir)
         time += float(data_check.iloc[0][speed_path])
-        if r == 1:
-            time = round(time)
     return time
 
 
