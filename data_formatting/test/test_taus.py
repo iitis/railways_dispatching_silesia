@@ -29,7 +29,7 @@ test_stop =  {"94766_Ty": 2, "94766_KL": 1, "94766_KO": 3,
                 "26103_CB": 2, '26103_GLC': 1, "421009_KO(STM)": 2,
                 "42100_KO": 8, "42100_KO(STM)": 1, "42100_KZ": 1}
 
-taus_stop = get_taus_stop(data,data_path_check)
+taus_stop,_ = get_taus_stop(data,data_path_check)
 
 @pytest.mark.parametrize("key, output",list(test_stop.items()))
 def test_taus_stop(key,output):
