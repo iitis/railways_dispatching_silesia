@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from sympy import intersection
-from .utils import common_path, flatten, get_J, get_passing_time_4singleblock, minimal_passing_time, minimal_stay, turn_around_time
+from .utils import common_path, flatten, get_J, get_passing_time_4singleblock, minimal_passing_time, minimal_stay, subsequent_block, turn_around_time
 from .time_table_check import train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
@@ -355,6 +355,8 @@ def get_taus_stop(data,data_path_check,trains = None):
         for i,station in enumerate(paths[train]):
             if i == 0:
                 first_station = True
+            if (i == len(paths[train])-1) and subsequent_block(data,train,blocks_list_4station(data, train, station)[0])==None:
+                continue
             time_flag,ts_prep = minimal_stay(train,station,data,data_path_check,first_station=first_station)
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
@@ -382,13 +384,13 @@ def get_taus_prep(data):
     return taus_prep
 
 def get_taus_headway(data,data_path_check,r=1):
-    jd_ = jd(data)
+    jd_dict = jd(data)
     important_stations = get_all_important_station()
     taus_headway = {}
     list_of_k1_pairs = {("KO(STM)", 'KZ'), ("CB", "CM"), ("KTC-CB", "via Gt")}
     for station1 in important_stations:
-        for station2 in jd_[station1].keys():
-            for train1,train2 in [a for a in it.product(flatten(jd_[station1][station2]),repeat=2) if a[0]!= a[1]]:
+        for station2 in jd_dict[station1].keys():
+            for train1,train2 in [a for a in it.product(flatten(jd_dict[station1][station2]),repeat=2) if a[0]!= a[1]]:
                 blocks_sequence = common_path(data,train1,train2,station1,station2)
                 t_pass = np.zeros(len(blocks_sequence))
                 deltas_vec = np.zeros(len(blocks_sequence))
@@ -403,7 +405,6 @@ def get_taus_headway(data,data_path_check,r=1):
                 t_headway = 0
                 if len(blocks_sequence) > 0: 
                     t_headway = np.max([np.sum([t_pass[:x+k]])+ deltas_vec[x] for x in range(len(deltas_vec))])  
-                    print(t_headway)
                 if r==1:
                     t_headway = round(t_headway)
                 taus_headway[f"{train1}_{train2}_{station1}_{station2}"] = t_headway

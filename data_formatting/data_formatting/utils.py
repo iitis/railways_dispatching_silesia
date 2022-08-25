@@ -211,7 +211,7 @@ def subsequent_block(data,train,block,verbose=False):
     time_table_blocks = train_time_table(data, train)['path'].tolist()
     assert block in time_table_blocks, "this train does not pass trought this block"
     block_id = time_table_blocks.index(block)
-    if block_id == len(time_table_blocks):
+    if block_id == len(time_table_blocks)-1:
         if verbose == True:
             print("This is the last station!")
         return None
@@ -326,9 +326,10 @@ def get_passing_time_4singleblock(block,train,data,data_path_check,verbose = Fal
     if block2 == None:
         if verbose == True:
             print("last station")
-        return 0
+        return None
     block_speed_list = [get_block_speed(data,train,block)]
-    return get_passing_time_4blocks([block,block2],block_speed_list,data_path_check)
+    passing_time = get_passing_time_4blocks([block,block2],block_speed_list,data_path_check)
+    return passing_time
 
 def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
     assert len(blocks_list) > 1, "only one block? can't continue"
