@@ -338,6 +338,7 @@ def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
         value1,value2 = blocks_list[i:i+2]
         v1_speed = block_speed_list[i]
         data_check = data_path_check.loc[data_path_check["previous_block"].isin([value1,value2]) & data_path_check["next_block"].isin([value1,value2])]
+        # TODO if no blocks found, print which blocks were not found. There may be some typo in the string.
         assert data_check.empty == False, "this combination is not valid"
         block_dir = get_indexes(data_check,value1)[0][1]
         speed_path = get_path_type_colunm(v1_speed,block_dir)
