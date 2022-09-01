@@ -28,7 +28,7 @@ class TimeTableCollector:
     def __init__(self) -> None:
         """Constructor for the TimeTableCollector class"""
 
-        self.time_tables = []
+        self.time_tables = {}
 
     def new_timetable(self, train, blocks, info)-> TimeTable:
         """Creates a new time_table
@@ -57,7 +57,7 @@ class TimeTableCollector:
         :rtype: TimeTableCollector
         """
         if self[time_table.train] == None:
-            self.time_tables.append(time_table)
+            self.time_tables[time_table.train]=time_table
         else:
             print(f"TimeTable for train {time_table.train} already exists")
         return self
