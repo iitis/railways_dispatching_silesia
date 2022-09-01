@@ -22,7 +22,7 @@ class TimeTableBlocks:
     def get_next(self,block):
         return None
 
-    def passing_time(self,block): #TODO: it depends on next block. 
+    def passing_time(self,block): #TODO: it depends on next block.
         return None
 
 class TimeTable:
@@ -30,13 +30,11 @@ class TimeTable:
         """Constructor  for the TimeTable class
 
         :param train: Train id
-        :type start: int
-        :param end: End time
-        :type end: int
-        :param weight: Weight of the time_table
-        :type weight: float
-        :param id: Id of the time_table
-        :type id: int
+        :type train: int
+        :param blocks: train blocks
+        :type end: list
+        :param info: Extra info of the time_table
+        :type weight: list
         """
         self.train = train
         self.blocks = blocks
