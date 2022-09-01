@@ -1,3 +1,30 @@
+class Block:
+    def __init__(self, name, speed, arr=None, derp=None, approx_enter=None, label=None, shuting=None, turnaround_time_minutes=0):
+        self.name = name
+        self.speed = speed
+        self.arr = arr
+        self.derp = derp
+        self.approx_enter = approx_enter
+        self.label = label
+        self.shuting = shuting
+        self.turnaround_time_minutes = turnaround_time_minutes
+
+class TimeTableBlocks:
+    def __init__(self):
+        self.time_table_blocks = []
+    
+    def __getitem__(self,name):
+        return next((block for block in self.time_table_blocks if block.name == name), None)
+    
+    def get_previous(self,block):
+        return None
+
+    def get_next(self,block):
+        return None
+
+    def passing_time(self,block): #TODO: it depends on next block. 
+        return None
+
 class TimeTable:
     def __init__(self, train, blocks, info):
         """Constructor  for the TimeTable class
@@ -25,7 +52,7 @@ class TimeTable:
 
 
 class TimeTableCollector:
-    def __init__(self) -> None:
+    def __init__(self):
         """Constructor for the TimeTableCollector class"""
 
         self.time_tables = {}
@@ -70,7 +97,7 @@ class TimeTableCollector:
         :return: time_table with the given train number
         :rtype:TimeTable
         """
-        return next((time_table for time_table in self.time_tables if time_table.train == train), None)
+        return next(self.time_tables[train], None)
 
     def __repr__(self):
         """Used for printing
