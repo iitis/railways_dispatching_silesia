@@ -96,7 +96,11 @@ def check_common_blocks_elements(data , train1, train2):
 # check which important station the block belongs to
 def get_block_station(block,important_stations):
     # important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    return [key for key, value in important_stations.items() if block in value][0]
+    station = [key for key, value in important_stations.items() if block in value]
+    if len(station)==0:
+        return np.nan
+    return station[0]
+
 
 def blocks_list_4station(data, train, station):
     sts = get_Paths(data)[train]
@@ -108,8 +112,33 @@ def blocks_list_4station(data, train, station):
     time_table_blocks = train_time_table(data, train)['path'].tolist()
     return common_elements(station_blocks,time_table_blocks)
 
+
+
+
+def get_blocks_b2win_station4train(timetable, stations, verbose = True):
+    sts = train_important_stations(timetable)
+    blocksb2win = []
+    rev = False
+    station1,station2 = stations
+    for station in stations:
+        if station not in sts:
+            print(f'Warning: station {station} not in the train set')
+            return [], None
+    if sts.index(station1) > sts.index(station2):
+        if verbose == True:
+            print("Warning: stations out of order")
+        rev = True
+    else:
+        df = timetable
+        mask = (df['important_station'] == station1) | (df['important_station'] == station2)
+        ind = df.loc[mask].index.values
+        blocksb2win = timetable['path'][ind[0]+1:ind[-1]].tolist()
+    
+    return blocksb2win,rev
+
+
 # get common blocks between stations, in order of the time table
-def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True):
+def get_blocks_b2win_station4train_deprecable(data, train,station1,station2, verbose = True):
     sts = get_Paths(data)[train]
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     blocksb2win = []
@@ -165,7 +194,24 @@ def check_common_specific_elements_lists(list1,list2):
             i+=1
     return common_elements
 
-def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,station2,verbose = False):
+
+def get_common_blocks_and_direction_b2win_trains_deprecable(data,train1,train2,station1,station2,verbose = False):
+    blocks_order = {}
+    for train in [train1,train2]:
+        blocks,rev = get_blocks_b2win_station4train(data,train,station1,station2,verbose)
+        if rev:
+            blocks,_ = get_blocks_b2win_station4train(data, train,station2,station1,verbose)
+        blocks_order[train] = [blocks,rev]
+    common_blocks = check_common_specific_elements_lists(blocks_order[train1][0],blocks_order[train2][0])
+    if blocks_order[train1][1] == blocks_order[train2][1]:
+        direction = 'same'
+    else:
+        direction = 'opposite'
+    # return common_blocks,direction
+    return flatten(common_blocks),direction
+
+
+def get_common_blocks_and_direction_b2win_trains_deprecable(data,train1,train2,station1,station2,verbose = False):
     blocks_order = {}
     for train in [train1,train2]:
         blocks,rev = get_blocks_b2win_station4train(data,train,station1,station2,verbose)
@@ -239,27 +285,26 @@ def get_trains_at_station(data,only_departue = False):
                     trains_from_station[station].append(train)
     return trains_from_station
 
-def get_J(data) -> List:
+def get_J(train_dict) -> List:
     """  return a dictionary of trains """
-    train_dict = timetable_to_train_dict(data)
+    # train_dict = timetable_to_train_dict(data)
     return list(train_dict.keys())
 
 def get_all_important_station() -> List : 
     """ read important stations from file """
     return list(np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()].keys())
 
-def get_Paths(data):
+def get_Paths(train_dict):
     """ return a dictonary of important stations, keys are trains numbers """
-    trains = get_J(data)
+    trains = get_J(train_dict)
     paths_per_train = {}
     for train in trains:
-        paths_per_train[train] = train_important_stations(data, train)
+        paths_per_train[train] = train_important_stations(train_dict[train][1])
     return paths_per_train
 
 
-def minimal_passing_time(train,station1,station2,data,data_path_check,resolution=1,verbose = False):
-    assert train in get_J(data),"train does not exist"
-    assert station1 and station2 in train_important_stations(data, train)
+def minimal_passing_time(timetable,station1,station2,resolution=1,verbose = False):
+    assert station1 and station2 in train_important_stations(timetable)
     blocks,_ = get_blocks_b2win_station4train(data, train, station1, station2, verbose = verbose)
     blocks_times = [get_passing_time_4singleblock(block,train,data,data_path_check) for block in blocks]
     time = sum(blocks_times)
