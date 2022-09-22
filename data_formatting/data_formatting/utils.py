@@ -94,8 +94,8 @@ def check_common_blocks_elements(data , train1, train2):
     return common_elements(list(train_time_table(data, train1)['path']),list(train_time_table(data, train2)['path']))
 
 # check which important station the block belongs to
-def get_block_station(block):
-    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+def get_block_station(block,important_stations):
+    # important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     return [key for key, value in important_stations.items() if block in value][0]
 
 def blocks_list_4station(data, train, station):
@@ -219,12 +219,8 @@ def subsequent_block(data,train,block,verbose=False):
 
 
 
-
-def get_block_speed(data,train,block):
-    time_table_blocks = train_time_table(data, train)['path'].tolist()
-    time_table_speeds = train_time_table(data, train)['speed'].tolist()
-    block_id = time_table_blocks.index(block)
-    return time_table_speeds[block_id]
+def get_block_speed(time_table,block):
+    return time_table.loc[time_table1["path"]==block]["speed"].values[0]
 
 def get_trains_at_station(data,only_departue = False):
 
