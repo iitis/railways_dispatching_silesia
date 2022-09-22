@@ -1,3 +1,20 @@
+
+def single_passing_time(block_info,data_paths):
+    value1,value2,v1_speed = block_info
+    data_check = data_paths.loc[data_paths["previous_block"].isin([value1,value2]) & data_paths["next_block"].isin([value1,value2])]
+    assert data_paths.empty == False, f"this combination: {value1} and {value2} is not valid"
+    block_dir = get_indexes(data_check,value1)[0][1]
+    speed_path = get_path_type_colunm(v1_speed,block_dir)
+    return float(data_check.iloc[0][speed_path])
+
+def passing_times_4blocks(timetable,data_paths):
+    blocks = timetable["paths"].tolist()
+    speed  = timetable["speed"].to_list()
+    blocks_info = list(zip(blocks[:],blocks[1:],speed))
+    return map(lambda x: single_passing_time(x,data_paths),blocks_info)
+
+
+
 class Block:
     def __init__(self, name, speed, arr=None, derp=None, approx_enter=None, label=None, shuting=None, turnaround_time_minutes=0):
         self.name = name
