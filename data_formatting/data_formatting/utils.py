@@ -81,17 +81,17 @@ def sublist(l1,l2):
         return False
 
 
-def check_common_station(data, train1, train2):
+def check_common_station(train_dict, train1, train2):
     """ get common stations of two trains, does not check order """
-    paths_dict = get_Paths(data)
+    paths_dict = get_Paths(train_dict)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
-def get_trains_with_same_stations(data):
-    return reverse_dict_of_lists(get_Paths(data))
+def get_trains_with_same_stations(train_dict):
+    return reverse_dict_of_lists(get_Paths(train_dict))
 
-def check_common_blocks_elements(data , train1, train2):
+def check_common_blocks_elements(train_dict , train1, train2):
     """ get common blocks between trains, does not check order """
-    return common_elements(list(train_time_table(data, train1)['path']),list(train_time_table(data, train2)['path']))
+    return common_elements(list(train_time_table(train_dict, train1)['path']),list(train_time_table(train_dict, train2)['path']))
 
 # check which important station the block belongs to
 def get_block_station(block,important_stations):
@@ -102,24 +102,22 @@ def get_block_station(block,important_stations):
     return station[0]
 
 
-def blocks_list_4station(data, train, station):
-    sts = get_Paths(data)[train]
+def blocks_list_4station(train_dict, train, station):
+    sts = get_Paths(train_dict)[train]
 
     if station not in sts:
         print('Warning: this train does not pass through this station!')
         return []
     station_blocks = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()][station]
-    time_table_blocks = train_time_table(data, train)['path'].tolist()
+    time_table_blocks = train_time_table(train_dict, train)['path'].tolist()
     return common_elements(station_blocks,time_table_blocks)
 
 
-
-
-def get_blocks_b2win_station4train(timetable, stations, verbose = True):
+def get_blocks_b2win_station4train(timetable, station1, station2, verbose = True):
     sts = train_important_stations(timetable)
     blocksb2win = []
     rev = False
-    station1,station2 = stations
+    stations=[station1,station2]
     for station in stations:
         if station not in sts:
             print(f'Warning: station {station} not in the train set')
@@ -226,10 +224,10 @@ def get_common_blocks_and_direction_b2win_trains_deprecable(data,train1,train2,s
     # return common_blocks,direction
     return flatten(common_blocks),direction
 
-def common_path(data,train1,train2,station1,station2,verbose=False):
+def common_path(timetable1,timetable2,station1,station2,verbose=False):
     common_path_list = []
-    blocks1,_ = get_blocks_b2win_station4train(data,train1,station1,station2,verbose)
-    blocks2,_ = get_blocks_b2win_station4train(data,train2,station1,station2,verbose)
+    blocks1,_ = get_blocks_b2win_station4train(timetable1,station1,station2,verbose)
+    blocks2,_ = get_blocks_b2win_station4train(timetable2,station1,station2,verbose)
     if blocks1 == blocks2:
         common_path_list = blocks1
     else:
@@ -266,7 +264,7 @@ def subsequent_block(data,train,block,verbose=False):
 
 
 def get_block_speed(time_table,block):
-    return time_table.loc[time_table1["path"]==block]["speed"].values[0]
+    return time_table.loc[time_table["path"]==block]["speed"].values[0]
 
 def get_trains_at_station(data,only_departue = False):
 
@@ -305,7 +303,7 @@ def get_Paths(train_dict):
 
 def minimal_passing_time(timetable,station1,station2,resolution=1,verbose = False):
     assert station1 and station2 in train_important_stations(timetable)
-    blocks,_ = get_blocks_b2win_station4train(data, train, station1, station2, verbose = verbose)
+    blocks,_ = get_blocks_b2win_station4train(timetable, station1, station2, verbose = verbose)
     blocks_times = [get_passing_time_4singleblock(block,train,data,data_path_check) for block in blocks]
     time = sum(blocks_times)
     if resolution == 1:
@@ -362,7 +360,7 @@ def get_path_type_colunm(path_type,block_dir):
     return path_column
 
 
-def get_passing_time_4singleblock(block,train,data,data_path_check,verbose = False):
+def get_passing_time_4singleblock(block,timetable,verbose = False):
     block2 = subsequent_block(data,train,block)
     if block2 == None:
         if verbose == True:

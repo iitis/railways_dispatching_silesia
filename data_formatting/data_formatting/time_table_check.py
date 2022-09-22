@@ -39,34 +39,33 @@ def timetable_to_train_dict(data):
     return train_dict
 
 
-def train_time_table(data, train):
+def train_time_table(train_dict, train):
     """
     return dict of trains timetable
     keys: 'path', 'speed', 'Arr', 'Dep', 'Approx_enter', 'Label', 'Shunting',
        'Turnaround_time_minutes'
     values are strings or NaN if there is nothing corresponding in csv field
     """
-    train_dict = timetable_to_train_dict(data)
-    time_table = train_dict[train][1]
-    return time_table
+    # train_dict = timetable_to_train_dict(data)
+    return train_dict[train][1]
 
 
-def get_arrdep(data, train):
+def get_arrdep(time_table):
     """ returns arriving, dep, approx dep times for blocks in the form of dict with
     keys: 'Arr', 'Dep', 'Approx_enter'
 
     Values are strings, if not given in the timetable file they are NaN
     """
-    time_table = train_time_table(data, train)
+    # time_table = train_time_table(data, train)
     arrdep = time_table.loc[:, ["Arr", "Dep", "Approx_enter"]]
     return arrdep
 
 
-def get_arr_dep_vals(data, train):
+def get_arr_dep_vals(time_table):
     """  return vector of [Arr, Dep, Approx_enter] at stations given in  .csv file
          if filed is empty returns nan
     """
-    arrdep = get_arrdep(data, train)
+    arrdep = get_arrdep(time_table)
     short_list = arrdep.dropna(how="all")
     arr_dep_vals = []
     for i in range(len(short_list)):
@@ -74,12 +73,21 @@ def get_arr_dep_vals(data, train):
     return arr_dep_vals
 
 
-def train_important_stations(data, train):
+
+
+def train_important_stations(time_table):
     """  return the vector of important stations of given train """
-    important_stations = np.load("./important_stations.npz", allow_pickle=True)[
-        "arr_0"
-    ][()]
-    time_table = train_time_table(data, train)
+
+    filtered_time_table = time_table[time_table['important_station'].notnull()]
+    return filtered_time_table["important_station"].values.tolist()
+
+
+def train_important_stations1(time_table,important_stations):
+    """  return the vector of important stations of given train """
+    # important_stations = np.load("./important_stations.npz", allow_pickle=True)[
+    #     "arr_0"
+    # ][()]
+    # time_table = train_time_table(data, train)
     blocks = time_table["path"]
     station_list = []
     for block in blocks:
@@ -89,12 +97,12 @@ def train_important_stations(data, train):
     return station_list
 
 
-def check_path_continuity(data, data_path_check, train):
+def check_path_continuity(paths, data_path_check):
     """ for given train checks if its path given in data in continious
      with regards to possible paths in data_path_check  if not raise AssertionError
     `not present`
      """
-    paths = train_time_table(data, train)["path"]
+    # paths = train_time_table(data, train)["path"]
     for i in range(len(paths) - 1):
         if data_path_check.isin([paths[i], paths[i + 1]]).all(1).any() == False:
             if data_path_check.isin([paths[i]]).any(1).any() == False:
