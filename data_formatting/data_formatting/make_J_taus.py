@@ -17,7 +17,7 @@ from .make_switch_set import z_out
 import itertools as it
 
 # get list of train with pairs containing a train number and train number+9
-def get_trains_pair9(data):
+def get_trains_pair9(train_dict):
     """
     Returns vector of pairs of train numbers such that the number of second
     is the number of first with 9 at the end.
@@ -26,7 +26,7 @@ def get_trains_pair9(data):
 
     The one with 9 at the end is shunting
     """
-    trains = get_J(data)
+    trains = get_J(train_dict)
     pair_lists = []
     for train in trains:
         if train*10+9 in trains:
@@ -34,7 +34,7 @@ def get_trains_pair9(data):
     return pair_lists
 
 # return dict
-def get_jround(data):
+def get_jround(train_dict,important_stations):
     """
     return dict with stations as keys, and a vector of pairs of trains
     with the same rolling stock. The change on the number occurs on the station
@@ -42,8 +42,8 @@ def get_jround(data):
 
     Order of trains in each pair is such as in real situation
     """
-    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    pair_lists = get_trains_pair9(data)
+    # important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    pair_lists = get_trains_pair9(train_dict)
     jround = {}
     for pair in pair_lists:
         a = train_time_table(data, pair[0])['path'].tolist()[0] == train_time_table(data, pair[1])['path'].tolist()[-1]
@@ -78,7 +78,7 @@ def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
     --> init_josingle (the dictionary that initially considered)
 
     """
-
+    # TODO: mark as deprecable, change notation
     path = get_blocks_b2win_station4train(data, j, s, s_prime, verbose = False)[0]
     path_j_prime = get_blocks_b2win_station4train(data, j_prime, s_prime, s, verbose = False)[0]
     if len(path) != 0 and path == list(reversed(path_j_prime)):
@@ -134,6 +134,7 @@ def important_trains_and_stations(data, imp_stations, only_departue):
     (2) Only departure = False, returns all the trains (i.e. departing + incoming)
 
     """
+        # TODO: mark as deprecable, change notation
 
     if imp_stations != None:
         imp_stations_list = imp_stations
