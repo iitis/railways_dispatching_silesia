@@ -45,7 +45,9 @@ def test_taus_prep():
 test_headway = {"26103_14006_KZ_KO(STM)": 1, "26103_40673_KZ_KO(STM)": 1, 
                   "26103_54101_KZ_KO(STM)": 1 , "26103_40675_KZ_KO(STM)": 1, 
                   "14006_40673_KZ_KO(STM)": 1, '14006_54101_KZ_KO(STM)': 1, 
-                  "14006_40675_KZ_KO(STM)": 1} 
+                  "14006_40675_KZ_KO(STM)": 1., "94766_40518_Ty_KL": 3., 
+                  "40518_94766_Ty_KL": 3., "94766_41004_Ty_KL": 2., 
+                  "41004_94766_Ty_KL": 4.} 
 
 taus_headway = get_taus_headway(data,data_path_check)
 @pytest.mark.parametrize("key, output",list(test_headway.items()))
