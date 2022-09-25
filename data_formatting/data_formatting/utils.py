@@ -300,7 +300,7 @@ def get_Paths(train_dict):
 def minimal_passing_time(timetable,station1,station2,resolution=1,verbose = False):
     assert station1 and station2 in train_important_stations(timetable)
     blocks,_ = get_blocks_b2win_station4train(timetable, station1, station2, verbose = verbose)
-    blocks_times = [get_passing_time_4singleblock(block,timetable) for block in blocks]
+    blocks_times = [get_passing_time_block(block,timetable) for block in blocks]
     time = sum(blocks_times)
     if resolution == 1:
         time = round(time)
@@ -324,8 +324,7 @@ def minimal_stay(train,station,train_dict,data_path_check,first_station = False,
     taus_prep1 = {}
     id_station_block = get_indexes(time_table,st_block[0])[0][0]
     blocks_list = time_table.iloc[id_station_block:id_station_block+2]["path"].tolist()
-    block_speed_list = time_table.iloc[id_station_block:id_station_block+2]["speed"].tolist()
-    t = get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check)
+    t = sum([get_passing_time_block(block,time_table) for block in blocks_list])
     turn_around = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(turn_around)==False:
         turn_around = float(turn_around)
@@ -356,28 +355,23 @@ def get_path_type_colunm(path_type,block_dir):
     return path_column
 
 
-def get_passing_time_4singleblock(block,timetable,verbose = False):
-    block2 = subsequent_block(timetable,block)
-    if block2 == None:
-        if verbose == True:
-            print("last station")
-        return None
-    block_speed_list = [get_block_speed(timetable,block)]
-    passing_time = get_passing_time_4blocks([block,block2],block_speed_list,data_path_check)
-    return passing_time
+def get_passing_time_block(block,timetable,verbose = False):
+    t = timetable[timetable["path"]== block ]['passing_time'].values[0]
+    return t
 
-def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
-    assert len(blocks_list) > 1, "only one block? can't continue"
-    time = 0
-    for i in range(len(blocks_list)-1):
-        value1,value2 = blocks_list[i:i+2]
-        v1_speed = block_speed_list[i]
-        data_check = data_path_check.loc[data_path_check["previous_block"].isin([value1,value2]) & data_path_check["next_block"].isin([value1,value2])]
-        # TODO if no blocks found, print which blocks were not found. There may be some typo in the string.
-        assert data_check.empty == False, f"this combination: {value1} and {value2} is not valid"
-        block_dir = get_indexes(data_check,value1)[0][1]
-        speed_path = get_path_type_colunm(v1_speed,block_dir)
-        time += float(data_check.iloc[0][speed_path])
-    return time
+
+# def get_passing_time_4blocks_depr(blocks_list,block_speed_list,data_path_check):
+#     assert len(blocks_list) > 1, "only one block? can't continue"
+#     time = 0
+#     for i in range(len(blocks_list)-1):
+#         value1,value2 = blocks_list[i:i+2]
+#         v1_speed = block_speed_list[i]
+#         data_check = data_path_check.loc[data_path_check["previous_block"].isin([value1,value2]) & data_path_check["next_block"].isin([value1,value2])]
+#         # TODO if no blocks found, print which blocks were not found. There may be some typo in the string.
+#         assert data_check.empty == False, f"this combination: {value1} and {value2} is not valid"
+#         block_dir = get_indexes(data_check,value1)[0][1]
+#         speed_path = get_path_type_colunm(v1_speed,block_dir)
+#         time += float(data_check.iloc[0][speed_path])
+#     return time
 
 
