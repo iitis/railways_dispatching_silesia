@@ -3,6 +3,7 @@ from tabnanny import verbose
 import pandas as pd
 import numpy as np
 import itertools
+import pickle as pkl
 from sympy import intersection
 from .utils import common_path, flatten, get_J, get_passing_time_block, minimal_passing_time, minimal_stay, subsequent_block, turn_around_time
 from .time_table_check import timetable_to_train_dict, train_time_table
