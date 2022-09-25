@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from sympy import intersection
-from .utils import common_path, flatten, get_J, get_passing_time_4singleblock, minimal_passing_time, minimal_stay, subsequent_block, turn_around_time
+from .utils import common_path, flatten, get_J, get_passing_time_block, minimal_passing_time, minimal_stay, subsequent_block, turn_around_time
 from .time_table_check import timetable_to_train_dict, train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
@@ -270,7 +270,46 @@ def jswitch(data, data_switch, imp_stations = None):
     return jswitch
 
 
+
 def jd(data, imp_stations = None):
+    """
+        function that creates Jd has to be encoded here
+    """
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
+    
+    with open('update_tables.pkl', 'rb') as file:
+        time_tables_dict = pkl.load(file)
+    
+    jd = {}
+    for s in imp_stations_list:
+        jd[s]={}
+        for j in trains_at_stations[s]:
+            timetable = time_tables_dict[j][1]
+            s2 = subsequent_station(timetable,s)
+            if s2 == None:
+                continue
+            if s2 not in jd[s].keys():
+                jd[s][s2] = []
+            while j not in flatten(jd[s][s2]):
+                i = 0
+                v = []
+                added = False
+                while i < len(jd[s][s2]):
+                    path_check = common_path(timetable,time_tables_dict[jd[s][s2][i][0]][1],s,s2)==get_blocks_b2win_station4train(timetable,s,s2)[0]
+                    if jd[s][s2][i] != [] and path_check== True:
+                        jd[s][s2][i].append(j)
+                        added = True
+                        i+=1
+                    else:
+                        i+=1
+                if added == False:
+                    v.append(j)
+                    jd[s][s2].append(v)
+    return jd
+
+
+
+def jd_depr(data, imp_stations = None):
     """
         function that creates Jd has to be encoded here
     """
@@ -333,7 +372,7 @@ def get_taus_pass(data,data_path_check,trains = None):
                 taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check,resolution=1, verbose = True)
     return taus_pass
 
-def get_taus_stop(train_dict,data_path_check,trains = None):
+def get_taus_stop(train_dict,trains = None):
     """Function for getting the mininal stop time for 
     a train in a station. 
 
@@ -361,7 +400,7 @@ def get_taus_stop(train_dict,data_path_check,trains = None):
                 first_station = True
             if (i == len(paths[train])-1) and subsequent_block(train_dict[train][1],blocks_list_4station(train_dict, train, station)[0])==None:
                 continue
-            time_flag,ts_prep = minimal_stay(train,station,data,data_path_check,first_station=first_station)
+            time_flag,ts_prep = minimal_stay(train,station,train_dict,first_station=first_station)
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
     return taus_stop,taus_prep
@@ -399,7 +438,7 @@ def get_taus_headway(data,data_path_check,r=1):
                 t_pass = np.zeros(len(blocks_sequence))
                 deltas_vec = np.zeros(len(blocks_sequence))
                 for i in range(len(blocks_sequence)):
-                    t = lambda i,train: get_passing_time_4singleblock(blocks_sequence[i],train,data,data_path_check)
+                    t = lambda i,train: get_passing_time_block(blocks_sequence[i],train,data,data_path_check)
                     t_pass[i]= t(i,train1)
                     if i > 0:
                         deltas_vec[i] = sum([t(j,train2) -t(j,train1) for j in range(i)])
