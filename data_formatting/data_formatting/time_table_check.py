@@ -76,7 +76,7 @@ def get_arr_dep_vals(time_table):
 
 
 def train_important_stations(time_table):
-    """  return the vector of important stations of given train """
+    """  return the vector of important stations of given train timetable"""
 
     filtered_time_table = time_table[time_table['important_station'].notnull()]
     return filtered_time_table["important_station"].values.tolist()

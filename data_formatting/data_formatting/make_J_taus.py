@@ -5,7 +5,7 @@ import numpy as np
 import itertools
 from sympy import intersection
 from .utils import common_path, flatten, get_J, get_passing_time_4singleblock, minimal_passing_time, minimal_stay, subsequent_block, turn_around_time
-from .time_table_check import train_time_table
+from .time_table_check import timetable_to_train_dict, train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
 from .utils import get_blocks_b2win_station4train
@@ -46,13 +46,13 @@ def get_jround(train_dict,important_stations):
     pair_lists = get_trains_pair9(train_dict)
     jround = {}
     for pair in pair_lists:
-        a = train_time_table(data, pair[0])['path'].tolist()[0] == train_time_table(data, pair[1])['path'].tolist()[-1]
-        b = train_time_table(data, pair[1])['path'].tolist()[0] == train_time_table(data, pair[0])['path'].tolist()[-1]
+        a = train_time_table(train_dict, pair[0])['path'].tolist()[0] == train_time_table(train_dict, pair[1])['path'].tolist()[-1]
+        b = train_time_table(train_dict, pair[1])['path'].tolist()[0] == train_time_table(train_dict, pair[0])['path'].tolist()[-1]
         if a:
-            block = (train_time_table(data, pair[0])['path'].tolist()[0])
+            block = (train_time_table(train_dict, pair[0])['path'].tolist()[0])
             pair = list(reversed(pair))
         elif b:
-            block = (train_time_table(data, pair[1])['path'].tolist()[0])
+            block = (train_time_table(train_dict, pair[1])['path'].tolist()[0])
         else:
             print("Something is wrong")
             exit(1)
@@ -79,8 +79,11 @@ def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
 
     """
     # TODO: mark as deprecable, change notation
-    path = get_blocks_b2win_station4train(data, j, s, s_prime, verbose = False)[0]
-    path_j_prime = get_blocks_b2win_station4train(data, j_prime, s_prime, s, verbose = False)[0]
+    train_dict = timetable_to_train_dict(data)
+    time_table_j = train_dict[j][1]
+    time_talbe_j_prime = train_dict[j_prime][1]
+    path = get_blocks_b2win_station4train(time_table_j, s, s_prime, verbose = False)[0]
+    path_j_prime = get_blocks_b2win_station4train(time_talbe_j_prime, s_prime, s, verbose = False)[0]
     if len(path) != 0 and path == list(reversed(path_j_prime)):
 
         if (s,s_prime) in init_josingle.keys():
@@ -330,7 +333,7 @@ def get_taus_pass(data,data_path_check,trains = None):
                 taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check,resolution=1, verbose = True)
     return taus_pass
 
-def get_taus_stop(data,data_path_check,trains = None):
+def get_taus_stop(train_dict,data_path_check,trains = None):
     """Function for getting the mininal stop time for 
     a train in a station. 
 
@@ -349,14 +352,14 @@ def get_taus_stop(data,data_path_check,trains = None):
     taus_prep = {}
     first_station = False
 
-    paths = get_Paths(data)
+    paths = get_Paths(train_dict)
     if trains == None:
         trains = paths.keys()
     for train in trains:
         for i,station in enumerate(paths[train]):
             if i == 0:
                 first_station = True
-            if (i == len(paths[train])-1) and subsequent_block(data,train,blocks_list_4station(data, train, station)[0])==None:
+            if (i == len(paths[train])-1) and subsequent_block(train_dict[train][1],blocks_list_4station(train_dict, train, station)[0])==None:
                 continue
             time_flag,ts_prep = minimal_stay(train,station,data,data_path_check,first_station=first_station)
             taus_stop[f"{train}_{station}"] = time_flag

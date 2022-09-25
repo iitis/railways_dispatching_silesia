@@ -24,6 +24,24 @@ def getSizeOfNestedList(listOfElem):
             count += 1
     return count
 
+def check_common_specific_elements_lists(list1,list2):
+    common_elements = []
+    i = 0
+    short = []
+    while i in range(len(list1)):
+        if list1[i] in list2:
+            short.append(list1[i])
+            if sublist(short,list2) and i<len(list1)-1:
+                i+=1
+            else:
+                common_elements.append(short)
+                short = []
+                i+=1
+        else:
+            i+=1
+    return common_elements
+
+
 def reverse_dict_of_lists(d):
     reversed_dict = defaultdict(list)
     for key, values in d.items():
@@ -102,7 +120,16 @@ def get_block_station(block,important_stations):
     return station[0]
 
 
-def blocks_list_4station(train_dict, train, station):
+def blocks_list_4station(timetable, station):
+    sts = train_important_stations(timetable)
+    if station not in sts:
+        print('Warning: this train does not pass through this station!')
+        return []
+    station_blocks = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()][station]
+    return common_elements(station_blocks,timetable)
+
+def blocks_list_4station_depr(data, train, station):
+    train_dict = train_time_table(data)
     sts = get_Paths(train_dict)[train]
 
     if station not in sts:
@@ -175,46 +202,16 @@ def get_blocks_b2win_station4train_deprecable(data, train,station1,station2, ver
                 blocksb2win.pop(-1)
         return blocksb2win,rev
 
-def check_common_specific_elements_lists(list1,list2):
-    common_elements = []
-    i = 0
-    short = []
-    while i in range(len(list1)):
-        if list1[i] in list2:
-            short.append(list1[i])
-            if sublist(short,list2) and i<len(list1)-1:
-                i+=1
-            else:
-                common_elements.append(short)
-                short = []
-                i+=1
-        else:
-            i+=1
-    return common_elements
+
 
 
 def get_common_blocks_and_direction_b2win_trains_deprecable(data,train1,train2,station1,station2,verbose = False):
+    time_tables_dict = timetable_to_train_dict(data)
     blocks_order = {}
     for train in [train1,train2]:
-        blocks,rev = get_blocks_b2win_station4train(data,train,station1,station2,verbose)
+        blocks,rev = get_blocks_b2win_station4train(time_tables_dict[train][1],station1,station2,verbose)
         if rev:
-            blocks,_ = get_blocks_b2win_station4train(data, train,station2,station1,verbose)
-        blocks_order[train] = [blocks,rev]
-    common_blocks = check_common_specific_elements_lists(blocks_order[train1][0],blocks_order[train2][0])
-    if blocks_order[train1][1] == blocks_order[train2][1]:
-        direction = 'same'
-    else:
-        direction = 'opposite'
-    # return common_blocks,direction
-    return flatten(common_blocks),direction
-
-
-def get_common_blocks_and_direction_b2win_trains_deprecable(data,train1,train2,station1,station2,verbose = False):
-    blocks_order = {}
-    for train in [train1,train2]:
-        blocks,rev = get_blocks_b2win_station4train(data,train,station1,station2,verbose)
-        if rev:
-            blocks,_ = get_blocks_b2win_station4train(data, train,station2,station1,verbose)
+            blocks,_ = get_blocks_b2win_station4train(time_tables_dict[train][1],station2,station1,verbose)
         blocks_order[train] = [blocks,rev]
     common_blocks = check_common_specific_elements_lists(blocks_order[train1][0],blocks_order[train2][0])
     if blocks_order[train1][1] == blocks_order[train2][1]:
@@ -235,14 +232,14 @@ def common_path(timetable1,timetable2,station1,station2,verbose=False):
     return common_path_list
 
 
-def is_train_passing_thru_station(data, train, station):
-    stations = get_Paths(data)[train]
+def is_train_passing_thru_station(timetable, station):
+    stations = train_important_stations(timetable)
     return station in stations
 
 # get subsequent station for a given train
-def subsequent_station(data, train, station):
+def subsequent_station(timetable, station):
 
-    sts = get_Paths(data)[train]
+    sts = train_important_stations(timetable)
     if station not in sts:
         # print( "The train does not pass trought this station!")
         return None
@@ -251,8 +248,8 @@ def subsequent_station(data, train, station):
         return None
     return sts[sts.index(station)+1]
 
-def subsequent_block(data,train,block,verbose=False):
-    time_table_blocks = train_time_table(data, train)['path'].tolist()
+def subsequent_block(time_table_blocks,block,verbose=False):
+    # time_table_blocks = train_time_table(data, train)['path'].tolist()
     assert block in time_table_blocks, "this train does not pass trought this block"
     block_id = time_table_blocks.index(block)
     if block_id == len(time_table_blocks)-1:
@@ -260,7 +257,6 @@ def subsequent_block(data,train,block,verbose=False):
             print("This is the last station!")
         return None
     return time_table_blocks[block_id + 1]
-
 
 
 def get_block_speed(time_table,block):
@@ -304,15 +300,14 @@ def get_Paths(train_dict):
 def minimal_passing_time(timetable,station1,station2,resolution=1,verbose = False):
     assert station1 and station2 in train_important_stations(timetable)
     blocks,_ = get_blocks_b2win_station4train(timetable, station1, station2, verbose = verbose)
-    blocks_times = [get_passing_time_4singleblock(block,train,data,data_path_check) for block in blocks]
+    blocks_times = [get_passing_time_4singleblock(block,timetable) for block in blocks]
     time = sum(blocks_times)
     if resolution == 1:
         time = round(time)
     return time
 
-def turn_around_time(data,train,station,r=1):
-    time_table = train_time_table(data,train)
-    st_block = blocks_list_4station(data, train, station)
+def turn_around_time(time_table,station,r=1):
+    st_block = blocks_list_4station(time_table, station)
     id_station_block = get_indexes(time_table,st_block[0])[0][0]
     time = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(time):
@@ -321,9 +316,10 @@ def turn_around_time(data,train,station,r=1):
         time = round(time)
     return time
     
-def minimal_stay(train,station,data,data_path_check,first_station = False,r=1):
-    time_table = train_time_table(data,train)
-    st_block = blocks_list_4station(data, train, station)
+    # TODO: mark as deprecable
+def minimal_stay(train,station,train_dict,data_path_check,first_station = False,r=1):
+    time_table = train_dict[train][1]
+    st_block = blocks_list_4station(time_table, station)
     time = 0
     taus_prep1 = {}
     id_station_block = get_indexes(time_table,st_block[0])[0][0]
@@ -361,12 +357,12 @@ def get_path_type_colunm(path_type,block_dir):
 
 
 def get_passing_time_4singleblock(block,timetable,verbose = False):
-    block2 = subsequent_block(data,train,block)
+    block2 = subsequent_block(timetable,block)
     if block2 == None:
         if verbose == True:
             print("last station")
         return None
-    block_speed_list = [get_block_speed(data,train,block)]
+    block_speed_list = [get_block_speed(timetable,block)]
     passing_time = get_passing_time_4blocks([block,block2],block_speed_list,data_path_check)
     return passing_time
 
