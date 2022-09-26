@@ -343,7 +343,7 @@ def jd_depr(data, imp_stations = None):
 
 # taus are from here
 
-def get_taus_pass(data,data_path_check,trains = None):
+def get_taus_pass(train_dict,trains = None):
     """Function to generate taus_pass, a dictionary with
     information about passing time for a given train between
     two subsequent stations. It has as key the "train_s1_s2"
@@ -363,14 +363,15 @@ def get_taus_pass(data,data_path_check,trains = None):
         and value minimal_passing_time(train, s1, s2)
     """
     taus_pass = {}
-    paths = get_Paths(data)
+    paths = get_Paths(train_dict)
     if trains == None:
         trains = paths.keys()
     for train in trains:
+        timetable = train_dict[train][1]
         for station in paths[train]:
-            station2 = subsequent_station(data,train,station)
+            station2 = subsequent_station(timetable,station)
             if station2 != None:
-                taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check,resolution=1, verbose = True)
+                taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(timetable,station,station2,resolution=1, verbose = True)
     return taus_pass
 
 def get_taus_stop(train_dict,trains = None):
