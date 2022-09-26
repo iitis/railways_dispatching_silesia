@@ -374,6 +374,7 @@ def get_taus_pass(train_dict,trains = None):
                 taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(timetable,station,station2,resolution=1, verbose = True)
     return taus_pass
 
+
 def get_taus_stop(train_dict,trains = None):
     """Function for getting the mininal stop time for 
     a train in a station. 
@@ -400,14 +401,14 @@ def get_taus_stop(train_dict,trains = None):
         for i,station in enumerate(paths[train]):
             if i == 0:
                 first_station = True
-            if (i == len(paths[train])-1) and subsequent_block(train_dict[train][1],blocks_list_4station(train_dict, train, station)[0])==None:
+            if (i == len(paths[train])-1) and subsequent_block(train_dict[train][1]["path"].tolist(),blocks_list_4station(train_dict[train][1], station)[0])==None:
                 continue
             time_flag,ts_prep = minimal_stay(train,station,train_dict,first_station=first_station)
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
     return taus_stop,taus_prep
 
-def get_taus_prep(data):
+def get_taus_prep(train_dict):
     """ Function that gives the preparation time
     for a given train at station
 
@@ -421,9 +422,10 @@ def get_taus_prep(data):
         and value turn_around_time(train,station)
     """
     taus_prep={}
-    for train,stations in get_Paths(data).items():
+    paths = get_Paths(train_dict)
+    for train,stations in paths.items():
         s = stations[0]
-        st_prep = turn_around_time(data,train,s,r=1)
+        st_prep = turn_around_time(train_dict[train][1],s,r=1)
         if st_prep != 0:
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep
@@ -436,7 +438,7 @@ def get_taus_headway(data,data_path_check,r=1):
     for station1 in important_stations:
         for station2 in jd_dict[station1].keys():
             for train1,train2 in [a for a in it.product(flatten(jd_dict[station1][station2]),repeat=2) if a[0]!= a[1]]:
-                blocks_sequence = common_path(data,train1,train2,station1,station2)
+                blocks_sequence = common_path([train1],train2,station1,station2)
                 t_pass = np.zeros(len(blocks_sequence))
                 deltas_vec = np.zeros(len(blocks_sequence))
                 for i in range(len(blocks_sequence)):

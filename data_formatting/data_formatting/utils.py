@@ -1,4 +1,5 @@
 from ast import List
+from cmath import isnan
 import pandas as pd
 import numpy as np
 from collections import defaultdict
@@ -126,7 +127,8 @@ def blocks_list_4station(timetable, station):
         print('Warning: this train does not pass through this station!')
         return []
     station_blocks = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()][station]
-    return common_elements(station_blocks,timetable)
+    c_elements = common_elements(station_blocks,timetable["path"].tolist())
+    return c_elements
 
 def blocks_list_4station_depr(data, train, station):
     train_dict = train_time_table(data)
@@ -249,7 +251,7 @@ def subsequent_station(timetable, station):
 
 def subsequent_block(time_table_blocks,block,verbose=False):
     # time_table_blocks = train_time_table(data, train)['path'].tolist()
-    assert block in time_table_blocks, "this train does not pass trought this block"
+    assert block in time_table_blocks, f"this train does not pass trought this block: {block}"
     block_id = time_table_blocks.index(block)
     if block_id == len(time_table_blocks)-1:
         if verbose == True:
@@ -326,15 +328,18 @@ def minimal_stay(train,station,train_dict,first_station = False,r=1):
     t = sum([get_passing_time_block(block,time_table) for block in blocks_list])
     turn_around = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(turn_around)==False:
+        print("is this happening?")
         turn_around = float(turn_around)
         if first_station == True:
             taus_prep1[f"{train}_{station}"] = turn_around
             turn_around = 0
         t+=turn_around       
+    print(time, t)
     time+=t 
     if r==1:
         time = round(time)
     return time,taus_prep1
+
 
 # check path directions and type: A to B or B to A, regional or intercity
 def get_path_type_colunm(path_type,block_dir):
@@ -356,6 +361,8 @@ def get_path_type_colunm(path_type,block_dir):
 
 def get_passing_time_block(block,timetable,verbose = False):
     t = timetable[timetable["path"]== block ]['passing_time'].values[0]
+    if np.isnan(t):
+        t = 0
     return t
 
 
