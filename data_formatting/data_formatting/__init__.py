@@ -8,3 +8,4 @@ from .utils import get_trains_at_station, get_Paths, is_train_passing_thru_stati
 from .utils import subsequent_station, get_trains_at_station, get_J, blocks_list_4station
 from .make_J_taus import get_trains_pair9, get_jround, josingle, jswitch, jtrack, jd
 from .make_J_taus import get_taus_pass, get_taus_stop, get_taus_prep, get_taus_headway
+from .new_time_tables import single_passing_time, passing_times_4blocks, update_all_timetables
