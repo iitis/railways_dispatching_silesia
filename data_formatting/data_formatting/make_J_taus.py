@@ -382,7 +382,7 @@ def get_taus_stop(train_dict,trains = None):
     Arguments:
         data -- data file containing train time tables
         data_path_check -- data file containing passing time between blocks
-
+    
     Keyword Arguments:
         trains -- list of trains (default: {None})
 

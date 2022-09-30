@@ -293,7 +293,8 @@ def get_Paths(train_dict):
     trains = get_J(train_dict)
     paths_per_train = {}
     for train in trains:
-        paths_per_train[train] = train_important_stations(train_dict[train][1])
+        timetable = train_dict[train][1]
+        paths_per_train[train] = train_important_stations(timetable)
     return paths_per_train
 
 
@@ -323,22 +324,18 @@ def minimal_stay(train,station,train_dict,first_station = False,r=1):
     time = 0
     taus_prep1 = {}
     id_station_block = get_indexes(time_table,st_block[0])[0][0]
-    blocks_list = time_table.iloc[id_station_block:id_station_block+2]["path"].tolist()
-    t = sum([get_passing_time_block(block,time_table) for block in blocks_list])
+    t = sum([get_passing_time_block(block,time_table) for block in st_block])
     turn_around = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(turn_around)==False:
-        print("is this happening?")
         turn_around = float(turn_around)
         if first_station == True:
             taus_prep1[f"{train}_{station}"] = turn_around
             turn_around = 0
         t+=turn_around       
-    print(time, t)
     time+=t 
     if r==1:
         time = round(time)
     return time,taus_prep1
-
 
 # check path directions and type: A to B or B to A, regional or intercity
 def get_path_type_colunm(path_type,block_dir):
