@@ -118,7 +118,7 @@ def jtrack_dict_generation(Jtrack_dict):
     return Jtrack_mod
 
 
-def important_trains_and_stations(data, imp_stations, only_departue):
+def important_trains_and_stations(trains_dict, imp_stations, only_departue):
 
     """
     Return:
@@ -144,7 +144,7 @@ def important_trains_and_stations(data, imp_stations, only_departue):
         imp_stations_list = imp_stations
     else:
         imp_stations_list = get_all_important_station()
-    trains_at_stations = get_trains_at_station(data, only_departue)
+    trains_at_stations = get_trains_at_station(trains_dict, only_departue)
     return imp_stations_list, trains_at_stations
 
 

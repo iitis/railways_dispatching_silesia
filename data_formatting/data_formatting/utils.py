@@ -263,9 +263,8 @@ def subsequent_block(time_table_blocks,block,verbose=False):
 def get_block_speed(time_table,block):
     return time_table.loc[time_table["path"]==block]["speed"].values[0]
 
-def get_trains_at_station(data,only_departue = False):
-
-    trains_infor = timetable_to_train_dict(data)
+def get_trains_at_station(trains_infor,only_departue = False):
+ 
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
 
     trains_from_station = {}
