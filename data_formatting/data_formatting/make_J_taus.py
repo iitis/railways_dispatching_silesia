@@ -430,19 +430,19 @@ def get_taus_prep(train_dict):
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep
 
-def get_taus_headway(data,data_path_check,r=1):
-    jd_dict = jd(data)
+def get_taus_headway(train_dict,r=1):
+    jd_dict = jd(train_dict)
     important_stations = get_all_important_station()
     taus_headway = {}
     list_of_k1_pairs = {("KO(STM)", 'KZ'), ("CB", "CM"), ("KTC-CB", "via Gt")}
     for station1 in important_stations:
         for station2 in jd_dict[station1].keys():
             for train1,train2 in [a for a in it.product(flatten(jd_dict[station1][station2]),repeat=2) if a[0]!= a[1]]:
-                blocks_sequence = common_path([train1],train2,station1,station2)
+                blocks_sequence = common_path(train_dict[train1][1],train_dict[train2][1],station1,station2)
                 t_pass = np.zeros(len(blocks_sequence))
                 deltas_vec = np.zeros(len(blocks_sequence))
                 for i in range(len(blocks_sequence)):
-                    t = lambda i,train: get_passing_time_block(blocks_sequence[i],train,data,data_path_check)
+                    t = lambda i,train: get_passing_time_block(blocks_sequence[i],train_dict[train][1])
                     t_pass[i]= t(i,train1)
                     if i > 0:
                         deltas_vec[i] = sum([t(j,train2) -t(j,train1) for j in range(i)])
