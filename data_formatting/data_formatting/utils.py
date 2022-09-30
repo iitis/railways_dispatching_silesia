@@ -355,10 +355,12 @@ def get_path_type_colunm(path_type,block_dir):
     return path_column
 
 
-def get_passing_time_block(block,timetable,verbose = False):
+def get_passing_time_block(block,timetable,verbose = False,r=None):
     t = timetable[timetable["path"]== block ]['passing_time'].values[0]
     if np.isnan(t):
         t = 0
+    if r==1:
+        t=round(t)
     return t
 
 

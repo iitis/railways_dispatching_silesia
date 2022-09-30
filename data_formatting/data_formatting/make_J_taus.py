@@ -382,7 +382,7 @@ def get_taus_stop(train_dict,trains = None):
     Arguments:
         data -- data file containing train time tables
         data_path_check -- data file containing passing time between blocks
-    
+
     Keyword Arguments:
         trains -- list of trains (default: {None})
 
@@ -451,7 +451,7 @@ def get_taus_headway(train_dict,r=1):
                         k=1
                 t_headway = 0
                 if len(blocks_sequence) > 0: 
-                    t_headway = np.max([np.sum([t_pass[:x+k]])+ deltas_vec[x] for x in range(len(deltas_vec))])  
+                    t_headway = np.max([np.sum([t_pass[x:x+k]])+ deltas_vec[x] for x in range(len(deltas_vec))])  
                 if r==1:
                     t_headway = round(t_headway)
                 taus_headway[f"{train1}_{train2}_{station1}_{station2}"] = t_headway
