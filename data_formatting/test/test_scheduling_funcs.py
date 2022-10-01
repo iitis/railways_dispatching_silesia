@@ -30,7 +30,7 @@ def test_schedule(key,output):
     assert schedule[f"{key}"] == output
 
 
-test_itial_conditions =  {"94766_Ty": -13, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 0, "5312_GLC": -18, "40518_Ty": -9}
+test_itial_conditions =  {"94766_Ty": -13, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 8, "5312_GLC": -18, "40518_Ty": -9}
 initial_conditions = get_initial_conditions(time_tables_dict,t1)
 
 @pytest.mark.parametrize("key, output",list(test_itial_conditions.items()))
@@ -38,7 +38,7 @@ def test_initial_conditions(key,output):
     assert initial_conditions[key]==output
 
 
-test_add_delay = {"94766_Ty": 7, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 0, "5312_GLC": -18, "40518_Ty": -9}
+test_add_delay = {"94766_Ty": 7, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 8, "5312_GLC": -18, "40518_Ty": -9}
 delayed_dict = add_delay(initial_conditions,train,delay)
 
 @pytest.mark.parametrize("key, output",list(test_add_delay.items()))
