@@ -370,14 +370,14 @@ def get_scheduleper_train(timetable):
     return {station:timetable[timetable["important_station"]==station]["Dep"].values[0] for station in timetable["important_station"]}
 
 def get_schedule(train_dicts,t1):
-    t1,t2 = str(t1),str(t2)
+    t1= str(t1)
     schedule = {}
 
     for train in train_dicts.keys():
         timetable = train_dicts[train][1]
         times_4_trais = get_scheduleper_train(timetable) 
         for station in times_4_trais.keys():
-            t2 =times_4_trais[station],format
+            t2 = times_4_trais[station]
             time = calc_time_diff(t1,t2)
             schedule[f"{train}_{station}"] = time
     return schedule
@@ -385,6 +385,7 @@ def get_schedule(train_dicts,t1):
 def calc_time_diff(t1,t2,format="default"):
     if format =="default":
         format = '%H:%M'
+    t1,t2 = str(t1),str(t2)
     t1, t2= datetime.strptime(t1,format),datetime.strptime(t2,format)
     time = ft.reduce(lambda a,b: b-a ,sorted([t1,t2])).total_seconds()/60
     if t1 > t2:
@@ -406,4 +407,10 @@ def get_initial_conditions(train_dicts,t1):
         else:
             time = calc_time_diff(t1,t2)
         initial_conditions[f"{train}_{station}"] = time
+    return initial_conditions
+
+def add_delay(initial_conditions,train,delay):
+    t_string = str(train)+"_"
+    new_value = {key:value+delay for key,value in initial_conditions.items() if t_string in key}
+    initial_conditions.update(new_value)
     return initial_conditions
