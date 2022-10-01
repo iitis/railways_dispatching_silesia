@@ -3,9 +3,10 @@ from tabnanny import verbose
 import pandas as pd
 import numpy as np
 import itertools
+import pickle as pkl
 from sympy import intersection
-from .utils import common_path, flatten, get_J, get_passing_time_4singleblock, minimal_passing_time, minimal_stay, subsequent_block, turn_around_time
-from .time_table_check import train_time_table
+from .utils import common_path, flatten, get_J, get_passing_time_block, minimal_passing_time, minimal_stay, subsequent_block, turn_around_time
+from .time_table_check import timetable_to_train_dict, train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
 from .utils import get_blocks_b2win_station4train
@@ -17,7 +18,7 @@ from .make_switch_set import z_out
 import itertools as it
 
 # get list of train with pairs containing a train number and train number+9
-def get_trains_pair9(data):
+def get_trains_pair9(train_dict):
     """
     Returns vector of pairs of train numbers such that the number of second
     is the number of first with 9 at the end.
@@ -26,7 +27,7 @@ def get_trains_pair9(data):
 
     The one with 9 at the end is shunting
     """
-    trains = get_J(data)
+    trains = get_J(train_dict)
     pair_lists = []
     for train in trains:
         if train*10+9 in trains:
@@ -34,7 +35,7 @@ def get_trains_pair9(data):
     return pair_lists
 
 # return dict
-def get_jround(data):
+def get_jround(train_dict,important_stations):
     """
     return dict with stations as keys, and a vector of pairs of trains
     with the same rolling stock. The change on the number occurs on the station
@@ -42,17 +43,17 @@ def get_jround(data):
 
     Order of trains in each pair is such as in real situation
     """
-    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    pair_lists = get_trains_pair9(data)
+    # important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    pair_lists = get_trains_pair9(train_dict)
     jround = {}
     for pair in pair_lists:
-        a = train_time_table(data, pair[0])['path'].tolist()[0] == train_time_table(data, pair[1])['path'].tolist()[-1]
-        b = train_time_table(data, pair[1])['path'].tolist()[0] == train_time_table(data, pair[0])['path'].tolist()[-1]
+        a = train_time_table(train_dict, pair[0])['path'].tolist()[0] == train_time_table(train_dict, pair[1])['path'].tolist()[-1]
+        b = train_time_table(train_dict, pair[1])['path'].tolist()[0] == train_time_table(train_dict, pair[0])['path'].tolist()[-1]
         if a:
-            block = (train_time_table(data, pair[0])['path'].tolist()[0])
+            block = (train_time_table(train_dict, pair[0])['path'].tolist()[0])
             pair = list(reversed(pair))
         elif b:
-            block = (train_time_table(data, pair[1])['path'].tolist()[0])
+            block = (train_time_table(train_dict, pair[1])['path'].tolist()[0])
         else:
             print("Something is wrong")
             exit(1)
@@ -78,9 +79,12 @@ def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
     --> init_josingle (the dictionary that initially considered)
 
     """
-
-    path = get_blocks_b2win_station4train(data, j, s, s_prime, verbose = False)[0]
-    path_j_prime = get_blocks_b2win_station4train(data, j_prime, s_prime, s, verbose = False)[0]
+    # TODO: mark as deprecable, change notation
+    train_dict = timetable_to_train_dict(data)
+    time_table_j = train_dict[j][1]
+    time_talbe_j_prime = train_dict[j_prime][1]
+    path = get_blocks_b2win_station4train(time_table_j, s, s_prime, verbose = False)[0]
+    path_j_prime = get_blocks_b2win_station4train(time_talbe_j_prime, s_prime, s, verbose = False)[0]
     if len(path) != 0 and path == list(reversed(path_j_prime)):
 
         if (s,s_prime) in init_josingle.keys():
@@ -114,7 +118,7 @@ def jtrack_dict_generation(Jtrack_dict):
     return Jtrack_mod
 
 
-def important_trains_and_stations(data, imp_stations, only_departue):
+def important_trains_and_stations(trains_dict, imp_stations, only_departue):
 
     """
     Return:
@@ -134,12 +138,13 @@ def important_trains_and_stations(data, imp_stations, only_departue):
     (2) Only departure = False, returns all the trains (i.e. departing + incoming)
 
     """
+        # TODO: mark as deprecable, change notation
 
     if imp_stations != None:
         imp_stations_list = imp_stations
     else:
         imp_stations_list = get_all_important_station()
-    trains_at_stations = get_trains_at_station(data, only_departue)
+    trains_at_stations = get_trains_at_station(trains_dict, only_departue)
     return imp_stations_list, trains_at_stations
 
 
@@ -266,7 +271,46 @@ def jswitch(data, data_switch, imp_stations = None):
     return jswitch
 
 
+
 def jd(data, imp_stations = None):
+    """
+        function that creates Jd has to be encoded here
+    """
+    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
+    
+    with open('update_tables.pkl', 'rb') as file:
+        time_tables_dict = pkl.load(file)
+    
+    jd = {}
+    for s in imp_stations_list:
+        jd[s]={}
+        for j in trains_at_stations[s]:
+            timetable = time_tables_dict[j][1]
+            s2 = subsequent_station(timetable,s)
+            if s2 == None:
+                continue
+            if s2 not in jd[s].keys():
+                jd[s][s2] = []
+            while j not in flatten(jd[s][s2]):
+                i = 0
+                v = []
+                added = False
+                while i < len(jd[s][s2]):
+                    path_check = common_path(timetable,time_tables_dict[jd[s][s2][i][0]][1],s,s2)==get_blocks_b2win_station4train(timetable,s,s2)[0]
+                    if jd[s][s2][i] != [] and path_check== True:
+                        jd[s][s2][i].append(j)
+                        added = True
+                        i+=1
+                    else:
+                        i+=1
+                if added == False:
+                    v.append(j)
+                    jd[s][s2].append(v)
+    return jd
+
+
+
+def jd_depr(data, imp_stations = None):
     """
         function that creates Jd has to be encoded here
     """
@@ -299,7 +343,7 @@ def jd(data, imp_stations = None):
 
 # taus are from here
 
-def get_taus_pass(data,data_path_check,trains = None):
+def get_taus_pass(train_dict,trains = None):
     """Function to generate taus_pass, a dictionary with
     information about passing time for a given train between
     two subsequent stations. It has as key the "train_s1_s2"
@@ -319,17 +363,19 @@ def get_taus_pass(data,data_path_check,trains = None):
         and value minimal_passing_time(train, s1, s2)
     """
     taus_pass = {}
-    paths = get_Paths(data)
+    paths = get_Paths(train_dict)
     if trains == None:
         trains = paths.keys()
     for train in trains:
+        timetable = train_dict[train][1]
         for station in paths[train]:
-            station2 = subsequent_station(data,train,station)
+            station2 = subsequent_station(timetable,station)
             if station2 != None:
-                taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(train,station,station2,data,data_path_check,resolution=1, verbose = True)
+                taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(timetable,station,station2,resolution=1, verbose = True)
     return taus_pass
 
-def get_taus_stop(data,data_path_check,trains = None):
+
+def get_taus_stop(train_dict,trains = None):
     """Function for getting the mininal stop time for 
     a train in a station. 
 
@@ -348,21 +394,21 @@ def get_taus_stop(data,data_path_check,trains = None):
     taus_prep = {}
     first_station = False
 
-    paths = get_Paths(data)
+    paths = get_Paths(train_dict)
     if trains == None:
         trains = paths.keys()
     for train in trains:
         for i,station in enumerate(paths[train]):
             if i == 0:
                 first_station = True
-            if (i == len(paths[train])-1) and subsequent_block(data,train,blocks_list_4station(data, train, station)[0])==None:
+            if (i == len(paths[train])-1) and subsequent_block(train_dict[train][1]["path"].tolist(),blocks_list_4station(train_dict[train][1], station)[0])==None:
                 continue
-            time_flag,ts_prep = minimal_stay(train,station,data,data_path_check,first_station=first_station)
+            time_flag,ts_prep = minimal_stay(train,station,train_dict,first_station=first_station)
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
     return taus_stop,taus_prep
 
-def get_taus_prep(data):
+def get_taus_prep(train_dict):
     """ Function that gives the preparation time
     for a given train at station
 
@@ -376,26 +422,27 @@ def get_taus_prep(data):
         and value turn_around_time(train,station)
     """
     taus_prep={}
-    for train,stations in get_Paths(data).items():
+    paths = get_Paths(train_dict)
+    for train,stations in paths.items():
         s = stations[0]
-        st_prep = turn_around_time(data,train,s,r=1)
+        st_prep = turn_around_time(train_dict[train][1],s,r=1)
         if st_prep != 0:
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep
 
-def get_taus_headway(data,data_path_check,r=1):
-    jd_dict = jd(data)
+def get_taus_headway(train_dict,r=1):
+    jd_dict = jd(train_dict)
     important_stations = get_all_important_station()
     taus_headway = {}
     list_of_k1_pairs = {("KO(STM)", 'KZ'), ("CB", "CM"), ("KTC-CB", "via Gt")}
     for station1 in important_stations:
         for station2 in jd_dict[station1].keys():
             for train1,train2 in [a for a in it.product(flatten(jd_dict[station1][station2]),repeat=2) if a[0]!= a[1]]:
-                blocks_sequence = common_path(data,train1,train2,station1,station2)
+                blocks_sequence = common_path(train_dict[train1][1],train_dict[train2][1],station1,station2)
                 t_pass = np.zeros(len(blocks_sequence))
                 deltas_vec = np.zeros(len(blocks_sequence))
                 for i in range(len(blocks_sequence)):
-                    t = lambda i,train: get_passing_time_4singleblock(blocks_sequence[i],train,data,data_path_check)
+                    t = lambda i,train: get_passing_time_block(blocks_sequence[i],train_dict[train][1])
                     t_pass[i]= t(i,train1)
                     if i > 0:
                         deltas_vec[i] = sum([t(j,train2) -t(j,train1) for j in range(i)])
@@ -404,7 +451,7 @@ def get_taus_headway(data,data_path_check,r=1):
                         k=1
                 t_headway = 0
                 if len(blocks_sequence) > 0: 
-                    t_headway = np.max([np.sum([t_pass[:x+k]])+ deltas_vec[x] for x in range(len(deltas_vec))])  
+                    t_headway = np.max([np.sum([t_pass[x:x+k]])+ deltas_vec[x] for x in range(len(deltas_vec))])  
                 if r==1:
                     t_headway = round(t_headway)
                 taus_headway[f"{train1}_{train2}_{station1}_{station2}"] = t_headway

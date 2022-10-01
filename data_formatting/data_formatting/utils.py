@@ -1,4 +1,5 @@
 from ast import List
+from cmath import isnan
 import pandas as pd
 import numpy as np
 from collections import defaultdict
@@ -23,6 +24,24 @@ def getSizeOfNestedList(listOfElem):
         else:
             count += 1
     return count
+
+def check_common_specific_elements_lists(list1,list2):
+    common_elements = []
+    i = 0
+    short = []
+    while i in range(len(list1)):
+        if list1[i] in list2:
+            short.append(list1[i])
+            if sublist(short,list2) and i<len(list1)-1:
+                i+=1
+            else:
+                common_elements.append(short)
+                short = []
+                i+=1
+        else:
+            i+=1
+    return common_elements
+
 
 def reverse_dict_of_lists(d):
     reversed_dict = defaultdict(list)
@@ -81,35 +100,72 @@ def sublist(l1,l2):
         return False
 
 
-def check_common_station(data, train1, train2):
+def check_common_station(train_dict, train1, train2):
     """ get common stations of two trains, does not check order """
-    paths_dict = get_Paths(data)
+    paths_dict = get_Paths(train_dict)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
-def get_trains_with_same_stations(data):
-    return reverse_dict_of_lists(get_Paths(data))
+def get_trains_with_same_stations(train_dict):
+    return reverse_dict_of_lists(get_Paths(train_dict))
 
-def check_common_blocks_elements(data , train1, train2):
+def check_common_blocks_elements(train_dict , train1, train2):
     """ get common blocks between trains, does not check order """
-    return common_elements(list(train_time_table(data, train1)['path']),list(train_time_table(data, train2)['path']))
+    return common_elements(list(train_time_table(train_dict, train1)['path']),list(train_time_table(train_dict, train2)['path']))
 
 # check which important station the block belongs to
-def get_block_station(block):
-    important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
-    return [key for key, value in important_stations.items() if block in value][0]
+def get_block_station(block,important_stations):
+    # important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+    station = [key for key, value in important_stations.items() if block in value]
+    if len(station)==0:
+        return np.nan
+    return station[0]
 
-def blocks_list_4station(data, train, station):
-    sts = get_Paths(data)[train]
+
+def blocks_list_4station(timetable, station):
+    sts = train_important_stations(timetable)
+    if station not in sts:
+        print('Warning: this train does not pass through this station!')
+        return []
+    station_blocks = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()][station]
+    c_elements = common_elements(station_blocks,timetable["path"].tolist())
+    return c_elements
+
+def blocks_list_4station_depr(data, train, station):
+    train_dict = train_time_table(data)
+    sts = get_Paths(train_dict)[train]
 
     if station not in sts:
         print('Warning: this train does not pass through this station!')
         return []
     station_blocks = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()][station]
-    time_table_blocks = train_time_table(data, train)['path'].tolist()
+    time_table_blocks = train_time_table(train_dict, train)['path'].tolist()
     return common_elements(station_blocks,time_table_blocks)
 
+
+def get_blocks_b2win_station4train(timetable, station1, station2, verbose = True):
+    sts = train_important_stations(timetable)
+    blocksb2win = []
+    rev = False
+    stations=[station1,station2]
+    for station in stations:
+        if station not in sts:
+            print(f'Warning: station {station} not in the train set')
+            return [], None
+    if sts.index(station1) > sts.index(station2):
+        if verbose == True:
+            print("Warning: stations out of order")
+        rev = True
+    else:
+        df = timetable
+        mask = (df['important_station'] == station1) | (df['important_station'] == station2)
+        ind = df.loc[mask].index.values
+        blocksb2win = timetable['path'][ind[0]+1:ind[-1]].tolist()
+    
+    return blocksb2win,rev
+
+
 # get common blocks between stations, in order of the time table
-def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True):
+def get_blocks_b2win_station4train_deprecable(data, train,station1,station2, verbose = True):
     sts = get_Paths(data)[train]
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
     blocksb2win = []
@@ -148,29 +204,15 @@ def get_blocks_b2win_station4train(data, train,station1,station2, verbose = True
                 blocksb2win.pop(-1)
         return blocksb2win,rev
 
-def check_common_specific_elements_lists(list1,list2):
-    common_elements = []
-    i = 0
-    short = []
-    while i in range(len(list1)):
-        if list1[i] in list2:
-            short.append(list1[i])
-            if sublist(short,list2) and i<len(list1)-1:
-                i+=1
-            else:
-                common_elements.append(short)
-                short = []
-                i+=1
-        else:
-            i+=1
-    return common_elements
 
+    # TOOD: mark as deprecable
 def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,station2,verbose = False):
+    time_tables_dict = timetable_to_train_dict(data)
     blocks_order = {}
     for train in [train1,train2]:
-        blocks,rev = get_blocks_b2win_station4train(data,train,station1,station2,verbose)
+        blocks,rev = get_blocks_b2win_station4train(time_tables_dict[train][1],station1,station2,verbose)
         if rev:
-            blocks,_ = get_blocks_b2win_station4train(data, train,station2,station1,verbose)
+            blocks,_ = get_blocks_b2win_station4train(time_tables_dict[train][1],station2,station1,verbose)
         blocks_order[train] = [blocks,rev]
     common_blocks = check_common_specific_elements_lists(blocks_order[train1][0],blocks_order[train2][0])
     if blocks_order[train1][1] == blocks_order[train2][1]:
@@ -180,10 +222,10 @@ def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,sta
     # return common_blocks,direction
     return flatten(common_blocks),direction
 
-def common_path(data,train1,train2,station1,station2,verbose=False):
+def common_path(timetable1,timetable2,station1,station2,verbose=False):
     common_path_list = []
-    blocks1,_ = get_blocks_b2win_station4train(data,train1,station1,station2,verbose)
-    blocks2,_ = get_blocks_b2win_station4train(data,train2,station1,station2,verbose)
+    blocks1,_ = get_blocks_b2win_station4train(timetable1,station1,station2,verbose)
+    blocks2,_ = get_blocks_b2win_station4train(timetable2,station1,station2,verbose)
     if blocks1 == blocks2:
         common_path_list = blocks1
     else:
@@ -191,14 +233,14 @@ def common_path(data,train1,train2,station1,station2,verbose=False):
     return common_path_list
 
 
-def is_train_passing_thru_station(data, train, station):
-    stations = get_Paths(data)[train]
+def is_train_passing_thru_station(timetable, station):
+    stations = train_important_stations(timetable)
     return station in stations
 
 # get subsequent station for a given train
-def subsequent_station(data, train, station):
+def subsequent_station(timetable, station):
 
-    sts = get_Paths(data)[train]
+    sts = train_important_stations(timetable)
     if station not in sts:
         # print( "The train does not pass trought this station!")
         return None
@@ -207,9 +249,9 @@ def subsequent_station(data, train, station):
         return None
     return sts[sts.index(station)+1]
 
-def subsequent_block(data,train,block,verbose=False):
-    time_table_blocks = train_time_table(data, train)['path'].tolist()
-    assert block in time_table_blocks, "this train does not pass trought this block"
+def subsequent_block(time_table_blocks,block,verbose=False):
+    # time_table_blocks = train_time_table(data, train)['path'].tolist()
+    assert block in time_table_blocks, f"this train does not pass trought this block: {block}"
     block_id = time_table_blocks.index(block)
     if block_id == len(time_table_blocks)-1:
         if verbose == True:
@@ -218,17 +260,11 @@ def subsequent_block(data,train,block,verbose=False):
     return time_table_blocks[block_id + 1]
 
 
+def get_block_speed(time_table,block):
+    return time_table.loc[time_table["path"]==block]["speed"].values[0]
 
-
-def get_block_speed(data,train,block):
-    time_table_blocks = train_time_table(data, train)['path'].tolist()
-    time_table_speeds = train_time_table(data, train)['speed'].tolist()
-    block_id = time_table_blocks.index(block)
-    return time_table_speeds[block_id]
-
-def get_trains_at_station(data,only_departue = False):
-
-    trains_infor = timetable_to_train_dict(data)
+def get_trains_at_station(trains_infor,only_departue = False):
+ 
     important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
 
     trains_from_station = {}
@@ -243,37 +279,36 @@ def get_trains_at_station(data,only_departue = False):
                     trains_from_station[station].append(train)
     return trains_from_station
 
-def get_J(data) -> List:
+def get_J(train_dict) -> List:
     """  return a dictionary of trains """
-    train_dict = timetable_to_train_dict(data)
+    # train_dict = timetable_to_train_dict(data)
     return list(train_dict.keys())
 
 def get_all_important_station() -> List : 
     """ read important stations from file """
     return list(np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()].keys())
 
-def get_Paths(data):
+def get_Paths(train_dict):
     """ return a dictonary of important stations, keys are trains numbers """
-    trains = get_J(data)
+    trains = get_J(train_dict)
     paths_per_train = {}
     for train in trains:
-        paths_per_train[train] = train_important_stations(data, train)
+        timetable = train_dict[train][1]
+        paths_per_train[train] = train_important_stations(timetable)
     return paths_per_train
 
 
-def minimal_passing_time(train,station1,station2,data,data_path_check,resolution=1,verbose = False):
-    assert train in get_J(data),"train does not exist"
-    assert station1 and station2 in train_important_stations(data, train)
-    blocks,_ = get_blocks_b2win_station4train(data, train, station1, station2, verbose = verbose)
-    blocks_times = [get_passing_time_4singleblock(block,train,data,data_path_check) for block in blocks]
+def minimal_passing_time(timetable,station1,station2,resolution=1,verbose = False):
+    assert station1 and station2 in train_important_stations(timetable)
+    blocks,_ = get_blocks_b2win_station4train(timetable, station1, station2, verbose = verbose)
+    blocks_times = [get_passing_time_block(block,timetable) for block in blocks]
     time = sum(blocks_times)
     if resolution == 1:
         time = round(time)
     return time
 
-def turn_around_time(data,train,station,r=1):
-    time_table = train_time_table(data,train)
-    st_block = blocks_list_4station(data, train, station)
+def turn_around_time(time_table,station,r=1):
+    st_block = blocks_list_4station(time_table, station)
     id_station_block = get_indexes(time_table,st_block[0])[0][0]
     time = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(time):
@@ -282,15 +317,14 @@ def turn_around_time(data,train,station,r=1):
         time = round(time)
     return time
     
-def minimal_stay(train,station,data,data_path_check,first_station = False,r=1):
-    time_table = train_time_table(data,train)
-    st_block = blocks_list_4station(data, train, station)
+    # TODO: mark as deprecable
+def minimal_stay(train,station,train_dict,first_station = False,r=1):
+    time_table = train_dict[train][1]
+    st_block = blocks_list_4station(time_table, station)
     time = 0
     taus_prep1 = {}
     id_station_block = get_indexes(time_table,st_block[0])[0][0]
-    blocks_list = time_table.iloc[id_station_block:id_station_block+2]["path"].tolist()
-    block_speed_list = time_table.iloc[id_station_block:id_station_block+2]["speed"].tolist()
-    t = get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check)
+    t = sum([get_passing_time_block(block,time_table) for block in st_block])
     turn_around = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(turn_around)==False:
         turn_around = float(turn_around)
@@ -321,28 +355,12 @@ def get_path_type_colunm(path_type,block_dir):
     return path_column
 
 
-def get_passing_time_4singleblock(block,train,data,data_path_check,verbose = False):
-    block2 = subsequent_block(data,train,block)
-    if block2 == None:
-        if verbose == True:
-            print("last station")
-        return None
-    block_speed_list = [get_block_speed(data,train,block)]
-    passing_time = get_passing_time_4blocks([block,block2],block_speed_list,data_path_check)
-    return passing_time
-
-def get_passing_time_4blocks(blocks_list,block_speed_list,data_path_check):
-    assert len(blocks_list) > 1, "only one block? can't continue"
-    time = 0
-    for i in range(len(blocks_list)-1):
-        value1,value2 = blocks_list[i:i+2]
-        v1_speed = block_speed_list[i]
-        data_check = data_path_check.loc[data_path_check["previous_block"].isin([value1,value2]) & data_path_check["next_block"].isin([value1,value2])]
-        # TODO if no blocks found, print which blocks were not found. There may be some typo in the string.
-        assert data_check.empty == False, f"this combination: {value1} and {value2} is not valid"
-        block_dir = get_indexes(data_check,value1)[0][1]
-        speed_path = get_path_type_colunm(v1_speed,block_dir)
-        time += float(data_check.iloc[0][speed_path])
-    return time
+def get_passing_time_block(block,timetable,verbose = False,r=None):
+    t = timetable[timetable["path"]== block ]['passing_time'].values[0]
+    if np.isnan(t):
+        t = 0
+    if r==1:
+        t=round(t)
+    return t
 
 
