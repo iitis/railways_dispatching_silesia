@@ -1,7 +1,9 @@
 from ast import List
-from cmath import isnan
 import pandas as pd
 import numpy as np
+import functools as ft
+from datetime import datetime
+
 from collections import defaultdict
 from .time_table_check import timetable_to_train_dict
 from .time_table_check import train_important_stations
@@ -363,4 +365,23 @@ def get_passing_time_block(block,timetable,verbose = False,r=None):
         t=round(t)
     return t
 
+def get_scheduleper_train(timetable):
+    timetable = timetable[timetable["important_station"].notnull() & timetable["Dep"].notnull()]
+    return {station:timetable[timetable["important_station"]==station]["Dep"].values[0] for station in timetable["important_station"]}
 
+def get_schedule(timetable,t1):
+    t1 = str(t1)
+    schedule = {}
+    format = '%H:%M'
+    t1 = datetime.strptime('16:00', format)
+
+    for train in train_dicts.keys():
+        timetable = train_dicts[train][1]
+        times_4_trais = get_scheduleper_train(timetable) 
+        for station in times_4_trais.keys():
+            t2 = datetime.strptime(times_4_trais[station],format)
+            time = ft.reduce(lambda a,b: b-a ,sorted([t1,t2])).total_seconds()/60
+            if t1 > t2:
+                time*=-1
+            schedule[f"{train}_{station}"] = time
+    return schedule
