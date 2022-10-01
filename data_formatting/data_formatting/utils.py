@@ -412,5 +412,6 @@ def get_initial_conditions(train_dicts,t1):
 def add_delay(initial_conditions,train,delay):
     t_string = str(train)+"_"
     new_value = {key:value+delay for key,value in initial_conditions.items() if t_string in key}
-    initial_conditions.update(new_value)
-    return initial_conditions
+    new_conditions = initial_conditions.copy()
+    new_conditions.update(new_value)
+    return new_conditions
