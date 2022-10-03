@@ -1,6 +1,7 @@
 """
     there sholud be tests taus
 """
+from pickle import FALSE
 import pandas as pd
 import numpy as np
 import pytest
@@ -17,12 +18,10 @@ time_tables_dict = timetable_to_train_dict(data)
 time_tables_dict = update_all_timetables(time_tables_dict,data_path_check,important_stations,save = False)
 
 t1 = '16:00'
-delay= 20
-train = 94766
 # ---------------- data coletions -----------------
 
 
-test_schedule = {"94766_Ty": -13, "94766_KL": -3, "26103_KO": 11, "26103_CB": 17, "26103_GLC": 36, "42100_KO": 8}
+test_schedule = {"94766_Ty": -13, "94766_KL": -3, "26103_KO": 11, "26103_CB": 17, "26103_GLC": 36, "42100_KO": 8, "41004_Ty": 1}
 schedule = get_schedule(time_tables_dict,t1)
 
 @pytest.mark.parametrize("key, output",list(test_schedule.items()))
@@ -30,7 +29,7 @@ def test_schedule(key,output):
     assert schedule[f"{key}"] == output
 
 
-test_itial_conditions =  {"94766_Ty": -13, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 8, "5312_GLC": -18, "40518_Ty": -9}
+test_itial_conditions =  {"94766_Ty": -13, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 8, "5312_GLC": -18, "40518_Ty": -9, "54101_KZ": 24, "541019_KO": 28}
 initial_conditions = get_initial_conditions(time_tables_dict,t1)
 
 @pytest.mark.parametrize("key, output",list(test_itial_conditions.items()))
@@ -38,9 +37,16 @@ def test_initial_conditions(key,output):
     assert initial_conditions[key]==output
 
 
-test_add_delay = {"94766_Ty": 7, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 8, "5312_GLC": -18, "40518_Ty": -9}
+test_delay_dict = {"94766_Ty": 7, "26103_KZ": 0, "421009_KO(IC)": -10, "42100_KO": 18, "5312_GLC": -18, "40518_Ty": -9}
+delay= 20
+train = 94766
 delayed_dict = add_delay(initial_conditions,train,delay)
+delay1 = 10
+train1 = 42100
+delayed_dict = add_delay(delayed_dict,train1,delay1)
 
-@pytest.mark.parametrize("key, output",list(test_add_delay.items()))
-def test_add_delay(key,output):
+@pytest.mark.parametrize("key, output",list(test_delay_dict.items()))
+def test_add_delay_1(key,output):
     assert delayed_dict[key] == output
+
+
