@@ -208,8 +208,7 @@ def get_blocks_b2win_station4train_deprecable(data, train,station1,station2, ver
 
 
     # TOOD: mark as deprecable
-def get_common_blocks_and_direction_b2win_trains(data,train1,train2,station1,station2,verbose = False):
-    time_tables_dict = timetable_to_train_dict(data)
+def get_common_blocks_and_direction_b2win_trains(time_tables_dict,train1,train2,station1,station2,verbose = False):
     blocks_order = {}
     for train in [train1,train2]:
         blocks,rev = get_blocks_b2win_station4train(time_tables_dict[train][1],station1,station2,verbose)
