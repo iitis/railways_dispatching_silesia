@@ -66,7 +66,7 @@ def get_jround(train_dict,important_stations):
 
 
 
-def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
+def josingle_dict_generate(train_dict, j, j_prime, s, s_prime, init_josingle):
 
     """
     Return:
@@ -80,7 +80,6 @@ def josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle):
 
     """
     # TODO: mark as deprecable, change notation
-    train_dict = timetable_to_train_dict(data)
     time_table_j = train_dict[j][1]
     time_talbe_j_prime = train_dict[j_prime][1]
     path = get_blocks_b2win_station4train(time_table_j, s, s_prime, verbose = False)[0]
@@ -118,7 +117,7 @@ def jtrack_dict_generation(Jtrack_dict):
     return Jtrack_mod
 
 
-def important_trains_and_stations(trains_dict, imp_stations, only_departue):
+def important_trains_and_stations(trains_dict, important_stations,imp_stations, only_departue):
 
     """
     Return:
@@ -144,7 +143,7 @@ def important_trains_and_stations(trains_dict, imp_stations, only_departue):
         imp_stations_list = imp_stations
     else:
         imp_stations_list = get_all_important_station()
-    trains_at_stations = get_trains_at_station(trains_dict, only_departue)
+    trains_at_stations = get_trains_at_station(trains_dict,important_stations ,only_departue)
     return imp_stations_list, trains_at_stations
 
 
@@ -167,26 +166,26 @@ def non_repeating_pair_for_jswitch():
 
 # Js are from here
 
-def josingle(data, imp_stations = None):
+def josingle(trains_dict, important_stations,imp_stations = None):
 
     init_josingle = {}
-    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, True)
+    imp_stations_list, trains_at_stations = important_trains_and_stations(trains_dict, important_stations,imp_stations,True)
 
     for s in imp_stations_list:
         for j in trains_at_stations[s]:
-            s_prime = subsequent_station(data, j, s)
+            s_prime = subsequent_station(trains_dict[j][1], s)
             if s_prime in imp_stations_list:
                 for j_prime in trains_at_stations[s]:
-                    if j_prime != j and s == subsequent_station(data, j_prime, s_prime):
+                    if j_prime != j and s == subsequent_station(trains_dict[j_prime][1], s_prime):
                         if (s_prime , s) not in init_josingle.keys():
-                            josingle_dict_generate(data, j, j_prime, s, s_prime, init_josingle)
+                            josingle_dict_generate(trains_dict, j, j_prime, s, s_prime, init_josingle)
 
     return init_josingle
 
-def jtrack_subroutine(data, s, trains_at_stations, block_exclusion_list, current_blocks, vs):
+def jtrack_subroutine(trains_dict, s, trains_at_stations, block_exclusion_list, current_blocks, vs):
 
     for j in trains_at_stations[s]:
-        b = blocks_list_4station(data, j, s)
+        b = blocks_list_4station(trains_dict[j][1], s)
         if b not in block_exclusion_list:
             if b in current_blocks:
                 i = current_blocks.index(b)+1
@@ -195,17 +194,17 @@ def jtrack_subroutine(data, s, trains_at_stations, block_exclusion_list, current
                 vs.append([j])
                 current_blocks.append(b)
 
-def jtrack(data, imp_stations = None):
+def jtrack(trains_dict,important_stations, imp_stations = None):
 
     init_jtrack = {}
-    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
+    imp_stations_list, trains_at_stations = important_trains_and_stations(trains_dict, important_stations, imp_stations, False)
     station_exclusion_list, block_exclusion_list = exclusion_list_jtrack()
 
     for s in imp_stations_list:
         if s not in station_exclusion_list:
             vs = [[]]
             current_blocks = []
-            jtrack_subroutine(data, s, trains_at_stations, block_exclusion_list, current_blocks, vs)
+            jtrack_subroutine(trains_dict, s, trains_at_stations, block_exclusion_list, current_blocks, vs)
             if len(vs) != 0:
                 init_jtrack[s] = vs
     return jtrack_dict_generation(init_jtrack)
@@ -272,14 +271,11 @@ def jswitch(data, data_switch, imp_stations = None):
 
 
 
-def jd(data, imp_stations = None):
+def jd(time_tables_dict, important_stations,imp_stations = None):
     """
         function that creates Jd has to be encoded here
     """
-    imp_stations_list, trains_at_stations = important_trains_and_stations(data, imp_stations, False)
-    
-    with open('update_tables.pkl', 'rb') as file:
-        time_tables_dict = pkl.load(file)
+    imp_stations_list, trains_at_stations = important_trains_and_stations(time_tables_dict, important_stations,imp_stations, False)
     
     jd = {}
     for s in imp_stations_list:
@@ -430,12 +426,13 @@ def get_taus_prep(train_dict):
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep
 
-def get_taus_headway(train_dict,r=1):
-    jd_dict = jd(train_dict)
-    important_stations = get_all_important_station()
+
+def get_taus_headway(train_dict,important_stations,r=1):
+    important_stations_list = list(important_stations.keys())
+    jd_dict = jd(train_dict,important_stations)
     taus_headway = {}
     list_of_k1_pairs = {("KO(STM)", 'KZ'), ("CB", "CM"), ("KTC-CB", "via Gt")}
-    for station1 in important_stations:
+    for station1 in important_stations_list:
         for station2 in jd_dict[station1].keys():
             for train1,train2 in [a for a in it.product(flatten(jd_dict[station1][station2]),repeat=2) if a[0]!= a[1]]:
                 blocks_sequence = common_path(train_dict[train1][1],train_dict[train2][1],station1,station2)
@@ -445,9 +442,10 @@ def get_taus_headway(train_dict,r=1):
                     t = lambda i,train: get_passing_time_block(blocks_sequence[i],train_dict[train][1])
                     t_pass[i]= t(i,train1)
                     if i > 0:
-                        deltas_vec[i] = sum([t(j,train2) -t(j,train1) for j in range(i)])
+                        deltas_vec[i] = sum([t(j,train1) -t(j,train2) for j in range(i)])
                     k = 2
-                    if (station1,station2) or (station2,station1) in list_of_k1_pairs:
+                    if (station1,station2) in list_of_k1_pairs or (station2,station1) in list_of_k1_pairs:
+                        print("print is this happening?: ",station1,station2)
                         k=1
                 t_headway = 0
                 if len(blocks_sequence) > 0: 

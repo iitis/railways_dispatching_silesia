@@ -50,8 +50,8 @@ test_headway = {"26103_14006_KZ_KO(STM)": 1, "26103_40673_KZ_KO(STM)": 1,
                   "26103_54101_KZ_KO(STM)": 1 , "26103_40675_KZ_KO(STM)": 1, 
                   "14006_40673_KZ_KO(STM)": 1, '14006_54101_KZ_KO(STM)': 1, 
                   "14006_40675_KZ_KO(STM)": 1., "94766_40518_Ty_KL": 2., 
-                  "40518_94766_Ty_KL": 2., "94766_41004_Ty_KL": 2., 
-                  "41004_94766_Ty_KL": 4.} 
+                  "40518_94766_Ty_KL": 2., "94766_41004_Ty_KL": 4., 
+                  "41004_94766_Ty_KL": 2.} 
 
 
 taus_headway = get_taus_headway(time_tables_dict,important_stations)

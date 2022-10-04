@@ -1,35 +1,43 @@
 import pandas as pd
+import numpy as np
 from data_formatting import get_trains_pair9, get_jround, josingle, jswitch, jtrack
 from data_formatting import jd
+from data_formatting import update_all_timetables
+from data_formatting import timetable_to_train_dict
+
+data = pd.read_csv("../data/train_schedule.csv", sep = ";")
+data_paths = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
+important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+
+time_tables_dict = timetable_to_train_dict(data)
+train_dict = update_all_timetables(time_tables_dict,data_paths,important_stations)
+
 
 def test_Js():
-
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
     #######    particulat Js #####
 
     # rolling stock circulation J
     # helper
-    assert get_trains_pair9(data) == [[42100, 421009], [34319, 343199], [54101, 541019]]
+    assert get_trains_pair9(train_dict) == [[42100, 421009], [34319, 343199], [54101, 541019]]
     # main function
-    assert get_jround(data) == {'KO': [[421009, 42100], [34319, 343199], [54101, 541019]]}
+    assert get_jround(train_dict,important_stations) == {'KO': [[421009, 42100], [34319, 343199], [54101, 541019]]}
 
 
 def test_josingle():
 
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
     # single track occupation
-    assert josingle(data, ["CM", "CB"]) == {}
-    assert josingle(data, ["Mi", "MJ"]) == {('Mi', 'MJ'): [[44862, 44717]]}
+    assert josingle(train_dict,important_stations,["CM", "CB"]) == {}
+    assert josingle(train_dict,important_stations,["Mi", "MJ"]) == {('Mi', 'MJ'): [[44862, 44717]]}
 
-    assert josingle(data, ['KL', 'MJ', 'Mi']) == {('KL', 'MJ'): [[44717, 44862]], ('MJ', 'Mi'): [[44717, 44862]]}
+    assert josingle(train_dict,important_stations,['KL', 'MJ', 'Mi']) == {('KL', 'MJ'): [[44717, 44862]], ('MJ', 'Mi'): [[44717, 44862]]}
 
-    assert josingle(data, ['GLC', 'CB']) ==  {}
+    assert josingle(train_dict,important_stations,['GLC', 'CB']) ==  {}
 
-    assert josingle(data, ['CM', 'CB']) ==  {}
+    assert josingle(train_dict,important_stations,['CM', 'CB']) ==  {}
     # specific dict format
 
-    trains_same_station_block = jtrack(data)
+    trains_same_station_block = jtrack(train_dict,important_stations)
     assert trains_same_station_block["KZ"] == [[26103, 14006, 40673, 54101, 40675], [42100, 40150, 41004, 4500, 40628, 4120], [5312, 64350, 73000], [34319, 94317]]
     assert trains_same_station_block["KO"] == [[94766, 40518, 34319, 343199, 64350, 44862], [26103, 40673, 40477, 94317], [421009, 42100, 4500, 40628], [5312, 40150, 73000], [14006, 54101, 541019, 40675], [94611, 94113, 44717, 94717], [41004, 4120]]
     assert trains_same_station_block["KO(STM)"] == [[26103, 14006, 40673, 54101, 40675], [421009, 42100, 5312, 34319, 40150, 4500, 40628, 73000, 4120], [41004, 64350], [541019, 94317]]
