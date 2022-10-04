@@ -9,22 +9,21 @@ def block_indices_to_interprete_switches(data_path_check, previous_block, next_b
     j = 0
     list_pos_previous_block = []
     list_pos_next_block = []
-    for el in data_path_check['previous_block']:
+    for el in data_path_check["previous_block"]:
         if el == previous_block:
             list_pos_previous_block.append(i)
         if el == next_block:
             list_pos_next_block.append(i)
-        i+= 1
+        i += 1
 
-    for el in data_path_check['next_block']:
+    for el in data_path_check["next_block"]:
         if el == previous_block:
             list_pos_previous_block.append(j)
         if el == next_block:
             list_pos_next_block.append(j)
-        j+= 1
+        j += 1
 
     return list_pos_previous_block, list_pos_next_block
-
 
 
 def z_in(data_path_check, j, s, paths, station_blocks, blocks_lists):
@@ -39,19 +38,26 @@ def z_in(data_path_check, j, s, paths, station_blocks, blocks_lists):
 
         if block_list_el == station_block[0]:
             next_block = blocks_list[block_list_el_no]
-            if sts.index(in_station)==0:
+            if sts.index(in_station) == 0:
                 return set()
             else:
-                previous_block = blocks_list[block_list_el_no-1]
+                previous_block = blocks_list[block_list_el_no - 1]
 
-            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
-            switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
+            (
+                list_pos_previous_block,
+                list_pos_next_block,
+            ) = block_indices_to_interprete_switches(
+                data_path_check, previous_block, next_block
+            )
+            switch_position = common_elements(
+                list_pos_next_block, list_pos_previous_block
+            )
 
             if len(switch_position) != 0:
                 for s in switch_position:
-                    switch = data_path_check['switches'][s]
+                    switch = data_path_check["switches"][s]
                     if type(switch) is float:
-                        switch = eval(str(switch).replace('.', ','))
+                        switch = eval(str(switch).replace(".", ","))
                         switch = set(switch)
                     else:
                         switch = eval(switch)
@@ -63,7 +69,6 @@ def z_in(data_path_check, j, s, paths, station_blocks, blocks_lists):
                 switch = set()
 
     return switch
-
 
 
 def z_out(data_path_check, j, s, paths, station_blocks, blocks_lists):
@@ -78,19 +83,26 @@ def z_out(data_path_check, j, s, paths, station_blocks, blocks_lists):
 
         if block_list_el == station_block[0]:
             previous_block = blocks_list[block_list_el_no]
-            if sts.index(out_station)==len(sts)-1:
+            if sts.index(out_station) == len(sts) - 1:
                 return set()
             else:
-                next_block = blocks_list[block_list_el_no+1]
+                next_block = blocks_list[block_list_el_no + 1]
 
-            list_pos_previous_block, list_pos_next_block = block_indices_to_interprete_switches(data_path_check, previous_block, next_block)
-            switch_position = common_elements(list_pos_next_block, list_pos_previous_block)
+            (
+                list_pos_previous_block,
+                list_pos_next_block,
+            ) = block_indices_to_interprete_switches(
+                data_path_check, previous_block, next_block
+            )
+            switch_position = common_elements(
+                list_pos_next_block, list_pos_previous_block
+            )
 
             if len(switch_position) != 0:
                 for s in switch_position:
-                    switch =  data_path_check['switches'][s]
+                    switch = data_path_check["switches"][s]
                     if type(switch) is float:
-                        switch = eval(str(switch).replace('.', ','))
+                        switch = eval(str(switch).replace(".", ","))
                         switch = set(switch)
                     else:
                         switch = eval(switch)

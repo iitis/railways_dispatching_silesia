@@ -73,16 +73,14 @@ def get_arr_dep_vals(time_table):
     return arr_dep_vals
 
 
-
-
 def train_important_stations(time_table):
     """  return the vector of important stations of given train timetable"""
 
-    filtered_time_table = time_table[time_table['important_station'].notnull()]
+    filtered_time_table = time_table[time_table["important_station"].notnull()]
     return filtered_time_table["important_station"].values.tolist()
 
 
-def train_important_stations1(time_table,important_stations):
+def train_important_stations1(time_table, important_stations):
     """  return the vector of important stations of given train """
     # important_stations = np.load("./important_stations.npz", allow_pickle=True)[
     #     "arr_0"
@@ -109,4 +107,3 @@ def check_path_continuity(paths, data_path_check):
                 raise AssertionError(paths[i], "not present in possible paths")
             if data_path_check.isin([paths[i + 1]]).any(1).any() == False:
                 raise AssertionError(paths[i], "not present in possible paths")
-
