@@ -50,10 +50,9 @@ def test_josingle():
 
 
 def test_Jswitches():
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-    data_switch = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
 
-    switches = jswitch(data, data_switch, ["GLC", "MJ", "Mi", "CB", "KO(IC)", "KO(KS)"])
+
+    switches = jswitch(train_dict,important_stations, data_paths, ["GLC", "MJ", "Mi", "CB", "KO(IC)", "KO(KS)"])
 
     assert switches["GLC"] == [{26103: 'in', 40673: 'in'}, {26103: 'in', 40675: 'in'}, {5312: 'out', 40150: 'out'}, {5312: 'out', 4500: 'out'}, {5312: 'out', 40628: 'out'}, {5312: 'out', 73000: 'out'}, {40150: 'out', 4500: 'out'}, {40150: 'out', 40628: 'out'}, {40150: 'out', 73000: 'out'}, {40673: 'in', 40675: 'in'}, {4500: 'out', 40628: 'out'}, {4500: 'out', 73000: 'out'}, {40628: 'out', 73000: 'out'}]
 
@@ -70,17 +69,16 @@ def test_Jswitches():
     print("trains sets tested")
 
 def test_Jd():
-    data = pd.read_csv("../data/train_schedule.csv", sep = ";")
 
     # testing particular stations = fast
-    Jd_s = jd(data, ["GLC", "MJ", "KZ"])
+    Jd_s = jd(train_dict,important_stations, ["GLC", "MJ", "KZ"])
     assert Jd_s["GLC"]["CB"] == [[5312, 40150, 4500, 40628, 73000]]
     assert Jd_s["MJ"]["KL"] == [[44862]]
     assert Jd_s["MJ"]["Mi"] == [[44717]]
     assert Jd_s["KZ"]["KO(STM)"] == [[26103, 14006, 40673, 54101, 40675], [34319, 94317]]
 
     # testing all, slow
-    Jd_all = jd(data)
+    Jd_all = jd(train_dict,important_stations)
     assert Jd_all["KO"]["CB"] == [[26103, 40673, 94317, 40675]]
     assert Jd_all["KO"]["KL"] == [[14006, 94611, 94113, 40477, 44717, 94717]]
     assert Jd_all["KO"]["KO(STM)"] == [[94766, 42100, 5312, 40518, 343199, 40150, 41004, 541019, 4500, 64350, 44862, 40628, 73000, 4120]]

@@ -1,5 +1,5 @@
 """
-    there sholud be tests taus
+    there should be tests taus
 """
 import pandas as pd
 import numpy as np
