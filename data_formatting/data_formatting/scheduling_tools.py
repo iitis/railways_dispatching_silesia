@@ -8,6 +8,16 @@ from .time_table_check import train_important_stations
 
 
 def get_schedule_per_train(timetable):
+    """ Return a dictionary with initial scheduling for a given train.
+        It take as keys trains with their important stations. 
+        
+    Arguments:
+        timetable -- time table of the train (pandas.DataFrame)
+
+    Returns:
+        Dict with keys "station" and value "Dep" if exists
+    """
+
     timetable = timetable[
         timetable["important_station"].notnull() & timetable["Dep"].notnull()
     ]
@@ -17,7 +27,17 @@ def get_schedule_per_train(timetable):
     }
 
 
-def get_schedule(train_dicts, t1):
+def get_schedule(train_dicts:dict, t1:str):
+    """_summary_
+
+    Arguments:
+        train_dicts -- _description_
+        t1 -- _description_
+
+    Returns:
+        _description_
+    """
+    
     t1 = str(t1)
     schedule = {}
 
