@@ -90,15 +90,15 @@ def make_weights(train_dict, stopping=1, fast=1.5, express=1.75, empty=0):
         ]
         for train in train_dict.keys()
     }
-    # penalty_weights.update(
-    #     {
-    #         f"{train}_{train_important_stations(train_dict[train][1])[-2]}": empty
-    #         for train in [
-    #             x
-    #             for x in train_dict.keys()
-    #             if x // 10 in flatten(get_trains_pair9(train_dict))
-    #         ]
-    #     }
-    # )
+    penalty_weights.update(
+        {
+            f"{train}_{train_important_stations(train_dict[train][1])[-2]}": empty
+            for train in [
+                x
+                for x in train_dict.keys()
+                if x // 10 in flatten(get_trains_pair9(train_dict))
+            ]
+        }
+    )
 
     return penalty_weights
