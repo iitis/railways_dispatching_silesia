@@ -27,4 +27,4 @@ from .new_time_tables import (
     passing_times_4blocks,
     update_all_timetables,
 )
-from .scheduling_tools import get_schedule, get_initial_conditions, add_delay
+from .scheduling_tools import get_schedule, get_initial_conditions, add_delay, make_weights
