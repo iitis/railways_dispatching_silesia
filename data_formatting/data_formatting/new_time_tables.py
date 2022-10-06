@@ -3,10 +3,6 @@ import pandas as pd
 import pickle
 from .utils import get_indexes, get_block_station, get_path_type_colunm
 
-data = pd.read_csv("../data/train_schedule.csv", sep=";")
-data_paths = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-important_stations = np.load("./important_stations.npz", allow_pickle=True)["arr_0"][()]
-
 
 def single_passing_time(block_info, data_paths):
     value1, value2, v1_speed = block_info
