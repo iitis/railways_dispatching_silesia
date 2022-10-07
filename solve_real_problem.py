@@ -1,58 +1,59 @@
-import pandas as pd
+import argparse
+
 import numpy as np
 
-import argparse
-import sys
+import pandas as pd
+from data_formatting.data_formatting import (
+    get_jround,
+    get_trains_pair9,
+    jd,
+    josingle,
+    jswitch,
+    jtrack,
+    timetable_to_train_dict,
+    update_all_timetables,
+)
 
-from railway_solvers.railway_solvers import delay_varibles, order_variables, solve_linear_problem
-from railway_solvers.railway_solvers import create_linear_problem, delay_and_acctual_time
-from railway_solvers.railway_solvers import  impact_to_objective
-
-from data_formatting.data_formatting import get_trains_pair9, get_jround, josingle, jswitch, jtrack
-from data_formatting.data_formatting import jd
-from data_formatting.data_formatting import update_all_timetables
-from data_formatting.data_formatting import timetable_to_train_dict
+# from railway_solvers.railway_solvers import (create_linear_problem,
+#                                              delay_and_acctual_time,
+#                                              delay_varibles,
+#                                              impact_to_objective,
+#                                              order_variables,
+#                                              solve_linear_problem)
 
 # TODO we should have a path to input file as an argument
 
 # TODO please produce Js and \taus from in the form analogical to, all functions should be in data_formatting.data_formatting
 
-parser = argparse.ArgumentParser()
-# parser.add_argument(
-#     '--debug',
-#     action='store_true',
-#     help='Print debug info'
-# )
-subparsers = parser.add_subparsers(dest='command')
-blame = subparsers.add_parser('blame', help='blame people')
-blame.add_argument(
-    '--dry-run',
-    help='do not blame, just pretend',
-    action='store_true'
+parser = argparse.ArgumentParser("Make variables to problem for dataframes")
+parser.add_argument(
+    "--stations", required=True, type=str, help="Path to important_station dictionary"
 )
-blame.add_argument('name', nargs='+', help='name(s) to blame')
-praise = subparsers.add_parser('praise', help='praise someone')
-praise.add_argument('name', help='name of person to praise')
-praise.add_argument(
-    'reason',
-    help='what to praise for (optional)',
-    default="no reason",
-    nargs='?'
+parser.add_argument(
+    "--load", type=str, required=False, help="Path to trains dataframes dictionary"
 )
-args = parser.parse_args(command_line)
-if args.debug:
-    print("debug: " + str(args))
-if args.command == 'blame':
-    if args.dry_run:
-        print("Not for real")
-    print("blaming " + ", ".join(args.name))
-elif args.command == 'praise':
-    print('praising ' + args.name + ' for ' + args.reason)
+subparsers = parser.add_subparsers(help="sub-command help")
+parser_build = subparsers.add_parser("build", help="Build dataframes from files")
+parser_build.add_argument("-d", type=str, help="path for data containing timetables")
+parser_build.add_argument(
+    "-p", type=str, help="path for data containing blocks passing times"
+)
+parser_build.add_argument(
+    "-sava_data", required=False, type=str, help="save built train dictionary"
+)
 
 
+# parser.add_argument("--build", type=str, required=False, help="Path to timetables csv")
 
-
-
+args = parser.parse_args()
+print(args)
+if (not args.load) and (not all([args.p, args.d])):
+    print(
+        "Please provide data.\
+        \n --load the trains dictonary with dataframe or \
+        \n build a new one with -d timetable data and -p data for passing time"
+    )
+    exit(1)
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument("--trains_dict", type=str, required=False)
@@ -62,8 +63,6 @@ elif args.command == 'praise':
 # parser.add_argument("--important_stations", type=str, required=False)
 
 # args = parser.parse_args()
-
-print(args)
 # data = arg.data
 # data_path = arg.data_path
 # important_stations = arg.important_stations
