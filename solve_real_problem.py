@@ -52,8 +52,8 @@ def make_taus(train_dict,important_stations,r):
     taus ={}
     taus["pass"] = get_taus_pass(train_dict)
     taus["headway"] = get_taus_headway(train_dict,important_stations,r)
-    taus["prep"] = get_taus_prep(train_dict)
-    taus["stop"],prep_extra= get_taus_stop(train_dict)
+    taus["prep"] = get_taus_prep(train_dict,important_stations)
+    taus["stop"],prep_extra= get_taus_stop(train_dict,important_stations)
     taus["prep"].update(prep_extra)
     taus["res"] = r
     return taus

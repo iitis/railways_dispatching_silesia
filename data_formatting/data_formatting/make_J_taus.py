@@ -246,6 +246,7 @@ def jtrack(trains_dict, important_stations, imp_stations=None):
             jtrack_subroutine(
                 trains_dict,
                 s,
+                important_stations,
                 trains_at_stations,
                 block_exclusion_list,
                 current_blocks,
@@ -470,7 +471,7 @@ def get_taus_stop(train_dict:dict, important_stations:dict,trains=None):
             ) == None:
                 continue
             time_flag, ts_prep = minimal_stay(
-                train, station, train_dict, first_station=first_station
+                train, station, train_dict, important_stations  ,first_station=first_station
             )
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
