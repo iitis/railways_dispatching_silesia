@@ -477,7 +477,7 @@ def get_taus_stop(train_dict:dict, important_stations:dict,trains=None):
     return taus_stop, taus_prep
 
 
-def get_taus_prep(train_dict:dict):
+def get_taus_prep(train_dict:dict,important_stations):
     """ Function that gives the preparation time
     for a given train at station
 
@@ -494,7 +494,7 @@ def get_taus_prep(train_dict:dict):
     paths = get_Paths(train_dict)
     for train, stations in paths.items():
         s = stations[0]
-        st_prep = turn_around_time(train_dict[train][1], s, r=1)
+        st_prep = turn_around_time(train_dict[train][1], s, important_stations,r=1)
         if st_prep != 0:
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep
