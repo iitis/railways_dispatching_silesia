@@ -88,13 +88,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Make variables to problem from dataframes")
     parser.add_argument(
-        "--stations, -s", required=True, type=str, help="Path to important_station dictionary"
+        "--stations", required=True, type=str, help="Path to important_station dictionary"
     )
     parser.add_argument(
-        "--load, -l", type=str, required=False, help="Path to trains dataframes dictionary"
+        "--load", type=str, required=False, help="Path to trains dataframes dictionary"
     )
     parser.add_argument(
-        "--paths, -p", type=str, required=True, help="Path for data containing blocks passing times"
+        "--paths", type=str, required=True, help="Path for data containing blocks passing times"
     )
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_build = subparsers.add_parser("build", help="Build dataframes from files")
@@ -103,8 +103,7 @@ if __name__ == "__main__":
         "-save", required=False, action="store_true", help="save built train dictionary"
     )
     args = parser.parse_args()
-
-    if (not args.load) and (not args.d):
+    if (args.load==None) and  (args.d==None):
         print(
             "Please provide data.\
             \n --load the trains dictonary with dataframe or \
@@ -113,7 +112,7 @@ if __name__ == "__main__":
         exit(1)
 
     important_stations = load_important_stations(args.stations)
-    data_paths = load_data_paths(args.p)
+    data_paths = load_data_paths(args.paths)
 
     if args.load:
         train_dict = load_timetables(args.load)
