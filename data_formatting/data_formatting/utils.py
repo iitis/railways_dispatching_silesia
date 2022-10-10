@@ -132,14 +132,12 @@ def get_block_station(block, important_stations):
     return station[0]
 
 
-def blocks_list_4station(timetable, station):
+def blocks_list_4station(timetable, station,important_stations):
     sts = train_important_stations(timetable)
     if station not in sts:
         print("Warning: this train does not pass through this station!")
         return []
-    station_blocks = np.load("./important_stations.npz", allow_pickle=True)["arr_0"][
-        ()
-    ][station]
+    station_blocks = important_stations[station]
     c_elements = common_elements(station_blocks, timetable["path"].tolist())
     return c_elements
 
@@ -367,8 +365,8 @@ def minimal_passing_time(timetable, station1, station2, resolution=1, verbose=Fa
     return time
 
 
-def turn_around_time(time_table, station, r=1):
-    st_block = blocks_list_4station(time_table, station)
+def turn_around_time(time_table, station,important_stations, r=1):
+    st_block = blocks_list_4station(time_table, station,important_stations)
     id_station_block = get_indexes(time_table, st_block[0])[0][0]
     time = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(time):
@@ -380,9 +378,9 @@ def turn_around_time(time_table, station, r=1):
     # TODO: mark as deprecable
 
 
-def minimal_stay(train, station, train_dict, first_station=False, r=1):
+def minimal_stay(train, station, train_dict,important_stations, first_station=False, r=1):
     time_table = train_dict[train][1]
-    st_block = blocks_list_4station(time_table, station)
+    st_block = blocks_list_4station(time_table, station,important_stations)
     time = 0
     taus_prep1 = {}
     id_station_block = get_indexes(time_table, st_block[0])[0][0]

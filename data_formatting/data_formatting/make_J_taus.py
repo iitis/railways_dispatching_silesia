@@ -217,11 +217,11 @@ def josingle(trains_dict, important_stations, imp_stations=None):
 
 
 def jtrack_subroutine(
-    trains_dict, s, trains_at_stations, block_exclusion_list, current_blocks, vs
+    trains_dict, s, important_stations,trains_at_stations, block_exclusion_list, current_blocks, vs
 ):
 
     for j in trains_at_stations[s]:
-        b = blocks_list_4station(trains_dict[j][1], s)
+        b = blocks_list_4station(trains_dict[j][1], s,important_stations)
         if b not in block_exclusion_list:
             if b in current_blocks:
                 i = current_blocks.index(b) + 1
@@ -320,7 +320,7 @@ def jswitch(train_dict, important_stations, data_switch, imp_stations=None):
     for s in imp_stations_list:
         vec_of_pairs = []
         station_block = {
-            j: blocks_list_4station(train_dict[j][1], s) for j in trains_at_stations[s]
+            j: blocks_list_4station(train_dict[j][1], s,important_stations) for j in trains_at_stations[s]
         }
         blocks_list = {
             j: train_time_table(train_dict, j)["path"].tolist()
@@ -438,7 +438,7 @@ def get_taus_pass(train_dict, trains=None):
     return taus_pass
 
 
-def get_taus_stop(train_dict:dict, trains=None):
+def get_taus_stop(train_dict:dict, important_stations:dict,trains=None):
     """Function for getting the mininal stop time for 
     a train in a station. 
 
@@ -466,7 +466,7 @@ def get_taus_stop(train_dict:dict, trains=None):
                 first_station = True
             if (i == len(paths[train]) - 1) and subsequent_block(
                 train_dict[train][1]["path"].tolist(),
-                blocks_list_4station(train_dict[train][1], station)[0],
+                blocks_list_4station(train_dict[train][1], station,important_stations)[0],
             ) == None:
                 continue
             time_flag, ts_prep = minimal_stay(
@@ -531,7 +531,6 @@ def get_taus_headway(train_dict:dict, important_stations:dict, r=1):
                         station2,
                         station1,
                     ) in list_of_k1_pairs:
-                        print("print is this happening?: ", station1, station2)
                         k = 1
                 t_headway = 0
                 if len(blocks_sequence) > 0:

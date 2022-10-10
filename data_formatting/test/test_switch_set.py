@@ -20,20 +20,20 @@ def test_sets_of_switches():
 
     j = 44862
     s = 'MJ'
-    station_block = {j: blocks_list_4station(train_dict[j][1], s)}
+    station_block = {j: blocks_list_4station(train_dict[j][1], s,important_stations)}
     blocks_list = {j: train_time_table(train_dict,j)['path'].tolist()}
     assert z_in(data_paths, j, s, paths, station_block, blocks_list) == {2}
     assert z_out(data_paths, j, s, paths, station_block, blocks_list) == {1}
 
     j = 44717
-    station_block = {j: blocks_list_4station(train_dict[j][1], s)}
+    station_block = {j: blocks_list_4station(train_dict[j][1], s,important_stations)}
     blocks_list = {j: train_time_table(train_dict,j)['path'].tolist()}
     assert z_in(data_paths, j, s, paths, station_block, blocks_list) == {1}
     assert z_out(data_paths, j, s, paths,  station_block, blocks_list) == {2}
 
     j = 44862
     s = 'KL'
-    station_block = {j: blocks_list_4station(train_dict[j][1], s)}
+    station_block = {j: blocks_list_4station(train_dict[j][1], s,important_stations)}
     blocks_list = {j: train_time_table(train_dict,j)['path'].tolist()}
     assert z_in(data_paths, j, s, paths, station_block, blocks_list) == {78, 79, 83, 84, 85, 55, 56}
     assert z_out(data_paths, j, s, paths, station_block, blocks_list) == {8, 15}
@@ -42,17 +42,17 @@ def test_sets_of_switches():
 
     j = 26103
     s = 'KZ'
-    station_block = {j: blocks_list_4station(train_dict[j][1], s)}
+    station_block = {j: blocks_list_4station(train_dict[j][1], s,important_stations)}
     blocks_list = {j: train_time_table(train_dict,j)['path'].tolist()}
     assert z_out(data_paths, j, s, paths, station_block, blocks_list) == {53, 47}
 
     s = 'KO(STM)'
-    station_block = {j: blocks_list_4station(train_dict[j][1], s)}
+    station_block = {j: blocks_list_4station(train_dict[j][1], s,important_stations)}
     blocks_list = {j: train_time_table(train_dict,j)['path'].tolist()}
     assert z_in(data_paths, j, s, paths, station_block, blocks_list) == {18, 5}
     assert z_out(data_paths, j, s, paths, station_block, blocks_list) == {55, 54, 39}
 
     s = 'KO'
-    station_block = {j: blocks_list_4station(train_dict[j][1], s)}
+    station_block = {j: blocks_list_4station(train_dict[j][1], s,important_stations)}
     blocks_list = {j: train_time_table(train_dict,j)['path'].tolist()}
     assert z_in(data_paths, j, s, paths, station_block, blocks_list) == {55, 54, 39}
