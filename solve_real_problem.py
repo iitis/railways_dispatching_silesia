@@ -119,9 +119,13 @@ if __name__ == "__main__":
     else:
         train_dict = build_timetables(args,important_stations,data_paths)
 
+    print(train_dict)
+
     taus = make_taus(train_dict,important_stations,1)
     timetable = make_timetable(train_dict,important_stations)
     train_set = make_train_set(train_dict,important_stations,data_paths)
+
+    print(timetable)
 
 
 """
