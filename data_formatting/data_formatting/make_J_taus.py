@@ -438,7 +438,7 @@ def get_taus_pass(train_dict, trains=None):
     return taus_pass
 
 
-def get_taus_stop(train_dict, trains=None):
+def get_taus_stop(train_dict:dict, trains=None):
     """Function for getting the mininal stop time for 
     a train in a station. 
 
@@ -477,7 +477,7 @@ def get_taus_stop(train_dict, trains=None):
     return taus_stop, taus_prep
 
 
-def get_taus_prep(train_dict):
+def get_taus_prep(train_dict:dict):
     """ Function that gives the preparation time
     for a given train at station
 
@@ -500,7 +500,7 @@ def get_taus_prep(train_dict):
     return taus_prep
 
 
-def get_taus_headway(train_dict, important_stations, r=1):
+def get_taus_headway(train_dict:dict, important_stations:dict, r=1):
     important_stations_list = list(important_stations.keys())
     jd_dict = jd(train_dict, important_stations)
     taus_headway = {}
