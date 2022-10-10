@@ -46,7 +46,7 @@ def build_timetables(args,important_stations,data_paths):
     train_dicts = timetable_to_train_dict(data)
     train_dicts = update_all_timetables(train_dicts,data_paths,important_stations,save = args.save)
     train_dict = {}
-    return train_dict
+    return train_dicts
 
 def make_taus(train_dict,important_stations,r):
     taus ={}
@@ -113,6 +113,8 @@ if __name__ == "__main__":
 
     important_stations = load_important_stations(args.stations)
     data_paths = load_data_paths(args.paths)
+
+    print(important_stations)
 
     if args.load:
         train_dict = load_timetables(args.load)
