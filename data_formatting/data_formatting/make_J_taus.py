@@ -164,7 +164,7 @@ def important_trains_and_stations(
     if imp_stations != None:
         imp_stations_list = imp_stations
     else:
-        imp_stations_list = get_all_important_station()
+        imp_stations_list = important_stations.keys()
     trains_at_stations = get_trains_at_station(
         trains_dict, important_stations, only_departue
     )

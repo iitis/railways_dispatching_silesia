@@ -42,7 +42,7 @@ def load_data_paths(data_paths_path):
     return pd.read_excel(data_paths_path, engine="odf")
 
 def build_timetables(args,important_stations,data_paths):
-    data = pd.read_csv(args.d, sep = ";")
+    data = pd.read_csv(args.d, sep = ";", engine="python")
     train_dicts = timetable_to_train_dict(data)
     train_dicts = update_all_timetables(train_dicts,data_paths,important_stations,save = args.save)
     train_dict = {}
@@ -58,13 +58,13 @@ def make_taus(train_dict,important_stations,r):
     taus["res"] = r
     return taus
 
-def make_timetable(train_dict,important_stations,taus=None):
+def make_timetable(train_dict,important_stations,t1='16:00',taus=None,):
     timetable = {}
     if taus != None:
         timetable["taus"] = make_taus(train_dict,important_stations,1)
     else:
         timetable["taus"] = taus
-    timetable["initial_conditions"] = get_initial_conditions(train_dict)
+    timetable["initial_conditions"] = get_initial_conditions(train_dict,t1)
     timetable["penalty_weights"] = make_weights(train_dict, stopping=1, fast=1.5, express=1.75, empty=0)
     return timetable
 
