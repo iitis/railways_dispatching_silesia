@@ -86,7 +86,7 @@ def make_train_set(train_dict,important_stations,data_path):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser("Make variables to problem for dataframes")
+    parser = argparse.ArgumentParser("Make variables to problem from dataframes")
     parser.add_argument(
         "--stations", required=True, type=str, help="Path to important_station dictionary"
     )
