@@ -58,9 +58,9 @@ def make_taus(train_dict,important_stations,r):
     taus["res"] = r
     return taus
 
-def make_timetable(train_dict,important_stations,t1='16:00',taus=None,):
+def make_timetable(train_dict,important_stations,t1='16:00',taus=None):
     timetable = {}
-    if taus != None:
+    if taus == None:
         timetable["taus"] = make_taus(train_dict,important_stations,1)
     else:
         timetable["taus"] = taus
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     print(train_dict)
 
     taus = make_taus(train_dict,important_stations,1)
-    timetable = make_timetable(train_dict,important_stations)
+    timetable = make_timetable(train_dict,important_stations,t1 ='16:00',taus=None)
     train_set = make_train_set(train_dict,important_stations,data_paths)
 
     print(timetable)
