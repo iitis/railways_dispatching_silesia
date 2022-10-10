@@ -88,13 +88,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Make variables to problem from dataframes")
     parser.add_argument(
-        "--stations", required=True, type=str, help="Path to important_station dictionary"
+        "--stations, -s", required=True, type=str, help="Path to important_station dictionary"
     )
     parser.add_argument(
-        "--load", type=str, required=False, help="Path to trains dataframes dictionary"
+        "--load, -l", type=str, required=False, help="Path to trains dataframes dictionary"
     )
     parser.add_argument(
-        "--p", type=str, required=True, help="Path for data containing blocks passing times"
+        "--paths, -p", type=str, required=True, help="Path for data containing blocks passing times"
     )
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_build = subparsers.add_parser("build", help="Build dataframes from files")
@@ -112,7 +112,7 @@ if __name__ == "__main__":
         )
         exit(1)
 
-    important_stations = load_important_stations(args.station)
+    important_stations = load_important_stations(args.stations)
     data_paths = load_data_paths(args.p)
 
     if args.load:
