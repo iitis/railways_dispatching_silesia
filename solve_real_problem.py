@@ -117,7 +117,7 @@ if __name__ == "__main__":
     if args.load:
         train_dict = load_timetables(args.load)
     else:
-        train_dict = build_timetables(args,important_stations)
+        train_dict = build_timetables(args,important_stations,data_paths)
 
     taus = make_taus(train_dict,important_stations)
     timetable = make_timetable(train_dict,important_stations)
