@@ -107,13 +107,14 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_build = subparsers.add_parser("build", help="Build dataframes from files")
     parser_build.add_argument(
-        "-d", type=str, help="path for data containing timetables"
+        "-d", type=str, default=None, help="path for data containing timetables"
     )
     parser_build.add_argument(
         "-save", required=False, action="store_true", help="save built train dictionary"
     )
     args = parser.parse_args()
-    if (args.load == None) and (args.d == None):
+    print(args)
+    if (args.load == None) and ("d" not in args):
         print(
             "Please provide data.\
             \n --load the trains dictonary with dataframe or \
