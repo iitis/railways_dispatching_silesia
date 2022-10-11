@@ -119,8 +119,6 @@ if __name__ == "__main__":
     important_stations = load_important_stations(args.stations)
     data_paths = load_data_paths(args.paths)
 
-    #print(important_stations)
-
     if args.load:
         train_dict = load_timetables(args.load)
     else:
