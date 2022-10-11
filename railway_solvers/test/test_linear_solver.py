@@ -27,7 +27,7 @@ def test_linear_varibles_creations():
 
     y = order_variables(train_sets)
 
-    assert str(y) == "{0: {1: {'A': y_0_1_A}}}"
+    assert str(y) == "{0: {1: {'one_station': {'A': y_0_1_one_station_A}}}}"
 
 
 def test_minimal_span_two_trains():
@@ -67,7 +67,7 @@ def test_minimal_span_two_trains():
     assert v[0].varValue == 0
     assert v[2].name == "Delays_1_A"
     assert v[2].varValue == 4
-    assert v[4].name == "y_0_1_A"
+    assert v[4].name == "y_0_1_one_station_A"
     assert v[4].varValue == 1.
     assert prob.objective.value() == 0.4
 
@@ -118,7 +118,7 @@ def test_deadlock_and_switches_two_trains():
     assert v[0].varValue == 0
     assert v[3].name == "Delays_1_B"
     assert v[3].varValue == 7
-    assert v[4].name == "y_0_1_A_B"
+    assert v[4].name == "z_0_1_A_B"
     assert v[4].varValue == 1.
 
     assert prob.objective.value() == pytest.approx(0.35)
@@ -207,7 +207,7 @@ def  test_station_track_and_switches_two_trains():
 
     assert vs[0].name == "Delays_0_A"
     assert vs[2].name == "Delays_1_A"
-    assert vs[4].name == "y_0_1_B"
+    assert vs[4].name == "y_0_1_one_station_B"
 
     assert vs[0].varValue == 0
     assert vs[2].varValue == 3
@@ -263,9 +263,9 @@ def  test_M_P_with_switches_two_trains():
     assert vs[2].name == "Delays_1_A"
     assert vs[3].name == "Delays_1_B"
 
-    assert vs[4].name == "y_0_1_A"
-    assert vs[5].name == "y_0_1_B"
-    assert vs[6].name =="y_in_0_1_B"
+    assert vs[4].name == "y_0_1_one_station_A"
+    assert vs[5].name == "y_0_1_one_station_B"
+    assert vs[6].name =="z_in_0_1_B"
 
     assert vs[0].varValue == 2
     assert vs[1].varValue == 2
@@ -327,8 +327,8 @@ def  test_M_P_with_switches_two_trains_no_station():
     assert vs[2].name == "Delays_1_A"
     assert vs[3].name == "Delays_1_B"
 
-    assert vs[4].name == "y_0_1_A"
-    assert vs[5].name =="y_in_0_1_B"
+    assert vs[4].name == "y_0_1_one_station_A"
+    assert vs[5].name =="z_in_0_1_B"
 
 
     assert vs[0].varValue == 1
@@ -390,8 +390,8 @@ def  test_swithes_three_trains():
     assert vs[2].name == "Delays_1_B"
     assert vs[3].name == "Delays_1_C"
 
-    assert vs[4].name == "y_0_1_B"
-    assert vs[5].name =="y_in_0_1_B"
+    assert vs[4].name == "y_0_1_one_station_B"
+    assert vs[5].name =="z_in_0_1_B"
 
     assert vs[0].varValue == 2
     assert vs[1].varValue == 2
@@ -448,9 +448,9 @@ def  test_station_track_and_circulation():
     vs = prob.variables()
 
 
-    assert vs[5].name == "y_0_2_A"
-    assert vs[6].name == "y_0_2_B"
-    assert vs[7].name == "y_1_2_B"
+    assert vs[5].name == "y_0_2_one_station_A"
+    assert vs[6].name == "y_0_2_one_station_B"
+    assert vs[7].name == "y_1_2_one_station_B"
 
     assert vs[5].varValue == 1.
     assert vs[6].varValue == 1.
@@ -512,9 +512,9 @@ def  test_station_track_and_circulation2():
     vs = prob.variables()
 
 
-    assert vs[5].name == "y_0_2_A"
-    assert vs[6].name == "y_0_2_B"
-    assert vs[7].name == "y_1_2_B"
+    assert vs[5].name == "y_0_2_one_station_A"
+    assert vs[6].name == "y_0_2_one_station_B"
+    assert vs[7].name == "y_1_2_one_station_B"
     assert vs[5].varValue == 0.
     assert vs[6].varValue == 0.
     assert vs[7].varValue == 0.
