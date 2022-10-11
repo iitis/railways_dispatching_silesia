@@ -29,7 +29,6 @@ def order_variables(train_sets):
     """
     order_vars = dict()
     order_var4single_line_constrain(order_vars, train_sets)
-    print(order_vars)
     order_var4minimal_span_constrain(order_vars, train_sets)
     order_var4track_occuparion_at_stations(order_vars, train_sets)
     order_var4switch_occupation(order_vars, train_sets)
@@ -118,8 +117,6 @@ def order_var4switch_occupation(order_vars, train_sets):
     for s in train_sets["Jswitch"].keys():
         for pair in train_sets["Jswitch"][s]:
             (jp, jpp) = pair.keys()
-            print(s)
-            print(pair)
 
             sp = departure_station4switches(s, jp, pair, train_sets)
             spp = departure_station4switches(s, jpp, pair, train_sets)
@@ -420,10 +417,8 @@ def keep_trains_order(
      ....j1 -> ...j2 ->..............
      [s']
      """
-
     S = train_sets["Paths"]
     sp = previous_station(S[j], s)
-    spp = previous_station(S[jp], s)
     if sp in train_sets["Jd"].keys():
         if s in train_sets["Jd"][sp].keys():
             # if both trains goes sp -> s and have common path
@@ -431,9 +426,7 @@ def keep_trains_order(
                 if not can_MO_on_line(j, jp, s, train_sets):
                     # the order on station y[j][jp][s] must be the same as
                     # on the path y[j][jp][sp] (previous station)
-                    print(y[j][jp])
                     if s in y[j][jp]["one_station"] and sp in y[j][jp]["one_station"]:
-                        print(y[j][jp]["one_station"])
                         problem += (
                             y[j][jp]["one_station"][s] == y[j][jp]["one_station"][sp],
                             f"track_occupation_{j}_{jp}_{s}_{sp}",
@@ -522,40 +515,45 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
             for (j, jp) in itertools.combinations(js, 2):
 
                 if not_the_same_rolling_stock(j, jp, train_sets):
+                    skip = "skip_station" in train_sets and jp in train_sets["skip_station"] and s in train_sets["skip_station"][jp]
+                    if not skip:
+                        keep_trains_order(
+                            s,
+                            j,
+                            jp,
+                            problem,
+                            timetable,
+                            delay_var,
+                            y,
+                            train_sets,
+                            d_max,
+                        )
+                    
+                        trains_order_at_s(
+                            s,
+                            jp,
+                            j,
+                            problem,
+                            timetable,
+                            delay_var,
+                            y,
+                            train_sets,
+                            d_max,
+                        )
 
-                    keep_trains_order(
-                        s,
-                        j,
-                        jp,
-                        problem,
-                        timetable,
-                        delay_var,
-                        y,
-                        train_sets,
-                        d_max,
-                    )
-                    trains_order_at_s(
-                        s,
-                        j,
-                        jp,
-                        problem,
-                        timetable,
-                        delay_var,
-                        y,
-                        train_sets,
-                        d_max,
-                    )
-                    trains_order_at_s(
-                        s,
-                        jp,
-                        j,
-                        problem,
-                        timetable,
-                        delay_var,
-                        y,
-                        train_sets,
-                        d_max,
-                    )
+                    skip = "skip_station" in train_sets and j in train_sets["skip_station"] and s in train_sets["skip_station"][j]
+                    if not skip:
+                        trains_order_at_s(
+                            s,
+                            j,
+                            jp,
+                            problem,
+                            timetable,
+                            delay_var,
+                            y,
+                            train_sets,
+                            d_max,
+                        )
 
 
 #switch occupatiion condition at stations
