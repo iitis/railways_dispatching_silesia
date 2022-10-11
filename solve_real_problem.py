@@ -13,12 +13,7 @@ from data_formatting.data_formatting.make_J_taus import get_taus_headway
 from data_formatting.data_formatting.utils import (get_initial_conditions,
                                                    get_Paths)
 
-from railway_solvers.railway_solvers import (create_linear_problem,
-                                              delay_and_acctual_time,
-                                              delay_varibles,
-                                              impact_to_objective,
-                                              order_variables,
-                                              solve_linear_problem)
+from railway_solvers.railway_solvers import solve_linear_problem
 
 # TODO we should have a path to input file as an argument
 

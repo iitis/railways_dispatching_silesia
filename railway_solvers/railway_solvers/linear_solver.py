@@ -404,7 +404,7 @@ def minimal_stay(problem, timetable, delay_var, train_sets):
 
 
 def keep_trains_order(
-    s, j, jp, problem, timetable, delay_var, y, train_sets, d_max
+    s, j, jp, problem, y, train_sets
 ):
     """Helper for single track occupation at the station constrain
 
@@ -522,11 +522,8 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
                             j,
                             jp,
                             problem,
-                            timetable,
-                            delay_var,
                             y,
                             train_sets,
-                            d_max,
                         )
                     
                         trains_order_at_s(
