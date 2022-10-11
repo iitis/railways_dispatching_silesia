@@ -3,22 +3,20 @@ import pickle as pkl
 import numpy as np
 import pandas as pd
 
-from data_formatting.data_formatting import (get_J, get_jround, get_taus_pass,
-                                             get_taus_prep, get_taus_stop,
-                                             get_trains_pair9, jd, josingle,
+from data_formatting.data_formatting import (get_initial_conditions, get_J,
+                                             get_jround, get_Paths,
+                                             get_schedule, get_taus_headway,
+                                             get_taus_pass, get_taus_prep,
+                                             get_taus_stop, jd, josingle,
                                              jswitch, jtrack, make_weights,
                                              timetable_to_train_dict,
                                              update_all_timetables)
-from data_formatting.data_formatting.make_J_taus import get_taus_headway
-from data_formatting.data_formatting.utils import (get_initial_conditions,
-                                                   get_Paths)
-
-# from railway_solvers.railway_solvers import (create_linear_problem,
-#                                              delay_and_acctual_time,
-#                                              delay_varibles,
-#                                              impact_to_objective,
-#                                              order_variables,
-#                                              solve_linear_problem)
+from railway_solvers.railway_solvers import (create_linear_problem,
+                                             delay_and_acctual_time,
+                                             delay_varibles,
+                                             impact_to_objective,
+                                             order_variables,
+                                             solve_linear_problem)
 
 # TODO we should have a path to input file as an argument
 
@@ -134,10 +132,11 @@ if __name__ == "__main__":
 
     print(train_dict)
 
-    taus = make_taus(train_dict, important_stations, 1)
+    t1 = "16:00"
+    taus = make_taus(train_dict, important_stations, t1)
     timetable = make_timetable(train_dict, important_stations)
     train_set = make_train_set(train_dict, important_stations, data_paths)
-
+    schedule = get_schedule(train_dict, t1)
     print(timetable)
 
 
