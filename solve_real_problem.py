@@ -11,12 +11,7 @@ from data_formatting.data_formatting import (get_initial_conditions, get_J,
                                              jswitch, jtrack, make_weights,
                                              timetable_to_train_dict,
                                              update_all_timetables)
-from railway_solvers.railway_solvers import (create_linear_problem,
-                                             delay_and_acctual_time,
-                                             delay_varibles,
-                                             impact_to_objective,
-                                             order_variables,
-                                             solve_linear_problem)
+from railway_solvers.railway_solvers import solve_linear_problem
 
 # TODO we should have a path to input file as an argument
 
@@ -66,6 +61,7 @@ def make_timetable(train_dict, important_stations, t1="16:00", taus=None):
     timetable["penalty_weights"] = make_weights(
         train_dict, stopping=1, fast=1.5, express=1.75, empty=0
     )
+    timetable["schedule"] = get_schedule(train_dict, t1)
     return timetable
 
 
@@ -133,24 +129,33 @@ if __name__ == "__main__":
 
     t1 = "16:00"
     taus = make_taus(train_dict, important_stations, t1)
-    timetable = make_timetable(train_dict, important_stations)
+    timetable = make_timetable(train_dict, important_stations, t1)
     skip_stations = {94766: "KO(STM)", 40518: "KO(STM)", 343199: "KO(STM)",
                      40673: "GLC", 541019: "KO(IC)", 44862: "KO(STM)", 40675: "GLC",
                      }
     train_set = make_train_set(train_dict, important_stations, data_paths, skip_stations)
+    
     schedule = get_schedule(train_dict, t1)
 
+   # no disturbance example
 
     d_max = 40
 
     prob = solve_linear_problem(train_set, timetable, d_max)
 
+    #print timetable
     for v in prob.variables():
         # test percedense vars
         if "z_" in str(v) or "y_" in str(v):
             assert v.varValue in [0.0, 1.0]
         else:
-            print(v, ", ", v.varValue)
+            #print(v, ", ", v.varValue)
+            key = str(v).replace("Delays_", "")
+            try:
+                print(key, "schedule dep ", schedule[key], "actual ", v.varValue + schedule[key])
+            except:
+                0
+
     
     print("objective")
     print(prob.objective.value())

@@ -107,7 +107,7 @@ def earliest_dep_time(S, timetable, train, station):
     """returns earlies possible departure of a train from the given station
     including unavoidlable delays and the schedule if the schedule is given
     """
-    if "schedule" in timetable:
+    if "schedule" in timetable and f"{train}_{station}" in timetable["schedule"]:
         sched = timetable["schedule"][f"{train}_{station}"]
     else:
         sched = -np.inf
