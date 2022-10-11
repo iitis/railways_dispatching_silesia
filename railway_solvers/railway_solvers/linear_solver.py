@@ -29,6 +29,7 @@ def order_variables(train_sets):
     """
     order_vars = dict()
     order_var4single_line_constrain(order_vars, train_sets)
+    print(order_vars)
     order_var4minimal_span_constrain(order_vars, train_sets)
     order_var4track_occuparion_at_stations(order_vars, train_sets)
     order_var4switch_occupation(order_vars, train_sets)
@@ -117,6 +118,8 @@ def order_var4switch_occupation(order_vars, train_sets):
     for s in train_sets["Jswitch"].keys():
         for pair in train_sets["Jswitch"][s]:
             (jp, jpp) = pair.keys()
+            print(s)
+            print(pair)
 
             sp = departure_station4switches(s, jp, pair, train_sets)
             spp = departure_station4switches(s, jpp, pair, train_sets)
@@ -127,7 +130,7 @@ def order_var4switch_occupation(order_vars, train_sets):
                     update_y3(order_vars, jp, jpp, sp)
             elif s == sp or s == spp:
                 update_y4(order_vars, jp, jpp, sp, spp)
-            else: # wh have differen s, sp and spp
+            else: # we have differen s, sp and spp
                 update_y4_in(order_vars, "in", jp, jpp, s)
 
 
@@ -139,7 +142,8 @@ def update_y3(order_var, j, jp, s):
     check1 = check_order_var_3arg(order_var, j, jp, s)
     check2 = check_order_var_3arg(order_var, jp, j, s)
     if not (check1 or check2):
-        y = pus.LpVariable.dicts("y", ([j], [jp], [s]), 0, 1, cat="Integer")
+        # 3 as there are 3 vars
+        y = pus.LpVariable.dicts("y", ([j], [jp], ["one_station"], [s]), 0, 1, cat="Integer")
         update_dictofdicts(order_var, y)
 
 
@@ -151,10 +155,10 @@ def update_y4(order_var, j, jp, s, sp):
     check1 = check_order_var_4arg(order_var, j, jp, s, sp)
     check2 = check_order_var_4arg(order_var, jp, j, sp, s)
     if not (check1 or check2):
-        y = pus.LpVariable.dicts(
-            "y", ([j], [jp], [s], [sp]), 0, 1, cat="Integer"
+        z = pus.LpVariable.dicts(
+            "z", ([j], [jp], [s], [sp]), 0, 1, cat="Integer"
             )
-        update_dictofdicts(order_var, y)
+        update_dictofdicts(order_var, z)
 
 
 def update_y4_in(order_var, a, j, jp, s):
@@ -164,10 +168,10 @@ def update_y4_in(order_var, a, j, jp, s):
     check1 = check_order_var_4arg(order_var, a, j, jp, s)
     check2 = check_order_var_4arg(order_var, a, jp, j, s)
     if not (check1 or check2):
-        y = pus.LpVariable.dicts(
-            "y", ([a], [j], [jp], [s]), 0, 1, cat="Integer"
+        z = pus.LpVariable.dicts(
+            "z", ([a], [j], [jp], [s]), 0, 1, cat="Integer"
             )
-        update_dictofdicts(order_var, y)
+        update_dictofdicts(order_var, z)
 
 def get_y3(order_var, j, jp, s):
     """gets order variable for two trains (j,jp) and one station (s)
@@ -186,9 +190,9 @@ def get_y3(order_var, j, jp, s):
     ......j -> .... j1 -> ......
     """
     if check_order_var_3arg(order_var, j, jp, s):
-        return order_var[j][jp][s]
+        return order_var[j][jp]["one_station"][s]
     else:
-        return 1 - order_var[jp][j][s]
+        return 1 - order_var[jp][j]["one_station"][s]
 
 
 def get_y4_singleline(y, j, jp, s, sp):
@@ -226,7 +230,7 @@ def get_y4_in(y, a, j, jp, s):
 
 def check_order_var_3arg(y, j, jp, s):
     """checks if in y there is an order variable for (j,jp,s) """
-    return j in y and jp in y[j] and s in y[j][jp] and (type(y[j][jp][s]) is not dict)
+    return j in y and jp in y[j] and "one_station" in y[j][jp] and s in y[j][jp]["one_station"]
 
 
 def check_order_var_4arg(y, j, jp, s, sp):
@@ -427,13 +431,16 @@ def keep_trains_order(
                 if not can_MO_on_line(j, jp, s, train_sets):
                     # the order on station y[j][jp][s] must be the same as
                     # on the path y[j][jp][sp] (previous station)
-                    problem += (
-                        y[j][jp][s] == y[j][jp][sp],
-                        f"track_occupation_{j}_{jp}_{s}_{sp}",
-                    )
+                    print(y[j][jp])
+                    if s in y[j][jp]["one_station"] and sp in y[j][jp]["one_station"]:
+                        print(y[j][jp]["one_station"])
+                        problem += (
+                            y[j][jp]["one_station"][s] == y[j][jp]["one_station"][sp],
+                            f"track_occupation_{j}_{jp}_{s}_{sp}",
+                        )
                 elif are_two_trains_entering_via_the_same_switches(train_sets, s, j, jp):
                     problem += (
-                                get_y4_in(y, "in", j, jp, s) == y[j][jp][s],
+                                get_y4_in(y, "in", j, jp, s) == y[j][jp]["one_station"][s],
                                 f"track_occupation_{j}_{jp}_{s}_{sp}",
                                 )
 
