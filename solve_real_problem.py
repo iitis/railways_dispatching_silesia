@@ -43,7 +43,6 @@ def build_timetables(args, important_stations, data_paths):
     train_dicts = update_all_timetables(
         train_dicts, data_paths, important_stations, save=args.save
     )
-    train_dict = {}
     return train_dicts
 
 
@@ -62,7 +61,7 @@ def make_timetable(train_dict, important_stations, t1="16:00", taus=None):
     timetable = {}
     if taus == None:
         taus = make_taus(train_dict, important_stations, 1)
-    timetable["taus"] = taus
+    timetable["tau"] = taus
     timetable["initial_conditions"] = get_initial_conditions(train_dict, t1)
     timetable["penalty_weights"] = make_weights(
         train_dict, stopping=1, fast=1.5, express=1.75, empty=0
@@ -70,8 +69,9 @@ def make_timetable(train_dict, important_stations, t1="16:00", taus=None):
     return timetable
 
 
-def make_train_set(train_dict, important_stations, data_path):
+def make_train_set(train_dict, important_stations, data_path, skip_stations):
     train_set = {}
+    train_set["skip_station"] = skip_stations
     train_set["Paths"] = get_Paths(train_dict)
     train_set["J"] = get_J(train_dict)
     train_set["Jd"] = jd(train_dict, important_stations)
@@ -123,82 +123,34 @@ if __name__ == "__main__":
     important_stations = load_important_stations(args.stations)
     data_paths = load_data_paths(args.paths)
 
-    print(important_stations)
+    #print(important_stations)
 
     if args.load:
         train_dict = load_timetables(args.load)
     else:
         train_dict = build_timetables(args, important_stations, data_paths)
 
-    print(train_dict)
 
     t1 = "16:00"
     taus = make_taus(train_dict, important_stations, t1)
     timetable = make_timetable(train_dict, important_stations)
-    train_set = make_train_set(train_dict, important_stations, data_paths)
+    skip_stations = {94766: "KO(STM)", 40518: "KO(STM)", 343199: "KO(STM)",
+                     40673: "GLC", 541019: "KO(IC)", 44862: "KO(STM)", 40675: "GLC",
+                     }
+    train_set = make_train_set(train_dict, important_stations, data_paths, skip_stations)
     schedule = get_schedule(train_dict, t1)
-    print(timetable)
 
 
-"""
-    taus = {
-        "pass": {
-            "21_A_B": 4,
-            "22_A_B": 8,
-            "21_B_C": 4,
-            "22_B_C": 8,
-            "23_C_B": 6,
-            "23_B_A": 6,
-            "24_C_D": 3,
-            "25_D_C": 3,
-        },
-        "headway": {"21_22_A_B": 2, "22_21_A_B": 6, "21_22_B_C": 2, "22_21_B_C": 6},
-        "stop": {"21_B": 1, "22_B": 1, "21_C": 1, "23_B": 1},
-        "prep": {"23_C": 3},
-        "res": 1,
-    }
-    timetable = {
-        "tau": taus,
-        "initial_conditions": {
-            "21_A": 6,
-            "22_A": 1,
-            "23_C": 26,
-            "24_C": 25,
-            "25_D": 28,
-        },
-        "penalty_weights": {
-            "21_B": 2,
-            "22_B": 0.5,
-            "21_A": 2,
-            "22_A": 0.5,
-            "23_B": 0.8,
-            "24_C": 0.5,
-            "25_D": 0.5,
-        },
-    }
+    d_max = 40
 
-    train_sets = {
-        "Paths": {
-            21: ["A", "B", "C"],
-            22: ["A", "B", "C"],
-            23: ["C", "B", "A"],
-            24: ["C", "D"],
-            25: ["D", "C"],
-        },
-        "J": [21, 22, 23, 24, 25],
-        "Jd": {"A": {"B": [[21, 22]]}, "B": {"C": [[21, 22]]}},
-        "Josingle": {("C", "D"): [[24, 25]]},
-        "Jround": {"C": [[22, 23]]},
-        "Jtrack": {"B": [[21, 22]], "C": [[21, 24], [22, 23]]},
-        "Jswitch": {
-            "B": [{21: "out", 22: "out"}, {21: "in", 22: "in"}],
-            "C": [
-                {23: "out", 24: "out"},
-                {22: "in", 24: "out"},
-                {22: "in", 23: "out"},
-                {21: "in", 24: "out"},
-            ],
-            "D": [{24: "in", 25: "out"}],
-        },
-    }
-    """
+    prob = solve_linear_problem(train_set, timetable, d_max)
+
+    for v in prob.variables():
+        # test percedense vars
+        if "z_" in str(v) or "y_" in str(v):
+            assert v.varValue in [0.0, 1.0]
+        else:
+            print(v, ", ", v.varValue)
+    
+    print("objective")
+    print(prob.objective.value())
