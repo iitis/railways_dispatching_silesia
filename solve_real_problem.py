@@ -79,6 +79,29 @@ def make_train_set(train_dict, important_stations, data_path, skip_stations):
     return train_set
 
 
+def print_optimisation_results(prob):
+
+    int_vars = 0
+    order_vars = 0
+    print(".................  TIMETABLE .........")
+    for v in prob.variables():
+        if "z_" in str(v) or "y_" in str(v):
+            assert v.varValue in [0.0, 1.0]
+            order_vars += 1
+        else:
+            int_vars += 1
+            key = str(v).replace("Delays_", "")
+            try:
+                print(key, "schedule dep ", schedule[key], "conflict free dep", v.varValue + schedule[key])
+            except:
+                0
+
+    print(".........  Charakteristics  of problem ......")
+    print("n.o. integer_vars", int_vars)
+    print("n.o. order vars", order_vars)  
+    print("objective", prob.objective.value())
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -141,19 +164,6 @@ if __name__ == "__main__":
 
     prob = solve_linear_problem(train_set, timetable, d_max)
 
-    #print timetable
-    for v in prob.variables():
-        # test percedense vars
-        if "z_" in str(v) or "y_" in str(v):
-            assert v.varValue in [0.0, 1.0]
-        else:
-            #print(v, ", ", v.varValue)
-            key = str(v).replace("Delays_", "")
-            try:
-                print(key, "schedule dep ", schedule[key], "actual ", v.varValue + schedule[key])
-            except:
-                0
+    print_optimisation_results(prob)
 
-    
-    print("objective")
-    print(prob.objective.value())
+
