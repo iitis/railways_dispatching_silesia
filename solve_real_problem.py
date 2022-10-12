@@ -10,7 +10,8 @@ from data_formatting.data_formatting import (get_initial_conditions, get_J,
                                              get_taus_stop, jd, josingle,
                                              jswitch, jtrack, make_weights,
                                              timetable_to_train_dict,
-                                             update_all_timetables)
+                                             update_all_timetables,
+                                             add_delay)
 from railway_solvers.railway_solvers import (create_linear_problem,
                                             delay_and_acctual_time,
                                             impact_to_objective)
@@ -89,10 +90,10 @@ def print_optimisation_results(prob, timetable, train_set, d_max):
                 delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
                 delay, conflict_free = delay_and_acctual_time(train_set, timetable, prob, j, s)
                 try: 
-                    sched = schedule[f"{j}_{s}"]
-                    print(s, "delay", delay, "conflict free time", conflict_free, "schedule", sched, "impact to objective", delta_obj)
+                    sched = timetable["schedule"][f"{j}_{s}"]
+                    print(s, "secondary delay", delay, "conflict free time", conflict_free, "impact to obj.", delta_obj, "schedule", sched)
                 except:
-                    print(s, "delay", delay, "conflict free time", conflict_free, "impact to objective", delta_obj)
+                    print(s, "secondary delay", delay, "conflict free time", conflict_free, "impact to obj.", delta_obj)
 
 
 def check_count_vars(prob):
@@ -165,19 +166,30 @@ if __name__ == "__main__":
     timetable = make_timetable(train_dict, important_stations, skip_stations, t1)
 
 
-   # no disturbance example, this will be case 0
+    case = 1
+
+    # case 0 no distrubrance
 
     d_max = 40
-
     prob = create_linear_problem(train_set, timetable, d_max)
-    start_time = time.time()
-    prob.solve()
+
+    if case == 1:
+        delay = 12
+        train = 14006
+        timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
+        
+        prob = create_linear_problem(train_set, timetable, d_max)
+
+    if True:
+        start_time = time.time()
+        prob.solve()
+        print("optimisation, time = ", time.time() - start_time, "seconds")
+
+        check_count_vars(prob)
+        print_optimisation_results(prob, timetable, train_set, d_max)
+        print("............")
+        print("objective", prob.objective.value())
 
 
-    print("optimisation, time = ", time.time() - start_time, "seconds")
-
-    check_count_vars(prob)
-    print("objcetive", prob.objective.value())
-    print_optimisation_results(prob, timetable, train_set, d_max)
 
 
