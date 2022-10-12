@@ -47,7 +47,7 @@ These are the actual solvers. A test can be run like that:
 in this directory. The `railway_solvers` subdirectory (same name as
 its parent) is the solver module.
 
-
+## main directory ##
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
 Input:
     --stations path to '''npz''' file of important stations (dict Important_station: list of blocks),
