@@ -5,9 +5,9 @@ from data_formatting import train_time_table, blocks_list_4station
 from data_formatting import update_all_timetables
 from data_formatting import timetable_to_train_dict
 
-data = pd.read_csv("../data/train_schedule.csv", sep = ";")
-data_paths = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-important_stations = np.load('./important_stations.npz',allow_pickle=True)['arr_0'][()]
+data = pd.read_csv("../data/trains_schedules.csv", sep = ";")
+data_paths = pd.read_excel("../data/network_paths.ods", engine="odf")
+important_stations = np.load('../data/important_stations.npz',allow_pickle=True)['arr_0'][()]
 
 time_tables_dict = timetable_to_train_dict(data)
 train_dict = update_all_timetables(time_tables_dict,data_paths,important_stations)

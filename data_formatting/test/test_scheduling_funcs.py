@@ -14,9 +14,9 @@ from data_formatting import (
 )
 
 # ---------------- data collections -----------------
-data = pd.read_csv("../data/train_schedule.csv", sep=";")
-data_path_check = pd.read_excel("../data/KZ-KO-KL-CB_paths.ods", engine="odf")
-important_stations = np.load("./important_stations.npz", allow_pickle=True)["arr_0"][()]
+data = pd.read_csv("../data/trains_schedules.csv", sep = ";")
+data_path_check = pd.read_excel("../data/network_paths.ods", engine="odf")
+important_stations = np.load('../data/important_stations.npz',allow_pickle=True)['arr_0'][()]
 
 time_tables_dict = timetable_to_train_dict(data)
 time_tables_dict = update_all_timetables(

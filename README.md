@@ -30,7 +30,6 @@ These are the raw input data.
 Scripts to parse the input data and generate inputs in the required
 format.
 
-Ongoing work.
 
 A test can be run like that:
 
@@ -47,3 +46,25 @@ These are the actual solvers. A test can be run like that:
 
 in this directory. The `railway_solvers` subdirectory (same name as
 its parent) is the solver module.
+
+
+The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
+Input:
+    --stations path to '''npz''' file of important stations (dict Important_station: list of blocks),
+    --p path to '''.ods''' file with all paths and passing times that can be realized on the network,
+    --load path to dataframe dictionary of trains timetable
+        build - subparser used to build the dataframes dictionary of train timetable with argument:
+        -d path to '''.csv''' train dictionary if used without other arguments --load is not required
+        -save - path to location where dataframe dictionary will be saved.
+
+
+
+Example use:
+
+```
+python solve_real_problem.py --stations data/important_stations.npz --paths data/network_paths.ods build -d data/trains_schedules.csv
+
+```
+
+
+Ongoing work.
