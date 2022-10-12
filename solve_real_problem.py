@@ -1,7 +1,7 @@
 import pickle as pkl
-
 import numpy as np
 import pandas as pd
+import time
 
 from data_formatting.data_formatting import (get_initial_conditions, get_J,
                                              get_jround, get_Paths,
@@ -11,11 +11,7 @@ from data_formatting.data_formatting import (get_initial_conditions, get_J,
                                              jswitch, jtrack, make_weights,
                                              timetable_to_train_dict,
                                              update_all_timetables)
-from railway_solvers.railway_solvers import solve_linear_problem
-
-# TODO we should have a path to input file as an argument
-
-# TODO please produce Js and \taus from in the form analogical to, all functions should be in data_formatting.data_formatting
+from railway_solvers.railway_solvers import (create_linear_problem)
 
 
 def load_timetables(timetables_path):
@@ -162,8 +158,13 @@ if __name__ == "__main__":
 
     d_max = 40
 
-    prob = solve_linear_problem(train_set, timetable, d_max)
+    prob = create_linear_problem(train_set, timetable, d_max)
+    start_time = time.time()
+    prob.solve()
+    print("optimisation, time = ", time.time() - start_time, "seconds")
 
-    print_optimisation_results(prob)
+    print(train_set.keys())
+
+    #print_optimisation_results(prob)
 
 

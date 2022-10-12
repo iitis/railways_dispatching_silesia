@@ -1,6 +1,6 @@
 import itertools
 import time
-import numpy as np
+#import numpy as np
 import pulp as pus
 
 
@@ -715,14 +715,14 @@ def solve_linear_problem(train_sets, timetable, d_max):
 # auxiliary functions for visualisation
 
 
-def delay_and_acctual_time(S, timetable, prob, j, s):
+def delay_and_acctual_time(train_sets, timetable, prob, j, s):
     """given the solution of the optimisation problem returns secondary delay
     and actual time of leaving given station
     """
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
             delay = v.varValue
-            time = v.varValue + earliest_dep_time(S, timetable, j, s)
+            time = v.varValue + earliest_dep_time(train_sets["Paths"], timetable, j, s)
             return delay, time
     return 0, 0
 
