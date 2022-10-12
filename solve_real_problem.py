@@ -11,7 +11,9 @@ from data_formatting.data_formatting import (get_initial_conditions, get_J,
                                              jswitch, jtrack, make_weights,
                                              timetable_to_train_dict,
                                              update_all_timetables)
-from railway_solvers.railway_solvers import (create_linear_problem)
+from railway_solvers.railway_solvers import (create_linear_problem,
+                                            delay_and_acctual_time,
+                                            impact_to_objective)
 
 
 def load_timetables(timetables_path):
@@ -71,31 +73,37 @@ def make_train_set(train_dict, important_stations, data_path, skip_stations):
     train_set["Jround"] = get_jround(train_dict, important_stations)
     train_set["Jtrack"] = jtrack(train_dict, important_stations)
     train_set["Jswitch"] = jswitch(train_dict, important_stations, data_path)
-
     return train_set
 
 
-def print_optimisation_results(prob):
+def print_optimisation_results(prob, timetable, train_set, d_max):
+    print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
+    print("reference_time", t1)
+    for j in train_set["J"]:
+        print("..............")
+        print("train", j)
+        for s in train_set["Paths"][j]:
+            delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
+            delay, conflict_free = delay_and_acctual_time(train_set, timetable, prob, j, s)
+            try: 
+                sched = schedule[f"{j}_{s}"]
+                print(s, "delay", delay, "conflict free time", conflict_free, "schedule", sched, "impact to objective", delta_obj)
+            except:
+                print(s, "delay", delay, "conflict free time", conflict_free, "impact to objective", delta_obj)
 
-    int_vars = 0
+
+def check_count_vars(prob):
+    """
+    counts n.o. vars and checks if bool vars are 0 or 1
+    TODO it can be done better, 
+    """
     order_vars = 0
-    print(".................  TIMETABLE .........")
     for v in prob.variables():
         if "z_" in str(v) or "y_" in str(v):
             assert v.varValue in [0.0, 1.0]
             order_vars += 1
-        else:
-            int_vars += 1
-            key = str(v).replace("Delays_", "")
-            try:
-                print(key, "schedule dep ", schedule[key], "conflict free dep", v.varValue + schedule[key])
-            except:
-                0
-
-    print(".........  Charakteristics  of problem ......")
-    print("n.o. integer_vars", int_vars)
-    print("n.o. order vars", order_vars)  
-    print("objective", prob.objective.value())
+    print("n.o. integer_vars", order_vars)
+    print("n.o. order vars", len(prob.variables()) - order_vars)  
 
 
 if __name__ == "__main__":
@@ -163,8 +171,8 @@ if __name__ == "__main__":
     prob.solve()
     print("optimisation, time = ", time.time() - start_time, "seconds")
 
-    print(train_set.keys())
-
-    #print_optimisation_results(prob)
+    check_count_vars(prob)
+    print("objcetive", prob.objective.value())
+    print_optimisation_results(prob, timetable, train_set, d_max)
 
 
