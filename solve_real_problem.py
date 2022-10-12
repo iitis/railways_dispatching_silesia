@@ -129,6 +129,14 @@ if __name__ == "__main__":
         required=True,
         help="Path for data containing blocks passing times",
     )
+
+    parser.add_argument(
+        "--case",
+        type=int,
+        help="Case of railway problem choose: 0 (no distur.), 1: (one IC late), 2 (one IC late), 3 (all from Ty late), 4 (all laving KO late), 5 (14 trains late)",
+        default = 0
+    )
+
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_build = subparsers.add_parser("build", help="Build dataframes from files")
     parser_build.add_argument(
@@ -166,7 +174,7 @@ if __name__ == "__main__":
     timetable = make_timetable(train_dict, important_stations, skip_stations, t1)
 
 
-    case = 5
+    case = args.case
 
     # case 0 no distrubrance
 
@@ -213,11 +221,12 @@ if __name__ == "__main__":
 
     start_time = time.time()
     prob.solve()
-    print("optimisation, time = ", time.time() - start_time, "seconds")
-
-    check_count_vars(prob)
+    end_time = time.time()
     print_optimisation_results(prob, timetable, train_set, d_max)
-    print("............")
+    print("............ case", args.case, ".......")
+    
+    print("optimisation, time = ", end_time - start_time, "seconds")
+    check_count_vars(prob)
     print("objective", prob.objective.value())
 
 
