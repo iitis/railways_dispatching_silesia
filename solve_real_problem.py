@@ -158,8 +158,8 @@ if __name__ == "__main__":
     t1 = "16:00"
     taus = make_taus(train_dict, important_stations, t1)
     
-    skip_stations = {94766: "KO(STM)", 40518: "KO(STM)", 343199: "KO(STM)", 421009: "KO", 34319: "KO",
-                     40673: "GLC", 541019: "KO(IC)", 54101: "KO", 44862: "KO(STM)", 40675: "GLC",
+    skip_stations = {94766: "KO(STM)", 421009: "KO", 40518: "KO(STM)", 34319: "KO", 343199: "KO(STM)",
+                     40673: "GLC", 54101: "KO", 541019: "KO(IC)", 44862: "KO(STM)", 40675: "GLC",
                      }
     train_set = make_train_set(train_dict, important_stations, data_paths, skip_stations)
     timetable = make_timetable(train_dict, important_stations, skip_stations, t1)
