@@ -50,14 +50,14 @@ def make_taus(train_dict, important_stations, r):
     return taus
 
 
-def make_timetable(train_dict, important_stations, t1="16:00", taus=None):
+def make_timetable(train_dict, important_stations, skip_stations, t1="16:00", taus=None):
     timetable = {}
     if taus == None:
         taus = make_taus(train_dict, important_stations, 1)
     timetable["tau"] = taus
     timetable["initial_conditions"] = get_initial_conditions(train_dict, t1)
     timetable["penalty_weights"] = make_weights(
-        train_dict, stopping=1, fast=1.5, express=1.75, empty=0
+        train_dict, skip_stations, stopping=1, fast=1.5, express=1.75, empty=0
     )
     timetable["schedule"] = get_schedule(train_dict, t1)
     return timetable
@@ -154,25 +154,27 @@ if __name__ == "__main__":
 
     t1 = "16:00"
     taus = make_taus(train_dict, important_stations, t1)
-    timetable = make_timetable(train_dict, important_stations, t1)
-    skip_stations = {94766: "KO(STM)", 40518: "KO(STM)", 343199: "KO(STM)",
-                     40673: "GLC", 541019: "KO(IC)", 44862: "KO(STM)", 40675: "GLC",
+    
+    skip_stations = {94766: "KO(STM)", 40518: "KO(STM)", 343199: "KO(STM)", 421009: "KO", 34319: "KO",
+                     40673: "GLC", 541019: "KO(IC)", 54101: "KO", 44862: "KO(STM)", 40675: "GLC",
                      }
     train_set = make_train_set(train_dict, important_stations, data_paths, skip_stations)
-    
-    schedule = get_schedule(train_dict, t1)
+    timetable = make_timetable(train_dict, important_stations, skip_stations, t1)
 
-   # no disturbance example
+
+   # no disturbance example, this will be case 0
 
     d_max = 40
 
     prob = create_linear_problem(train_set, timetable, d_max)
     start_time = time.time()
     prob.solve()
-    print("optimisation, time = ", time.time() - start_time, "seconds")
 
-    check_count_vars(prob)
-    print("objcetive", prob.objective.value())
-    print_optimisation_results(prob, timetable, train_set, d_max)
+    if True:
+        print("optimisation, time = ", time.time() - start_time, "seconds")
+
+        check_count_vars(prob)
+        print("objcetive", prob.objective.value())
+        print_optimisation_results(prob, timetable, train_set, d_max)
 
 

@@ -95,31 +95,27 @@ def add_delay(initial_conditions, train, delay):
     return new_conditions
 
 
-def make_weights(train_dict, stopping=1, fast=1.5, express=1.75, empty=0):
-    company_weights = {
-        "KS - OsP": stopping,
-        "IC - EIP": express,
-        "PR - R": stopping,
-        "IC - TLK": fast,
+def make_weights(train_dict, skip_stations, stopping=1, fast=1.5, express=1.75, empty=0):
+    trains_weights = {
         "KS - Os": stopping,
+        "PR - R": stopping,
+        "KS - OsP": stopping, #TODO we may make it semi fast
+        "IC - TLK": fast,
         "IC - IC": fast,
+        "IC - EIP": express,
+        "IC - EIC": express,
     }
 
-    penalty_weights = {
-        f"{train}_{train_important_stations(train_dict[train][1])[-2]}": company_weights[
-            train_dict[train][0][0]
-        ]
-        for train in train_dict.keys()
-    }
-    penalty_weights.update(
-        {
-            f"{train}_{train_important_stations(train_dict[train][1])[-2]}": empty
-            for train in [
-                x
-                for x in train_dict.keys()
-                if x // 10 in flatten(get_trains_pair9(train_dict))
-            ]
-        }
-    )
+    penalty_weights = {}
+    for train in train_dict.keys():
+        type_of_train = train_dict[train][0][0]
+        weight = trains_weights[type_of_train]
+        if train // 10 in flatten(get_trains_pair9(train_dict)):
+            weight = empty
+        station = train_important_stations(train_dict[train][1])[-1]
+        if train in skip_stations and station == skip_stations[train]:
+            station = train_important_stations(train_dict[train][1])[-2]
+        
+        penalty_weights.update({f"{train}_{station}": weight})
 
     return penalty_weights

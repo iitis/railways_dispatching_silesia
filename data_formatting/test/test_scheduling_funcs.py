@@ -85,26 +85,31 @@ def test_add_delay_1(key, output):
 
 test_weights_dict = {
     "94766_KO": 1.0,
-    "26103_CB": 1.5,
-    "421009_KO(STM)": 0,
-    "42100_KO(STM)": 1.5,
-    "5312_KO(STM)": 1.5,
+    "26103_GLC": 1.5,
+    "421009_KO": 0,
+    "42100_KZ": 1.5,
+    "5312_KZ": 1.5,
     "40518_KO": 1.0,
     "34319_KO(STM)": 1.0,
     "343199_KO": 0.0,
-    "14006_KL": 1.5,
-    "94611_KL": 1.0,
-    "40150_KO(STM)": 1.0,
-    "14006_KL": 1.5,
-    "94113_KL": 1.0,
+    "14006_Ty": 1.5,
+    "94611_Ty": 1.0,
+    "40150_KZ": 1.0,
+    "14006_Ty": 1.5,
+    "94113_Ty": 1.0,
     "40673_CB": 1.0,
     "54101_KO(STM)": 1.5,
     "541019_KO(STM)": 0.0,
-    "40477_KL": 1.0,
-    "4500_KO(STM)": 1.75,
+    "40477_Ty": 1.0,
+    "4500_KZ": 1.75,
 }
+
+skip_stations = {94766: "KO(STM)", 40518: "KO(STM)", 343199: "KO(STM)", 34319: "KO",
+                     40673: "GLC", 541019: "KO(IC)", 54101: "KO", 44862: "KO(STM)", 40675: "GLC",
+                     }
+
 penalty_weights = make_weights(
-    time_tables_dict, stopping=1, fast=1.5, express=1.75, empty=0
+    time_tables_dict, skip_stations, stopping=1, fast=1.5, express=1.75, empty=0
 )
 
 
