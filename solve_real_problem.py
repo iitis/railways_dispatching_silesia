@@ -83,13 +83,16 @@ def print_optimisation_results(prob, timetable, train_set, d_max):
         print("..............")
         print("train", j)
         for s in train_set["Paths"][j]:
-            delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
-            delay, conflict_free = delay_and_acctual_time(train_set, timetable, prob, j, s)
-            try: 
-                sched = schedule[f"{j}_{s}"]
-                print(s, "delay", delay, "conflict free time", conflict_free, "schedule", sched, "impact to objective", delta_obj)
-            except:
-                print(s, "delay", delay, "conflict free time", conflict_free, "impact to objective", delta_obj)
+            if j in skip_stations and s == skip_stations[j]: # TODO improve if
+                0
+            else:
+                delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
+                delay, conflict_free = delay_and_acctual_time(train_set, timetable, prob, j, s)
+                try: 
+                    sched = schedule[f"{j}_{s}"]
+                    print(s, "delay", delay, "conflict free time", conflict_free, "schedule", sched, "impact to objective", delta_obj)
+                except:
+                    print(s, "delay", delay, "conflict free time", conflict_free, "impact to objective", delta_obj)
 
 
 def check_count_vars(prob):
@@ -170,11 +173,11 @@ if __name__ == "__main__":
     start_time = time.time()
     prob.solve()
 
-    if True:
-        print("optimisation, time = ", time.time() - start_time, "seconds")
 
-        check_count_vars(prob)
-        print("objcetive", prob.objective.value())
-        print_optimisation_results(prob, timetable, train_set, d_max)
+    print("optimisation, time = ", time.time() - start_time, "seconds")
+
+    check_count_vars(prob)
+    print("objcetive", prob.objective.value())
+    print_optimisation_results(prob, timetable, train_set, d_max)
 
 

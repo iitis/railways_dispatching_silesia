@@ -244,9 +244,12 @@ def delay_varibles(train_sets, d_max):
     """
     secondary_delays_vars = dict()
     for j in train_sets["J"]:
+        print(".......")
+        print(j)
         for s in train_sets["Paths"][j]:
             if not skip_station(j,s, train_sets):
                 if subsequent_train_at_Jround(train_sets, j, s) is None:
+                    print(s)
 
                     dvar = pus.LpVariable.dicts(
                         "Delays", ([j], [s]), 0, d_max, cat="Integer"
@@ -724,7 +727,6 @@ def delay_and_acctual_time(train_sets, timetable, prob, j, s):
             delay = v.varValue
             time = v.varValue + earliest_dep_time(train_sets["Paths"], timetable, j, s)
             return delay, time
-    return 0, 0
 
 
 def impact_to_objective(prob, timetable, j, s, d_max):
