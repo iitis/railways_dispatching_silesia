@@ -166,29 +166,59 @@ if __name__ == "__main__":
     timetable = make_timetable(train_dict, important_stations, skip_stations, t1)
 
 
-    case = 1
+    case = 5
 
     # case 0 no distrubrance
 
     d_max = 40
-    prob = create_linear_problem(train_set, timetable, d_max)
-
     if case == 1:
         delay = 12
         train = 14006
         timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
-        
-        prob = create_linear_problem(train_set, timetable, d_max)
 
-    if True:
-        start_time = time.time()
-        prob.solve()
-        print("optimisation, time = ", time.time() - start_time, "seconds")
+    if case == 2:
+        delay = 15
+        train = 5312
+        timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
 
-        check_count_vars(prob)
-        print_optimisation_results(prob, timetable, train_set, d_max)
-        print("............")
-        print("objective", prob.objective.value())
+
+    if case == 3:
+        delays = [15, 12, 13, 6, 21]
+        trains = [94766, 40518, 41004, 44862, 4120]
+        i = 0
+        for train in trains:
+            timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delays[i])
+            i = i+1
+
+
+    if case == 4:
+        delays = [30, 12, 25, 5, 30]
+        trains = [421009, 94611, 94113, 44717, 94717]
+        i = 0
+        for train in trains:
+            timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delays[i])
+            i = i+1
+
+    if case == 5:
+        delays = [30, 12, 17, 5, 30, 22, 3, 20, 35, 10, 25, 7, 5, 15]
+        trains = [94766, 26013, 5312, 40518, 34319, 14006, 40150, 41004, 45101, 4500, 49317, 64359, 44862, 73000]
+        i = 0
+        for train in trains:
+            timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delays[i])
+            i = i+1
+
+
+    prob = create_linear_problem(train_set, timetable, d_max)
+
+
+    start_time = time.time()
+    prob.solve()
+    print("optimisation, time = ", time.time() - start_time, "seconds")
+
+    check_count_vars(prob)
+    print_optimisation_results(prob, timetable, train_set, d_max)
+    print("............")
+    print("objective", prob.objective.value())
 
 
 
