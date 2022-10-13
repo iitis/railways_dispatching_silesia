@@ -55,6 +55,7 @@ Input:
     --p path to '''.ods''' file with all paths and passing times that can be realized on the network,
     --load path to dataframe dictionary of trains timetable
     --case it is particular case of railway dispatching problems
+    --category ("Integer" or "Continious") the category of time variables "Integer" yields ILP "Continious" yields MLP
         build - subparser used to build the dataframes dictionary of train timetable with argument:
         -d path to '''.csv''' train dictionary if used without other arguments --load is not required
         -save - path to location where dataframe dictionary will be saved.
