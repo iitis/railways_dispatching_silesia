@@ -20,7 +20,7 @@ def test_linear_varibles_creations():
         "Jswitch": dict()
     }
 
-    dv = delay_varibles(train_sets, 5)
+    dv = delay_varibles(train_sets, 5, cat = "Integer")
 
     assert str(
         dv) == "{0: {'A': Delays_0_A, 'B': Delays_0_B}, 1: {'A': Delays_1_A, 'B': Delays_1_B}}"
@@ -625,9 +625,12 @@ def  test_3stationsIC_STM_KO_case():
 
 
 
-def test_HOBO_problems():
+def test_QIP_problems():
 
     """
+    test problem form Quadratic and higher-order unconstrained binary optimization of railway rescheduling for quantum computing
+    K Domino, A Kundu, Ö Salehi, K Krawiec
+    Quantum Information Processing 21 (9), 1-33
                                             <- 2
     ...............................................
      [ A ]                             .   .  [ B ]
@@ -865,12 +868,68 @@ def test_constraint_labels():
         "add_swithes_at_s": ["B"]
     }
 
-    prob = create_linear_problem(train_sets, timetable, d_max)
+    prob = create_linear_problem(train_sets, timetable, d_max, "Integer")
     cnames = [cname for cname, _ in prob.constraints.items()]
     from re import match
     assert all(not match("_C[0-9]+", c) for c in cnames)
 
-    prob = create_linear_problem(train_sets_rerouted, timetable, d_max)
+    prob = create_linear_problem(train_sets_rerouted, timetable, d_max, "Integer")
     cnames = [cname for cname, _ in prob.constraints.items()]
     from re import match
     assert all(not match("_C[0-9]+", c) for c in cnames)
+
+
+def test_MLP():
+
+    """
+                                            <- 2
+    ...............................................
+     [ A ]                             .   .  [ B ]
+    .....................................c.........
+    0 ->
+    1 ->
+    """
+
+    taus = {"pass": {"0_A_B": 3.95, "1_A_B": 8.05, "2_B_A": 8.05},
+            "headway": {"0_1_A_B": 1.95, "1_0_A_B": 6.05},
+            "stop": {"0_B": 1, "1_B": 1},
+            "res": 1
+            }
+
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_A": 4, "1_A": 1, "2_B": 8},
+                 "penalty_weights": {"0_A": 2, "1_A": 1, "2_B": 1}}
+
+    d_max = 10
+
+    train_sets = {
+        "skip_station": {
+            2: "A",  # we do not count train 2 leaving A
+        },
+        "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
+        "J": [0, 1, 2],
+        "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
+        "Josingle": dict(),
+        "Jround": dict(),
+        "Jtrack": {"B": [[0, 1]]},
+        "Jswitch": dict(),
+        "add_swithes_at_s": ["B"]
+    }
+
+    prob = create_linear_problem(train_sets, timetable, d_max, cat = "Continuous")
+    print(prob)
+
+    prob.solve()
+
+    v = prob.variables()
+
+    assert v[0].name == "Delays_0_A"
+    assert v[0].varValue == 0
+    assert v[1].name == "Delays_0_B"
+    assert v[1].varValue == 4.05
+    assert v[2].name == "Delays_1_A"
+    assert v[2].varValue == pytest.approx(4.95)
+    assert v[4].name == "Delays_2_B"
+    assert v[4].varValue == 0
+
+    assert prob.objective.value() == pytest.approx(0.495)

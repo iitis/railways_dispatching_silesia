@@ -137,6 +137,13 @@ if __name__ == "__main__":
         default = 0
     )
 
+    parser.add_argument(
+        "--category",
+        type=str,
+        help="category of time variables integer in contionious",
+        default = "Continious"
+    )
+
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_build = subparsers.add_parser("build", help="Build dataframes from files")
     parser_build.add_argument(
@@ -216,8 +223,7 @@ if __name__ == "__main__":
             i = i+1
 
 
-    prob = create_linear_problem(train_set, timetable, d_max)
-
+    prob = create_linear_problem(train_set, timetable, d_max, cat = args.category)
 
     start_time = time.time()
     prob.solve()

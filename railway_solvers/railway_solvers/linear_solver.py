@@ -238,7 +238,7 @@ def check_order_var_4arg(y, j, jp, s, sp):
 # delay variables
 
 
-def delay_varibles(train_sets, d_max):
+def delay_varibles(train_sets, d_max, cat):
     """returns all linear variables for the optimisation problem, i.e.
     secondary_delays_vars and order_vars
     """
@@ -249,7 +249,7 @@ def delay_varibles(train_sets, d_max):
                 if subsequent_train_at_Jround(train_sets, j, s) is None:
 
                     dvar = pus.LpVariable.dicts(
-                        "Delays", ([j], [s]), 0, d_max, cat="Integer"
+                        "Delays", ([j], [s]), 0, d_max, cat=cat
                     )
 
                     update_dictofdicts(secondary_delays_vars, dvar)
@@ -681,11 +681,11 @@ def objective(problem, timetable, delay_var, train_sets, d_max):
     )
 
 
-def create_linear_problem(train_sets, timetable, d_max):
+def create_linear_problem(train_sets, timetable, d_max, cat):
     """creates the linear problem model"""
     prob = pus.LpProblem("Trains", pus.LpMinimize)
 
-    secondary_delays_var = delay_varibles(train_sets, d_max)
+    secondary_delays_var = delay_varibles(train_sets, d_max, cat = cat)
     y = order_variables(train_sets)
 
     # following conditions are added
@@ -702,9 +702,9 @@ def create_linear_problem(train_sets, timetable, d_max):
     return prob
 
 
-def solve_linear_problem(train_sets, timetable, d_max):
+def solve_linear_problem(train_sets, timetable, d_max, cat = "Integer"):
     """solves the linear problem returns the pulp object"""
-    prob = create_linear_problem(train_sets, timetable, d_max)
+    prob = create_linear_problem(train_sets, timetable, d_max, cat)
     start_time = time.time()
     prob.solve()
     print("optimisation, time = ", time.time() - start_time, "seconds")
