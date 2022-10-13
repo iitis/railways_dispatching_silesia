@@ -50,6 +50,7 @@ its parent) is the solver module.
 ## main directory ##
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
 Input:
+```
     --stations path to '''npz''' file of important stations (dict Important_station: list of blocks),
     --p path to '''.ods''' file with all paths and passing times that can be realized on the network,
     --load path to dataframe dictionary of trains timetable
@@ -57,7 +58,7 @@ Input:
         build - subparser used to build the dataframes dictionary of train timetable with argument:
         -d path to '''.csv''' train dictionary if used without other arguments --load is not required
         -save - path to location where dataframe dictionary will be saved.
-
+```
 
 
 Example use:
