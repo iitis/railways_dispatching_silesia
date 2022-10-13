@@ -42,12 +42,12 @@ def build_timetables(args, important_stations, data_paths):
 
 def make_taus(train_dict, important_stations, r):
     taus = {}
-    taus["pass"] = get_taus_pass(train_dict)
-    taus["headway"] = get_taus_headway(train_dict, important_stations, r)
-    taus["prep"] = get_taus_prep(train_dict, important_stations)
-    taus["stop"], prep_extra = get_taus_stop(train_dict, important_stations)
+    taus["pass"] = get_taus_pass(train_dict, r=r)
+    taus["headway"] = get_taus_headway(train_dict, important_stations, r=r)
+    taus["prep"] = get_taus_prep(train_dict, important_stations, r=r)
+    taus["stop"], prep_extra = get_taus_stop(train_dict, important_stations, r=r)
     taus["prep"].update(prep_extra)
-    taus["res"] = r
+    taus["res"] = 1 
     return taus
 
 
@@ -77,9 +77,9 @@ def make_train_set(train_dict, important_stations, data_path, skip_stations):
     return train_set
 
 
-def print_optimisation_results(prob, timetable, train_set, d_max):
+def print_optimisation_results(prob, timetable, train_set, d_max, t_ref):
     print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
-    print("reference_time", t1)
+    print("reference_time", t_ref)
     for j in train_set["J"]:
         print("..............")
         print("train", j)
@@ -171,34 +171,34 @@ if __name__ == "__main__":
         train_dict = build_timetables(args, important_stations, data_paths)
 
 
-    t1 = "16:00"
-    taus = make_taus(train_dict, important_stations, t1)
+    taus = make_taus(train_dict, important_stations, r = 0)  # r = 0 no rounding
+
     
     skip_stations = {94766: "KO(STM)", 421009: "KO", 40518: "KO(STM)", 34319: "KO", 343199: "KO(STM)",
                      40673: "GLC", 54101: "KO", 541019: "KO(IC)", 44862: "KO(STM)", 40675: "GLC",
                      }
     train_set = make_train_set(train_dict, important_stations, data_paths, skip_stations)
-    timetable = make_timetable(train_dict, important_stations, skip_stations, t1)
+    t_ref = "16:00"
+    timetable = make_timetable(train_dict, important_stations, skip_stations, t_ref)
 
+    print(taus["pass"])
 
-    case = args.case
-
-    # case 0 no distrubrance
+    # args.case == 0 no distrubrance
 
     d_max = 40
-    if case == 1:
-        delay = 12
+    if args.case == 1:
+        delay = 12.5
         train = 14006
         timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
 
-    if case == 2:
-        delay = 15
+    if args.case == 2:
+        delay = 15.1
         train = 5312
         timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
 
 
-    if case == 3:
-        delays = [15, 12, 13, 6, 21]
+    if args.case == 3:
+        delays = [15.1, 12.3, 13.4, 6.1, 21.01]
         trains = [94766, 40518, 41004, 44862, 4120]
         i = 0
         for train in trains:
@@ -206,16 +206,16 @@ if __name__ == "__main__":
             i = i+1
 
 
-    if case == 4:
-        delays = [30, 12, 25, 5, 30]
+    if args.case == 4:
+        delays = [30.5, 12.1, 25.3, 5.7, 30.2]
         trains = [421009, 94611, 94113, 44717, 94717]
         i = 0
         for train in trains:
             timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delays[i])
             i = i+1
 
-    if case == 5:
-        delays = [30, 12, 17, 5, 30, 22, 3, 20, 35, 10, 25, 7, 5, 15]
+    if args.case == 5:
+        delays = [30.4, 12.5, 17.7, 5.1, 30.2, 22.8, 3.2, 20.6, 35.2, 10.1, 25.0, 7.1, 5.2, 15.7]
         trains = [94766, 26013, 5312, 40518, 34319, 14006, 40150, 41004, 45101, 4500, 49317, 64359, 44862, 73000]
         i = 0
         for train in trains:
@@ -224,11 +224,12 @@ if __name__ == "__main__":
 
 
     prob = create_linear_problem(train_set, timetable, d_max, cat = args.category)
+    #print(prob.variables)
 
     start_time = time.time()
     prob.solve()
     end_time = time.time()
-    print_optimisation_results(prob, timetable, train_set, d_max)
+    print_optimisation_results(prob, timetable, train_set, d_max, t_ref)
     print("............ case", args.case, ".......")
     
     print("optimisation, time = ", end_time - start_time, "seconds")

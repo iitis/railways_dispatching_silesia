@@ -405,7 +405,7 @@ def jd(time_tables_dict, important_stations, imp_stations=None):
 # taus are from here
 
 
-def get_taus_pass(train_dict, trains=None):
+def get_taus_pass(train_dict, trains=None, r = 1):
     """Function to generate taus_pass, a dictionary with
     information about passing time for a given train between
     two subsequent stations. It has as key the "train_s1_s2"
@@ -434,12 +434,12 @@ def get_taus_pass(train_dict, trains=None):
             station2 = subsequent_station(timetable, station)
             if station2 != None:
                 taus_pass[f"{train}_{station}_{station2}"] = minimal_passing_time(
-                    timetable, station, station2, resolution=1, verbose=True
+                    timetable, station, station2, resolution=r, verbose=True
                 )
     return taus_pass
 
 
-def get_taus_stop(train_dict:dict, important_stations:dict,trains=None):
+def get_taus_stop(train_dict:dict, important_stations:dict,trains=None, r = 1):
     """Function for getting the mininal stop time for 
     a train in a station. 
 
@@ -471,14 +471,14 @@ def get_taus_stop(train_dict:dict, important_stations:dict,trains=None):
             ) == None:
                 continue
             time_flag, ts_prep = minimal_stay(
-                train, station, train_dict, important_stations  ,first_station=first_station
+                train, station, train_dict, important_stations , first_station=first_station, r = r
             )
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
     return taus_stop, taus_prep
 
 
-def get_taus_prep(train_dict:dict,important_stations):
+def get_taus_prep(train_dict:dict,important_stations, r = 1):
     """ Function that gives the preparation time
     for a given train at station
 
@@ -495,7 +495,7 @@ def get_taus_prep(train_dict:dict,important_stations):
     paths = get_Paths(train_dict)
     for train, stations in paths.items():
         s = stations[0]
-        st_prep = turn_around_time(train_dict[train][1], s, important_stations,r=1)
+        st_prep = turn_around_time(train_dict[train][1], s, important_stations,r=r)
         if st_prep != 0:
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep

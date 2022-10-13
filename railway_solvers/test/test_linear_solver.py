@@ -917,8 +917,6 @@ def test_MLP():
     }
 
     prob = create_linear_problem(train_sets, timetable, d_max, cat = "Continuous")
-    print(prob)
-
     prob.solve()
 
     v = prob.variables()
