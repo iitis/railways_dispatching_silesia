@@ -56,7 +56,7 @@ def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
 
     return num_reads, annealing_time, chain_strength
 
-def process_experiment(bqm, dict_list):
+def print_experiment(bqm, dict_list):
     """Creates a log file for the experiment to monitor experiment results
 
     :param folder: Name of the folder to store the log file
@@ -85,13 +85,14 @@ def process_experiment(bqm, dict_list):
 
         
 def annealing(
-    prob, method, pdict=None, real_anneal_var_dict=None, sim_anneal_var_dict=None, file_name =None
+    bqm, interpreter, method, pdict=None, real_anneal_var_dict=None, sim_anneal_var_dict=None
 ):
     """Performs the annealing experiment
 
-    :param prob: The problem instance
-    :type prob: pulp.pulp.LpProblem
-    :param method: 'sim', 'real', 'hyb', 'cqm'
+    :param bqm: The problem instance
+    :type prob: bqm
+    :param interpreter: ....
+    :param method: 'sim', 'real', 'hyb'
     :type method: str
     :param input_name: name of the input data
     :type input_name: str
@@ -101,32 +102,47 @@ def annealing(
     :type real_anneal_var_dict: Dict[str, float]
     """
 
-    assert method in ["sim", "real", "hyb", "cqm"]
-    if method == "cqm":
-        cqm, interpreter = convert_to_cqm(prob)
-        sampleset = constrained_solver(cqm)
-    else:
-        bqm, _, interpreter = convert_to_bqm(prob, pdict)
-        if method == "sim":
-            sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
-        elif method == "real":
-            num_reads, annealing_time, chain_strength = get_parameters(
-                real_anneal_var_dict
-            )
-            sampleset = real_anneal(
-                bqm,
-                num_reads=num_reads,
-                annealing_time=annealing_time,
-                chain_strength=chain_strength,
-            )
-        elif method == "hyb":
-            sampleset = hybrid_anneal(bqm)
+    assert method in ["sim", "real", "hyb"]
 
-    #store_result(file_name, sampleset)
-    #load_results(file_name)
-    sampleset = interpreter(sampleset)
-    dict_list = get_results(sampleset, prob=prob)
-    return process_experiment(bqm, dict_list)
+    if method == "sim":
+         sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
+    elif method == "real":
+        num_reads, annealing_time, chain_strength = get_parameters(
+            real_anneal_var_dict
+        )
+        sampleset = real_anneal(
+            bqm,
+            num_reads=num_reads,
+            annealing_time=annealing_time,
+            chain_strength=chain_strength,
+        )
+    elif method == "hyb":
+        sampleset = hybrid_anneal(bqm)
+    return interpreter(sampleset)
+    
 
 
+
+
+##### QUBO provessing
+def count_quadratic_couplings(bqm):
+    """
+    returns number of copulings - Js
+    """
+    count = 0
+    for J in bqm.quadratic.values():
+        if J != 0:
+            count = count + 1
+    return count
+
+
+def count_linear_fields(bqm):
+    """
+    return number of local fields hs
+    """ 
+    count = 0
+    for h in bqm.linear.values():
+        if h != 0:
+            count = count + 1
+    return count     
 

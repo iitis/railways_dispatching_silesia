@@ -13,4 +13,5 @@ from .converter_bqm import convert_to_pyqubo, convert_to_bqm
 
 from .results_manipulation import analyze_constraints, get_objective, get_best_feasible_sample
 from .results_manipulation import get_results, store_result, load_results
-from .bqm_optimization import annealing
+
+from .bqm_optimization import annealing, print_experiment, count_quadratic_couplings, count_linear_fields

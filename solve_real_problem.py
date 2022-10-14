@@ -16,7 +16,12 @@ from railway_solvers.railway_solvers import (create_linear_problem,
                                             delay_and_acctual_time,
                                             impact_to_objective,
                                             annealing,
-                                            convert_to_bqm
+                                            convert_to_bqm,
+                                            count_quadratic_couplings,
+                                            count_linear_fields,
+                                            get_results,
+                                            get_best_feasible_sample,
+                                            convert_to_cqm
                                             )
 
 
@@ -113,29 +118,7 @@ def check_count_vars(prob):
             order_vars += 1
     print("n.o. integer_vars", order_vars)
     print("n.o. order vars", len(prob.variables()) - order_vars) 
-
-
-##### QUBO provessing
-def count_quadratic_couplings(bqm):
-    """
-    returns number of copulings - Js
-    """
-    count = 0
-    for J in bqm.quadratic.values():
-        if J != 0:
-            count = count + 1
-    return count
-
-
-def count_linear_fields(bqm):
-    """
-    return number of local fields hs
-    """ 
-    count = 0
-    for h in bqm.linear.values():
-        if h != 0:
-            count = count + 1
-    return count      
+ 
 
 
 if __name__ == "__main__":
@@ -201,7 +184,7 @@ if __name__ == "__main__":
 
     taus = make_taus(train_dict, important_stations, r = 0)  # r = 0 no rounding
 
-    
+    # These ae stations to which trains arrives but does not leave, i.e. DEPOs
     skip_stations = {94766: "KO(STM)", 421009: "KO", 40518: "KO(STM)", 34319: "KO", 343199: "KO(STM)",
                      40673: "GLC", 54101: "KO", 541019: "KO(IC)", 44862: "KO(STM)", 40675: "GLC",
                      }
@@ -283,12 +266,22 @@ if __name__ == "__main__":
 
     simulated_annealig = True
     if simulated_annealig:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
+        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
         method = "sim"
         print("simulated annealing")
-        sample = annealing(prob, method, pdict, sim_anneal_var_dict=sim_annealing_var )
+        sampleset = annealing(bqm, interpreter, method, pdict, sim_anneal_var_dict=sim_annealing_var )
+        dict_list = get_results(sampleset, prob=prob)
+        #store_result(f"test/annealing_results/{file_name}", sampleset)
+        #load_results(f"test/annealing_results/{file_name}")
+        sample = get_best_feasible_sample(dict_list)
+
         print(sample)
 
+
+    # this will be cqm
+    if False:
+        cqm, interpreter = convert_to_cqm(prob)
+        #sampleset = constrained_solver(cqm)
 
 
 
