@@ -264,7 +264,7 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-    simulated_annealig = True
+    simulated_annealig = False
     if simulated_annealig:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
         method = "sim"
