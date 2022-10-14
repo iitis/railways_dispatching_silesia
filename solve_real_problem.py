@@ -1,25 +1,35 @@
 import pickle as pkl
-import numpy as np
-import pandas as pd
 import time
 
-from data_formatting.data_formatting import (get_initial_conditions, get_J,
-                                             get_jround, get_Paths,
-                                             get_schedule, get_taus_headway,
-                                             get_taus_pass, get_taus_prep,
-                                             get_taus_stop, jd, josingle,
-                                             jswitch, jtrack, make_weights,
-                                             timetable_to_train_dict,
-                                             update_all_timetables,
-                                             add_delay)
-from railway_solvers.railway_solvers import (create_linear_problem,
-                                            delay_and_acctual_time,
-                                            impact_to_objective,
-                                            annealing,
-                                            convert_to_bqm
-                                            )
+import numpy as np
 
-
+import pandas as pd
+from data_formatting.data_formatting import (
+    add_delay,
+    get_initial_conditions,
+    get_J,
+    get_jround,
+    get_Paths,
+    get_schedule,
+    get_taus_headway,
+    get_taus_pass,
+    get_taus_prep,
+    get_taus_stop,
+    jd,
+    josingle,
+    jswitch,
+    jtrack,
+    make_weights,
+    timetable_to_train_dict,
+    update_all_timetables,
+)
+from railway_solvers.railway_solvers import (
+    annealing,
+    convert_to_bqm,
+    create_linear_problem,
+    delay_and_acctual_time,
+    impact_to_objective,
+)
 
 
 def load_timetables(timetables_path):
@@ -52,11 +62,13 @@ def make_taus(train_dict, important_stations, r):
     taus["prep"] = get_taus_prep(train_dict, important_stations, r=r)
     taus["stop"], prep_extra = get_taus_stop(train_dict, important_stations, r=r)
     taus["prep"].update(prep_extra)
-    taus["res"] = 1 
+    taus["res"] = 1
     return taus
 
 
-def make_timetable(train_dict, important_stations, skip_stations, t1="16:00", taus=None):
+def make_timetable(
+    train_dict, important_stations, skip_stations, t1="16:00", taus=None
+):
     timetable = {}
     if taus == None:
         taus = make_taus(train_dict, important_stations, 1)
@@ -89,16 +101,36 @@ def print_optimisation_results(prob, timetable, train_set, d_max, t_ref):
         print("..............")
         print("train", j)
         for s in train_set["Paths"][j]:
-            if j in skip_stations and s == skip_stations[j]: # TODO improve if
+            if j in skip_stations and s == skip_stations[j]:  # TODO improve if
                 0
             else:
                 delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
-                delay, conflict_free = delay_and_acctual_time(train_set, timetable, prob, j, s)
-                try: 
+                delay, conflict_free = delay_and_acctual_time(
+                    train_set, timetable, prob, j, s
+                )
+                try:
                     sched = timetable["schedule"][f"{j}_{s}"]
-                    print(s, "secondary delay", delay, "conflict free time", conflict_free, "impact to obj.", delta_obj, "schedule", sched)
+                    print(
+                        s,
+                        "secondary delay",
+                        delay,
+                        "conflict free time",
+                        conflict_free,
+                        "impact to obj.",
+                        delta_obj,
+                        "schedule",
+                        sched,
+                    )
                 except:
-                    print(s, "secondary delay", delay, "conflict free time", conflict_free, "impact to obj.", delta_obj)
+                    print(
+                        s,
+                        "secondary delay",
+                        delay,
+                        "conflict free time",
+                        conflict_free,
+                        "impact to obj.",
+                        delta_obj,
+                    )
 
 
 def check_count_vars(prob):
@@ -112,7 +144,7 @@ def check_count_vars(prob):
             assert v.varValue in [0.0, 1.0]
             order_vars += 1
     print("n.o. integer_vars", order_vars)
-    print("n.o. order vars", len(prob.variables()) - order_vars) 
+    print("n.o. order vars", len(prob.variables()) - order_vars)
 
 
 ##### QUBO provessing
@@ -130,12 +162,12 @@ def count_quadratic_couplings(bqm):
 def count_linear_fields(bqm):
     """
     return number of local fields hs
-    """ 
+    """
     count = 0
     for h in bqm.linear.values():
         if h != 0:
             count = count + 1
-    return count      
+    return count
 
 
 if __name__ == "__main__":
@@ -162,14 +194,14 @@ if __name__ == "__main__":
         "--case",
         type=int,
         help="Case of railway problem choose: 0 (no distur.), 1: (one IC late), 2 (one IC late), 3 (all from Ty late), 4 (all laving KO late), 5 (14 trains late)",
-        default = 0
+        default=0,
     )
 
     parser.add_argument(
         "--category",
         type=str,
         help="category of time variables integer in contionious",
-        default = "Continious"
+        default="Continious",
     )
 
     subparsers = parser.add_subparsers(help="sub-command help")
@@ -181,7 +213,6 @@ if __name__ == "__main__":
         "-save", required=False, action="store_true", help="save built train dictionary"
     )
     args = parser.parse_args()
-    print(args)
     if (args.load == None) and ("d" not in args):
         print(
             "Please provide data.\
@@ -198,17 +229,25 @@ if __name__ == "__main__":
     else:
         train_dict = build_timetables(args, important_stations, data_paths)
 
+    taus = make_taus(train_dict, important_stations, r=0)  # r = 0 no rounding
 
-    taus = make_taus(train_dict, important_stations, r = 0)  # r = 0 no rounding
-
-    
-    skip_stations = {94766: "KO(STM)", 421009: "KO", 40518: "KO(STM)", 34319: "KO", 343199: "KO(STM)",
-                     40673: "GLC", 54101: "KO", 541019: "KO(IC)", 44862: "KO(STM)", 40675: "GLC",
-                     }
-    train_set = make_train_set(train_dict, important_stations, data_paths, skip_stations)
+    skip_stations = {
+        94766: "KO(STM)",
+        421009: "KO",
+        40518: "KO(STM)",
+        34319: "KO",
+        343199: "KO(STM)",
+        40673: "GLC",
+        54101: "KO",
+        541019: "KO(IC)",
+        44862: "KO(STM)",
+        40675: "GLC",
+    }
+    train_set = make_train_set(
+        train_dict, important_stations, data_paths, skip_stations
+    )
     t_ref = "16:00"
     timetable = make_timetable(train_dict, important_stations, skip_stations, t_ref)
-
 
     # args.case == 0 no distrubrance
 
@@ -216,56 +255,76 @@ if __name__ == "__main__":
     if args.case == 1:
         delay = 12
         train = 14006
-        timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
+        timetable["initial_conditions"] = add_delay(
+            timetable["initial_conditions"], train, delay
+        )
 
     if args.case == 2:
         delay = 15
         train = 5312
-        timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
-
+        timetable["initial_conditions"] = add_delay(
+            timetable["initial_conditions"], train, delay
+        )
 
     if args.case == 3:
         delays = [15, 12, 13, 6, 21]
         trains = [94766, 40518, 41004, 44862, 4120]
         i = 0
         for train in trains:
-            timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delays[i])
-            i = i+1
-
+            timetable["initial_conditions"] = add_delay(
+                timetable["initial_conditions"], train, delays[i]
+            )
+            i = i + 1
 
     if args.case == 4:
         delays = [30, 12, 25, 5, 30]
         trains = [421009, 94611, 94113, 44717, 94717]
         i = 0
         for train in trains:
-            timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delays[i])
-            i = i+1
+            timetable["initial_conditions"] = add_delay(
+                timetable["initial_conditions"], train, delays[i]
+            )
+            i = i + 1
 
     if args.case == 5:
         delays = [30, 12, 18, 5, 30, 23, 3, 21, 35, 10, 25, 7, 5, 16]
-        trains = [94766, 26013, 5312, 40518, 34319, 14006, 40150, 41004, 45101, 4500, 49317, 64359, 44862, 73000]
+        trains = [
+            94766,
+            26013,
+            5312,
+            40518,
+            34319,
+            14006,
+            40150,
+            41004,
+            45101,
+            4500,
+            49317,
+            64359,
+            44862,
+            73000,
+        ]
         i = 0
         for train in trains:
-            timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delays[i])
-            i = i+1
+            timetable["initial_conditions"] = add_delay(
+                timetable["initial_conditions"], train, delays[i]
+            )
+            i = i + 1
 
-
-    prob = create_linear_problem(train_set, timetable, d_max, cat = args.category)
-
+    prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 
     start_time = time.time()
     prob.solve()
     end_time = time.time()
     print_optimisation_results(prob, timetable, train_set, d_max, t_ref)
     print("............ case", args.case, ".......")
-    
+
     print("optimisation, time = ", end_time - start_time, "seconds")
     check_count_vars(prob)
-    print("objective x d_max  in [min]", prob.objective.value()*d_max)
+    print("objective x d_max  in [min]", prob.objective.value() * d_max)
 
     simulated_annealig = True
 
-    
     pdict = {
         "minimal_span": 2.5,
         "single_line": 2.5,
@@ -281,14 +340,13 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-
     if simulated_annealig:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
+        sim_annealing_var = {
+            "beta_range": (0.001, 10),
+            "num_sweeps": 100,
+            "num_reads": 100,
+        }
         method = "sim"
         print("simulated annealing")
-        sample = annealing(prob, method, pdict, sim_anneal_var_dict=sim_annealing_var )
+        sample = annealing(prob, method, pdict, sim_anneal_var_dict=sim_annealing_var)
         print(sample)
-
-
-
-

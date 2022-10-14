@@ -5,7 +5,6 @@ import functools as ft
 from datetime import datetime
 
 from collections import defaultdict
-from .time_table_check import timetable_to_train_dict
 from .time_table_check import train_important_stations
 from .time_table_check import train_time_table
 
@@ -490,3 +489,8 @@ def add_delay(initial_conditions, train, delay):
     new_conditions = initial_conditions.copy()
     new_conditions.update(new_value)
     return new_conditions
+
+def get_skip_stations(train_dict):
+    station = lambda train: train_dict[train][1].iloc[-1,-1]
+    get_skip_stations = {train: station(train) for train in train_dict.keys() if type(station(train))==str}
+    return get_skip_stations
