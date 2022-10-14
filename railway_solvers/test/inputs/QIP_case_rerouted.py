@@ -32,8 +32,6 @@ train_sets = {
 
 train_sets = {
     "skip_station": {
-        0: None,
-        1: None,
         2: "A",
     },
     "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},

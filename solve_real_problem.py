@@ -14,7 +14,12 @@ from data_formatting.data_formatting import (get_initial_conditions, get_J,
                                              add_delay)
 from railway_solvers.railway_solvers import (create_linear_problem,
                                             delay_and_acctual_time,
-                                            impact_to_objective)
+                                            impact_to_objective,
+                                            annealing,
+                                            convert_to_bqm
+                                            )
+
+
 
 
 def load_timetables(timetables_path):
@@ -107,7 +112,30 @@ def check_count_vars(prob):
             assert v.varValue in [0.0, 1.0]
             order_vars += 1
     print("n.o. integer_vars", order_vars)
-    print("n.o. order vars", len(prob.variables()) - order_vars)  
+    print("n.o. order vars", len(prob.variables()) - order_vars) 
+
+
+##### QUBO provessing
+def count_quadratic_couplings(bqm):
+    """
+    returns number of copulings - Js
+    """
+    count = 0
+    for J in bqm.quadratic.values():
+        if J != 0:
+            count = count + 1
+    return count
+
+
+def count_linear_fields(bqm):
+    """
+    return number of local fields hs
+    """ 
+    count = 0
+    for h in bqm.linear.values():
+        if h != 0:
+            count = count + 1
+    return count      
 
 
 if __name__ == "__main__":
@@ -181,24 +209,23 @@ if __name__ == "__main__":
     t_ref = "16:00"
     timetable = make_timetable(train_dict, important_stations, skip_stations, t_ref)
 
-    print(taus["pass"])
 
     # args.case == 0 no distrubrance
 
-    d_max = 40
+    d_max = 20
     if args.case == 1:
-        delay = 12.5
+        delay = 12
         train = 14006
         timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
 
     if args.case == 2:
-        delay = 15.1
+        delay = 15
         train = 5312
         timetable["initial_conditions"] = add_delay(timetable["initial_conditions"], train, delay)
 
 
     if args.case == 3:
-        delays = [15.1, 12.3, 13.4, 6.1, 21.01]
+        delays = [15, 12, 13, 6, 21]
         trains = [94766, 40518, 41004, 44862, 4120]
         i = 0
         for train in trains:
@@ -207,7 +234,7 @@ if __name__ == "__main__":
 
 
     if args.case == 4:
-        delays = [30.5, 12.1, 25.3, 5.7, 30.2]
+        delays = [30, 12, 25, 5, 30]
         trains = [421009, 94611, 94113, 44717, 94717]
         i = 0
         for train in trains:
@@ -215,7 +242,7 @@ if __name__ == "__main__":
             i = i+1
 
     if args.case == 5:
-        delays = [30.4, 12.5, 17.7, 5.1, 30.2, 22.8, 3.2, 20.6, 35.2, 10.1, 25.0, 7.1, 5.2, 15.7]
+        delays = [30, 12, 18, 5, 30, 23, 3, 21, 35, 10, 25, 7, 5, 16]
         trains = [94766, 26013, 5312, 40518, 34319, 14006, 40150, 41004, 45101, 4500, 49317, 64359, 44862, 73000]
         i = 0
         for train in trains:
@@ -224,7 +251,7 @@ if __name__ == "__main__":
 
 
     prob = create_linear_problem(train_set, timetable, d_max, cat = args.category)
-    #print(prob.variables)
+
 
     start_time = time.time()
     prob.solve()
@@ -234,7 +261,33 @@ if __name__ == "__main__":
     
     print("optimisation, time = ", end_time - start_time, "seconds")
     check_count_vars(prob)
-    print("objective", prob.objective.value())
+    print("objective x d_max  in [min]", prob.objective.value()*d_max)
+
+    simulated_annealig = True
+
+    
+    pdict = {
+        "minimal_span": 2.5,
+        "single_line": 2.5,
+        "minimal_stay": 2.5,
+        "track_occupation": 2.5,
+        "switch": 2.5,
+        "occupation": 2.5,
+        "circulation": 2.5,
+        "objective": 1,
+    }
+    bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
+    print("QUBO variables", len(bqm.variables))
+    print("quadratic terms", count_quadratic_couplings(bqm))
+    print("linear terms", count_linear_fields(bqm))
+
+
+    if simulated_annealig:
+        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
+        method = "sim"
+        print("simulated annealing")
+        sample = annealing(prob, method, pdict, sim_anneal_var_dict=sim_annealing_var )
+        print(sample)
 
 
 

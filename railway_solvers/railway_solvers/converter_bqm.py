@@ -143,4 +143,4 @@ def convert_to_bqm(
             dimod.as_samples(result), "BINARY", energies
         )
 
-    return pyqubo_model.to_bqm(feed_dict=pdict), lambda ss: interpreter(ss)
+    return pyqubo_model.to_bqm(feed_dict=pdict), pyqubo_model.to_qubo(feed_dict=pdict), lambda ss: interpreter(ss)

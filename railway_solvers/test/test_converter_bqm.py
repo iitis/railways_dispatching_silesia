@@ -1,4 +1,4 @@
-from dimod.constrained import _LowerBounds, cqm_to_bqm
+from dimod.constrained import cqm_to_bqm
 import pulp
 import dimod
 from railway_solvers import convert_to_bqm
@@ -29,7 +29,7 @@ def test_equality_binary():
             "track_occupation" : 1,
             "switch": 1,
             "objective" : 1}
-    dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
+    dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Binary(f"y_{i}") for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -49,7 +49,7 @@ def test_equality():
     pulp_problem += sum(vars.values()) == 1, "minimal_span_1"
     pulp_problem += sum((i+1)*vars[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
-    dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
+    dwave_pulp_problem, _ , _= convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=7) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -70,7 +70,7 @@ def test_geq():
     pulp_problem += sum(vars.values()) >= 1, "minimal_span_1"
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
-    dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
+    dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=3) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -91,7 +91,7 @@ def test_geq_negative():
     pulp_problem += sum(val*vars[i] for i, val in zip(range(n),[1,2,3])) <= 3, "minimal_span_1"
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
-    dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
+    dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=15) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -112,7 +112,7 @@ def test_leq():
     pulp_problem += sum(vars.values()) <= 1, "minimal_span_1"
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
-    dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
+    dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -132,7 +132,7 @@ def test_nonzero_lb():
     pulp_problem += sum(vars.values()) <= 17, "minimal_span_1"
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
-    dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
+    dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=15) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()
@@ -153,7 +153,7 @@ def test_bad_leq():
     pulp_problem += sum(vars.values()) <= 1, "minimal_span_1"
     # pulp_problem += sum((i+1)*vars[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
-    dwave_pulp_problem, _ = convert_to_bqm(pulp_problem, pdict)
+    dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
     cqm = dimod.ConstrainedQuadraticModel()

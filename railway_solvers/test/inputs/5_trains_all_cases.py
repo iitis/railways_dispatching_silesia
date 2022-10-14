@@ -59,7 +59,7 @@ timetable = {
 }
 
 train_sets = {
-    "skip_station": {21: None, 22: "C", 23: "A", 24: "D", 25: "C"},
+    "skip_station": {22: "C", 23: "A", 24: "D", 25: "C"},
     "Paths": {
         21: ["A", "B", "C"],
         22: ["A", "B", "C"],
