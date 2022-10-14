@@ -69,5 +69,6 @@ python solve_real_problem.py --stations data/important_stations.npz --paths data
 
 ```
 
+It solves the ILP or MLP and returns also QUBP and bqm.
 
 Ongoing work.

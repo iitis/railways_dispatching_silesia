@@ -212,7 +212,7 @@ if __name__ == "__main__":
 
     # args.case == 0 no distrubrance
 
-    d_max = 20
+    d_max = 40
     if args.case == 1:
         delay = 12
         train = 14006
@@ -263,8 +263,8 @@ if __name__ == "__main__":
     check_count_vars(prob)
     print("objective x d_max  in [min]", prob.objective.value()*d_max)
 
-    simulated_annealig = True
 
+    # QUBO creation an solution
     
     pdict = {
         "minimal_span": 2.5,
@@ -281,9 +281,9 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-
+    simulated_annealig = True
     if simulated_annealig:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
+        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
         method = "sim"
         print("simulated annealing")
         sample = annealing(prob, method, pdict, sim_anneal_var_dict=sim_annealing_var )
