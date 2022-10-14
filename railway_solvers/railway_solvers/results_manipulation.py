@@ -100,6 +100,7 @@ def store_result(file_name: str, sampleset: dimod.SampleSet):
     :param sampleset: samples
     :type sampleset: dimod.SampleSet
     """
+    print(file_name)
     sdf = sampleset.to_serializable()
     with open(file_name, "wb") as handle:
         pickle.dump(sdf, handle)
@@ -113,5 +114,6 @@ def load_results(file_name: str) -> dimod.SampleSet:
     :return: loaded samples
     :rtype: dimod.SampleSet
     """
+    print(file_name)
     file = pickle.load(open(file_name, "rb"))
     return dimod.SampleSet.from_serializable(file)

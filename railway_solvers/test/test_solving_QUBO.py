@@ -46,9 +46,10 @@ def compute_single_file(
     prob = create_linear_problem(train_sets, timetable, d_max, cat = "Integer")
     bqm, _, interpreter = convert_to_bqm(prob, pdict)
     sampleset = annealing(bqm, interpreter, method, pdict, real_anneal_var, sim_annealing_var)
-    dict_list = get_results(sampleset, prob=prob)
     store_result(f"test/annealing_results/{file_name}", sampleset)
-    load_results(f"test/annealing_results/{file_name}")
+    sampleset1 = load_results(f"test/annealing_results/{file_name}")
+    # TODO, store and load is not the same I do not know why
+    dict_list = get_results(sampleset, prob=prob)
     sample = get_best_feasible_sample(dict_list)
     assert sample["feasible"] == True
 

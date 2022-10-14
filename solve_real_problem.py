@@ -271,11 +271,11 @@ if __name__ == "__main__":
         print("simulated annealing")
         sampleset = annealing(bqm, interpreter, method, pdict, sim_anneal_var_dict=sim_annealing_var )
         dict_list = get_results(sampleset, prob=prob)
-        #store_result(f"test/annealing_results/{file_name}", sampleset)
-        #load_results(f"test/annealing_results/{file_name}")
         sample = get_best_feasible_sample(dict_list)
 
-        print(sample)
+        print(sample["energy"])
+        print(sample["feasible"])
+        print(sample["feas_constraints"])
 
 
     # this will be cqm
