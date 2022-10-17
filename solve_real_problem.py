@@ -34,7 +34,9 @@ from railway_solvers.railway_solvers import (
     get_best_feasible_sample,
     print_results,
     convert_to_cqm,
-    constrained_solver
+    constrained_solver,
+    count_quadratic_couplings,
+    count_linear_fields
 
 )
 
@@ -152,31 +154,11 @@ def check_count_vars(prob):
         if "z_" in str(v) or "y_" in str(v):
             assert v.varValue in [0.0, 1.0]
             order_vars += 1
-    print("n.o. integer_vars", order_vars)
-    print("n.o. order vars", len(prob.variables()) - order_vars)
+    print("....  linear problem size ....")
+    print("n.o. integer_vars = ", order_vars)
+    print("n.o. order vars = ", len(prob.variables()) - order_vars)
+    print("n.o. linear constraints = ", prob.numConstraints())
  
-
-##### QUBO provessing
-def count_quadratic_couplings(bqm):
-    """
-    returns number of copulings - Js
-    """
-    count = 0
-    for J in bqm.quadratic.values():
-        if J != 0:
-            count = count + 1
-    return count
-
-
-def count_linear_fields(bqm):
-    """
-    return number of local fields hs
-    """
-    count = 0
-    for h in bqm.linear.values():
-        if h != 0:
-            count = count + 1
-    return count
 
 
 if __name__ == "__main__":
@@ -336,6 +318,7 @@ if __name__ == "__main__":
         "objective": 1,
     }
     bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
+    print("..... QUBO size .....")
     print("QUBO variables", len(bqm.variables))
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
