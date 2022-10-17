@@ -6,7 +6,7 @@ import numpy as np
 from railway_solvers import (create_linear_problem, annealing, 
                              convert_to_bqm, count_quadratic_couplings, 
                              get_results, count_linear_fields, get_best_feasible_sample,
-                             store_result, load_results)
+                             save_results, read_process_results, print_results)
 
 
 def compute_all_files(method, pdict=None, real_anneal_var=None, sim_annealing_var=None):
@@ -45,11 +45,17 @@ def compute_single_file(
     globals().update(mdl.__dict__)
     prob = create_linear_problem(train_sets, timetable, d_max, cat = "Integer")
     bqm, _, interpreter = convert_to_bqm(prob, pdict)
-    sampleset = annealing(bqm, interpreter, method, pdict, real_anneal_var, sim_annealing_var)
+    sampleset = annealing(bqm, interpreter, method, real_anneal_var, sim_annealing_var)
+    
+    save_results(f"test/annealing_results/{file_name}", sampleset)
+    dict_list1 = read_process_results(f"test/annealing_results/{file_name}", prob)
+
     dict_list = get_results(sampleset, prob=prob)
-    store_result(f"test/annealing_results/{file_name}", sampleset)
-    load_results(f"test/annealing_results/{file_name}")
-    sample = get_best_feasible_sample(dict_list)
+    assert dict_list == dict_list1
+
+    print_results(dict_list)
+    sample = get_best_feasible_sample(dict_list1)
+
     assert sample["feasible"] == True
 
 

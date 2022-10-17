@@ -32,6 +32,8 @@ from railway_solvers.railway_solvers import (
 )
 
 
+
+
 def load_timetables(timetables_path):
     with open(timetables_path.load, "rb") as file:
         train_dict = pkl.load(file)
@@ -341,24 +343,33 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-    simulated_annealig = True
+    file = f"qubos/qubo_case{args.case}_{args.category}.pkl"
+    with open(file, "wb") as f:
+        pkl.dump(qubo[0], f)
+
+
+    simulated_annealig = False
     if simulated_annealig:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
         method = "sim"
         print("simulated annealing")
         sampleset = annealing(bqm, interpreter, method, pdict, sim_anneal_var_dict=sim_annealing_var)
         dict_list = get_results(sampleset, prob=prob)
-        #store_result(f"test/annealing_results/{file_name}", sampleset)
-        #load_results(f"test/annealing_results/{file_name}")
         sample = get_best_feasible_sample(dict_list)
 
-        print(sample)
+        print_results(dict_list)
+
+
+        print("...........")
+        print(sample["energy"])
+        print(sample["feasible"])
+        print(sample["feas_constraints"])
 
 
     # this will be cqm
     if False:
         cqm, interpreter = convert_to_cqm(prob)
-        #sampleset = constrained_solver(cqm)
+        sampleset = constrained_solver(cqm)
 
 
 
