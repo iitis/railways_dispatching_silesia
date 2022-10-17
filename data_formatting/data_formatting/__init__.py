@@ -2,7 +2,6 @@ from .make_switch_set import block_indices_to_interprete_switches, z_in, z_out
 from .time_table_check import (
     get_arrdep,
     train_time_table,
-    train_time_table,
     timetable_to_train_dict,
 )
 from .time_table_check import (
@@ -16,9 +15,9 @@ from .utils import get_common_blocks_and_direction_b2win_trains
 from .utils import get_trains_at_station, get_Paths, is_train_passing_thru_station
 from .utils import (
     subsequent_station,
-    get_trains_at_station,
     get_J,
     blocks_list_4station,
+    get_skip_stations
 )
 from .make_J_taus import get_trains_pair9, get_jround, josingle, jswitch, jtrack, jd
 from .make_J_taus import get_taus_pass, get_taus_stop, get_taus_prep, get_taus_headway
