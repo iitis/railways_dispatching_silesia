@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import neal
 import dimod
 from dwave.system import (
@@ -81,3 +83,64 @@ def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
     """
     sampler = LeapHybridSampler()
     return sampler.sample_qubo(bqm)
+
+
+
+
+def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
+    """Extracts/sets parameters for annealing experiment
+
+    :param real_anneal_var_dict: Parameters for QA experiment
+    :type real_anneal_var_dict: Dict[str, float]
+    :return: Number of reads, annealing_time and chain strength
+    :rtype: Tuple[int, int, int]
+    """
+    if real_anneal_var_dict == None:
+        num_reads = 1000
+        annealing_time = 250
+        chain_strength = 4
+    else:
+        num_reads = real_anneal_var_dict["num_reads"]
+        annealing_time = real_anneal_var_dict["annealing_time"]
+        chain_strength = real_anneal_var_dict["chain_strength"]
+
+    return num_reads, annealing_time, chain_strength
+
+
+        
+def annealing(
+    bqm, interpreter, method, real_anneal_var_dict=None, sim_anneal_var_dict=None
+):
+    """Performs the annealing experiment
+
+    :param bqm: The problem instance
+    :type prob: bqm
+    :param interpreter: ....
+    :param method: 'sim', 'real', 'hyb'
+    :type method: str
+    :param input_name: name of the input data
+    :type input_name: str
+    :param real_anneal_var_dict: Parameters for QA
+    :type real_anneal_var_dict: Dict[str, float]
+    """
+
+    assert method in ["sim", "real", "hyb"]
+
+    if method == "sim":
+         sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
+    elif method == "real":
+        num_reads, annealing_time, chain_strength = get_parameters(
+            real_anneal_var_dict
+        )
+        sampleset = real_anneal(
+            bqm,
+            num_reads=num_reads,
+            annealing_time=annealing_time,
+            chain_strength=chain_strength,
+        )
+    elif method == "hyb":
+        sampleset = hybrid_anneal(bqm)
+    return interpreter(sampleset)
+    
+
+

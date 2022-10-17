@@ -92,28 +92,107 @@ def get_results(
     return sorted(dict_list, key=lambda d: d["objective"])
 
 
-def store_result(file_name: str, sampleset: dimod.SampleSet):
-    """Save samples to the file
 
-    :param file_name: name of the file
-    :type file_name: str
-    :param sampleset: samples
+def save_results(
+    file_name: str, sampleset: dimod.SampleSet, 
+) -> List[Dict[str, Any]]:
+    """
+
+    :param sampleset: analyzed samples
     :type sampleset: dimod.SampleSet
+    :return: analyzed samples, sorted according to objective
+    :rtype: List[Dict[str,Any]]
     """
-    print(file_name)
-    sdf = sampleset.to_serializable()
+    dict_list = []
+    for data in sampleset.data():
+        rdict = {}
+        rdict["sample"] = data.sample
+        rdict["energy"] = data.energy
+        dict_list.append(rdict)
     with open(file_name, "wb") as handle:
-        pickle.dump(sdf, handle)
+        pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_results(file_name: str) -> dimod.SampleSet:
-    """Load samples from the file
-
-    :param file_name: name of the file
-    :type file_name: str
-    :return: loaded samples
-    :rtype: dimod.SampleSet
+def read_process_results(
+    file, prob: pulp.LpProblem
+) -> List[Dict[str, Any]]:
     """
-    print(file_name)
-    file = pickle.load(open(file_name, "rb"))
-    return dimod.SampleSet.from_serializable(file)
+    Read sample from file.
+    Format list of dict fileds:
+    - sample
+    - energy
+    Check samples one by one, and computes it statistics.
+
+    Statistics includes energy (as provided by D'Wave), objective function
+    value, feasibility analysis, the samples itself. Samples are sorted
+    according to value of the objetive function
+
+
+    :param prob: integer problem according to which samples are analyzed
+    :type prob: pulp.LpProblem
+    :return: analyzed samples, sorted according to objective
+    :rtype: List[Dict[str,Any]]
+    """
+    with open(file, 'rb') as handle:
+        samples = pickle.load(handle)
+
+
+    dict_list = []
+    for data in samples:
+        rdict = {}
+        sample = data["sample"]
+        #print(sample)
+        rdict["energy"] = data["energy"]
+        rdict["objective"] = round(get_objective(prob, sample), 2)
+        rdict["feasible"] = all(analyze_constraints(prob, sample)[0].values())
+        rdict["sample"] = sample
+        rdict["feas_constraints"] = analyze_constraints(prob, sample)
+        dict_list.append(rdict)
+    return sorted(dict_list, key=lambda d: d["objective"])
+
+
+
+def print_results(dict_list):
+    soln = next((l for l in dict_list if l["feasible"]), None)
+    if soln is not None:
+        print("obj:", soln["objective"], "x:", list(soln["sample"].values()))
+        print("First 10 solutions")
+        for d in dict_list[:10]:
+            print(d)
+    else:
+        print("No feasible solution")
+        for d in dict_list[:10]:
+            print(
+                "Energy:",
+                d["energy"],
+                "Objective:",
+                d["objective"],
+                "Feasible",
+                d["feasible"],
+                "Broken constraints:",
+                d["feas_constraints"][1],
+            )
+
+
+
+##### QUBO provessing
+def count_quadratic_couplings(bqm):
+    """
+    returns number of copulings - Js
+    """
+    count = 0
+    for J in bqm.quadratic.values():
+        if J != 0:
+            count = count + 1
+    return count
+
+
+def count_linear_fields(bqm):
+    """
+    return number of local fields hs
+    """ 
+    count = 0
+    for h in bqm.linear.values():
+        if h != 0:
+            count = count + 1
+    return count     

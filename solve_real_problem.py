@@ -21,7 +21,9 @@ from railway_solvers.railway_solvers import (create_linear_problem,
                                             count_linear_fields,
                                             get_results,
                                             get_best_feasible_sample,
-                                            convert_to_cqm
+                                            convert_to_cqm,
+                                            constrained_solver,
+                                            print_results
                                             )
 
 
@@ -264,7 +266,7 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-    simulated_annealig = False
+    simulated_annealig = True
     if simulated_annealig:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
         method = "sim"
@@ -273,6 +275,10 @@ if __name__ == "__main__":
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
 
+        print_results(dict_list)
+
+
+        print("...........")
         print(sample["energy"])
         print(sample["feasible"])
         print(sample["feas_constraints"])
@@ -281,7 +287,7 @@ if __name__ == "__main__":
     # this will be cqm
     if False:
         cqm, interpreter = convert_to_cqm(prob)
-        #sampleset = constrained_solver(cqm)
+        sampleset = constrained_solver(cqm)
 
 
 
