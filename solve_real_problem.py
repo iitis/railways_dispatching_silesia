@@ -29,6 +29,12 @@ from railway_solvers.railway_solvers import (
     create_linear_problem,
     delay_and_acctual_time,
     impact_to_objective,
+    get_results,
+    get_best_feasible_sample,
+    print_results,
+    convert_to_cqm,
+    constrained_solver
+
 )
 
 
@@ -343,14 +349,14 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-    generate_qubo = False
-    if generate_qubo:
+    save_qubo = False
+    if save_qubo:
         file = f"qubos/qubo_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(qubo[0], f)
 
 
-    simulated_annealig = True
+    simulated_annealig = False
     if simulated_annealig:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
         method = "sim"
