@@ -266,14 +266,16 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-    file = f"qubos/qubo_case{args.case}_{args.category}.pkl"
-    with open(file, "wb") as f:
-        pkl.dump(qubo[0], f)
+    generate_qubo = False
+    if generate_qubo:
+        file = f"qubos/qubo_case{args.case}_{args.category}.pkl"
+        with open(file, "wb") as f:
+            pkl.dump(qubo[0], f)
 
 
-    simulated_annealig = False
+    simulated_annealig = True
     if simulated_annealig:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
+        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
         method = "sim"
         print("simulated annealing")
         sampleset = annealing(bqm, interpreter, method, pdict, sim_anneal_var_dict=sim_annealing_var )
@@ -283,10 +285,10 @@ if __name__ == "__main__":
         print_results(dict_list)
 
 
-        print("...........")
-        print(sample["energy"])
-        print(sample["feasible"])
-        print(sample["feas_constraints"])
+        #print("...........")
+        #print(sample["energy"])
+        #print(sample["feasible"])
+        #print(sample["feas_constraints"])
 
 
     # this will be cqm
