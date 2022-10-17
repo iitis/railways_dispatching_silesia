@@ -266,7 +266,12 @@ if __name__ == "__main__":
     print("quadratic terms", count_quadratic_couplings(bqm))
     print("linear terms", count_linear_fields(bqm))
 
-    simulated_annealig = True
+    file = f"qubos/qubo_case{args.case}_{args.category}.pkl"
+    with open(file, "wb") as f:
+        pkl.dump(qubo[0], f)
+
+
+    simulated_annealig = False
     if simulated_annealig:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
         method = "sim"
