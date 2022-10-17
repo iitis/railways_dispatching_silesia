@@ -145,7 +145,7 @@ def check_count_vars(prob):
             order_vars += 1
     print("n.o. integer_vars", order_vars)
     print("n.o. order vars", len(prob.variables()) - order_vars)
-
+ 
 
 ##### QUBO provessing
 def count_quadratic_couplings(bqm):
@@ -343,8 +343,22 @@ if __name__ == "__main__":
 
     simulated_annealig = True
     if simulated_annealig:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
+        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
         method = "sim"
         print("simulated annealing")
-        sample = annealing(prob, method, pdict, sim_anneal_var_dict=sim_annealing_var)
+        sampleset = annealing(bqm, interpreter, method, pdict, sim_anneal_var_dict=sim_annealing_var)
+        dict_list = get_results(sampleset, prob=prob)
+        #store_result(f"test/annealing_results/{file_name}", sampleset)
+        #load_results(f"test/annealing_results/{file_name}")
+        sample = get_best_feasible_sample(dict_list)
+
         print(sample)
+
+
+    # this will be cqm
+    if False:
+        cqm, interpreter = convert_to_cqm(prob)
+        #sampleset = constrained_solver(cqm)
+
+
+

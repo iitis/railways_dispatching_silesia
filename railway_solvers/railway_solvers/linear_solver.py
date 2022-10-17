@@ -1,6 +1,5 @@
 import itertools
 import time
-#import numpy as np
 import pulp as pus
 
 

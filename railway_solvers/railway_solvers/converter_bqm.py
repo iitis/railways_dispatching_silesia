@@ -86,7 +86,6 @@ def convert_to_pyqubo(model: LpProblem) -> pyqubo.Model:
         expr = sum(val * vars_trans[var] for var, val in c.items())
         expr += c.constant
 
-        values = [val for _, val in c.items()]
         ph = _get_placeholder(cname)
         if sense == pulp.LpConstraintEQ:
             H += ph * expr ** 2

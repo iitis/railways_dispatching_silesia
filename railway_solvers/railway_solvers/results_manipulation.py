@@ -56,7 +56,11 @@ def get_best_feasible_sample(dict_list: List[Dict[str, Any]]) -> Dict[str, Any]:
     :return: first feasible sample
     :rtype: Dict[str,Any]
     """
-    return next((l for l in dict_list if l["feasible"]), None)
+    best_feasible =  next((l for l in dict_list if l["feasible"]), None)
+    if best_feasible:
+        return best_feasible
+    else:
+        return sorted(dict_list, key=lambda d: d["energy"])[0]
 
 
 def get_results(
