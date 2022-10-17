@@ -22,6 +22,7 @@ from data_formatting.data_formatting import (
     make_weights,
     timetable_to_train_dict,
     update_all_timetables,
+    get_skip_stations
 )
 from railway_solvers.railway_solvers import (
     annealing,
@@ -239,18 +240,8 @@ if __name__ == "__main__":
 
     taus = make_taus(train_dict, important_stations, r=0)  # r = 0 no rounding
 
-    skip_stations = {
-        94766: "KO(STM)",
-        421009: "KO",
-        40518: "KO(STM)",
-        34319: "KO",
-        343199: "KO(STM)",
-        40673: "GLC",
-        54101: "KO",
-        541019: "KO(IC)",
-        44862: "KO(STM)",
-        40675: "GLC",
-    }
+    skip_stations = get_skip_stations(train_dict)
+
     train_set = make_train_set(
         train_dict, important_stations, data_paths, skip_stations
     )

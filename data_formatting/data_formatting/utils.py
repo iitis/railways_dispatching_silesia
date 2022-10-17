@@ -490,7 +490,7 @@ def add_delay(initial_conditions, train, delay):
     new_conditions.update(new_value)
     return new_conditions
 
-def get_skip_stations(train_dict):
+def get_skip_stations(train_dict:dict):
     station = lambda train: train_dict[train][1].iloc[-1,-1]
     get_skip_stations = {train: station(train) for train in train_dict.keys() if type(station(train))==str}
     return get_skip_stations
