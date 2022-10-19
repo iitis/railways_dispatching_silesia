@@ -7,6 +7,7 @@
 <li><a href="#sec-1-1">1.1. <code>data</code> subdirectory</a></li>
 <li><a href="#sec-1-2">1.2. <code>data_formatting</code> subdirectory</a></li>
 <li><a href="#sec-1-3">1.3. <code>railway_solvers</code> subdirectory</a></li>
+<li><a href="#sec-1-4">1.4. <code>qubos</code> subdirectory</a></li>
 </ul>
 </li>
 </ul>
@@ -46,6 +47,11 @@ These are the actual solvers. A test can be run like that:
 
 in this directory. The `railway_solvers` subdirectory (same name as
 its parent) is the solver module.
+
+
+## `qubos` subdirectory<a id="sec-1-4" name="sec-1-4"></a>
+
+There are pickles files containing QUBOs for particuler use cases. 
 
 ## main directory ##
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
