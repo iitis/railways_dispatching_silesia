@@ -63,7 +63,10 @@ important_stations = {
 '"Mi", "ST", 2, "(1)"'],
 
 "MJ":['"MJ", "ST", 3, "(1)"',
-'"MJ", "ST", 1, "(1)"']
+'"MJ", "ST", 1, "(1)"'],
+
+"KTC":['"KTC-KO-1", "SBL+PO(Załęże)", 2, "1", "(2)"',
+'"KO-KTC-2", "SBL+POGP", 1, "2", "(2)"']
 }
 
 aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
@@ -77,15 +80,13 @@ aditional_stations = {"RCB":['"RCB", "ST", 1, "(1)"',
 '"Mc", "PODG", 2, "(N/A)"',
 '"Mc", "PODG", 3, "(N/A)"'],
 
-# KTC (for trains going KO -> CB):
-"KTC":['"KTC-KO-1", "SBL+PO(Załęże)", 2, "1", "(2)"',
-'"KO-KTC-2", "SBL+POGP", 1, "2", "(2)"'],
+
 # Bry (for trains going KL -> KO):
 "Bry":['"KL-Bry-2", "SBL+Sem(PODG)", 2, "2", "(2)"',
 '"Bry-KL-1", "SBL+POGP", 1, "1", "(2)"']
 }
-np.savez('important_stations',important_stations)
-np.savez('aditional_stations',aditional_stations)
+np.savez('important_stations_Gt',important_stations)
+np.savez('aditional_stations_Gt',aditional_stations)
 
 npzfile = np.load('./important_stations.npz')
 print(npzfile.files)

@@ -552,7 +552,7 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
                         )
 
 
-#switch occupatiion condition at stations
+#switch occupation condition at stations
 
 
 def switch_occ(
