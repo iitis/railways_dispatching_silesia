@@ -82,7 +82,7 @@ of ```--solve = sim, real, hyb, cqm``` are saved in ```solutions``` subdirectory
 Example use:
 
 ```
-python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer--solve lp --paths data/network_paths.ods build -d data/trains_schedules.csv
+python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer --solve lp --paths data/network_paths.ods build -d data/trains_schedules.csv
 
 ```
 
