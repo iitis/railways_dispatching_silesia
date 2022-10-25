@@ -10,7 +10,7 @@
 <li><a href="#sec-1-4">1.4. <code>qubos</code> subdirectory</a></li>
 <li><a href="#sec-1-4">1.5. <code>solutions</code> subdirectory</a></li>
 </ul>
-</li>
+</li><a href="#sec-2">2. Main directory</a>
 </ul>
 </div>
 </div>
@@ -59,7 +59,7 @@ There are pickles files containing results of D-Wave solutions via:
 - real annelaing,
 - hybrid solvers
 
-## main directory ##
+## main directory ##<a id="sec-2" name="sec-2"></a>
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
 Input:
 ```
