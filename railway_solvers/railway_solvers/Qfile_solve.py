@@ -82,7 +82,7 @@ def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
     :rtype: dimod.SampleSet
     """
     sampler = LeapHybridSampler()
-    return sampler.sample_qubo(bqm)
+    return sampler.sample(bqm)
 
 
 

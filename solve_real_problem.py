@@ -41,8 +41,6 @@ from railway_solvers.railway_solvers import (
 )
 
 
-
-
 def load_timetables(timetables_path):
     with open(timetables_path.load, "rb") as file:
         train_dict = pkl.load(file)
@@ -353,9 +351,8 @@ if __name__ == "__main__":
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
 
-        print_results(dict_list)
+        #print_results(dict_list)
 
-    # this will be cqm
     if args.solve == "cqm":
         cqm, interpreter = convert_to_cqm(prob)
         start_time = time.time()
@@ -364,6 +361,8 @@ if __name__ == "__main__":
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
+
+        #print_results(dict_list)
 
     if args.solve in ["sim", "real", "hyb", "cqm"]:
         file = f"solutions/{args.solve}_case{args.case}_{args.category}.pkl"
