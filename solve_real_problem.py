@@ -342,10 +342,13 @@ if __name__ == "__main__":
 
 
     if args.solve in ["sim", "real", "hyb"]:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 10}
+        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 10, "num_reads": 2}
         real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
         print(f"{args.solve} annealing")
+        start_time = time.time()
         sampleset = annealing(bqm, interpreter, args.solve, pdict, sim_anneal_var_dict=sim_annealing_var)
+        end_time = time.time()
+        print(f"{args.solve} time = ", end_time - start_time, "seconds")
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
 
