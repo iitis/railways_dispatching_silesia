@@ -82,13 +82,15 @@ of ```--solve = sim, real, hyb, cqm``` are saved in ```solutions``` subdirectory
 Example use:
 
 ```
-python solve_real_problem.py --stations data/important_stations.npz --paths data/network_paths.ods build -d data/trains_schedules.csv
+python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer
+--solve lp --paths data/network_paths.ods build -d data/trains_schedules.csv
 
 ```
 
 For rerouted via ```Gt``` i.e. case ```6``` or ```7``` please run:
 
 ```
-python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods --case 6 --category Integer  build -d data/trains_schedules_Gt.csv
+python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods 
+--case 6 --category Integer --solve lp build -d data/trains_schedules_Gt.csv
 ```
 
