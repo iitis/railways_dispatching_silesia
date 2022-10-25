@@ -67,15 +67,17 @@ Input:
     --load path to dataframe dictionary of trains timetable
     --case it is particular case of railway dispatching problems
     --category ("Integer" or "Continious") the category of time variables "Integer" yields ILP "Continious" yields MLP
-    --solve  ("lp" - linear programming, "sim" - D-Wave simulation, "real" - D-Wave, "bqm" - D-Wave hybrid bqm, 
-        "cqm" - D-Wave hybrid cqm, "save_qubo" just save qubo to ```./qubos```)
+    --solve  ("lp" - linear programming, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, 
+        "cqm" - D-Wave hybrid cqm, "save_qubo" just save qubo to ./qubos)
         build - subparser used to build the dataframes dictionary of train timetable with argument:
         -d path to '''.csv''' train dictionary if used without other arguments --load is not required
         -save - path to location where dataframe dictionary will be saved.
 ```
+Output:
 
+The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator or saves qubo file to ```qubos``` directory. Solutions
+of ```--solve = sim, real, hyb, cqm``` are saved in ```solutions``` subdirectory ad pikle files. Solutions of ```lp``` are only printed.
 
-The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator or savers the qubo
 
 Example use:
 
@@ -84,7 +86,7 @@ python solve_real_problem.py --stations data/important_stations.npz --paths data
 
 ```
 
-For rerouted ```Gt``` example please run:
+For rerouted via ```Gt``` i.e. case ```6``` or ```7``` please run:
 
 ```
 python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods --case 6 --category Integer  build -d data/trains_schedules_Gt.csv
