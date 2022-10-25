@@ -195,6 +195,13 @@ if __name__ == "__main__":
         default="Continious",
     )
 
+    parser.add_argument(
+        "--solve",
+        type=str,
+        help="possible lp, sim, real, hyb, cqm, save_qubo",
+        default="lp",
+    )
+
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_build = subparsers.add_parser("build", help="Build dataframes from files")
     parser_build.add_argument(
@@ -294,64 +301,66 @@ if __name__ == "__main__":
 
     prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 
-    start_time = time.time()
-    prob.solve()
-    end_time = time.time()
-    print_optimisation_results(prob, timetable, train_set, d_max, t_ref)
-    print("............ case", args.case, ".......")
+    assert args.solve in ["lp", "sim", "real", "hyb", "cqm", "save_qubo"]
 
-    print("optimisation, time = ", end_time - start_time, "seconds")
-    check_count_vars(prob)
-    print("objective x d_max  in [min]", prob.objective.value() * d_max)
+    if args.solve == "lp":
+        start_time = time.time()
+        prob.solve()
+        end_time = time.time()
+        print_optimisation_results(prob, timetable, train_set, d_max, t_ref)
+        print("............ case", args.case, ".......")
+
+        print("optimisation, time = ", end_time - start_time, "seconds")
+        check_count_vars(prob)
+        print("objective x d_max  in [min]", prob.objective.value() * d_max)
 
 
     # QUBO creation an solution
     
-    pdict = {
-        "minimal_span": 2.5,
-        "single_line": 2.5,
-        "minimal_stay": 2.5,
-        "track_occupation": 2.5,
-        "switch": 2.5,
-        "occupation": 2.5,
-        "circulation": 2.5,
-        "objective": 1,
-    }
-    bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
-    print("..... QUBO size .....")
-    print("QUBO variables", len(bqm.variables))
-    print("quadratic terms", count_quadratic_couplings(bqm))
-    print("linear terms", count_linear_fields(bqm))
+    if args.solve in ["sim", "real", "hyb", "cqm", "save_qubo"]:
+        pdict = {
+            "minimal_span": 2.5,
+            "single_line": 2.5,
+            "minimal_stay": 2.5,
+            "track_occupation": 2.5,
+            "switch": 2.5,
+            "occupation": 2.5,
+            "circulation": 2.5,
+            "objective": 1,
+        }
+        bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
 
-    save_qubo = False
-    if save_qubo:
+    if args.solve == "save_qubo":
+        print("..... QUBO size .....")
+        print("QUBO variables", len(bqm.variables))
+        print("quadratic terms", count_quadratic_couplings(bqm))
+        print("linear terms", count_linear_fields(bqm))
+
         file = f"qubos/qubo_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(qubo[0], f)
 
 
-    simulated_annealig = False
-    if simulated_annealig:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
-        method = "sim"
-        print("simulated annealing")
-        sampleset = annealing(bqm, interpreter, method, pdict, sim_anneal_var_dict=sim_annealing_var)
+    if args.solve in ["sim", "real", "hyb"]:
+        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 10}
+        real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
+        print(f"{args.solve} annealing")
+        sampleset = annealing(bqm, interpreter, args.solve, pdict, sim_anneal_var_dict=sim_annealing_var)
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
 
         print_results(dict_list)
 
-
-        #print("...........")
-        #print(sample["energy"])
-        #print(sample["feasible"])
-        #print(sample["feas_constraints"])
-
-
     # this will be cqm
-    if False:
+    if args.solve == "cqm":
         cqm, interpreter = convert_to_cqm(prob)
         sampleset = constrained_solver(cqm)
+        dict_list = get_results(sampleset, prob=prob)
+        sample = get_best_feasible_sample(dict_list)
 
+    if args.solve in ["sim", "real", "hyb", "cqm"]:
+        file = f"solutions/{args.solve}_{args.case}_{args.category}.pkl"
+        with open(file, "wb") as f:
+            pkl.dump(sample, f)
 
 
