@@ -74,6 +74,8 @@ Input:
 ```
 
 
+The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator or savers the qubo
+
 Example use:
 
 ```
@@ -81,12 +83,9 @@ python solve_real_problem.py --stations data/important_stations.npz --paths data
 
 ```
 
-It solves the ILP or MLP and returns also QUBP and bqm.
-
 For rerouted ```Gt``` example please run:
 
 ```
 python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods --case 6 --category Integer  build -d data/trains_schedules_Gt.csv
 ```
 
-Ongoing work.
