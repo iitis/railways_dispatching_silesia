@@ -10,13 +10,11 @@
 <li><a href="#sec-1-4">1.4. <code>qubos</code> subdirectory</a></li>
 <li><a href="#sec-1-4">1.5. <code>solutions</code> subdirectory</a></li>
 </ul>
-</li>
+</li><a href="#sec-2">2. Main directory</a>
 </ul>
 </div>
 </div>
 
-This is just a brief, incomplete README with minor notes. To be
-extended.
 
 Please edit the org which is in [Emacs org markup](https://orgmode.org/guide/Markup.html). The md5 will be
 generated from that.
@@ -56,9 +54,12 @@ There are pickles files containing QUBOs for particuler use cases.
 
 ## `solutions` subdirectory<a id="sec-1-5" name="sec-1-5"></a>
 
-Results from D-Wave simulations, real annelaing, and hybrid solvers are stored there.
+There are pickles files containing results of D-Wave solutions via:
+- simulations, 
+- real annelaing,
+- hybrid solvers
 
-## main directory ##
+## Main directory<a id="sec-2" name="sec-2"></a>
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
 Input:
 ```
