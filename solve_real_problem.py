@@ -192,7 +192,7 @@ if __name__ == "__main__":
         "--category",
         type=str,
         help="category of time variables integer in contionious",
-        default="Continious",
+        default="Integer",
     )
 
     parser.add_argument(
@@ -347,22 +347,26 @@ if __name__ == "__main__":
         print(f"{args.solve} annealing")
         start_time = time.time()
         sampleset = annealing(bqm, interpreter, args.solve, pdict, sim_anneal_var_dict=sim_annealing_var)
-        end_time = time.time()
-        print(f"{args.solve} time = ", end_time - start_time, "seconds")
+        t = time.time() - start_time
+        print(f"{args.solve} time = ", t, "seconds")
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
+        sample.update({"comp_time_seconds": t})
 
         print_results(dict_list)
 
     # this will be cqm
     if args.solve == "cqm":
         cqm, interpreter = convert_to_cqm(prob)
+        start_time = time.time()
         sampleset = constrained_solver(cqm)
+        t = time.time() - start_time
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
+        sample.update({"comp_time_seconds": t})
 
     if args.solve in ["sim", "real", "hyb", "cqm"]:
-        file = f"solutions/{args.solve}_{args.case}_{args.category}.pkl"
+        file = f"solutions/{args.solve}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
 
