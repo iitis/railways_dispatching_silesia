@@ -15,8 +15,6 @@
 </div>
 </div>
 
-This is just a brief, incomplete README with minor notes. To be
-extended.
 
 Please edit the org which is in [Emacs org markup](https://orgmode.org/guide/Markup.html). The md5 will be
 generated from that.
