@@ -272,7 +272,7 @@ if __name__ == "__main__":
             )
             i = i + 1
 
-    if args.case == 5:
+    if args.case == 5 or args.case == 7:
         delays = [30, 12, 18, 5, 30, 23, 3, 21, 35, 10, 25, 7, 5, 16]
         trains = [
             94766,
