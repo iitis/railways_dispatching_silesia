@@ -83,7 +83,6 @@ Example use:
 
 ```
 python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer --solve lp --paths data/network_paths.ods build -d data/trains_schedules.csv
-
 ```
 
 For rerouted via ```Gt``` i.e. case ```6``` or ```7``` please run:
