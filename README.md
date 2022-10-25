@@ -59,7 +59,7 @@ There are pickles files containing results of D-Wave solutions via:
 - real annelaing,
 - hybrid solvers
 
-## main directory ##<a id="sec-2" name="sec-2"></a>
+## Main directory<a id="sec-2" name="sec-2"></a>
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
 Input:
 ```
