@@ -55,9 +55,9 @@ There are pickles files containing QUBOs for particuler use cases.
 ## `solutions` subdirectory<a id="sec-1-5" name="sec-1-5"></a>
 
 There are pickles files containing results of D-Wave solutions via:
-#### simulations, 
-#### real annelaing,
-#### hybrid solvers
+- simulations, 
+- real annelaing,
+- hybrid solvers
 
 ## main directory ##
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
