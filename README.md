@@ -8,6 +8,7 @@
 <li><a href="#sec-1-2">1.2. <code>data_formatting</code> subdirectory</a></li>
 <li><a href="#sec-1-3">1.3. <code>railway_solvers</code> subdirectory</a></li>
 <li><a href="#sec-1-4">1.4. <code>qubos</code> subdirectory</a></li>
+<li><a href="#sec-1-4">1.5. <code>solutions</code> subdirectory</a></li>
 </ul>
 </li>
 </ul>
@@ -52,6 +53,10 @@ its parent) is the solver module.
 ## `qubos` subdirectory<a id="sec-1-4" name="sec-1-4"></a>
 
 There are pickles files containing QUBOs for particuler use cases. 
+
+## `solutions` subdirectory<a id="sec-1-5" name="sec-1-5"></a>
+
+Solutions of D-Wave simulations, real annelaing and hybrid are stored there.
 
 ## main directory ##
 The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
