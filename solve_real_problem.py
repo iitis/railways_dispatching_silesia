@@ -344,7 +344,7 @@ if __name__ == "__main__":
         real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
         print(f"{args.solve} annealing")
         start_time = time.time()
-        sampleset = annealing(bqm, interpreter, args.solve, pdict, sim_anneal_var_dict=sim_annealing_var)
+        sampleset = annealing(bqm, interpreter, args.solve, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
         t = time.time() - start_time
         print(f"{args.solve} time = ", t, "seconds")
         dict_list = get_results(sampleset, prob=prob)

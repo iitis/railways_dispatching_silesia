@@ -92,3 +92,18 @@ For rerouted via ```Gt``` i.e. case ```6``` or ```7``` please run:
 python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods --case 6 --category Integer --solve lp build -d data/trains_schedules_Gt.csv
 ```
 
+The module:
+```
+wisla_problems.py 
+```
+is the test module for the problem in Krzysztof Domino, Mátyás Koniorczyk, Krzysztof Krawiec, Konrad Jałowiecki, Sebastian Deffner, Bartłomiej Gardas
+``Quantum annealing in the NISQ era: railway conflict management`` arXiv preprint arXiv:2112.03674.
+Case 1 therein is used.
+
+Input:
+```
+    --solve  ("lp" - linear programming, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, 
+        "cqm" - D-Wave hybrid cqm, "save_qubo" just save qubo to ./qubos)
+```
+
+Output, as before.
