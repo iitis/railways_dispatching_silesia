@@ -181,13 +181,13 @@ if __name__ == "__main__":
     
     if args.solve in ["sim", "real", "hyb", "cqm", "save_qubo"]:
         pdict = {
-            "minimal_span": 2.5,
-            "single_line": 2.5,
-            "minimal_stay": 2.5,
-            "track_occupation": 2.5,
-            "switch": 2.5,
-            "occupation": 2.5,
-            "circulation": 2.5,
+            "minimal_span": 10,
+            "single_line": 10,
+            "minimal_stay": 10,
+            "track_occupation": 10,
+            "switch": 10,
+            "occupation": 10,
+            "circulation": 4,
             "objective": 1,
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
@@ -205,7 +205,7 @@ if __name__ == "__main__":
 
     if args.solve in ["sim", "real", "hyb"]:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
-        real_anneal_var_dict = {"num_reads": 2000, "annealing_time": 200, "chain_strength": 4}
+        real_anneal_var_dict = {"num_reads": 260, "annealing_time": 1300, "chain_strength": 4}
         print(f"{args.solve} annealing")
         start_time = time.time()
         sampleset = annealing(bqm, interpreter, args.solve, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
