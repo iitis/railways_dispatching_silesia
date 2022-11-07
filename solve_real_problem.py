@@ -1,9 +1,9 @@
 import pickle as pkl
 import time
-
 import numpy as np
-
 import pandas as pd
+import pulp as pl
+
 from data_formatting.data_formatting import (
     add_delay,
     get_initial_conditions,
@@ -302,8 +302,10 @@ if __name__ == "__main__":
     assert args.solve in ["lp", "sim", "real", "hyb", "cqm", "save_qubo"]
 
     if args.solve == "lp":
+        solver = pl.getSolver('PULP_CBC_CMD')
+
         start_time = time.time()
-        prob.solve()
+        prob.solve(solver = solver)
         end_time = time.time()
         print_optimisation_results(prob, timetable, train_set, d_max, t_ref)
         print("............ case", args.case, ".......")
