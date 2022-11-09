@@ -302,9 +302,10 @@ if __name__ == "__main__":
     assert args.solve in ["lp", "sim", "real", "hyb", "cqm", "save_qubo"]
 
     if args.solve == "lp":
-        solver = pl.PULP_CBC_CMD()
+        #solver = pl.PULP_CBC_CMD()
         #path_to_cplex = r'/opt/ibm/ILOG/CPLEX_Studio_Community221/cplex/bin/x86-64_linux/cplex'
         #solver =  pl.CPLEX_CMD(path=path_to_cplex)
+        solver = pl.GUROBI_CMD()
         start_time = time.time()
         prob.solve(solver = solver)
         end_time = time.time()

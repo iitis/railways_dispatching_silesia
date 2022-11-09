@@ -1,6 +1,7 @@
 import pickle as pkl
 import time
 import pulp as pl
+PATH="${PATH}:/opt/gurobi_server952/linux64/bin"
 
 
 from railway_solvers.railway_solvers import (
@@ -19,8 +20,6 @@ from railway_solvers.railway_solvers import (
 )
 
 
-solver_list = pl.listSolvers(onlyAvailable=True)
-print(solver_list)
 
 def print_optimisation_results(prob, timetable, train_set, d_max, t_ref):
     print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
@@ -146,10 +145,12 @@ if __name__ == "__main__":
 
     assert args.solve in ["lp", "sim", "real", "hyb", "cqm", "save_qubo"]
 
+    print(pl.listSolvers(onlyAvailable=True))
     if args.solve == "lp":
         solver = pl.getSolver('PULP_CBC_CMD')
         #path_to_cplex = r'/opt/ibm/ILOG/CPLEX_Studio_Community221/cplex/bin/x86-64_linux/cplex'
         #solver =  pl.CPLEX_CMD(path=path_to_cplex)
+        solver = pl.GUROBI_CMD()
         start_time = time.time()
         prob.solve(solver = solver)
         end_time = time.time()
