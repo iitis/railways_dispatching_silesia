@@ -77,16 +77,16 @@ Input:
 Output:
 
 The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator or saves qubo file to ```qubos``` directory. Solutions
-of ```--solve = sim, real, hyb, cqm``` are saved in ```solutions``` subdirectory ad pikle files. Solutions of ```lp``` are only printed.
+of quantum approach (i.e. by -solve_quantum) are saved in ```solutions``` subdirectory as pikle files. Solutions of linear programming apprach are only printed.
 
 
 Example use:
 
-- lieanr programming
+- linear programming
 ```
 python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer --solve_lp PULP_CBC_CMD --paths data/network_paths.ods build -d data/trains_schedules.csv
 ```
-- quantum
+- quantum approach
 ```
 python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer --solve_quantum cqm --paths data/network_paths.ods build -d data/trains_schedules.csv
 ```
@@ -115,11 +115,11 @@ Output, as before.
 
 Example use:
 
-- lieanr programming
+- linear programming
 ```
 python wisla_problems.py --solve_lp PULP_CBC_CMD
 ```
-- quantum
+- quantum approach
 ```
 python wisla_problems.py --solve_quantum real
 ```
