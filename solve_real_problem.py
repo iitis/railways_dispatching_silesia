@@ -379,7 +379,7 @@ if __name__ == "__main__":
         #print_results(dict_list)
 
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
-        file = f"solutions/{args.solve_quantum}_case{args.case}_{args.category}.pkl"
+        file = f"solutions_quantum/{args.solve_quantum}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
 

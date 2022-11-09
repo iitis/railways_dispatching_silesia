@@ -77,7 +77,7 @@ Input:
 Output:
 
 The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator or saves qubo file to ```qubos``` directory. Solutions
-of quantum approach (i.e. by -solve_quantum) are saved in ```solutions``` subdirectory as pikle files. Solutions of linear programming apprach are only printed.
+of quantum approach (i.e. by -solve_quantum) are saved in ```solutions_quantum``` subdirectory as pikle files. Solutions of linear programming apprach are only printed.
 
 
 Example use:
