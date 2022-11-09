@@ -1,29 +1,8 @@
 import pickle as pkl
 import time
+import pulp as pl
 
-import numpy as np
 
-import pandas as pd
-from data_formatting.data_formatting import (
-    add_delay,
-    get_initial_conditions,
-    get_J,
-    get_jround,
-    get_Paths,
-    get_schedule,
-    get_taus_headway,
-    get_taus_pass,
-    get_taus_prep,
-    get_taus_stop,
-    jd,
-    josingle,
-    jswitch,
-    jtrack,
-    make_weights,
-    timetable_to_train_dict,
-    update_all_timetables,
-    get_skip_stations
-)
 from railway_solvers.railway_solvers import (
     annealing,
     convert_to_bqm,
@@ -32,7 +11,6 @@ from railway_solvers.railway_solvers import (
     impact_to_objective,
     get_results,
     get_best_feasible_sample,
-    print_results,
     convert_to_cqm,
     constrained_solver,
     count_quadratic_couplings,
@@ -41,6 +19,8 @@ from railway_solvers.railway_solvers import (
 )
 
 
+solver_list = pl.listSolvers(onlyAvailable=True)
+print(solver_list)
 
 def print_optimisation_results(prob, timetable, train_set, d_max, t_ref):
     print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
@@ -167,8 +147,11 @@ if __name__ == "__main__":
     assert args.solve in ["lp", "sim", "real", "hyb", "cqm", "save_qubo"]
 
     if args.solve == "lp":
+        solver = pl.getSolver('PULP_CBC_CMD')
+        #path_to_cplex = r'/opt/ibm/ILOG/CPLEX_Studio_Community221/cplex/bin/x86-64_linux/cplex'
+        #solver =  pl.CPLEX_CMD(path=path_to_cplex)
         start_time = time.time()
-        prob.solve()
+        prob.solve(solver = solver)
         end_time = time.time()
         print_optimisation_results(prob, timetable, train_set, d_max, t_ref)
 
