@@ -162,7 +162,7 @@ def check_count_vars(prob):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser("Make variables to problem from dataframes")
+    parser = argparse.ArgumentParser("Make variables to problem from dataframes, parameters of problem and solutions")
     parser.add_argument(
         "--stations",
         required=True,
@@ -194,10 +194,17 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--solve",
+        "--solve_lp",
         type=str,
-        help="possible lp, sim, real, hyb, cqm, save_qubo",
-        default="lp",
+        help="LP solver of PuLp librery e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'",
+        default="",
+    )
+
+    parser.add_argument(
+        "--solve_quantum",
+        type=str,
+        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm, 'save_qubo' just save qubo to ./qubos",
+        default="",
     )
 
     subparsers = parser.add_subparsers(help="sub-command help")
@@ -299,13 +306,16 @@ if __name__ == "__main__":
 
     prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 
-    assert args.solve in ["lp", "sim", "real", "hyb", "cqm", "save_qubo"]
+    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm", "save_qubo"]
 
-    if args.solve == "lp":
-        #solver = pl.PULP_CBC_CMD()
-        #path_to_cplex = r'/opt/ibm/ILOG/CPLEX_Studio_Community221/cplex/bin/x86-64_linux/cplex'
-        #solver =  pl.CPLEX_CMD(path=path_to_cplex)
-        solver = pl.GUROBI_CMD()
+    if args.solve_lp != "":
+        if "CPLEX_CMD" == args.solve_lp:
+            print("cplex")
+            path_to_cplex = r'/opt/ibm/ILOG/CPLEX_Studio_Community221/cplex/bin/x86-64_linux/cplex'
+            solver =  pl.CPLEX_CMD(path=path_to_cplex)
+        else:    
+            solver = pl.getSolver(args.solve_lp)
+
         start_time = time.time()
         prob.solve(solver = solver)
         end_time = time.time()
@@ -319,7 +329,7 @@ if __name__ == "__main__":
 
     # QUBO creation an solution
     
-    if args.solve in ["sim", "real", "hyb", "cqm", "save_qubo"]:
+    if args.solve_quantum in ["sim", "real", "hyb", "save_qubo"]:
         pdict = {
             "minimal_span": 2.5,
             "single_line": 2.5,
@@ -332,7 +342,7 @@ if __name__ == "__main__":
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
 
-    if args.solve == "save_qubo":
+    if args.solve_quantum == "save_qubo":
         print("..... QUBO size .....")
         print("QUBO variables", len(bqm.variables))
         print("quadratic terms", count_quadratic_couplings(bqm))
@@ -343,21 +353,21 @@ if __name__ == "__main__":
             pkl.dump(qubo[0], f)
 
 
-    if args.solve in ["sim", "real", "hyb"]:
+    if args.solve_quantum in ["sim", "real", "hyb"]:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 10, "num_reads": 2}
         real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
-        print(f"{args.solve} annealing")
+        print(f"{args.solve_quantum} annealing")
         start_time = time.time()
-        sampleset = annealing(bqm, interpreter, args.solve, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
+        sampleset = annealing(bqm, interpreter, args.solve_quantum, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
         t = time.time() - start_time
-        print(f"{args.solve} time = ", t, "seconds")
+        print(f"{args.solve_quantum} time = ", t, "seconds")
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
 
         #print_results(dict_list)
 
-    if args.solve == "cqm":
+    if args.solve_quantum == "cqm":
         cqm, interpreter = convert_to_cqm(prob)
         start_time = time.time()
         sampleset = constrained_solver(cqm)
@@ -368,8 +378,8 @@ if __name__ == "__main__":
 
         #print_results(dict_list)
 
-    if args.solve in ["sim", "real", "hyb", "cqm"]:
-        file = f"solutions/{args.solve}_case{args.case}_{args.category}.pkl"
+    if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
+        file = f"solutions/{args.solve_quantum}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
 
