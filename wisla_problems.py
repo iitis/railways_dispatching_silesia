@@ -71,8 +71,8 @@ def check_count_vars(prob):
             assert v.varValue in [0.0, 1.0]
             order_vars += 1
     print("....  linear problem size ....")
-    print("n.o. integer_vars = ", order_vars)
-    print("n.o. order vars = ", len(prob.variables()) - order_vars)
+    print("n.o. order vars = ", order_vars)
+    print("n.o. integer vars = ", len(prob.variables()) - order_vars)
     print("n.o. linear constraints = ", prob.numConstraints())
  
 
