@@ -60,7 +60,7 @@ There are pickles files containing results of D-Wave solutions via:
 - hybrid solvers
 
 ## Main directory<a id="sec-2" name="sec-2"></a>
-The module '''solve_real_problem.py''' is used to solve real problem of railway dispatching.
+The module ```solve_real_problem.py``` is used to solve real problem of railway dispatching.
 Input:
 ```
 --stations path to '''npz''' file of important stations (dict Important_station: list of blocks),
