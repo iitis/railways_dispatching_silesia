@@ -102,9 +102,8 @@ Please run:
 python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods --case 7 --category Integer --solve_lp PULP_CBC_CMD  build -d data/trains_schedules_Gt.csv
 ```
 
-```
 
-For cases with single track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty``` use following (conflicted) schedule in ```data/trains_schedules_1track.csv``` and original important station path `````` data/important_stations.npz```
+For cases with single track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty``` use following (conflicted) schedule in ```data/trains_schedules_1track.csv``` and original important station path ```data/important_stations.npz```
 
 
 ```python solve_real_problem.py --stations data/important_stations.npz --case 8 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track.csv
