@@ -106,10 +106,9 @@ python solve_real_problem.py --stations data/important_stations_Gt.npz --paths d
 For cases with single track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty``` use following (conflicted) schedule in ```data/trains_schedules_1track.csv``` and original important station path ```data/important_stations.npz```
 
 
-```python solve_real_problem.py --stations data/important_stations.npz --case 8 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track.csv
 ```
-
-Here cases ```6``` and ```8``` are with no itinatial disturbtions, but cases ```7``` and ```9``` are with heavy disturptions as in case ```5```. 
+python solve_real_problem.py --stations data/important_stations.npz --case 8 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track.csv
+```
 
 The most dificult case is the merge of single track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty``` the single track line ```KTC``` -  ```Gt``` - ```CB```. Then the initial (conflicted) schedule is in ```data/trains_schedules_1track_Gt.csv``` and the important station path is in ``` data/important_stations_Gt.npz```. Please run:
 
