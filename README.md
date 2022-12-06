@@ -91,11 +91,30 @@ python solve_real_problem.py --stations data/important_stations.npz --case 0 --c
 python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer --solve_quantum cqm --paths data/network_paths.ods build -d data/trains_schedules.csv
 ```
 
-For rerouted via ```Gt``` i.e. case ```6``` or ```7``` please run:
+For rerouted via ```Gt``` i.e. case ```6``` or ```7``` the conflicted schedule is in input file  ```data/trains_schedules_Gt.csv``` and the important station path is in ``` data/important_stations_Gt.npz```. 
+Please run:
 
 ```
 python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods --case 6 --category Integer --solve_lp PULP_CBC_CMD  build -d data/trains_schedules_Gt.csv
 ```
+
+For single track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty``` the conflicted schedule is in ```data/trains_schedules_1track.csv``` and one ca use original station path `````` data/important_stations.npz```
+
+
+```python solve_real_problem.py --stations data/important_stations.npz --case 8 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track.csv
+```
+
+Here cases ```6``` and ```8``` are with no itinatial disturbtions, but cases ```7``` and ```9``` are with heavy disturptions as in case ```5```. 
+
+The most dificult case is the merge of track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty```, rerouted via ```Gt``` and heavy disturptions as in case ```5```. Then the conflicted schedule is in ```data/trains_schedules_1track_Gt.csv``` and the important station path is in ``` data/important_stations_Gt.npz```. Please run:
+
+```
+python solve_real_problem.py --stations data/important_stations_Gt.npz --case 10 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track_Gt.csv
+
+```
+
+
+#### Simple comparison example.
 
 The module:
 ```
