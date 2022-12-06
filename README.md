@@ -125,9 +125,9 @@ The module:
 ```
 wisla_problems.py 
 ```
-is the test module for the problem in Krzysztof Domino, Mátyás Koniorczyk, Krzysztof Krawiec, Konrad Jałowiecki, Sebastian Deffner, Bartłomiej Gardas
-Quantum annealing in the NISQ era: railway conflict management [arXiv preprint arXiv:2112.03674](https://arxiv.org/abs/2112.03674).
-Case 1 therein is used.
+is the test module for the problem in K. Domino, M. Koniorczyk,K. Krawiec, K. Jałowiecki, S. Deffner, B. Gardas
+"Quantum annealing in the NISQ era: railway conflict management" [arXiv preprint arXiv:2112.03674](https://arxiv.org/abs/2112.03674).
+We demonstrate implementationf for case ```1``` from this work.
 
 Input:
 ```
