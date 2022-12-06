@@ -3,6 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 import pulp as pl
+import pytest
 
 from data_formatting.data_formatting import (
     add_delay,
@@ -150,7 +151,7 @@ def check_count_vars(prob):
     order_vars = 0
     for v in prob.variables():
         if "z_" in str(v) or "y_" in str(v):
-            assert v.varValue in [0.0, 1.0]
+            assert v.varValue in [pytest.approx(0), pytest.approx(1)]
             order_vars += 1
     print("....  linear problem size ....")
     print("n.o. order vars = ", order_vars)
@@ -311,7 +312,7 @@ if __name__ == "__main__":
     if args.solve_lp != "":
         if "CPLEX_CMD" == args.solve_lp:
             print("cplex")
-            path_to_cplex = r'/opt/ibm/ILOG/CPLEX_Studio_Community221/cplex/bin/x86-64_linux/cplex'
+            path_to_cplex = r'/home/ludmila/CPLEX_Studio221/cplex/bin/x86-64_linux/cplex'
             solver =  pl.CPLEX_CMD(path=path_to_cplex)
         else:    
             solver = pl.getSolver(args.solve_lp)
