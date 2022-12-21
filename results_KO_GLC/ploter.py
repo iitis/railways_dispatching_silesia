@@ -6,8 +6,8 @@ k = 1
 file = f"results_PULP_CBC_CMD__{k}_Integer.pkl"
 results = pd.read_pickle(rf'{file}')
 
-file1 = f"results_PULP_CBC_CMD__{k}_Integer.pkl"
-results1 = pd.read_pickle(rf'{file}')
+file1 = f"results__cqm_{k}_Integer.pkl"
+results1 = pd.read_pickle(rf'{file1}')
 N = results1["samples"]
 
 
@@ -32,7 +32,7 @@ for i in range(N):
         colors1.append("black")
 
 plt.scatter(x, y, s=100, c=colors, alpha=0.5, label = "PULP_CBC_CMD")
-plt.scatter(x1, y1, s=100, c=colors, alpha=0.5, label = "quantum sim")
+plt.scatter(x1, y1, s=100, c=colors1, alpha=0.5, label = "hybrid cqm")
 plt.xlabel("computational time [s]")
 plt.ylabel("objective times dmax [min]")
 plt.legend()
