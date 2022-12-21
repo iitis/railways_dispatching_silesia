@@ -95,8 +95,8 @@ if __name__ == "__main__":
 
     disturbances = {}
     disturbances[0] = dict()
-    disturbances[1] = dict({4601:3})
-    disturbances[2] = dict({4601:3, 4603:5})
+    disturbances[1] = dict({4601:7})
+    disturbances[2] = dict({4601:7, 4603:13})
     disturbances[3] = dict({1:2, 3:2, 5:7})
     disturbances[4] = dict({2:2, 4:2, 4605:3, 4607:3})
     disturbances[5] = dict({1:5, 2:3, 3:7, 4:2, 5:1, 4601:2})
