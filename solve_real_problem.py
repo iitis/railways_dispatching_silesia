@@ -78,7 +78,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--solve_quantum",
         type=str,
-        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm, 'save_qubo' just save qubo to ./qubos",
+        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
         default="",
     )
 
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
     prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 
-    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm", "save_qubo"]
+    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
 
     if args.solve_lp != "":
         if "CPLEX_CMD" == args.solve_lp:
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
     # QUBO creation an solution
     
-    if args.solve_quantum in ["sim", "real", "hyb", "save_qubo"]:
+    if args.solve_quantum in ["sim", "real", "hyb"]:
         pdict = {
             "minimal_span": 2.5,
             "single_line": 2.5,
@@ -217,15 +217,6 @@ if __name__ == "__main__":
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
 
-    if args.solve_quantum == "save_qubo":
-        print("..... QUBO size .....")
-        print("QUBO variables", len(bqm.variables))
-        print("quadratic terms", count_quadratic_couplings(bqm))
-        print("linear terms", count_linear_fields(bqm))
-
-        file = f"qubos/qubo_case{args.case}_{args.category}.pkl"
-        with open(file, "wb") as f:
-            pkl.dump(qubo[0], f)
 
 
     if args.solve_quantum in ["sim", "real", "hyb"]:

@@ -140,8 +140,23 @@ def check_count_vars(prob):
         if "z_" in str(v) or "y_" in str(v):
             assert v.varValue in [pytest.approx(0), pytest.approx(1)]
             order_vars += 1
+    int_vars = len(prob.variables()) - order_vars
+    constraints = prob.numConstraints()
     print("....  linear problem size ....")
     print("n.o. order vars = ", order_vars)
-    print("n.o. integer vars = ", len(prob.variables()) - order_vars)
-    print("n.o. linear constraints = ", prob.numConstraints())
- 
+    print("n.o. integer vars = ", int_vars)
+    print("n.o. linear constraints = ", constraints)
+
+
+
+def count_vars(prob):
+    """
+    counts n.o. vars and checks  
+    """
+    order_vars = 0
+    for v in prob.variables():
+        if "z_" in str(v) or "y_" in str(v):
+            order_vars += 1
+    int_vars = len(prob.variables()) - order_vars
+    constraints = prob.numConstraints()
+    return order_vars, int_vars, constraints
