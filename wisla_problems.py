@@ -7,8 +7,6 @@ from railway_solvers.railway_solvers import (
     annealing,
     convert_to_bqm,
     create_linear_problem,
-    delay_and_acctual_time,
-    impact_to_objective,
     get_results,
     get_best_feasible_sample,
     convert_to_cqm,
@@ -19,62 +17,11 @@ from railway_solvers.railway_solvers import (
 )
 
 
+from helpers import(
+    print_optimisation_results,
+    check_count_vars
+    )
 
-def print_optimisation_results(prob, timetable, train_set, d_max, t_ref):
-    print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
-    print("reference_time", t_ref)
-    for j in train_set["J"]:
-        print("..............")
-        print("train", j)
-        for s in train_set["Paths"][j]:
-            skip_stations = train_set["skip_station"]
-            if j in skip_stations and s == skip_stations[j]:  # TODO improve if
-                0
-            else:
-                delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
-                delay, conflict_free = delay_and_acctual_time(
-                    train_set, timetable, prob, j, s
-                )
-                try:
-                    sched = timetable["schedule"][f"{j}_{s}"]
-                    print(
-                        s,
-                        "secondary delay",
-                        delay,
-                        "conflict free time",
-                        conflict_free,
-                        "impact to obj.",
-                        delta_obj,
-                        "schedule",
-                        sched,
-                    )
-                except:
-                    print(
-                        s,
-                        "secondary delay",
-                        delay,
-                        "conflict free time",
-                        conflict_free,
-                        "impact to obj.",
-                        delta_obj,
-                    )
-
-
-def check_count_vars(prob):
-    """
-    counts n.o. vars and checks if bool vars are 0 or 1
-    TODO it can be done better, 
-    """
-    order_vars = 0
-    for v in prob.variables():
-        if "z_" in str(v) or "y_" in str(v):
-            assert v.varValue in [0.0, 1.0]
-            order_vars += 1
-    print("....  linear problem size ....")
-    print("n.o. order vars = ", order_vars)
-    print("n.o. integer vars = ", len(prob.variables()) - order_vars)
-    print("n.o. linear constraints = ", prob.numConstraints())
- 
 
 
 if __name__ == "__main__":
@@ -160,7 +107,7 @@ if __name__ == "__main__":
         start_time = time.time()
         prob.solve(solver = solver)
         end_time = time.time()
-        print_optimisation_results(prob, timetable, train_set, d_max, t_ref)
+        print_optimisation_results(prob, timetable, train_set, train_set["skip_station"], d_max, t_ref)
 
         print("optimisation, time = ", end_time - start_time, "seconds")
         check_count_vars(prob)

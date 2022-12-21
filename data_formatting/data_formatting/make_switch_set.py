@@ -4,7 +4,6 @@ from .utils import common_elements
 
 
 def block_indices_to_interprete_switches(data_path_check, previous_block, next_block):
-
     i = 0
     j = 0
     list_pos_previous_block = []

@@ -21,10 +21,9 @@ from railway_solvers.railway_solvers import (
 )
 
 from helpers import (
-    load_timetables,
     load_important_stations,
-    load_data_paths,
     build_timetables,
+    load_data_paths,
     make_taus,
     make_timetable,
     make_train_set,
@@ -34,30 +33,17 @@ from helpers import (
 
 
 
+
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser("Make variables to problem from dataframes, parameters of problem and solutions")
-    parser.add_argument(
-        "--stations",
-        required=True,
-        type=str,
-        help="Path to important_station dictionary",
-    )
-    parser.add_argument(
-        "--load", type=str, required=False, help="Path to trains dataframes dictionary"
-    )
-    parser.add_argument(
-        "--paths",
-        type=str,
-        required=True,
-        help="Path for data containing blocks passing times",
-    )
+    
 
     parser.add_argument(
         "--case",
         type=int,
-        help="Case of railway problem choose: 0 (no distur.), 1: (one IC late), 2 (one IC late), 3 (all from Ty late), 4 (all laving KO late), 5 (14 trains late) 6 (as case 0) 7 (as case 5)",
+        help="Case of railway problem choose: 0 (no distur.), 1: ...",
         default=0,
     )
 
@@ -82,30 +68,19 @@ if __name__ == "__main__":
         default="",
     )
 
-    subparsers = parser.add_subparsers(help="sub-command help")
-    parser_build = subparsers.add_parser("build", help="Build dataframes from files")
-    parser_build.add_argument(
-        "-d", type=str, default=None, help="path for data containing timetables"
-    )
-    parser_build.add_argument(
-        "-save", required=False, action="store_true", help="save built train dictionary"
-    )
     args = parser.parse_args()
-    if (args.load == None) and ("d" not in args):
-        print(
-            "Please provide data.\
-            \n --load the trains dictonary with dataframe or \
-            \n build a new one with the paths to -d timetable data."
-        )
-        exit(1)
 
-    important_stations = load_important_stations(args.stations)
-    data_paths = load_data_paths(args.paths)
 
-    if args.load:
-        train_dict = load_timetables(args.load)
-    else:
-        train_dict = build_timetables(args.d, args.save, important_stations, data_paths)
+    important_stations_path = "./data/KO_GLC/important_stations_KO_GLC.npz"
+    data_paths = load_data_paths("./data/network_paths.ods")
+
+    important_stations = load_important_stations(important_stations_path)
+
+    d = "./data/KO_GLC/trains_schedules_KO_GLC.csv"
+
+
+
+    train_dict = build_timetables(d, False, important_stations, data_paths)
 
     taus = make_taus(train_dict, important_stations, r=0)  # r = 0 no rounding
 
@@ -114,39 +89,25 @@ if __name__ == "__main__":
     train_set = make_train_set(
         train_dict, important_stations, data_paths, skip_stations
     )
-    t_ref = "16:00"
+    print("start creating timetable")
+    t_ref = "14:00"
     timetable = make_timetable(train_dict, important_stations, skip_stations, t_ref)
+
 
     # args.case == 0 no distrubrance
 
     d_max = 40
     if args.case == 1:
-        delay = 12
-        train = 14006
+        delay = 5
+        train = 1
         timetable["initial_conditions"] = add_delay(
             timetable["initial_conditions"], train, delay
         )
+
 
     if args.case == 2:
-        delay = 15
-        train = 5312
-        timetable["initial_conditions"] = add_delay(
-            timetable["initial_conditions"], train, delay
-        )
-
-    if args.case == 3:
-        delays = [15, 12, 13, 6, 21]
-        trains = [94766, 40518, 41004, 44862, 4120]
-        i = 0
-        for train in trains:
-            timetable["initial_conditions"] = add_delay(
-                timetable["initial_conditions"], train, delays[i]
-            )
-            i = i + 1
-
-    if args.case == 4:
         delays = [30, 12, 25, 5, 30]
-        trains = [421009, 94611, 94113, 44717, 94717]
+        trains = [1,3,5,7,9]
         i = 0
         for train in trains:
             timetable["initial_conditions"] = add_delay(
@@ -154,30 +115,6 @@ if __name__ == "__main__":
             )
             i = i + 1
 
-    if args.case == 5 or args.case == 7 or args.case == 8 or args.case == 9:
-        delays = [30, 12, 18, 5, 30, 23, 3, 21, 35, 10, 25, 7, 5, 16]
-        trains = [
-            94766,
-            26013,
-            5312,
-            40518,
-            34319,
-            14006,
-            40150,
-            41004,
-            45101,
-            4500,
-            49317,
-            64359,
-            44862,
-            73000,
-        ]
-        i = 0
-        for train in trains:
-            timetable["initial_conditions"] = add_delay(
-                timetable["initial_conditions"], train, delays[i]
-            )
-            i = i + 1
 
     prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 

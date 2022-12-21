@@ -71,7 +71,7 @@ def get_jround(train_dict, important_stations):
         elif b:
             block = train_time_table(train_dict, pair[1])["path"].tolist()[0]
         else:
-            print("Something is wrong")
+            print("Something is wrong in get_jround")
             exit(1)
         station = [key for key, value in important_stations.items() if block in value][
             0
