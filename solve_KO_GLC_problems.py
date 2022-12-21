@@ -97,15 +97,15 @@ if __name__ == "__main__":
     disturbances[0] = dict()
     disturbances[1] = dict({4601:3})
     disturbances[2] = dict({4601:3, 4603:5})
-    disturbances[3] = dict({1:2, 3:2, 5:7})
-    disturbances[4] = dict({2:2, 4:2, 4605:3, 4607:3})
-    disturbances[5] = dict({1:5, 2:3, 3:7, 4:2, 5:1, 4601:2})
-    disturbances[6] = dict({3:7, 4:2, 5:1, 23: 6, 31:6, 4611:2, 101: 4, 6402: 7})
-    disturbances[7] = dict({1: 5, 11: 3, 21:3, 31:2, 2:4, 4:2, 6:6, 8:3, 10:3, 22: 6, 24:7, 40: 6, 36: 1})
-    disturbances[8] = dict({1:3, 2:5, 3:7, 4:27, 5:8, 6:12, 7:17, 23: 4, 25: 6, 25: 8, 27: 11, 31:3, 32: 8, 10:4, 6401:3, 6403: 7, 101:8})
-    disturbances[9] = dict({2: 3, 4602:1, 4: 10, 102: 2, 6: 15, 8: 7, 4604: 4, 10: 1, 12: 7, 1: 10, 101: 8, 3: 2, 6401: 6, 5: 15, 7: 1, 103: 30, 9: 7, 6403: 8})
-    disturbances[10] = dict({i: i%3 for i in train_set["J"]})
-    disturbances[11] = dict({i: i%10 for i in train_set["J"]})
+    #disturbances[3] = dict({1:2, 3:2, 5:7})
+    #disturbances[4] = dict({2:2, 4:2, 4605:3, 4607:3})
+    #disturbances[5] = dict({1:5, 2:3, 3:7, 4:2, 5:1, 4601:2})
+    #disturbances[6] = dict({3:7, 4:2, 5:1, 23: 6, 31:6, 4611:2, 101: 4, 6402: 7})
+    #disturbances[7] = dict({1: 5, 11: 3, 21:3, 31:2, 2:4, 4:2, 6:6, 8:3, 10:3, 22: 6, 24:7, 40: 6, 36: 1})
+    #disturbances[8] = dict({1:3, 2:5, 3:7, 4:27, 5:8, 6:12, 7:17, 23: 4, 25: 6, 25: 8, 27: 11, 31:3, 32: 8, 10:4, 6401:3, 6403: 7, 101:8})
+    #disturbances[9] = dict({2: 3, 4602:1, 4: 10, 102: 2, 6: 15, 8: 7, 4604: 4, 10: 1, 12: 7, 1: 10, 101: 8, 3: 2, 6401: 6, 5: 15, 7: 1, 103: 30, 9: 7, 6403: 8})
+    #disturbances[10] = dict({i: i%3 for i in train_set["J"]})
+    #disturbances[11] = dict({i: i%10 for i in train_set["J"]})
 
 
     pdict = {
@@ -181,7 +181,7 @@ if __name__ == "__main__":
             dict_list = get_results(sampleset, prob=prob)
             sample = get_best_feasible_sample(dict_list)
             result.update(sample)
-            results["broken_constraints"] = constraints - sample["feas_constraints"]
+            results["broken_constraints"] = constraints - len(sample["feas_constraints"])
 
         elif args.solve_quantum == "cqm":
             cqm, interpreter = convert_to_cqm(prob)
@@ -198,7 +198,6 @@ if __name__ == "__main__":
     
     results["samples"] = k+1
 
-    print(results)
     file = f"results_KO_GLC/results_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
     with open(file, "wb") as f:
         pkl.dump(results, f)
