@@ -69,14 +69,14 @@ Input:
 --case it is particular case of railway dispatching problems
 --category ("Integer" or "Continious") the category of time variables "Integer" yields ILP "Continious" yields MLP
 --solve_lp   chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
---solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm, "save_qubo" just save qubo to ./qubos
+--solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
     build - subparser used to build the dataframes dictionary of train timetable with argument:
     -d path to '''.csv''' train dictionary if used without other arguments --load is not required
     -save - path to location where dataframe dictionary will be saved.
 ```
 Output:
 
-The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator or saves qubo file to ```qubos``` directory. Solutions
+The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator. Solutions
 of quantum approach (i.e. by -solve_quantum) are saved in ```solutions_quantum``` subdirectory as pikle files. Solutions of linear programming apprach are only printed.
 
 
@@ -116,7 +116,16 @@ The most dificult case is the merge of single track line between ```KZ``` - ```K
 python solve_real_problem.py --stations data/important_stations_Gt.npz --case 9 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track_Gt.csv
 
 ```
+#### Generic provblem
 
+Clasiccal
+
+```python3 solve_KO_GLC_problems.py --solve_lp PULP_CBC_CMD   --case 1```
+
+
+Quantum (hybrid)
+
+```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1```
 
 #### Simple comparison example.
 
@@ -131,7 +140,7 @@ We demonstrate implementationf for case ```1``` from this work.
 Input:
 ```
 --solve_lp   chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
---solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm, "save_qubo" just save qubo to ./
+--solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
 ```
 
 Output, as before.

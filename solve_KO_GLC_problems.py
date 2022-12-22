@@ -14,10 +14,7 @@ from railway_solvers.railway_solvers import (
     get_results,
     get_best_feasible_sample,
     convert_to_cqm,
-    constrained_solver,
-    count_quadratic_couplings,
-    count_linear_fields
-
+    constrained_solver
 )
 
 from helpers import (
@@ -74,6 +71,10 @@ if __name__ == "__main__":
         important_stations_path = "./data/KO_GLC/important_stations_KO_GLC.npz"
         data_paths = load_data_paths("./data/network_paths.ods")
         d = "./data/KO_GLC/trains_schedules_KO_GLC.csv"
+    if args.case == 2:
+        important_stations_path = "./data/KO_GLC/important_stations_KO_GLC_R.npz"
+        data_paths = load_data_paths("./data/network_paths.ods")
+        d = "./data/KO_GLC/trains_schedules_KO_RCB_ZZ_GLC .csv"
 
     important_stations = load_important_stations(important_stations_path)
     train_dict = build_timetables(d, False, important_stations, data_paths)
