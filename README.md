@@ -116,16 +116,18 @@ The most dificult case is the merge of single track line between ```KZ``` - ```K
 python solve_real_problem.py --stations data/important_stations_Gt.npz --case 9 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track_Gt.csv
 
 ```
-#### Generic provblem
+#### Generic problem
 
-Clasiccal
+Here the prt of the railway line i.e. KO - GLC is analysed. These is a cyclic timetable of ```3``` hours i.e. with ```60``` trains. For each case there are ```12``` instances of various delays of trains at the begining of their routes. In case ```1``` there are no disturptions insode the line. In case ```2``` we assume one track between ```RCB``` and ```ZZ``` is closed, hence the line becomes partially ```1``` trach and disturptions arise.
 
-```python3 solve_KO_GLC_problems.py --solve_lp PULP_CBC_CMD   --case 1```
+Clasical 
+
+```python3 solve_KO_GLC_problems.py --solve_lp PULP_CBC_CMD   --case 1 --category Integer```
 
 
 Quantum (hybrid)
 
-```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1```
+```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer```
 
 #### Simple comparison example.
 
