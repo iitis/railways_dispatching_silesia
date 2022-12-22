@@ -24,6 +24,7 @@ x = [results[i]["comp_time_seconds"] for i in range(N)]
 y = [results[i]["objective"] for i in range(N)]
 
 x1 = [results1[i]["comp_time_seconds"] for i in range(N)]
+y1 = [results1[i]["objective"]*results1["d_max"] for i in range(N)]
 y1 = [results1[i]["objective"]*results1["d_max"]-y[i] for i in range(N)]
 
 y = [0 for _ in y]
@@ -32,19 +33,19 @@ colors = []
 colors1 = []
 for i in range(N):
     if results[i]["feasible"] == True:
-        colors.append("green")
+        colors.append("blue")
     else:
-        colors.append("red")
+        colors.append("black")
 
 for i in range(N):
     if results1[i]["feasible"] == True:
-        colors1.append("blue")
+        colors1.append("green")
     else:
-        colors1.append("black")
+        colors1.append("red")
 
 plt.scatter(x, y, s=100, c=colors, alpha=0.5, label = f"{solver1}")
 plt.scatter(x1, y1, s=100, c=colors1, alpha=0.5, label = f"{solver2}")
 plt.xlabel("computational time [s]")
 plt.ylabel("( objective - optimal ) x dmax [min]")
 plt.legend()
-plt.savefig(f"{solver1}{solver2}case{k}.pdf")
+plt.savefig(f"{solver1}_{solver2}_case{k}.pdf")

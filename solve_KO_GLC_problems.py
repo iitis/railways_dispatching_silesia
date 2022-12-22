@@ -74,7 +74,11 @@ if __name__ == "__main__":
     if args.case == 2:
         important_stations_path = "./data/KO_GLC/important_stations_KO_GLC_R.npz"
         data_paths = load_data_paths("./data/network_paths.ods")
-        d = "./data/KO_GLC/trains_schedules_KO_RCB_ZZ_GLC .csv"
+        d = "./data/KO_GLC/trains_schedules_KO_RCB_ZZ_GLC.csv"
+    if args.case == 3:
+        important_stations_path = "./data/KO_GLC/important_stations_KO_GLC_R.npz"
+        data_paths = load_data_paths("./data/network_paths.ods")
+        d = "./data/KO_GLC/trains_schedules_KO_RCB_ZZ_GLC_v2.csv"
 
     important_stations = load_important_stations(important_stations_path)
     train_dict = build_timetables(d, False, important_stations, data_paths)
@@ -92,6 +96,7 @@ if __name__ == "__main__":
 
     d_max = 40
 
+
     disturbances = {}
     disturbances[0] = dict()
     disturbances[1] = dict({4602:2})
@@ -99,9 +104,9 @@ if __name__ == "__main__":
     disturbances[3] = dict({1:2, 3:2, 5:7})
     disturbances[4] = dict({2:2, 4:2, 6405:3, 6407:3})
     disturbances[5] = dict({1:5, 2:3, 3:7, 4:2, 5:1, 6401:2})
-    disturbances[6] = dict({3:7, 4:2, 5:1, 23: 6, 31:6, 6411:2, 101: 4, 4602: 7})
-    disturbances[7] = dict({1: 5, 11: 3, 21:3, 31:2, 2:4, 4:2, 6:6, 8:3, 10:3, 22: 6, 24:7, 4: 6, 36: 1})
-    disturbances[8] = dict({1:3, 2:5, 3:7, 4:27, 5:8, 6:12, 7:17, 23: 4, 25: 6, 25: 8, 27: 11, 31:3, 32: 8, 10:4, 6401:3, 6403: 7, 101:8})
+    disturbances[6] = dict({3:7, 4:2, 5:1, 23: 6, 1:6, 6407:2, 101: 4, 4602: 7})
+    disturbances[7] = dict({1: 5, 11: 3, 21:3, 25:2, 2:4, 4:2, 6:6, 8:3, 10:3, 22: 6, 24:7, 4: 6, 24: 1})
+    disturbances[8] = dict({1:3, 2:5, 3:7, 4:25, 5:8, 6:12, 7:17, 23: 4, 25: 6, 25: 8, 25: 11, 25:3, 24: 8, 10:4, 6401:3, 6403: 7, 101:8})
     disturbances[9] = dict({2: 3, 4602:1, 4: 10, 102: 2, 6: 15, 8: 7, 4604: 4, 10: 1, 12: 7, 1: 10, 101: 8, 3: 2, 6401: 6, 5: 15, 7: 1, 103: 30, 9: 7, 6403: 8})
     disturbances[10] = dict({i: i%3 for i in train_set["J"]})
     disturbances[11] = dict({i: i%10 for i in train_set["J"]})
@@ -197,6 +202,7 @@ if __name__ == "__main__":
             sample = get_best_feasible_sample(dict_list)
             result.update(sample)
             result["broken_constraints"] = constraints - sample["feas_constraints"][1]
+            print(result["broken_constraints"])
         
         results[k] = result
     
