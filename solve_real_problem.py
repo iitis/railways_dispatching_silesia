@@ -186,6 +186,7 @@ if __name__ == "__main__":
     if args.solve_lp != "":
         if "CPLEX_CMD" == args.solve_lp:
             print("cplex")
+            # TODO user can add custom path
             path_to_cplex = r'/home/ludmila/CPLEX_Studio221/cplex/bin/x86-64_linux/cplex'
             solver =  pl.CPLEX_CMD(path=path_to_cplex)
         else:    
