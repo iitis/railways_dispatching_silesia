@@ -61,7 +61,7 @@ legend1 = plt.legend(handles=[scatter , scatter1])
 colors = ['red', 'green']
 lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='--', alpha=0.5) for c in colors]
 labels = ['non feasible', 'feasible']
-legend2 = plt.legend(lines, labels, loc = 4, fontsize = 8, ncol = 2)
+legend2 = plt.legend(lines, labels, loc = 8, fontsize = 8, ncol = 2)
 ax.add_artist(legend1)
 ax.add_artist(legend2)
 

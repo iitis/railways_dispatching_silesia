@@ -98,7 +98,7 @@ def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max,
         print("..............")
         print("train", j)
         for s in train_set["Paths"][j]:
-            if j in skip_stations and s == skip_stations[j]:  # TODO improve if
+            if j in skip_stations and s == skip_stations[j]: 
                 0
             else:
                 delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
