@@ -118,7 +118,11 @@ python solve_real_problem.py --stations data/important_stations_Gt.npz --case 9 
 ```
 #### Generic problem
 
-Here the prt of the railway line i.e. KO - GLC is analysed. These is a cyclic timetable of ```3``` hours i.e. with ```60``` trains. For each case there are ```12``` instances of various delays of trains at the begining of their routes. In case ```1``` there are no disturptions insode the line. In case ```2``` we assume one track between ```RCB``` and ```ZZ``` is closed, hence the line becomes partially ```1``` trach and disturptions arise.
+Here the part of the railway line i.e. KO - GLC is analysed. For each case there are '''12''' instances of various delays of trains at the beginning of their routes. 
+
+- In case '''1''' there are no disruptions inside the line, and we use cyclic timetable of '''3''' hours i.e. with '''60''' trains. 
+- In case '''2''' we assume one track between '''RCB''' and '''ZZ''' is closed, hence the line becomes partially '''1''' track and additional disruptions are as in case '''1''' we use cyclic timetable of '''2''' hours i.e. with '''40''' trains.
+- Case '''3''' concerns a hypothetical single track traffic with feasible timetable of '''21''' trains during '''3''' hours of traffic.
 
 Clasical 
 
