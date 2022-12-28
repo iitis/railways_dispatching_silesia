@@ -72,7 +72,7 @@ def test_minimal_span_two_trains():
     assert prob.objective.value() == 0.4
 
     assert delay_and_acctual_time(
-        train_sets, timetable, prob, 1, "A") == (4.0, 5.0)
+        train_sets, timetable, prob, 1, "A") == (4.0, 5.0, 1.0)
     assert impact_to_objective(prob, timetable, 1, "A", 5) == 0.4
 
 
@@ -456,12 +456,12 @@ def  test_station_track_and_circulation():
     assert vs[6].varValue == 1.
     assert vs[7].varValue == 1.
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (0., 1.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (0., 1., 1.)
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "B") == (8.0, 10.0)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "B") == (8.0, 10.0, 2.0)
 
-    assert  delay_and_acctual_time(train_sets, timetable, prob, 2, "A") == (4.0, 6.0)
-    assert  delay_and_acctual_time(train_sets, timetable, prob, 2, "B") == (4.0, 11.0)
+    assert  delay_and_acctual_time(train_sets, timetable, prob, 2, "A") == (4.0, 6.0, 2.0)
+    assert  delay_and_acctual_time(train_sets, timetable, prob, 2, "B") == (4.0, 11.0, 7.0)
 
     assert prob.objective.value() == pytest.approx(0.8)
 
@@ -518,9 +518,9 @@ def  test_station_track_and_circulation2():
     assert vs[7].varValue == 0.
 
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (3., 4.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "B") == (16.0, 18.0)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 2, "A") == (0., 2.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (3., 4., 1.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "B") == (16.0, 18.0, 2.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 2, "A") == (0., 2., 2.)
 
 
     assert prob.objective.value() == pytest.approx(0.95)
@@ -563,13 +563,13 @@ def  test_station_followed_by_station_KO_STMcase():
     prob = solve_linear_problem(train_sets, timetable, 5)
 
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (0., 1.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "B") == (0., 4.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "C") == (0., 9.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (0., 1., 1.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "B") == (0., 4., 4.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "C") == (0., 9., 9.)
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "A") == (2., 4.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "B") == (3., 6.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "C") == (3., 11.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "A") == (2., 4., 2.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "B") == (3., 6., 3.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "C") == (3., 11., 8.)
 
     assert prob.objective.value() == pytest.approx(0.6)
 
@@ -612,13 +612,13 @@ def  test_3stationsIC_STM_KO_case():
 
     prob = solve_linear_problem(train_sets, timetable, 5)
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "KO(IC)") == (0., 1.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "KO(STM)") == (0., 4.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "KO") == (0., 5.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "KO(IC)") == (0., 1., 1.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "KO(STM)") == (0., 4., 4.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "KO") == (0., 5., 5.)
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "KO(IC)") == (2., 4.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "KO(STM)") == (2., 5.)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "KO") == (2., 6.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "KO(IC)") == (2., 4., 2.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "KO(STM)") == (2., 5., 3.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "KO") == (2., 6., 4.)
 
     assert prob.objective.value() == pytest.approx(0.4)
 
@@ -682,10 +682,10 @@ def test_QIP_problems():
     assert prob.objective.value() == 0.5
 
 
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (0,4)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "A") == (5,6)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 2, "B") == (0, 8)
-    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "B") == (0, 9)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (0., 4., 4.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "A") == (5., 6., 1.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 2, "B") == (0., 8., 8.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "B") == (0., 9., 9.)
 
 
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
@@ -734,10 +734,10 @@ def test_QIP_problems():
 
     assert prob.objective.value() == 0.4
 
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "A") == (0,4)
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 1, "A") == (1,2)
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 2, "B") == (3, 11)
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "B") == (0, 9)
+    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "A") == (0., 4., 4.)
+    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 1, "A") == (1., 2., 1.)
+    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 2, "B") == (3., 11., 8.)
+    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "B") == (0., 9., 9.)
 
 
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)

@@ -222,6 +222,8 @@ if __name__ == "__main__":
     
     results["samples"] = k+1
 
+
+
     file = f"results_KO_GLC/results_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
     with open(file, "wb") as f:
         pkl.dump(results, f)

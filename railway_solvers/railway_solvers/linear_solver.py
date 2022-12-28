@@ -716,13 +716,14 @@ def solve_linear_problem(train_sets, timetable, d_max, cat = "Integer"):
 
 def delay_and_acctual_time(train_sets, timetable, prob, j, s):
     """given the solution of the optimisation problem returns secondary delay
-    and actual time of leaving given station
+    conflict free time and conflicted time
     """
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
             delay = v.varValue
-            time = v.varValue + earliest_dep_time(train_sets["Paths"], timetable, j, s)
-            return delay, time
+            conflicted_tt = earliest_dep_time(train_sets["Paths"], timetable, j, s)
+            conflict_free = delay + conflicted_tt
+            return delay, conflict_free, conflicted_tt
 
 
 def impact_to_objective(prob, timetable, j, s, d_max):

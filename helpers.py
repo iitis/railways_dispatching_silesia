@@ -102,30 +102,35 @@ def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max,
                 0
             else:
                 delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
-                delay, conflict_free = delay_and_acctual_time(
+                delay, conflict_free, conflicted_tt = delay_and_acctual_time(
                     train_set, timetable, prob, j, s
                 )
                 try:
                     sched = timetable["schedule"][f"{j}_{s}"]
-                    print(
+                    print("s",
                         s,
-                        "secondary delay",
-                        delay,
-                        "conflict free time",
-                        conflict_free,
-                        "impact to obj.",
+                        "v", 
+                        int(conflicted_tt),
+                        "d",
+                        int(delay),
+                        "t",
+                        int(conflict_free),
+                        "delta f(t)",
                         delta_obj,
+                        "||",
                         "schedule",
                         sched,
                     )
                 except:
-                    print(
+                    print("s",
                         s,
-                        "secondary delay",
-                        delay,
-                        "conflict free time",
-                        conflict_free,
-                        "impact to obj.",
+                        "v", 
+                        int(conflicted_tt),
+                        "d",
+                        int(delay),
+                        "t",
+                        int(conflict_free),
+                        "delta f(t)",
                         delta_obj,
                     )
 
