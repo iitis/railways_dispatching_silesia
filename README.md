@@ -120,9 +120,9 @@ python solve_real_problem.py --stations data/important_stations_Gt.npz --case 9 
 
 Here the part of the railway line i.e. KO - GLC is analysed. For each case there are '''12''' instances of various delays of trains at the beginning of their routes. 
 
-- In case '''1''' there are no disruptions inside the line, and we use cyclic timetable of '''3''' hours i.e. with '''60''' trains. 
-- In case '''2''' we assume one track between '''RCB''' and '''ZZ''' is closed, hence the line becomes partially '''1''' track and additional disruptions are as in case '''1''' we use cyclic timetable of '''2''' hours i.e. with '''40''' trains.
-- Case '''3''' concerns a hypothetical single track traffic with feasible timetable of '''21''' trains during '''3''' hours of traffic.
+- In case ```1``` delay_and_acctual_time there are no disruptions inside the line, and we use cyclic timetable of ```3``` hours i.e. with ```60``` trains. 
+- In case ```2``` we assume one track between ```RCB``` and ```ZZ``` is closed, hence the line becomes partially ```1``` track and additional disruptions are as in case ```1``` we use cyclic timetable of ```2``` hours i.e. with ```40``` trains.
+- In case  ```3``` we have a hypothetical single track traffic with feasible timetable of ```3``` hours with ```21`` trains.
 
 Clasical 
 
