@@ -1,4 +1,4 @@
-name: qumusic
+name: trains
 channels:
   - defaults
   - conda-forge
