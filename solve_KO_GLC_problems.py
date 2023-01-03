@@ -204,7 +204,8 @@ if __name__ == "__main__":
             dict_list = get_results(sampleset, prob=prob)
             sample = get_best_feasible_sample(dict_list)
             result.update(sample)
-            results["broken_constraints"] = constraints - sample["feas_constraints"][1]
+            result["broken_constraints"] = constraints - sample["feas_constraints"][1]
+            print("broken constraints", result["broken_constraints"])
 
         elif args.solve_quantum == "cqm":
             cqm, interpreter = convert_to_cqm(prob)
@@ -216,7 +217,7 @@ if __name__ == "__main__":
             sample = get_best_feasible_sample(dict_list)
             result.update(sample)
             result["broken_constraints"] = constraints - sample["feas_constraints"][1]
-            print(result["broken_constraints"])
+            print("broken constraints", result["broken_constraints"])
         
         results[k] = result
     
