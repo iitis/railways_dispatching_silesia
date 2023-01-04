@@ -78,7 +78,7 @@ def tau(
         return timetable["tau"]["headway"][
             f"{first_train}_{second_train}_{first_station}_{second_station}"
         ]
-    elif key == "pass":
+    if key == "pass":
         string = f"{first_train}_{first_station}_{second_station}"
         return timetable["tau"][key][string]
     if key == "stop":
@@ -114,16 +114,16 @@ def earliest_dep_time(S, timetable, train, station):
         unaviodable = timetable["initial_conditions"][train_station]
         return np.maximum(sched, unaviodable)
     s = previous_station(S[train], station)
-    τ_pass = tau(
+    tau_pass = tau(
         timetable,
         "pass",
         first_train=train,
         first_station=s,
         second_station=station,
     )
-    τ_stop = tau(timetable, "stop", first_train=train, first_station=station)
-    unavoidable = earliest_dep_time(S, timetable, train, s) + τ_pass
-    unavoidable += τ_stop
+    tau_stop = tau(timetable, "stop", first_train=train, first_station=station)
+    unavoidable = earliest_dep_time(S, timetable, train, s) + tau_pass
+    unavoidable += tau_stop
     return np.maximum(sched, unavoidable)
 
 
@@ -143,9 +143,10 @@ def departure_station4switches(s, j, place_of_switch, train_sets):
     """
     if place_of_switch[j] == "out":
         return s
-    elif place_of_switch[j] == "in":
+    if place_of_switch[j] == "in":
         S = train_sets["Paths"]
         return previous_station(S[j], s)
+    return None
 
 
 def get_M(LHS, RHS, d_max):
@@ -224,10 +225,11 @@ def can_MO_on_line(j, jp, s, train_sets):
     return True
 
 def are_two_trains_entering_via_the_same_switches(train_sets, s, j, jp):
+    """ checks if thw trains are entering station using common subset od swithes  """
     if s in train_sets["Jswitch"].keys():
         v = train_sets["Jswitch"][s]
         are_swithes = np.array([j in e and jp in e for e in v])
         if True in are_swithes:
-            return ('in', 'in') in [(v[i][j], v[i][jp]) for i in np.where(are_swithes == True)[0]]
+            return ('in', 'in') in [(v[i][j], v[i][jp]) for i in np.where(are_swithes)[0]]
         return False
     return False
