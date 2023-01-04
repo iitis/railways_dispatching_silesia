@@ -3,7 +3,6 @@ import pickle as pkl
 import time
 import pulp as pl
 
-
 from railway_solvers.railway_solvers import (
     annealing,
     convert_to_bqm,
@@ -20,12 +19,9 @@ from helpers import(
     check_count_vars
     )
 
-
 if __name__ == "__main__":
     import argparse
-
     parser = argparse.ArgumentParser("Solutions methods")
-
     d_max = 10
 
     parser.add_argument(
@@ -34,14 +30,12 @@ if __name__ == "__main__":
         help="LP solver of PuLp librery e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'",
         default="",
     )
-
     parser.add_argument(
         "--solve_quantum",
         type=str,
         help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
         default="",
     )
-
     train_set = {
         "skip_station": {
             "Ks1": 10, "Ks3": 10, "Ic1": 10, "Ks2": 1, "Ks4":1, "Ic2":1},
@@ -80,11 +74,8 @@ if __name__ == "__main__":
                 }
 
     t_ref = "8:00"
-  
     prob = create_linear_problem(train_set, timetable, d_max, cat="Integer")
-
     args = parser.parse_args()
-
     assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm", "save_qubo"]
 
     if args.solve_lp != "":
@@ -117,7 +108,6 @@ if __name__ == "__main__":
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
 
-
     if args.solve_quantum in ["sim", "real", "hyb"]:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
         real_anneal_var_dict = {"num_reads": 260, "annealing_time": 1300, "chain_strength": 4}
@@ -140,7 +130,7 @@ if __name__ == "__main__":
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
         #print_results(dict_list)
-        
+
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
         file = f"solutions_quantum/{args.solve_quantum}_wisla_case1.pkl"
         with open(file, "wb") as f:

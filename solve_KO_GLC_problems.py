@@ -56,7 +56,6 @@ if __name__ == "__main__":
         default="",
     )
     args = parser.parse_args()
-
     # paths to files
     if args.case == 1:
         important_stations_path = "./data/KO_GLC/important_stations_KO_GLC.npz"
