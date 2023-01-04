@@ -1,3 +1,4 @@
+""" implementation of ILP / MPL solver"""
 import itertools
 import time
 import pulp as pus
@@ -26,7 +27,7 @@ def order_variables(train_sets):
     """return order variables in pus.LpVariable.dicts for constrains where
     these variables are necessary
     """
-    order_vars = dict()
+    order_vars = {}
     order_var4single_line_constrain(order_vars, train_sets)
     order_var4minimal_span_constrain(order_vars, train_sets)
     order_var4track_occuparion_at_stations(order_vars, train_sets)
@@ -124,7 +125,7 @@ def order_var4switch_occupation(order_vars, train_sets):
                     update_y4_in(order_vars, "in", jp, jpp, s)
                 else:
                     update_y3(order_vars, jp, jpp, sp)
-            elif s == sp or s == spp:
+            elif s in (sp, spp):
                 update_y4(order_vars, jp, jpp, sp, spp)
             else: # we have differen s, sp and spp
                 update_y4_in(order_vars, "in", jp, jpp, s)
@@ -187,8 +188,7 @@ def get_y3(order_var, j, jp, s):
     """
     if check_order_var_3arg(order_var, j, jp, s):
         return order_var[j][jp]["one_station"][s]
-    else:
-        return 1 - order_var[jp][j]["one_station"][s]
+    return 1 - order_var[jp][j]["one_station"][s]
 
 
 def get_y4_singleline(y, j, jp, s, sp):
@@ -210,8 +210,7 @@ def get_y4_singleline(y, j, jp, s, sp):
     """
     if check_order_var_4arg(y, j, jp, s, sp):
         return y[j][jp][s][sp]
-    else:
-        return 1 - y[jp][j][sp][s]
+    return 1 - y[jp][j][sp][s]
 
 
 def get_y4_in(y, a, j, jp, s):
@@ -220,8 +219,7 @@ def get_y4_in(y, a, j, jp, s):
     """
     if check_order_var_4arg(y, a, j, jp, s):
         return y[a][j][jp][s]
-    else:
-        return 1 - y[a][jp][j][s]
+    return 1 - y[a][jp][j][s]
 
 
 def check_order_var_3arg(y, j, jp, s):
@@ -241,7 +239,7 @@ def delay_varibles(train_sets, d_max, cat):
     """returns all linear variables for the optimisation problem, i.e.
     secondary_delays_vars and order_vars
     """
-    secondary_delays_vars = dict()
+    secondary_delays_vars = {}
     for j in train_sets["J"]:
         for s in train_sets["Paths"][j]:
             if not skip_station(j,s, train_sets):
@@ -507,8 +505,6 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
     ..j2 ->..............
 
     """
-
-    S = train_sets["Paths"]
     for s in train_sets["Jtrack"].keys():
         for js in train_sets["Jtrack"][s]:
             for (j, jp) in itertools.combinations(js, 2):
@@ -558,9 +554,9 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
 def switch_occ(
     s, jp, sp, jpp, spp, problem, timetable, delay_var, y, train_sets, d_max
 ):
+    """helper for switch_occupation"""
 
     S = train_sets["Paths"]
-
     LHS = earliest_dep_time(S, timetable, jp, sp)
     RHS = earliest_dep_time(S, timetable, jpp, spp)
 
@@ -586,7 +582,7 @@ def switch_occ(
                 RHS -= M * get_y4_in(y, "in", jp, jpp, s)
             else:
                 RHS -= M * get_y3(y, jp, jpp, sp)
-        elif s == spp or s == sp:
+        elif s in (spp, sp):
             RHS -= M * get_y4_singleline(y, jp, jpp, sp, spp)
         else: # s, sp and spp differs
             RHS -= M * get_y4_in(y, "in", jp, jpp, s)
@@ -724,6 +720,7 @@ def delay_and_acctual_time(train_sets, timetable, prob, j, s):
             conflicted_tt = earliest_dep_time(train_sets["Paths"], timetable, j, s)
             conflict_free = delay + conflicted_tt
             return delay, conflict_free, conflicted_tt
+    return 0,0,0
 
 
 def impact_to_objective(prob, timetable, j, s, d_max):

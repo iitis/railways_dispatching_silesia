@@ -70,7 +70,7 @@ def convert_to_pyqubo(model: LpProblem) -> pyqubo.Model:
     H = 0
 
     # vars translator
-    vars_trans = dict()
+    vars_trans = {}
     for var in model.variables():
         assert var.cat != pulp.LpContinuous
         if _is_binary(var):

@@ -1,3 +1,4 @@
+""" return important stations for analysed metropolitan network """
 import numpy as np
 
 important_stations = {

@@ -20,10 +20,10 @@ train_sets = {
     "Paths": {0: ["A", "B"], 1: ["A", "B"]},
     "J": [0, 1],
     "Jd": {"A": {"B": [[0, 1]]}},
-    "Josingle": dict(),
-    "Jround": dict(),
-    "Jtrack": dict(),
-    "Jswitch": dict()
+    "Josingle": {},
+    "Jround": {},
+    "Jtrack": {},
+    "Jswitch": {}
 }
 
 d_max = 10

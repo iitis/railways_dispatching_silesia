@@ -23,10 +23,10 @@ train_sets = {
     "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
     "J": [0, 1, 2],
     "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
-    "Josingle": dict(),
-    "Jround": dict(),
+    "Josingle": {},
+    "Jround": {},
     "Jtrack": {"B": [[0, 1]]},
-    "Jswitch": dict(),
+    "Jswitch": {},
     "add_swithes_at_s": ["B"]
 }
 

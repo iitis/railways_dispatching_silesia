@@ -1,3 +1,4 @@
+""" return important stations for analysed metropolitan network case with rerouting  on KO - KTC - GT - CB"""
 import numpy as np
 
 important_stations = {

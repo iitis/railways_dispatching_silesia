@@ -1,8 +1,14 @@
+"""test ILP on simple problems """
 import pytest
 
-from railway_solvers import delay_varibles, order_variables, solve_linear_problem
-from railway_solvers import create_linear_problem, delay_and_acctual_time
-from railway_solvers import  impact_to_objective
+from railway_solvers import (
+    delay_varibles, 
+    order_variables, 
+    solve_linear_problem, 
+    create_linear_problem, 
+    delay_and_acctual_time, 
+    impact_to_objective
+)
 
 def test_linear_varibles_creations():
     """
@@ -14,10 +20,10 @@ def test_linear_varibles_creations():
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": {"A": {"B": [[0, 1]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
-        "Jtrack": dict(),
-        "Jswitch": dict()
+        "Josingle": {},
+        "Jround": {},
+        "Jtrack": {},
+        "Jswitch": {}
     }
 
     dv = delay_varibles(train_sets, 5, cat = "Integer")
@@ -52,10 +58,10 @@ def test_minimal_span_two_trains():
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": {"A": {"B": [[0, 1]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
-        "Jtrack": dict(),
-        "Jswitch": dict()
+        "Josingle": {},
+        "Jround": {},
+        "Jtrack": {},
+        "Jswitch": {}
     }
 
     ####   simple problem #####
@@ -97,10 +103,10 @@ def test_deadlock_and_switches_two_trains():
     train_sets = {
         "Paths": {0: ["A", "B"], 1: ["B", "A"]},
         "J": [0, 1],
-        "Jd": dict(),
+        "Jd": {},
         "Josingle": {("A","B"): [[0,1]]},
-        "Jround": dict(),
-        "Jtrack": dict(),
+        "Jround": {},
+        "Jtrack": {},
         "Jswitch": {"A": [{0: "out", 1: "in"}], "B": [{0: "in", 1: "out"}]}
     }
 
@@ -138,11 +144,11 @@ def test_rolling_stock_circulation():
     train_sets = {
         "Paths": {0: ["A", "B"], 1: ["B", "A"]},
         "J": [0, 1],
-        "Jd": dict(),
-        "Josingle": dict(),
+        "Jd": {},
+        "Josingle": {},
         "Jround": {"B": [[0,1]]},
-        "Jtrack": dict(),
-        "Jswitch": dict()
+        "Jtrack": {},
+        "Jswitch": {}
     }
 
     taus = {"pass": {"0_A_B": 4, "1_B_A": 8}, "prep": {"1_B": 2},
@@ -193,11 +199,11 @@ def  test_station_track_and_switches_two_trains():
     train_sets = {
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
-        "Jd": dict(),
-        "Josingle": dict(),
-        "Jround": dict(),
+        "Jd": {},
+        "Josingle": {},
+        "Jround": {},
         "Jtrack": {"B": [[0, 1]]},
-        "Jswitch": dict(),
+        "Jswitch": {},
         "add_swithes_at_s": ["B"]
     }
 
@@ -248,8 +254,8 @@ def  test_M_P_with_switches_two_trains():
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": {"A":{"B": [[0], [1]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
+        "Josingle": {},
+        "Jround": {},
         "Jtrack": {"A": [[0, 1]], "B": [[0, 1]]},
         "Jswitch": {"A": [{0:"out", 1:"out"}], "B": [{0:"in", 1:"in"}]}
     }
@@ -312,8 +318,8 @@ def  test_M_P_with_switches_two_trains_no_station():
         "Paths": {0: ["A", "B"], 1: ["A", "B"]},
         "J": [0, 1],
         "Jd": {"A":{"B": [[0], [1]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
+        "Josingle": {},
+        "Jround": {},
         "Jtrack": {"A": [[0, 1]]},
         "Jswitch": {"A": [{0:"out", 1:"out"}], "B": [{0:"in", 1:"in"}]}
     }
@@ -375,8 +381,8 @@ def  test_swithes_three_trains():
         "Paths": {0: ["A", "B"], 1: ["C", "B"]},
         "J": [0, 1],
         "Jd": {"A":{"B": [[0]]}, "C":{"B": [[1]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
+        "Josingle": {},
+        "Jround": {},
         "Jtrack": {"B": [[0, 1]]},
         "Jswitch": {"B": [{0:"in", 1:"in"}]}
     }
@@ -438,8 +444,8 @@ def  test_station_track_and_circulation():
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 2]]}, "B": {"A": [[1]]}},
         "Jtrack": {"B": [[0,1,2]]},
-        "Jswitch": dict(),
-        "Josingle": dict(),
+        "Jswitch": {},
+        "Josingle": {},
         "Jround": {"B": [[0,1]]}
     }
 
@@ -499,8 +505,8 @@ def  test_station_track_and_circulation2():
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 2]]}, "B": {"A": [[1]]}},
         "Jtrack": {"B": [[0,1,2]]},
-        "Jswitch": dict(),
-        "Josingle": dict(),
+        "Jswitch": {},
+        "Josingle": {},
         "Jround": {"B": [[0,1]]}
     }
 
@@ -555,9 +561,9 @@ def  test_station_followed_by_station_KO_STMcase():
         "J": [0, 1],
         "Jd": {"A": {"B": [[0, 1]]}, "B": {"C": [[0, 1]]}},
         "Jtrack": {"B": [[0,1]]},
-        "Jswitch": dict(),
-        "Josingle": dict(),
-        "Jround": dict()
+        "Jswitch": {},
+        "Josingle": {},
+        "Jround": {}
     }
 
     prob = solve_linear_problem(train_sets, timetable, 5)
@@ -605,9 +611,9 @@ def  test_3stationsIC_STM_KO_case():
         "J": [0, 1],
         "Jd": {"KO(IC)": {"KO(STM)": [[0, 1]]}, "KO(STM)": {"KO": [[0, 1]]}},
         "Jtrack": {"KO(STM)": [[0,1]], "KO": [[0,1]]},
-        "Jswitch": dict(),
-        "Josingle": dict(),
-        "Jround": dict()
+        "Jswitch": {},
+        "Josingle": {},
+        "Jround": {}
     }
 
     prob = solve_linear_problem(train_sets, timetable, 5)
@@ -625,10 +631,10 @@ def  test_3stationsIC_STM_KO_case():
 
 
 
-def test_QIP_problems():
+def test_QIP_problem1():
 
     """
-    test problem form Quadratic and higher-order unconstrained binary optimization of railway rescheduling for quantum computing
+    test first problem form Quadratic and higher-order unconstrained binary optimization of railway rescheduling for quantum computing
     K Domino, A Kundu, Ö Salehi, K Krawiec
     Quantum Information Processing 21 (9), 1-33
                                             <- 2
@@ -658,10 +664,10 @@ def test_QIP_problems():
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
+        "Josingle": {},
+        "Jround": {},
         "Jtrack": {"B": [[0, 1]]},
-        "Jswitch": dict(),
+        "Jswitch": {},
         "add_swithes_at_s": ["B"]
     }
 
@@ -686,21 +692,33 @@ def test_QIP_problems():
     assert delay_and_acctual_time(train_sets, timetable, prob, 1, "A") == (5., 6., 1.)
     assert delay_and_acctual_time(train_sets, timetable, prob, 2, "B") == (0., 8., 8.)
     assert delay_and_acctual_time(train_sets, timetable, prob, 0, "B") == (0., 9., 9.)
-
-
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
     assert impact_to_objective(prob, timetable, 1, "A", d_max) == pytest.approx(0.5)
     assert impact_to_objective(prob, timetable, 2, "B", d_max) == pytest.approx(0)
 
-    #rerouting
 
+def test_QIP_problem2():
     """
+    test second problem form Quadratic and higher-order unconstrained binary optimization of railway rescheduling for quantum computing
+    K Domino, A Kundu, Ö Salehi, K Krawiec Quantum Information Processing 21 (9), 1-33
+
     1 ->                                       <- 2
     ...............................................
      [ A ]                             .   .  [ B ]
     .....................................c.........
     0 ->
     """
+    taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
+            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
+            "stop": {"0_B": 1, "1_B": 1},
+            "res": 1
+            }
+
+    timetable = {"tau": taus,
+                 "initial_conditions": {"0_A": 4, "1_A": 1, "2_B": 8},
+                 "penalty_weights": {"0_A": 2, "1_A": 1, "2_B": 1}}
+
+    d_max = 10
 
 
     train_sets_rerouted = {
@@ -709,9 +727,9 @@ def test_QIP_problems():
         },
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
-        "Jd": dict(),
+        "Jd": {},
         "Josingle": {("A", "B"): [[1,2]]},
-        "Jround": dict(),
+        "Jround": {},
         "Jtrack": {"B": [[0, 1]]},
         "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
         "add_swithes_at_s": ["B"]
@@ -739,12 +757,16 @@ def test_QIP_problems():
     assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 2, "B") == (3., 11., 8.)
     assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "B") == (0., 9., 9.)
 
-
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
     assert impact_to_objective(prob, timetable, 1, "A", d_max) == pytest.approx(0.1)
     assert impact_to_objective(prob, timetable, 2, "B", d_max) == pytest.approx(0.3)
 
+
+def test_QIP_problem3():
     """
+    test third problem form Quadratic and higher-order unconstrained binary optimization of railway rescheduling for quantum computing
+    K Domino, A Kundu, Ö Salehi, K Krawiec Quantum Information Processing 21 (9), 1-33
+
 
                                         <- j3  j4
     ..........c........................c....c......
@@ -752,8 +774,6 @@ def test_QIP_problems():
     .......c....c........................c.........
     j1 ->
     j2 ->
-
-
 
     S1, S2 - stations
     j1, j2, j3 - trains
@@ -767,6 +787,7 @@ def test_QIP_problems():
                      "res": 1
                     }
 
+    d_max = 10
 
     trains_timing = {"tau": taus,
                      "initial_conditions": {"j1_S1": 4, "j2_S1": 1, "j3_S2": 8, "j4_S2": 9},
@@ -836,10 +857,10 @@ def test_constraint_labels():
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
+        "Josingle": {},
+        "Jround": {},
         "Jtrack": {"B": [[0, 1]]},
-        "Jswitch": dict(),
+        "Jswitch": {},
         "add_swithes_at_s": ["B"]
     }
 
@@ -860,9 +881,9 @@ def test_constraint_labels():
         },
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
-        "Jd": dict(),
+        "Jd": {},
         "Josingle": {("A", "B"): [[1,2]]},
-        "Jround": dict(),
+        "Jround": {},
         "Jtrack": {"B": [[0, 1]]},
         "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
         "add_swithes_at_s": ["B"]
@@ -909,10 +930,10 @@ def test_MLP():
         "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
         "J": [0, 1, 2],
         "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
-        "Josingle": dict(),
-        "Jround": dict(),
+        "Josingle": {},
+        "Jround": {},
         "Jtrack": {"B": [[0, 1]]},
-        "Jswitch": dict(),
+        "Jswitch": {},
         "add_swithes_at_s": ["B"]
     }
 

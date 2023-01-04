@@ -1,5 +1,4 @@
 import os
-import logging
 import importlib
 import numpy as np
 
@@ -7,7 +6,6 @@ from railway_solvers import (create_linear_problem, annealing,
                              convert_to_bqm, count_quadratic_couplings, 
                              get_results, count_linear_fields, get_best_feasible_sample,
                              save_results, read_process_results, print_results)
-
 
 def compute_all_files(method, pdict=None, real_anneal_var=None, sim_annealing_var=None):
     """Runs the annealing experiment for the files inside the inputs folder
@@ -24,12 +22,10 @@ def compute_all_files(method, pdict=None, real_anneal_var=None, sim_annealing_va
         if "init" not in file and "pycach" not in file and ".pytest_cache" not in file:
             compute_single_file(file[:-3], method, pdict, real_anneal_var, sim_annealing_var)
 
-
 def compute_single_file(
     file, method,  pdict=None, real_anneal_var=None, sim_annealing_var=None
 ):
     """Runs the annealing experiment for the files inside the inputs folder
-
     :param file: Name of the input data file
     :type file: str
     :param method: 'sim', 'real', 'hyb', 'cqm'
@@ -45,20 +41,14 @@ def compute_single_file(
     globals().update(mdl.__dict__)
     prob = create_linear_problem(train_sets, timetable, d_max, cat = "Integer")
     bqm, _, interpreter = convert_to_bqm(prob, pdict)
-    sampleset = annealing(bqm, interpreter, method, real_anneal_var, sim_annealing_var)
-    
+    sampleset = annealing(bqm, interpreter, method, real_anneal_var, sim_annealing_var) 
     save_results(f"test/annealing_results/{file_name}", sampleset)
     dict_list1 = read_process_results(f"test/annealing_results/{file_name}", prob)
-
     dict_list = get_results(sampleset, prob=prob)
     assert dict_list == dict_list1
-
     print_results(dict_list)
     sample = get_best_feasible_sample(dict_list1)
-
-    assert sample["feasible"] == True
-
-
+    assert sample["feasible"] is True
 
 def test_qubo():
     file = "5_trains_all_cases"
@@ -76,39 +66,33 @@ def test_qubo():
     mdl = importlib.import_module(file_name)
     globals().update(mdl.__dict__)
     prob = create_linear_problem(train_sets, timetable, d_max, cat = "Integer")
-    bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
+    bqm, qubo, _ = convert_to_bqm(prob, pdict)
 
-
-    vars = bqm.variables
+    variables = bqm.variables
     hs = bqm.linear
     Js = bqm.quadratic
-    s = np.size(vars)
-
+    s = np.size(variables)
     count = 0
     for i in range(s):
         for j in range(i, s):
             if i == j:
-                if hs[vars[i]] != 0:
+                if hs[variables[i]] != 0:
                     count = count + 1
-                    assert hs[vars[i]] == qubo[0][(vars[i], vars[i])]
+                    assert hs[variables[i]] == qubo[0][(variables[i], variables[i])]
             else:
-                if (vars[i], vars[j]) in Js:
-                    J = Js[vars[i], vars[j]]
+                if (variables[i], variables[j]) in Js:
+                    J = Js[variables[i], variables[j]]
                     count = count + 1
                     try: 
-                        assert J == qubo[0][(vars[i], vars[j])]
+                        assert J == qubo[0][(variables[i], variables[j])]
                     except:
-                        assert J == qubo[0][(vars[j], vars[i])]
-
+                        assert J == qubo[0][(variables[j], variables[i])]
     assert count == len(qubo[0])
-
     assert len(bqm.linear) == count_linear_fields(bqm)
-
     assert len(bqm.quadratic) == count_quadratic_couplings(bqm)
 
-
 def test_all_files():
-    #real_anneal_var = {"num_reads": 1000, "annealing_time": 20, "chain_strength": 4}
+    """test simple examples on simulated annealing. It is probabilistic test"""
     sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 100, "num_reads": 100}
     method = "sim"
     pdict = {

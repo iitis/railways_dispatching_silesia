@@ -9,11 +9,11 @@ At station B train 0 terminates and turns intro train 1 that starts there
 train_sets = {
     "Paths": {0: ["A", "B"], 1: ["B", "A"]},
     "J": [0, 1],
-    "Jd": dict(),
-    "Josingle": dict(),
+    "Jd": {},
+    "Josingle": {},
     "Jround": {"B": [[0,1]]},
-    "Jtrack": dict(),
-    "Jswitch": dict()
+    "Jtrack": {},
+    "Jswitch": {}
 }
 
 taus = {"pass": {"0_A_B": 4, "1_B_A": 8}, "prep": {"1_B": 2},

@@ -27,9 +27,9 @@ timetable = {"tau": taus,
 train_sets = {
     "Paths": {0: ["A", "B"], 1: ["A", "B"]},
     "J": [0, 1],
-    "Jd": dict(),
-    "Josingle": dict(),
-    "Jround": dict(),
+    "Jd": {},
+    "Josingle": {},
+    "Jround": {},
     "Jtrack": {"B": [[0, 1]]},
     "Jswitch": {"B": [{0:"in", 1:"in"}, {0:"out", 1:"out"}]}
 }

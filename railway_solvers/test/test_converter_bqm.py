@@ -2,7 +2,6 @@ from dimod.constrained import cqm_to_bqm
 import pulp
 import dimod
 from railway_solvers import convert_to_bqm
-import pytest
 
 def _compare_bqm(bqm1, bqm2):
     outcome = True
@@ -16,12 +15,12 @@ def _compare_bqm(bqm1, bqm2):
 def test_equality_binary():
     n = 3
 
-    vars = dict()
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], cat="Binary"))
+        variables.update(pulp.LpVariable.dicts("y", [i], cat="Binary"))
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) == 1, "minimal_span_1"
-    pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) == 1, "minimal_span_1"
+    pulp_problem += sum((i+1)*variables[i] for i in range(n))
     pdict = {"minimal_span" : 1,
             "single_line" : 1,
             "circulation": 1,
@@ -41,13 +40,13 @@ def test_equality_binary():
 def test_equality():
     n = 3
 
-    vars = dict()
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 7, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 7, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) == 1, "minimal_span_1"
-    pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) == 1, "minimal_span_1"
+    pulp_problem += sum((i+1)*variables[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem, _ , _= convert_to_bqm(pulp_problem, pdict)
 
@@ -62,13 +61,13 @@ def test_equality():
 def test_geq():
     n = 3
 
-    vars = dict()
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 3, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 3, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) >= 1, "minimal_span_1"
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) >= 1, "minimal_span_1"
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
@@ -83,13 +82,13 @@ def test_geq():
 def test_geq_negative():
     n = 3
 
-    vars = dict()
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], -5, 10, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], -5, 10, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(val*vars[i] for i, val in zip(range(n),[1,2,3])) <= 3, "minimal_span_1"
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(val*variables[i] for i, val in zip(range(n),[1,2,3])) <= 3, "minimal_span_1"
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
@@ -104,13 +103,13 @@ def test_geq_negative():
 def test_leq():
     n = 3
 
-    vars = dict()
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) <= 1, "minimal_span_1"
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) <= 1, "minimal_span_1"
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
@@ -124,13 +123,13 @@ def test_leq():
 def test_nonzero_lb():
     n = 3
 
-    vars = dict()
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 5, 20, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 5, 20, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) <= 17, "minimal_span_1"
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) <= 17, "minimal_span_1"
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
@@ -145,13 +144,13 @@ def test_nonzero_lb():
 def test_bad_leq():
     n = 3
 
-    vars = dict()
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) <= 1, "minimal_span_1"
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) <= 1, "minimal_span_1"
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
