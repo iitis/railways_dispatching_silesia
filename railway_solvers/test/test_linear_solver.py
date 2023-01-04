@@ -757,7 +757,6 @@ def test_QIP_problem2():
     assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 2, "B") == (3., 11., 8.)
     assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "B") == (0., 9., 9.)
 
-
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
     assert impact_to_objective(prob, timetable, 1, "A", d_max) == pytest.approx(0.1)
     assert impact_to_objective(prob, timetable, 2, "B", d_max) == pytest.approx(0.3)

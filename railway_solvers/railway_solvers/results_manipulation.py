@@ -1,10 +1,9 @@
+"""analyze constraints, objective etc. of the solution"""
 import pickle
 from typing import Any, Dict, List, Tuple
-
 import dimod
 import pulp
 from pulp.pulp import LpProblem
-
 
 def analyze_constraints(
     prob: LpProblem, sample: Dict[str, int]
@@ -31,7 +30,6 @@ def analyze_constraints(
             result[cname] = expr >= -c.constant
     return result, sum(x is True for x in result.values())
 
-
 def get_objective(prob: pulp.LpProblem, sample) -> float:
     """computes objective value for sample
 
@@ -47,7 +45,6 @@ def get_objective(prob: pulp.LpProblem, sample) -> float:
     result += sum(val * sample[var.name] for var, val in obj.items())
     return result
 
-
 def get_best_feasible_sample(dict_list: List[Dict[str, Any]]) -> Dict[str, Any]:
     """output first feasible sample in the list
 
@@ -59,9 +56,7 @@ def get_best_feasible_sample(dict_list: List[Dict[str, Any]]) -> Dict[str, Any]:
     best_feasible =  next((l for l in dict_list if l["feasible"]), None)
     if best_feasible:
         return best_feasible
-    else:
-        return sorted(dict_list, key=lambda d: d["energy"])[0]
-
+    return sorted(dict_list, key=lambda d: d["energy"])[0]
 
 def get_results(
     sampleset: dimod.SampleSet, prob: pulp.LpProblem
@@ -91,13 +86,10 @@ def get_results(
         dict_list.append(rdict)
     return sorted(dict_list, key=lambda d: d["objective"])
 
-
-
 def save_results(
     file_name: str, sampleset: dimod.SampleSet, 
 ) -> List[Dict[str, Any]]:
     """
-
     :param sampleset: analyzed samples
     :type sampleset: dimod.SampleSet
     :return: analyzed samples, sorted according to objective
@@ -111,7 +103,6 @@ def save_results(
         dict_list.append(rdict)
     with open(file_name, "wb") as handle:
         pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
 
 def read_process_results(
     file, prob: pulp.LpProblem
@@ -135,8 +126,6 @@ def read_process_results(
     """
     with open(file, 'rb') as handle:
         samples = pickle.load(handle)
-
-
     dict_list = []
     for data in samples:
         rdict = {}
@@ -150,9 +139,8 @@ def read_process_results(
         dict_list.append(rdict)
     return sorted(dict_list, key=lambda d: d["objective"])
 
-
-
 def print_results(dict_list):
+    """pront some fetures of solution """
     soln = next((l for l in dict_list if l["feasible"]), None)
     if soln is not None:
         print("obj:", soln["objective"], "x:", list(soln["sample"].values()))
@@ -172,7 +160,6 @@ def print_results(dict_list):
                 "Broken constraints:",
                 d["feas_constraints"][1],
             )
-
 
 
 ##### QUBO provessing
