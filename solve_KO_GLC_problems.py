@@ -3,7 +3,6 @@ import pickle as pkl
 import time
 import pulp as pl
 
-
 from data_formatting.data_formatting import (
     add_delay,
     get_skip_stations
@@ -17,7 +16,6 @@ from railway_solvers.railway_solvers import (
     convert_to_cqm,
     constrained_solver
 )
-
 from helpers import (
     load_important_stations,
     build_timetables,
@@ -32,7 +30,6 @@ from helpers import (
 
 if __name__ == "__main__":
     import argparse
-
     parser = argparse.ArgumentParser("Make variables to problem from dataframes, parameters of problem and solutions") 
     parser.add_argument(
         "--case",
@@ -40,28 +37,24 @@ if __name__ == "__main__":
         help="Case of railway problem",
         default=1,
     )
-
     parser.add_argument(
         "--category",
         type=str,
         help="category of time variables integer in contionious",
         default="Integer",
     )
-
     parser.add_argument(
         "--solve_lp",
         type=str,
         help="LP solver of PuLp librery e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'",
         default="",
     )
-
     parser.add_argument(
         "--solve_quantum",
         type=str,
         help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm, 'save_qubo' just save qubo to ./qubos",
         default="",
     )
-
     args = parser.parse_args()
 
     # paths to files
@@ -86,7 +79,6 @@ if __name__ == "__main__":
         train_dict, important_stations, data_paths, skip_stations
     )
     t_ref = "14:00"
-
     assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
     
     # input
@@ -117,9 +109,7 @@ if __name__ == "__main__":
         disturbances[9] = dict({2:90, 4602:72, 4:72, 102:45, 4604:10, 101:47, 6401: 35, 6403:20, 5:25, 103:30, 3:60, 10:25})
         disturbances[10] = dict({1:29, 2:36, 4602: 20, 9:12, 4606:30, 102:45, 101:47, 6401: 35, 6403:20, 5:25, 103:30, 3:60, 4604:10, 10:25})
         disturbances[11] = dict({2:92, 4602:70, 4:72, 102:46, 101:45, 6401:33, 6403:20, 5:25, 103:28, 3:59, 4604:12, 10:25})
-
     print("n.o. trains", len(train_set["J"]))
-
     pdict = {
         "minimal_span": 2.5,
         "single_line": 2.5,
@@ -130,10 +120,8 @@ if __name__ == "__main__":
         "circulation": 2.5,
         "objective": 1,
     }
-
     sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 10, "num_reads": 2}
     real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
-
     results = {}
     results["method"] = args.solve_lp
     results["d_max"] = d_max
