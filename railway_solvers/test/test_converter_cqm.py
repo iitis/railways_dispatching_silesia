@@ -18,13 +18,13 @@ def _compare_bqm(bqm1, bqm2):
 def test_equality_binary():
     n = 3
 
-    vars = {}
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], cat="Binary"))
-    # print([v.cat for v in vars.values()])
+        variables.update(pulp.LpVariable.dicts("y", [i], cat="Binary"))
+    # print([v.cat for v in variables.values()])
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) == 1
-    pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) == 1
+    pulp_problem += sum((i+1)*variables[i] for i in range(n))
     dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Binary(f"y_{i}") for i in range(n)]
@@ -37,13 +37,13 @@ def test_equality_binary():
 def test_equality():
     n = 3
 
-    vars = {}
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) == 1
-    pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) == 1
+    pulp_problem += sum((i+1)*variables[i] for i in range(n))
     dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
@@ -56,13 +56,13 @@ def test_equality():
 def test_geq():
     n = 3
 
-    vars = {}
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) >= 3
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) >= 3
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
@@ -77,13 +77,13 @@ def test_geq():
 def test_leq():
     n = 3
 
-    vars = {}
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) <= 1
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) <= 1
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
@@ -98,13 +98,13 @@ def test_leq():
 def test_leq():
     n = 3
 
-    vars = {}
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 5, 20, cat="Integer"))
+        variables.update(pulp.LpVariable.dicts("y", [i], 5, 20, cat="Integer"))
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) <= 17
-    # pulp_problem += sum((i+1)*vars[i] for i in range(n))
+    pulp_problem += sum(variables.values()) <= 17
+    # pulp_problem += sum((i+1)*variables[i] for i in range(n))
     dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=15) for i in range(n)]
@@ -119,13 +119,13 @@ def test_leq():
 def test_bad_leq():
     n = 3
 
-    vars = {}
+    variables = {}
     for i in range(n):
-        vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
-    print(vars)
+        variables.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
+    print(variables)
 
     pulp_problem = pulp.LpProblem("simple_test")
-    pulp_problem += sum(vars.values()) <= 1
+    pulp_problem += sum(variables.values()) <= 1
     dwave_pulp_problem, _ = convert_to_cqm(pulp_problem)
 
     var_dwave = [dimod.Integer(f"y_{i}", upper_bound=20) for i in range(n)]
