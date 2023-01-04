@@ -6,9 +6,9 @@ from railway_solvers import are_two_trains_entering_via_the_same_switches, can_M
 
 
 def test_pairs():
-    assert occurs_as_pair(1, 2, [[1, 2, 3], [4], [5, 6]]) == True
-    assert occurs_as_pair(2, 1, [[1, 2, 3], [4], [5, 6]]) == True
-    assert occurs_as_pair(1, 4, [[1, 2, 3], [4], [5, 6]]) == False
+    assert occurs_as_pair(1, 2, [[1, 2, 3], [4], [5, 6]]) is True
+    assert occurs_as_pair(2, 1, [[1, 2, 3], [4], [5, 6]]) is True
+    assert occurs_as_pair(1, 4, [[1, 2, 3], [4], [5, 6]]) is False
 
     d1 = {0: {0: 1, 1: 2}, 1: {0: 1}}
     d2 = {0: {2: 3}}
@@ -23,9 +23,9 @@ def test_trains_paths():
     S = {0: [0, 1, 2, 4], 1: [0, 1, 2], 2: [1, 0]}
 
     assert previous_station(S[0], 4) == 2
-    assert previous_station(S[2], 1) == None
+    assert previous_station(S[2], 1) is None
 
-    assert subsequent_station(S[1], 2) == None
+    assert subsequent_station(S[1], 2) is None
     assert subsequent_station(S[0], 2) == 4
     assert subsequent_station(S[2], 1) == 0
 
@@ -73,36 +73,36 @@ def test_helpers_of_train_sets():
         "Jswitch": {"B": [{1: "out", 3: "out"}, {1: "in", 3: "in"}]},
     }
 
-    assert not_the_same_rolling_stock(0, 1, train_sets) == True
-    assert not_the_same_rolling_stock(0, 1, train_sets) == True
-    assert not_the_same_rolling_stock(1, 2, train_sets) == False
+    assert not_the_same_rolling_stock(0, 1, train_sets) is True
+    assert not_the_same_rolling_stock(0, 1, train_sets) is True
+    assert not_the_same_rolling_stock(1, 2, train_sets) is False
 
     assert departure_station4switches("B", 1, {1: "out", 3: "out"}, train_sets) == "B"
     assert departure_station4switches("B", 1, {1: "in", 3: "in"}, train_sets) == "A"
     assert get_M(2, 3, 4) == 5
-    assert skip_station(1, "A", train_sets) == False
+    assert skip_station(1, "A", train_sets) is False
 
     assert previous_train_from_Jround(train_sets, 2, "B") == 1
     assert subsequent_train_at_Jround(train_sets, 1, "B") == 2
-    assert previous_train_from_Jround(train_sets, 1, "B") == None
-    assert subsequent_train_at_Jround(train_sets, 2, "B") == None
+    assert previous_train_from_Jround(train_sets, 1, "B") is None
+    assert subsequent_train_at_Jround(train_sets, 2, "B") is None
 
-    assert are_two_trains_entering_via_the_same_switches(train_sets, "B", 1, 3) == True
-    assert are_two_trains_entering_via_the_same_switches(train_sets, "B", 1, 2) == False
-    assert are_two_trains_entering_via_the_same_switches(train_sets, "A", 1, 3) == False
+    assert are_two_trains_entering_via_the_same_switches(train_sets, "B", 1, 3) is True
+    assert are_two_trains_entering_via_the_same_switches(train_sets, "B", 1, 2) is False
+    assert are_two_trains_entering_via_the_same_switches(train_sets, "A", 1, 3) is False
 
     train_sets = {
         "Paths": {1: ["A", "B"], 2: ["C", "B"], 3: ["A", "B"]},
         "Jd": {"A":{"B":[[1,3]]}, "C":{"B":[[2]]}},
     }
 
-    assert can_MO_on_line(1, 3, "B", train_sets) == False
-    assert can_MO_on_line(1, 2, "B", train_sets) == True
+    assert can_MO_on_line(1, 3, "B", train_sets) is False
+    assert can_MO_on_line(1, 2, "B", train_sets) is True
 
     train_sets = {
         "Paths": {1: ["A", "B"], 2: ["C", "B"], 3: ["A", "B"]},
         "Jd": {"A":{"B":[[1],[3]]}, "C":{"B":[[2]]}},
     }
 
-    assert can_MO_on_line(1, 3, "B", train_sets) == True
-    assert can_MO_on_line(1, 2, "B", train_sets) == True
+    assert can_MO_on_line(1, 3, "B", train_sets) is True
+    assert can_MO_on_line(1, 2, "B", train_sets) is True
