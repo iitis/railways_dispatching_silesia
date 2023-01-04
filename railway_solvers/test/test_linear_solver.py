@@ -1,5 +1,6 @@
 """test ILP on simple problems """
 import pytest
+import importlib
 
 from railway_solvers import (
     delay_varibles, 
@@ -140,26 +141,12 @@ def test_rolling_stock_circulation():
     [ A ]                                       [  B  ]
 
     """
+    file = "rolling_stock_circulation"
+    file_name = f"inputs4QUBO.{file}"
+    mdl = importlib.import_module(file_name)
+    globals().update(mdl.__dict__)
 
-    train_sets = {
-        "Paths": {0: ["A", "B"], 1: ["B", "A"]},
-        "J": [0, 1],
-        "Jd": {},
-        "Josingle": {},
-        "Jround": {"B": [[0,1]]},
-        "Jtrack": {},
-        "Jswitch": {}
-    }
-
-    taus = {"pass": {"0_A_B": 4, "1_B_A": 8}, "prep": {"1_B": 2},
-            "stop":{"1_A": 0, "0_B": 0}}
-    timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 3, "1_B": 1},
-                 "penalty_weights": {"0_A": 2, "1_B": 0.5}}
-
-
-    prob = solve_linear_problem(train_sets, timetable, 10)
-
+    prob = solve_linear_problem(train_sets, timetable, d_max)
     v = prob.variables()
     assert v[0].name == "Delays_0_A"
     assert v[0].varValue == 0
@@ -189,6 +176,7 @@ def  test_station_track_and_switches_two_trains():
                                  simplifies swith condition at B
 
     """
+    
 
     taus = {"pass": {"0_A_B": 4, "1_A_B": 4},
             "stop": {"0_B": 1, "1_B": 1}, "res": 2}
@@ -243,6 +231,7 @@ def  test_M_P_with_switches_two_trains():
 
 
     """
+
 
     taus = {"pass": {"0_A_B": 6, "1_A_B": 2},
             "stop": {"0_B": 1, "1_B": 1}, "res": 2}
