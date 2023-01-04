@@ -30,12 +30,10 @@ from helpers import (
     count_vars
 )
 
-
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser("Make variables to problem from dataframes, parameters of problem and solutions")
-    
+    parser = argparse.ArgumentParser("Make variables to problem from dataframes, parameters of problem and solutions") 
     parser.add_argument(
         "--case",
         type=int,
@@ -92,9 +90,7 @@ if __name__ == "__main__":
     assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
     
     # input
-
     d_max = 40
-
     disturbances = {}
     disturbances[0] = {}
     if args.case != 3:
@@ -119,7 +115,7 @@ if __name__ == "__main__":
         disturbances[7] = dict({2:50, 4602: 32, 4:10, 102:5, 1:12, 101:10 })
         disturbances[8] = dict({2:90, 4602: 72, 4:72, 102:45, 4604:10, 101:47,  6401: 35, 3:20})
         disturbances[9] = dict({2:90, 4602:72, 4:72, 102:45, 4604:10, 101:47, 6401: 35, 6403:20, 5:25, 103:30, 3:60, 10:25})
-        disturbances[10] = dict({101:18, 1:29, 3:25, 5:15, 2:36, 4602: 20, 9:12, 103:15, 10:50, 4606:30, 102:45, 4604:10, 101:47, 6401: 35, 3:20, 6403:20, 5:25, 103:30, 3:60, 4604:10, 10:25})
+        disturbances[10] = dict({1:29, 2:36, 4602: 20, 9:12, 4606:30, 102:45, 101:47, 6401: 35, 6403:20, 5:25, 103:30, 3:60, 4604:10, 10:25})
         disturbances[11] = dict({2:92, 4602:70, 4:72, 102:46, 101:45, 6401:33, 6403:20, 5:25, 103:28, 3:59, 4604:12, 10:25})
 
     print("n.o. trains", len(train_set["J"]))
@@ -138,17 +134,14 @@ if __name__ == "__main__":
     sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 10, "num_reads": 2}
     real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
 
-
     results = {}
     results["method"] = args.solve_lp
     results["d_max"] = d_max
     results["case"] = args.case
 
-
     for k in disturbances:
         print("n.o. problem", k)
         dist = disturbances[k]
-
         timetable = make_timetable(train_dict, important_stations, skip_stations, t_ref)
         for i in dist:
             if i not in train_set["J"]:
@@ -157,7 +150,6 @@ if __name__ == "__main__":
             timetable["initial_conditions"] = add_delay(
                 timetable["initial_conditions"], i, dist[i]
             )
-
         result = {}  
         prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
         order_vars, int_vars, constraints = count_vars(prob)   
@@ -178,13 +170,11 @@ if __name__ == "__main__":
             visualize = False
             if visualize:
                 print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref)
-
             result["objective"] = prob.objective.value() * d_max
             result["comp_time_seconds"] = end_time - start_time
             result["feasible"] = True
             results["brolen_constraints"] = 0
             check_count_vars(prob)
-
         elif args.solve_quantum in ["sim", "real", "hyb"]:
             bqm, qubo, interpreter = convert_to_bqm(prob, pdict)       
             print(f"{args.solve_quantum} annealing")
@@ -196,7 +186,6 @@ if __name__ == "__main__":
             result.update(sample)
             result["broken_constraints"] = constraints - sample["feas_constraints"][1]
             print("broken constraints", result["broken_constraints"])
-
         elif args.solve_quantum == "cqm":
             cqm, interpreter = convert_to_cqm(prob)
             start_time = time.time()
@@ -209,7 +198,6 @@ if __name__ == "__main__":
             print("broken constraints", result["broken_constraints"])      
         results[k] = result 
     results["samples"] = k+1
-
     file = f"results_KO_GLC/results_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
     with open(file, "wb") as f:
         pkl.dump(results, f)

@@ -15,12 +15,10 @@ from railway_solvers.railway_solvers import (
 
 )
 
-
 from helpers import(
     print_optimisation_results,
     check_count_vars
     )
-
 
 
 if __name__ == "__main__":
@@ -44,7 +42,6 @@ if __name__ == "__main__":
         default="",
     )
 
-
     train_set = {
         "skip_station": {
             "Ks1": 10, "Ks3": 10, "Ic1": 10, "Ks2": 1, "Ks4":1, "Ic2":1},
@@ -60,7 +57,6 @@ if __name__ == "__main__":
         "Jtrack": {},
         "Jswitch": {}
     }
-
     taus = {"pass": {"Ks1_1_3": 4, "Ks1_3_5": 6, "Ks1_5_10": 6, "Ks3_1_3": 4, "Ks3_3_5": 6, "Ks3_5_10": 6, "Ic1_1_3": 4, "Ic1_3_5": 4, "Ic1_5_10": 5,
                     "Ks2_3_1": 4, "Ks2_5_3": 6, "Ks2_10_5": 6, "Ks4_3_1": 4, "Ks4_5_3": 6, "Ks4_10_5": 6, "Ic2_3_1": 4, "Ic2_5_3": 4, "Ic2_10_5": 5
             },
@@ -83,7 +79,6 @@ if __name__ == "__main__":
                  "schedule": {"Ks1_1": 0, "Ks3_1": 60, "Ic1_1": 10, "Ks2_10": 40, "Ks4_10": 100, "Ic2_10": 95}
                 }
 
-
     t_ref = "8:00"
   
     prob = create_linear_problem(train_set, timetable, d_max, cat="Integer")
@@ -104,14 +99,11 @@ if __name__ == "__main__":
         prob.solve(solver = solver)
         end_time = time.time()
         print_optimisation_results(prob, timetable, train_set, train_set["skip_station"], d_max, t_ref)
-
         print("optimisation, time = ", end_time - start_time, "seconds")
         check_count_vars(prob)
         print("objective", prob.objective.value())
 
-
-    # QUBO creation an solution
-    
+    # QUBO creation an solution 
     if args.solve_quantum in ["sim", "real", "hyb", "save_qubo"]:
         pdict = {
             "minimal_span": 10,
@@ -148,7 +140,7 @@ if __name__ == "__main__":
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
         #print_results(dict_list)
-
+        
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
         file = f"solutions_quantum/{args.solve_quantum}_wisla_case1.pkl"
         with open(file, "wb") as f:

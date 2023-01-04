@@ -195,13 +195,11 @@ if __name__ == "__main__":
         end_time = time.time()
         print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref)
         print("............ case", args.case, ".......")
-
         print("optimisation, time = ", end_time - start_time, "seconds")
         check_count_vars(prob)
         print("objective x d_max  in [min]", prob.objective.value() * d_max)
 
     # QUBO creation an solution
-    
     if args.solve_quantum in ["sim", "real", "hyb"]:
         pdict = {
             "minimal_span": 2.5,
@@ -245,3 +243,4 @@ if __name__ == "__main__":
         file = f"solutions_quantum/{args.solve_quantum}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
+            
