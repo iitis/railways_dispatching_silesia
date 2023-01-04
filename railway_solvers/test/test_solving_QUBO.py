@@ -1,5 +1,4 @@
 import os
-import logging
 import importlib
 import numpy as np
 
@@ -7,7 +6,6 @@ from railway_solvers import (create_linear_problem, annealing,
                              convert_to_bqm, count_quadratic_couplings, 
                              get_results, count_linear_fields, get_best_feasible_sample,
                              save_results, read_process_results, print_results)
-
 
 def compute_all_files(method, pdict=None, real_anneal_var=None, sim_annealing_var=None):
     """Runs the annealing experiment for the files inside the inputs folder
@@ -24,12 +22,10 @@ def compute_all_files(method, pdict=None, real_anneal_var=None, sim_annealing_va
         if "init" not in file and "pycach" not in file and ".pytest_cache" not in file:
             compute_single_file(file[:-3], method, pdict, real_anneal_var, sim_annealing_var)
 
-
 def compute_single_file(
     file, method,  pdict=None, real_anneal_var=None, sim_annealing_var=None
 ):
     """Runs the annealing experiment for the files inside the inputs folder
-
     :param file: Name of the input data file
     :type file: str
     :param method: 'sim', 'real', 'hyb', 'cqm'
@@ -50,7 +46,6 @@ def compute_single_file(
     dict_list1 = read_process_results(f"test/annealing_results/{file_name}", prob)
     dict_list = get_results(sampleset, prob=prob)
     assert dict_list == dict_list1
-
     print_results(dict_list)
     sample = get_best_feasible_sample(dict_list1)
     assert sample["feasible"] is True
@@ -77,7 +72,6 @@ def test_qubo():
     hs = bqm.linear
     Js = bqm.quadratic
     s = np.size(variables)
-
     count = 0
     for i in range(s):
         for j in range(i, s):
@@ -96,7 +90,6 @@ def test_qubo():
     assert count == len(qubo[0])
     assert len(bqm.linear) == count_linear_fields(bqm)
     assert len(bqm.quadratic) == count_quadratic_couplings(bqm)
-
 
 def test_all_files():
     """test simple examples on simulated annealing. It is probabilistic test"""
