@@ -32,3 +32,4 @@ six==1.16.0
 toml==0.10.2
 wrapt==1.13.3
 coverage
+sympy
