@@ -29,7 +29,7 @@ def analyze_constraints(
             result[cname] = expr <= -c.constant
         elif sense == pulp.LpConstraintGE:
             result[cname] = expr >= -c.constant
-    return result, sum(x == True for x in result.values())
+    return result, sum(x is True for x in result.values())
 
 
 def get_objective(prob: pulp.LpProblem, sample) -> float:
