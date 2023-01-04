@@ -18,7 +18,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install coverage pytest
     - name: Running test on data_formating
-      working-directory: data_formating
+      working-directory: data_formatting
       run: |
         coverage run -m pytest
     - name: Running test on railway_solvers
