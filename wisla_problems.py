@@ -1,3 +1,4 @@
+""" chosen problem form Quantum annealing in the NISQ era: railway conflict management """
 import pickle as pkl
 import time
 import pulp as pl
@@ -10,9 +11,7 @@ from railway_solvers.railway_solvers import (
     get_results,
     get_best_feasible_sample,
     convert_to_cqm,
-    constrained_solver,
-    count_quadratic_couplings,
-    count_linear_fields
+    constrained_solver
 
 )
 
@@ -31,7 +30,6 @@ if __name__ == "__main__":
 
     d_max = 10
 
-
     parser.add_argument(
         "--solve_lp",
         type=str,
@@ -42,11 +40,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--solve_quantum",
         type=str,
-        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm, 'save_qubo' just save qubo to ./qubos",
+        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
         default="",
     )
 
-    
 
     train_set = {
         "skip_station": {
@@ -60,8 +57,8 @@ if __name__ == "__main__":
                     (5,10): [["Ks1", "Ks2"], ["Ks1", "Ks4"], ["Ks1", "Ic2"], ["Ks3", "Ks2"], ["Ks3", "Ks4"], ["Ks3", "Ic2"], ["Ic1", "Ks2"], ["Ic1", "Ks4"], ["Ic1", "Ic2"]]
                     },
         "Jround": {10: [["Ic1", "Ic2"]]},
-        "Jtrack": dict(),
-        "Jswitch": dict()
+        "Jtrack": {},
+        "Jswitch": {}
     }
 
     taus = {"pass": {"Ks1_1_3": 4, "Ks1_3_5": 6, "Ks1_5_10": 6, "Ks3_1_3": 4, "Ks3_3_5": 6, "Ks3_5_10": 6, "Ic1_1_3": 4, "Ic1_3_5": 4, "Ic1_5_10": 5,
@@ -89,7 +86,6 @@ if __name__ == "__main__":
 
     t_ref = "8:00"
   
-
     prob = create_linear_problem(train_set, timetable, d_max, cat="Integer")
 
     args = parser.parse_args()
@@ -129,16 +125,6 @@ if __name__ == "__main__":
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
 
-    if args.solve_quantum == "save_qubo":
-        print("..... QUBO size .....")
-        print("QUBO variables", len(bqm.variables))
-        print("quadratic terms", count_quadratic_couplings(bqm))
-        print("linear terms", count_linear_fields(bqm))
-
-        file = f"qubos/qubo_wisla_case1.pkl"
-        with open(file, "wb") as f:
-            pkl.dump(qubo[0], f)
-
 
     if args.solve_quantum in ["sim", "real", "hyb"]:
         sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
@@ -151,7 +137,6 @@ if __name__ == "__main__":
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
-
         #print_results(dict_list)
 
     if args.solve_quantum == "cqm":
@@ -162,12 +147,9 @@ if __name__ == "__main__":
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
-
         #print_results(dict_list)
 
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
         file = f"solutions_quantum/{args.solve_quantum}_wisla_case1.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
-
-

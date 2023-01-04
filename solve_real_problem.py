@@ -1,3 +1,4 @@
+""" close to real problems on metropolitan network """
 import pickle as pkl
 import time
 import pulp as pl
@@ -14,9 +15,7 @@ from railway_solvers.railway_solvers import (
     get_results,
     get_best_feasible_sample,
     convert_to_cqm,
-    constrained_solver,
-    count_quadratic_couplings,
-    count_linear_fields
+    constrained_solver
 
 )
 
@@ -91,7 +90,7 @@ if __name__ == "__main__":
         "-save", required=False, action="store_true", help="save built train dictionary"
     )
     args = parser.parse_args()
-    if (args.load == None) and ("d" not in args):
+    if (args.load is None) and ("d" not in args):
         print(
             "Please provide data.\
             \n --load the trains dictonary with dataframe or \
@@ -154,7 +153,7 @@ if __name__ == "__main__":
             )
             i = i + 1
 
-    if args.case == 5 or args.case == 7 or args.case == 8 or args.case == 9:
+    if args.case in (5, 7, 8, 9):
         delays = [30, 12, 18, 5, 30, 23, 3, 21, 35, 10, 25, 7, 5, 16]
         trains = [
             94766,
@@ -191,7 +190,6 @@ if __name__ == "__main__":
             solver =  pl.CPLEX_CMD(path=path_to_cplex)
         else:    
             solver = pl.getSolver(args.solve_lp)
-
         start_time = time.time()
         prob.solve(solver = solver)
         end_time = time.time()
@@ -201,7 +199,6 @@ if __name__ == "__main__":
         print("optimisation, time = ", end_time - start_time, "seconds")
         check_count_vars(prob)
         print("objective x d_max  in [min]", prob.objective.value() * d_max)
-
 
     # QUBO creation an solution
     
@@ -217,7 +214,6 @@ if __name__ == "__main__":
             "objective": 1,
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
-
 
 
     if args.solve_quantum in ["sim", "real", "hyb"]:
@@ -249,5 +245,3 @@ if __name__ == "__main__":
         file = f"solutions_quantum/{args.solve_quantum}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
-
-

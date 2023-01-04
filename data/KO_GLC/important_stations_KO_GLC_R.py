@@ -1,3 +1,4 @@
+""" important stations on the KO - GLC segment inbluding CB and ZZ  (rerouting or single track case) """
 import numpy as np
 
 important_stations = {

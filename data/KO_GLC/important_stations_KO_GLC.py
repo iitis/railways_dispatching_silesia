@@ -1,3 +1,4 @@
+""" important stations on the KO - GLC segment """
 import numpy as np
 
 important_stations = {
