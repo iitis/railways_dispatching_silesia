@@ -1,3 +1,4 @@
+""" helpers for close to real and generic examples """
 import pickle as pkl
 import numpy as np
 import pandas as pd
@@ -22,26 +23,20 @@ from data_formatting.data_formatting import (
     update_all_timetables,
 )
 from railway_solvers.railway_solvers import (
-
     delay_and_acctual_time,
     impact_to_objective,
-
 )
-
 
 def load_timetables(timetables_path):
     with open(timetables_path.load, "rb") as file:
         train_dict = pkl.load(file)
     return train_dict
 
-
 def load_important_stations(important_station_path):
     return np.load(important_station_path, allow_pickle=True)["arr_0"][()]
 
-
 def load_data_paths(data_paths_path):
     return pd.read_excel(data_paths_path, engine="odf")
-
 
 def build_timetables(d, save, important_stations, data_paths):
     data = pd.read_csv(d, sep=";", engine="python")
@@ -50,7 +45,6 @@ def build_timetables(d, save, important_stations, data_paths):
         train_dicts, data_paths, important_stations, save=save
     )
     return train_dicts
-
 
 def make_taus(train_dict, important_stations, r):
     taus = {}
@@ -62,12 +56,11 @@ def make_taus(train_dict, important_stations, r):
     taus["res"] = 1
     return taus
 
-
 def make_timetable(
     train_dict, important_stations, skip_stations, t1="16:00", taus=None
 ):
     timetable = {}
-    if taus == None:
+    if taus is None:
         taus = make_taus(train_dict, important_stations, 1)
     timetable["tau"] = taus
     timetable["initial_conditions"] = get_initial_conditions(train_dict, t1)
@@ -76,7 +69,6 @@ def make_timetable(
     )
     timetable["schedule"] = get_schedule(train_dict, t1)
     return timetable
-
 
 def make_train_set(train_dict, important_stations, data_path, skip_stations):
     train_set = {}
@@ -89,7 +81,6 @@ def make_train_set(train_dict, important_stations, data_path, skip_stations):
     train_set["Jtrack"] = jtrack(train_dict, important_stations)
     train_set["Jswitch"] = jswitch(train_dict, important_stations, data_path)
     return train_set
-
 
 def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref):
     print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
@@ -133,7 +124,6 @@ def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max,
                         "delta f(t)",
                         delta_obj,
                     )
-
 
 def check_count_vars(prob):
     """

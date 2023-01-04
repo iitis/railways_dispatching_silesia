@@ -1,11 +1,9 @@
-from copy import deepcopy
 from typing import Callable, Tuple
 
 import dimod
 import pulp
 from dimod import ConstrainedQuadraticModel
 from dimod.constrained import ConstrainedQuadraticModel
-from dimod.sampleset import SampleSet
 from pulp import LpProblem
 
 
@@ -36,7 +34,7 @@ def convert_to_cqm(model: LpProblem) -> Tuple[ConstrainedQuadraticModel, Callabl
     cqm = ConstrainedQuadraticModel()
 
     # vars translator
-    vars_trans = dict()
+    vars_trans = {}
     for var in model.variables():
         if _is_binary(var):
             vars_trans[var] = dimod.Binary(var.name)

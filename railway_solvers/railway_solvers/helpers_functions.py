@@ -1,5 +1,5 @@
+""" helpers for ILP solver"""
 import numpy as np
-
 
 def occurs_as_pair(a, b, vecofvec):
     """checks whether a and b occurs together in the same vector of vectors """
@@ -30,8 +30,7 @@ def subsequent_station(path, s):
     k = path.index(s)
     if k == len(path) - 1:
         return None
-    else:
-        return path[k + 1]
+    return path[k + 1]
 
 
 def previous_station(path, s):
@@ -43,8 +42,7 @@ def previous_station(path, s):
     k = path.index(s)
     if k == 0:
         return None
-    else:
-        return path[k - 1]
+    return path[k - 1]
 
 
 # timetable input is extected to be in the following form of dict of dicts
@@ -83,11 +81,11 @@ def tau(
     elif key == "pass":
         string = f"{first_train}_{first_station}_{second_station}"
         return timetable["tau"][key][string]
-    elif key == "stop":
+    if key == "stop":
         return timetable["tau"][key][f"{first_train}_{first_station}"]
-    elif key == "prep":
+    if key == "prep":
         return timetable["tau"][key][f"{first_train}_{first_station}"]
-    elif key == "res":
+    if key == "res":
         return timetable["tau"]["res"]
     return None
 
@@ -99,8 +97,7 @@ def penalty_weights(timetable, train, station):
     train_station = f"{train}_{station}"
     if train_station in timetable["penalty_weights"]:
         return timetable["penalty_weights"][train_station]
-    else:
-        return 0.0
+    return 0.0
 
 
 def earliest_dep_time(S, timetable, train, station):
@@ -116,23 +113,21 @@ def earliest_dep_time(S, timetable, train, station):
     if train_station in timetable["initial_conditions"]:
         unaviodable = timetable["initial_conditions"][train_station]
         return np.maximum(sched, unaviodable)
-    else:
-        s = previous_station(S[train], station)
-        τ_pass = tau(
-            timetable,
-            "pass",
-            first_train=train,
-            first_station=s,
-            second_station=station,
-        )
-        τ_stop = tau(timetable, "stop", first_train=train, first_station=station)
-        unavoidable = earliest_dep_time(S, timetable, train, s) + τ_pass
-        unavoidable += τ_stop
-        return np.maximum(sched, unavoidable)
+    s = previous_station(S[train], station)
+    τ_pass = tau(
+        timetable,
+        "pass",
+        first_train=train,
+        first_station=s,
+        second_station=station,
+    )
+    τ_stop = tau(timetable, "stop", first_train=train, first_station=station)
+    unavoidable = earliest_dep_time(S, timetable, train, s) + τ_pass
+    unavoidable += τ_stop
+    return np.maximum(sched, unavoidable)
 
 
 # helpers for trains set
-
 
 def not_the_same_rolling_stock(j, jp, train_sets):
     """checks if two trains (j, jp) are not served by the same rolling stock"""
@@ -170,9 +165,9 @@ def skip_station(j,s, train_sets):
      """
     if "skip_station" not in train_sets:
         return False
-    elif j not in train_sets["skip_station"]:
+    if j not in train_sets["skip_station"]:
         return False
-    elif s != train_sets["skip_station"][j]:
+    if s != train_sets["skip_station"][j]:
         return False
     return True
 
@@ -218,17 +213,15 @@ def can_MO_on_line(j, jp, s, train_sets):
     sp = previous_station(S[j], s)
     spp = previous_station(S[jp], s)
 
-    if Jd == dict():
+    if Jd == {}:
         return False
-
-    if sp == None or spp == None:
+    if sp is None or spp is None:
         return False
     if sp != spp:
         return True
-    elif occurs_as_pair(j, jp, Jd[sp][s]):
+    if occurs_as_pair(j, jp, Jd[sp][s]):
         return False
-    else:
-        return True
+    return True
 
 def are_two_trains_entering_via_the_same_switches(train_sets, s, j, jp):
     if s in train_sets["Jswitch"].keys():
@@ -236,7 +229,5 @@ def are_two_trains_entering_via_the_same_switches(train_sets, s, j, jp):
         are_swithes = np.array([j in e and jp in e for e in v])
         if True in are_swithes:
             return ('in', 'in') in [(v[i][j], v[i][jp]) for i in np.where(are_swithes == True)[0]]
-        else:
-            return False
-    else:
         return False
+    return False

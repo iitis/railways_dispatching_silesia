@@ -9,7 +9,6 @@ from dwave.system import (
     LeapHybridCQMSampler,
 )
 
-
 def sim_anneal(
     bqm, beta_range=(5, 100), num_sweeps=4000, num_reads=1000
 ) -> dimod.sampleset.SampleSet:
@@ -60,7 +59,6 @@ def real_anneal(
     )
     return sampleset
 
-
 def constrained_solver(cqm) -> dimod.sampleset.SampleSet:
     """Runs experiment using constrained solver
 
@@ -84,9 +82,6 @@ def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
     sampler = LeapHybridSampler()
     return sampler.sample(bqm)
 
-
-
-
 def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
     """Extracts/sets parameters for annealing experiment
 
@@ -105,9 +100,7 @@ def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
         chain_strength = real_anneal_var_dict["chain_strength"]
 
     return num_reads, annealing_time, chain_strength
-
-
-        
+     
 def annealing(
     bqm, interpreter, method, real_anneal_var_dict=None, sim_anneal_var_dict=None
 ):
@@ -123,9 +116,7 @@ def annealing(
     :param real_anneal_var_dict: Parameters for QA
     :type real_anneal_var_dict: Dict[str, float]
     """
-
     assert method in ["sim", "real", "hyb"]
-
     if method == "sim":
          sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
     elif method == "real":
@@ -142,5 +133,3 @@ def annealing(
         sampleset = hybrid_anneal(bqm)
     return interpreter(sampleset)
     
-
-
