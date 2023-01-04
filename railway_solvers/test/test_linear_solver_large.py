@@ -1,16 +1,9 @@
+"""test ILP on larger problem """
 import pytest
 
-from railway_solvers import solve_linear_problem
-from railway_solvers import delay_and_acctual_time
-
-
-def energy(v, Q):
-    if -1 in v:
-        v = [(y + 1) / 2 for y in v]
-    X = np.array(Q)
-    V = np.array(v)
-    return V @ X @ V.transpose()
-
+from railway_solvers import (
+    solve_linear_problem, delay_and_acctual_time
+    )
 
 def test_5_trains_all_cases():
     """
@@ -210,7 +203,6 @@ def test_many_trains_single_line():
             "14_A": 0.5,
             "16_A": 0.5,
             "11_B": 0.5,
-            "11_B": 0.5,
             "13_B": 0.5,
             "15_B": 0.5,
             "17_B": 0.5,
@@ -260,9 +252,9 @@ def test_many_trains_single_line():
                 [16, 17],
             ]
         },
-        "Jround": dict(),
+        "Jround": {},
         "Jtrack": {"A": [[10, 12, 14, 16]], "B": [[11, 13, 15, 17]]},
-        "Jswitch": dict(),
+        "Jswitch": {},
     }
 
     d_max = 10

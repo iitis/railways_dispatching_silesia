@@ -29,8 +29,8 @@ train_sets = {
   "J": [0, 1, 2],
   "Jd": {"A": {"B": [[0, 2]]}, "B": {"A": [[1]]}},
   "Jtrack": {"B": [[0,1,2]]},
-  "Jswitch": dict(),
-  "Josingle": dict(),
+  "Jswitch": {},
+  "Josingle": {},
   "Jround": {"B": [[0,1]]}
 }
 

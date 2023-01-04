@@ -118,9 +118,9 @@ train_sets = {
             [16, 17],
         ]
     },
-    "Jround": dict(),
+    "Jround": {},
     "Jtrack": {"A": [[10, 12, 14, 16]], "B": [[11, 13, 15, 17]]},
-    "Jswitch": dict(),
+    "Jswitch": {},
 }
 
 d_max = 10

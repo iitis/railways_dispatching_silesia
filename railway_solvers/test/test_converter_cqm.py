@@ -18,7 +18,7 @@ def _compare_bqm(bqm1, bqm2):
 def test_equality_binary():
     n = 3
 
-    vars = dict()
+    vars = {}
     for i in range(n):
         vars.update(pulp.LpVariable.dicts("y", [i], cat="Binary"))
     # print([v.cat for v in vars.values()])
@@ -37,7 +37,7 @@ def test_equality_binary():
 def test_equality():
     n = 3
 
-    vars = dict()
+    vars = {}
     for i in range(n):
         vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
@@ -56,7 +56,7 @@ def test_equality():
 def test_geq():
     n = 3
 
-    vars = dict()
+    vars = {}
     for i in range(n):
         vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
@@ -77,7 +77,7 @@ def test_geq():
 def test_leq():
     n = 3
 
-    vars = dict()
+    vars = {}
     for i in range(n):
         vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
 
@@ -98,7 +98,7 @@ def test_leq():
 def test_leq():
     n = 3
 
-    vars = dict()
+    vars = {}
     for i in range(n):
         vars.update(pulp.LpVariable.dicts("y", [i], 5, 20, cat="Integer"))
 
@@ -119,7 +119,7 @@ def test_leq():
 def test_bad_leq():
     n = 3
 
-    vars = dict()
+    vars = {}
     for i in range(n):
         vars.update(pulp.LpVariable.dicts("y", [i], 0, 20, cat="Integer"))
     print(vars)

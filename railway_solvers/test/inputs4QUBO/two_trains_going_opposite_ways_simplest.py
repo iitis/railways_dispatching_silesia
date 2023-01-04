@@ -17,10 +17,10 @@ tracks - ......
 train_sets = {
     "Paths": {0: ["A", "B"], 1: ["B", "A"]},
     "J": [0, 1],
-    "Jd": dict(),
+    "Jd": {},
     "Josingle": {("A","B"): [[0,1]]},
-    "Jround": dict(),
-    "Jtrack": dict(),
+    "Jround": {},
+    "Jtrack": {},
     "Jswitch": {"A": [{0: "out", 1: "in"}], "B": [{0: "in", 1: "out"}]}
 }
 
