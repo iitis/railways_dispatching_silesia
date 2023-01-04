@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install coverage pytest
+        pip install -r requirements.txt
     - name: Running test on data_formating
       working-directory: data_formatting
       run: |
