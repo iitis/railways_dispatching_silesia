@@ -10,7 +10,7 @@ from .linear_solver import  impact_to_objective
 
 from .converter_cqm import convert_to_cqm
 from .converter_bqm import convert_to_pyqubo, convert_to_bqm
-from .Qfile_solve import constrained_solver, annealing
+from .d_wave_solves import constrained_solver, annealing
 
 from .results_manipulation import analyze_constraints, get_objective, get_best_feasible_sample, print_results
 from .results_manipulation import get_results, save_results, read_process_results, count_quadratic_couplings, count_linear_fields, print_results

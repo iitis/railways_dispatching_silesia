@@ -1,3 +1,4 @@
+""" implement D_Wave solvers """
 from typing import Tuple
 
 import neal
@@ -30,7 +31,6 @@ def sim_anneal(
         bqm, beta_range, num_sweeps, num_reads, beta_schedule_type="geometric"
     )
     return sampleset
-
 
 def real_anneal(
     bqm, num_reads, annealing_time, chain_strength
@@ -70,7 +70,6 @@ def constrained_solver(cqm) -> dimod.sampleset.SampleSet:
     sampler = LeapHybridCQMSampler()
     return sampler.sample_cqm(cqm)
 
-
 def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
     """Runs experiment using hybrid solver
 
@@ -98,7 +97,6 @@ def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
         num_reads = real_anneal_var_dict["num_reads"]
         annealing_time = real_anneal_var_dict["annealing_time"]
         chain_strength = real_anneal_var_dict["chain_strength"]
-
     return num_reads, annealing_time, chain_strength
      
 def annealing(
