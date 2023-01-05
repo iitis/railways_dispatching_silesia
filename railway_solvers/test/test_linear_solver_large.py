@@ -6,6 +6,10 @@ from railway_solvers import (
     solve_linear_problem, delay_and_acctual_time
     )
 
+train_sets = None
+timetable = None
+d_max = None
+
 def test_5_trains_all_cases():
     """
     We have the following trains: 21,22,23,24,25
