@@ -16,7 +16,8 @@ from railway_solvers.railway_solvers import (
 
 from helpers import(
     print_optimisation_results,
-    check_count_vars
+    check_count_vars,
+    solve_on_quantum
     )
 
 if __name__ == "__main__":
@@ -94,8 +95,10 @@ if __name__ == "__main__":
         check_count_vars(prob)
         print("objective", prob.objective.value())
 
-    # QUBO creation an solution 
-    if args.solve_quantum in ["sim", "real", "hyb", "save_qubo"]:
+    # QUBO creation an solution
+    
+    pdict = {}
+    if args.solve_quantum in ["sim", "real", "hyb"]:
         pdict = {
             "minimal_span": 10,
             "single_line": 10,
@@ -106,32 +109,10 @@ if __name__ == "__main__":
             "circulation": 4,
             "objective": 1,
         }
-        bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
-
-    if args.solve_quantum in ["sim", "real", "hyb"]:
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 1000, "num_reads": 1000}
-        real_anneal_var_dict = {"num_reads": 260, "annealing_time": 1300, "chain_strength": 4}
-        print(f"{args.solve_quantum} annealing")
-        start_time = time.time()
-        sampleset = annealing(bqm, interpreter, args.solve_quantum, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
-        t = time.time() - start_time
-        print(f"{args.solve_quantum} time = ", t, "seconds")
-        dict_list = get_results(sampleset, prob=prob)
-        sample = get_best_feasible_sample(dict_list)
-        sample.update({"comp_time_seconds": t})
-        #print_results(dict_list)
-
-    if args.solve_quantum == "cqm":
-        cqm, interpreter = convert_to_cqm(prob)
-        start_time = time.time()
-        sampleset = constrained_solver(cqm)
-        t = time.time() - start_time
-        dict_list = get_results(sampleset, prob=prob)
-        sample = get_best_feasible_sample(dict_list)
-        sample.update({"comp_time_seconds": t})
-        #print_results(dict_list)
 
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
+        sample = solve_on_quantum(args, prob, pdict)
+        
         file = f"solutions_quantum/{args.solve_quantum}_wisla_case1.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)

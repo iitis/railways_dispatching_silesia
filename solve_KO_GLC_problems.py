@@ -84,8 +84,8 @@ if __name__ == "__main__":
     # input
     d_max = 40
     disturbances = {}
-    disturbances[0] = {}
 
+    disturbances[0] = {}
     if args.case != 3:
         disturbances[1] = dict({4602:2})
         disturbances[2] = dict({6401:3, 4604:13})
@@ -110,6 +110,7 @@ if __name__ == "__main__":
         disturbances[9] = dict({2:90, 4602:72, 4:72, 102:45, 4604:10, 101:47, 6401: 35, 6403:20, 5:25, 103:30, 3:60, 10:25})
         disturbances[10] = dict({1:29, 2:36, 4602: 20, 9:12, 4606:30, 102:45, 101:47, 6401: 35, 6403:20, 5:25, 103:30, 3:60, 4604:10, 10:25})
         disturbances[11] = dict({2:92, 4602:70, 4:72, 102:46, 101:45, 6401:33, 6403:20, 5:25, 103:28, 3:59, 4604:12, 10:25})
+    
     print("n.o. trains", len(train_set["J"]))
     pdict = {
         "minimal_span": 2.5,
@@ -146,7 +147,9 @@ if __name__ == "__main__":
         result["order_vars"] = order_vars
         result["int_vars"] = int_vars
         result["constraints"] = constraints
+
         if args.solve_lp != "":
+
             if "CPLEX_CMD" == args.solve_lp:
                 print("cplex")
                 # TODO user can add custom path
@@ -158,13 +161,16 @@ if __name__ == "__main__":
             prob.solve(solver = solver)
             end_time = time.time()
             visualize = False
+
             if visualize:
                 print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref)
+
             result["objective"] = prob.objective.value() * d_max
             result["comp_time_seconds"] = end_time - start_time
             result["feasible"] = True
             results["brolen_constraints"] = 0
             check_count_vars(prob)
+
         elif args.solve_quantum in ["sim", "real", "hyb"]:
             bqm, qubo, interpreter = convert_to_bqm(prob, pdict)       
             print(f"{args.solve_quantum} annealing")
@@ -176,6 +182,7 @@ if __name__ == "__main__":
             result.update(sample)
             result["broken_constraints"] = constraints - sample["feas_constraints"][1]
             print("broken constraints", result["broken_constraints"])
+
         elif args.solve_quantum == "cqm":
             cqm, interpreter = convert_to_cqm(prob)
             start_time = time.time()
@@ -185,9 +192,11 @@ if __name__ == "__main__":
             sample = get_best_feasible_sample(dict_list)
             result.update(sample)
             result["broken_constraints"] = constraints - sample["feas_constraints"][1]
-            print("broken constraints", result["broken_constraints"])      
+            print("broken constraints", result["broken_constraints"])
+
         results[k] = result 
     results["samples"] = k+1
+
     file = f"results_KO_GLC/results_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
     with open(file, "wb") as f:
         pkl.dump(results, f)
