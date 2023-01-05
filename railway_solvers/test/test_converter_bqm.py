@@ -1,9 +1,11 @@
+"""test converts ILP to QUBO via bqm and slack variables"""
 from dimod.constrained import cqm_to_bqm
 import pulp
 import dimod
 from railway_solvers import convert_to_bqm
 
 def _compare_bqm(bqm1, bqm2):
+    "helper"
     outcome = True
     linear1, quadratic1, offset1 = bqm1.to_ising()
     linear2, quadratic2, offset2 = bqm2.to_ising()
@@ -13,6 +15,7 @@ def _compare_bqm(bqm1, bqm2):
     return outcome
 
 def test_equality_binary():
+    """test conversion ILP with equity and binary variables"""
     n = 3
 
     variables = {}
@@ -21,13 +24,7 @@ def test_equality_binary():
     pulp_problem = pulp.LpProblem("simple_test")
     pulp_problem += sum(variables.values()) == 1, "minimal_span_1"
     pulp_problem += sum((i+1)*variables[i] for i in range(n))
-    pdict = {"minimal_span" : 1,
-            "single_line" : 1,
-            "circulation": 1,
-            "minimal_stay" : 1,
-            "track_occupation" : 1,
-            "switch": 1,
-            "objective" : 1}
+    pdict = {"minimal_span" : 1, "objective" : 1}
     dwave_pulp_problem, _, _ = convert_to_bqm(pulp_problem, pdict)
 
     var_dwave = [dimod.Binary(f"y_{i}") for i in range(n)]
@@ -38,6 +35,7 @@ def test_equality_binary():
     assert dwave_pulp_problem == cqm_to_bqm(cqm, 1)[0]
 
 def test_equality():
+    """test conversion ILP with equity and integer variables"""
     n = 3
 
     variables = {}
@@ -59,6 +57,7 @@ def test_equality():
     assert _compare_bqm(dwave_pulp_problem, bqm1)
 
 def test_geq():
+    """test conversion ILP with inequlaity and integer variables"""
     n = 3
 
     variables = {}
@@ -80,6 +79,7 @@ def test_geq():
     assert _compare_bqm(dwave_pulp_problem, bqm2)
 
 def test_geq_negative():
+    """test conversion ILP with inequlaity and integer variables with negative range"""
     n = 3
 
     variables = {}
@@ -101,6 +101,7 @@ def test_geq_negative():
     assert _compare_bqm(dwave_pulp_problem, bqm2)
 
 def test_leq():
+    """test conversion ILP with inequlaity and integer variables larger range of varialbe"""
     n = 3
 
     variables = {}
@@ -121,6 +122,8 @@ def test_leq():
     assert _compare_bqm(dwave_pulp_problem, bqm2)
 
 def test_nonzero_lb():
+    """test conversion ILP with inequlaity and integer variables larger range of varialbes,
+    positive and non-zero lower bound"""
     n = 3
 
     variables = {}
@@ -142,6 +145,7 @@ def test_nonzero_lb():
 
 
 def test_bad_leq():
+    """ negative testing"""
     n = 3
 
     variables = {}

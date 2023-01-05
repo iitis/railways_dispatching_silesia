@@ -89,7 +89,7 @@ def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
     :return: Number of reads, annealing_time and chain strength
     :rtype: Tuple[int, int, int]
     """
-    if real_anneal_var_dict == None:
+    if real_anneal_var_dict is None:
         num_reads = 1000
         annealing_time = 250
         chain_strength = 4
@@ -98,7 +98,7 @@ def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
         annealing_time = real_anneal_var_dict["annealing_time"]
         chain_strength = real_anneal_var_dict["chain_strength"]
     return num_reads, annealing_time, chain_strength
-     
+
 def annealing(
     bqm, interpreter, method, real_anneal_var_dict=None, sim_anneal_var_dict=None
 ):
@@ -116,7 +116,7 @@ def annealing(
     """
     assert method in ["sim", "real", "hyb"]
     if method == "sim":
-         sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
+        sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
     elif method == "real":
         num_reads, annealing_time, chain_strength = get_parameters(
             real_anneal_var_dict

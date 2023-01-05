@@ -1,6 +1,6 @@
 """test ILP on simple problems """
-import pytest
 import importlib
+import pytest
 
 from railway_solvers import (
     delay_varibles, 

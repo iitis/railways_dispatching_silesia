@@ -4,7 +4,6 @@ from typing import Callable, Dict, List, Tuple
 
 import dimod
 import pulp
-import pyqubo
 from pulp import LpProblem
 from pulp.constants import LpMinimize
 from pyqubo import Binary, LogEncInteger, Placeholder

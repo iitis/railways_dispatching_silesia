@@ -87,7 +87,7 @@ def get_results(
     return sorted(dict_list, key=lambda d: d["objective"])
 
 def save_results(
-    file_name: str, sampleset: dimod.SampleSet, 
+    file_name: str, sampleset: dimod.SampleSet
 ) -> List[Dict[str, Any]]:
     """
     :param sampleset: analyzed samples
@@ -177,9 +177,9 @@ def count_quadratic_couplings(bqm):
 def count_linear_fields(bqm):
     """
     return number of local fields hs
-    """ 
+    """
     count = 0
     for h in bqm.linear.values():
         if h != 0:
             count = count + 1
-    return count     
+    return count
