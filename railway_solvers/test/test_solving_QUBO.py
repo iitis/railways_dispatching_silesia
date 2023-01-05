@@ -49,6 +49,16 @@ def compute_single_file(
     print_results(dict_list)
     sample = get_best_feasible_sample(dict_list1)
     assert sample["feasible"] is True
+    assert len(sample["feas_constraints"][0]) == sample["feas_constraints"][1]
+    assert all(sample["feas_constraints"][0].values())
+
+    if file_name == "inputs4QUBO.two_trains_going_one_way_simplest":
+        assert sample["objective"] == 0.2
+    elif file_name == "inputs4QUBO.rolling_stock_circulation":
+        assert sample["objective"] == 0.4
+    elif file_name == "inputs4QUBO.mo_on_the_line":
+        assert sample["objective"] < 1.2
+
 
 def test_qubo():
     file = "5_trains_all_cases"

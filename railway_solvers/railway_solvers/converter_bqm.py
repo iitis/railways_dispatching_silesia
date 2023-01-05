@@ -1,3 +1,4 @@
+"""converts ILP to QUBO via bqm and slack variables"""
 import re
 from typing import Callable, Dict, List, Tuple
 
@@ -57,7 +58,7 @@ def _get_slack_ub(data: List[int], offset: int) -> int:
     return int(result)
 
 
-def convert_to_pyqubo(model: LpProblem) -> pyqubo.Model:
+def convert_to_pyqubo(model: LpProblem):
     """Converts Integer program into pyqubo.Model. Placeholders (penalty
     parameters) are NOT set up. Names of placeholders can be found in the code of
     _get_placeholder function, and for objective there is extra Placeholder called "objective".

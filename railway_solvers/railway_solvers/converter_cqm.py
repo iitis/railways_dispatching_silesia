@@ -1,8 +1,9 @@
+
+"""convert ILP to cqm input of D-Wave hybrid solver"""
 from typing import Callable, Tuple
 
 import dimod
 import pulp
-from dimod import ConstrainedQuadraticModel
 from dimod.constrained import ConstrainedQuadraticModel
 from pulp import LpProblem
 

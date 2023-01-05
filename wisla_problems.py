@@ -76,7 +76,7 @@ if __name__ == "__main__":
     t_ref = "8:00"
     prob = create_linear_problem(train_set, timetable, d_max, cat="Integer")
     args = parser.parse_args()
-    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm", "save_qubo"]
+    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
 
     if args.solve_lp != "":
         if "CPLEX_CMD" == args.solve_lp:

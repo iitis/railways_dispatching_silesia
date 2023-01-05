@@ -47,26 +47,13 @@ def test_minimal_span_two_trains():
      0 ->  --------------------------
     """
 
-
-    taus = {"pass": {"0_A_B": 4, "1_A_B": 8},
-            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
-            "stop": {"0_B": 1, "1_B": 1}, "res": 1}
-    timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 3, "1_A": 1},
-                 "penalty_weights": {"0_A": 2, "1_A": 0.5}}
-
-    train_sets = {
-        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
-        "J": [0, 1],
-        "Jd": {"A": {"B": [[0, 1]]}},
-        "Josingle": {},
-        "Jround": {},
-        "Jtrack": {},
-        "Jswitch": {}
-    }
+    file = "two_trains_going_one_way_simplest"
+    file_name = f"inputs4QUBO.{file}"
+    mdl = importlib.import_module(file_name)
+    globals().update(mdl.__dict__)
 
     ####   simple problem #####
-    prob = solve_linear_problem(train_sets, timetable, 5)
+    prob = solve_linear_problem(train_sets, timetable, d_max)
 
     v = prob.variables()
 
@@ -76,7 +63,7 @@ def test_minimal_span_two_trains():
     assert v[2].varValue == 4
     assert v[4].name == "y_0_1_one_station_A"
     assert v[4].varValue == 1.
-    assert prob.objective.value() == 0.4
+    assert prob.objective.value() == 0.2
 
     assert delay_and_acctual_time(
         train_sets, timetable, prob, 1, "A") == (4.0, 5.0, 1.0)
@@ -228,8 +215,6 @@ def  test_M_P_with_switches_two_trains():
 
             [ A  ]                                               [ B ]
 
-
-
     """
 
 
@@ -248,6 +233,7 @@ def  test_M_P_with_switches_two_trains():
         "Jtrack": {"A": [[0, 1]], "B": [[0, 1]]},
         "Jswitch": {"A": [{0:"out", 1:"out"}], "B": [{0:"in", 1:"in"}]}
     }
+    
 
     prob = solve_linear_problem(train_sets, timetable, 5)
 
@@ -297,23 +283,12 @@ def  test_M_P_with_switches_two_trains_no_station():
 
     """
 
-    taus = {"pass": {"0_A_B": 6, "1_A_B": 2},
-            "stop": {"0_B": 1, "1_B": 1}, "res": 1}
-    timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 1, "1_A": 5},
-                 "penalty_weights": {"0_B": 1., "1_B": 2.}}
+    file = "mo_on_the_line"
+    file_name = f"inputs4QUBO.{file}"
+    mdl = importlib.import_module(file_name)
+    globals().update(mdl.__dict__)
 
-    train_sets = {
-        "Paths": {0: ["A", "B"], 1: ["A", "B"]},
-        "J": [0, 1],
-        "Jd": {"A":{"B": [[0], [1]]}},
-        "Josingle": {},
-        "Jround": {},
-        "Jtrack": {"A": [[0, 1]]},
-        "Jswitch": {"A": [{0:"out", 1:"out"}], "B": [{0:"in", 1:"in"}]}
-    }
-
-    prob = solve_linear_problem(train_sets, timetable, 5)
+    prob = solve_linear_problem(train_sets, timetable, d_max)
 
     vs = prob.variables()
 
@@ -321,19 +296,15 @@ def  test_M_P_with_switches_two_trains_no_station():
     assert vs[1].name == "Delays_0_B"
     assert vs[2].name == "Delays_1_A"
     assert vs[3].name == "Delays_1_B"
-
     assert vs[4].name == "y_0_1_one_station_A"
     assert vs[5].name =="z_in_0_1_B"
-
 
     assert vs[0].varValue == 1
     assert vs[1].varValue == 1
     assert vs[2].varValue == 0
     assert vs[3].varValue == 0
-
     assert vs[4].varValue == 1
     assert vs[5].varValue == 0
-
 
     assert prob.objective.value() == pytest.approx(0.2)
 
@@ -482,25 +453,12 @@ def  test_station_track_and_circulation2():
 
     """
 
-    taus = {"pass": {"0_A_B": 4, "1_B_A": 4, "2_A_B": 4},
-            "stop": {"0_B": 0, "1_A": 1, "2_B": 1}, "res": 1,
-            "headway": {"0_2_A_B": 2, "2_0_A_B": 2},"prep": {"1_B": 10}}
-    timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 1, "1_B": 2, "2_A": 2},
-                 "penalty_weights": {"0_A": 1., "1_B": 1., "2_A": 1.}}
+    file = "station_track_and_circ"
+    file_name = f"inputs4QUBO.{file}"
+    mdl = importlib.import_module(file_name)
+    globals().update(mdl.__dict__)
 
-    train_sets = {
-        "Paths": {0: ["A", "B"], 1: ["B", "A"], 2: ["A", "B"]},
-        "J": [0, 1, 2],
-        "Jd": {"A": {"B": [[0, 2]]}, "B": {"A": [[1]]}},
-        "Jtrack": {"B": [[0,1,2]]},
-        "Jswitch": {},
-        "Josingle": {},
-        "Jround": {"B": [[0,1]]}
-    }
-
-
-    prob = solve_linear_problem(train_sets, timetable, 20)
+    prob = solve_linear_problem(train_sets, timetable, d_max)
 
     vs = prob.variables()
 
@@ -634,31 +592,10 @@ def test_QIP_problem1():
     1 ->
     """
 
-    taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
-            "stop": {"0_B": 1, "1_B": 1},
-            "res": 1
-            }
-
-    timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 4, "1_A": 1, "2_B": 8},
-                 "penalty_weights": {"0_A": 2, "1_A": 1, "2_B": 1}}
-
-    d_max = 10
-
-    train_sets = {
-        "skip_station": {
-            2: "A",  # we do not count train 2 leaving A
-        },
-        "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
-        "J": [0, 1, 2],
-        "Jd": {"A": {"B": [[0, 1]]}, "B": {"A": [[2]]}},
-        "Josingle": {},
-        "Jround": {},
-        "Jtrack": {"B": [[0, 1]]},
-        "Jswitch": {},
-        "add_swithes_at_s": ["B"]
-    }
+    file = "QIP_case_default"
+    file_name = f"inputs4QUBO.{file}"
+    mdl = importlib.import_module(file_name)
+    globals().update(mdl.__dict__)
 
 
     prob = solve_linear_problem(train_sets, timetable, d_max)
@@ -697,35 +634,13 @@ def test_QIP_problem2():
     .....................................c.........
     0 ->
     """
-    taus = {"pass": {"0_A_B": 4, "1_A_B": 8, "2_B_A": 8},
-            "headway": {"0_1_A_B": 2, "1_0_A_B": 6},
-            "stop": {"0_B": 1, "1_B": 1},
-            "res": 1
-            }
+    
+    file = "QIP_case_rerouted"
+    file_name = f"inputs4QUBO.{file}"
+    mdl = importlib.import_module(file_name)
+    globals().update(mdl.__dict__)
 
-    timetable = {"tau": taus,
-                 "initial_conditions": {"0_A": 4, "1_A": 1, "2_B": 8},
-                 "penalty_weights": {"0_A": 2, "1_A": 1, "2_B": 1}}
-
-    d_max = 10
-
-
-    train_sets_rerouted = {
-        "skip_station": {
-            2: "A",
-        },
-        "Paths": {0: ["A", "B"], 1: ["A", "B"], 2: ["B", "A"]},
-        "J": [0, 1, 2],
-        "Jd": {},
-        "Josingle": {("A", "B"): [[1,2]]},
-        "Jround": {},
-        "Jtrack": {"B": [[0, 1]]},
-        "Jswitch": {"A": [{1:"out", 2:"in"}], "B": [{1:"in", 2:"out"}]},
-        "add_swithes_at_s": ["B"]
-    }
-
-
-    prob = solve_linear_problem(train_sets_rerouted, timetable, d_max)
+    prob = solve_linear_problem(train_sets, timetable, d_max)
 
     v = prob.variables()
 
@@ -741,10 +656,10 @@ def test_QIP_problem2():
 
     assert prob.objective.value() == 0.4
 
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "A") == (0., 4., 4.)
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 1, "A") == (1., 2., 1.)
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 2, "B") == (3., 11., 8.)
-    assert delay_and_acctual_time(train_sets_rerouted, timetable, prob, 0, "B") == (0., 9., 9.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "A") == (0., 4., 4.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 1, "A") == (1., 2., 1.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 2, "B") == (3., 11., 8.)
+    assert delay_and_acctual_time(train_sets, timetable, prob, 0, "B") == (0., 9., 9.)
 
     assert impact_to_objective(prob, timetable, 0, "A", d_max) == pytest.approx(0)
     assert impact_to_objective(prob, timetable, 1, "A", d_max) == pytest.approx(0.1)
