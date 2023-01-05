@@ -11,6 +11,10 @@ from railway_solvers import (
     impact_to_objective
 )
 
+train_sets = None
+timetable = None
+d_max = None
+
 def test_linear_varibles_creations():
     """
         A                            B

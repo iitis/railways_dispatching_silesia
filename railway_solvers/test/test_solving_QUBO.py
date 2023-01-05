@@ -15,6 +15,10 @@ from railway_solvers import (
     print_results
     )
 
+train_sets = None
+timetable = None
+d_max = None
+
 def compute_all_files(method, pdict=None, real_anneal_var=None, sim_annealing_var=None):
     """Runs the annealing experiment for the files inside the inputs folder
 
