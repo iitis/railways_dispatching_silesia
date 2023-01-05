@@ -56,6 +56,7 @@ if __name__ == "__main__":
         default="",
     )
     args = parser.parse_args()
+
     # paths to files
     if args.case == 1:
         important_stations_path = "./data/KO_GLC/important_stations_KO_GLC.npz"
@@ -79,11 +80,12 @@ if __name__ == "__main__":
     )
     t_ref = "14:00"
     assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
-    
+
     # input
     d_max = 40
     disturbances = {}
     disturbances[0] = {}
+
     if args.case != 3:
         disturbances[1] = dict({4602:2})
         disturbances[2] = dict({6401:3, 4604:13})
@@ -119,6 +121,7 @@ if __name__ == "__main__":
         "circulation": 2.5,
         "objective": 1,
     }
+
     sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 10, "num_reads": 2}
     real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
     results = {}

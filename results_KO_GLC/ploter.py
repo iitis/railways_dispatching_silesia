@@ -1,3 +1,4 @@
+"""plots computational results from KO-GLC  generic cases"""
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -33,13 +34,13 @@ y1 = [results1[i]["objective"]*results1["d_max"] for i in range(N)]
 colors = []
 colors1 = []
 for i in range(N):
-    if results[i]["feasible"] == True:
+    if results[i]["feasible"] is True:
         colors.append("green")
     else:
         colors.append("red")
 
 for i in range(N):
-    if results1[i]["feasible"] == True:
+    if results1[i]["feasible"] is True:
         colors1.append("green")
     else:
         colors1.append("red")

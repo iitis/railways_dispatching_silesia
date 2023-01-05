@@ -2,10 +2,18 @@ import os
 import importlib
 import numpy as np
 
-from railway_solvers import (create_linear_problem, annealing, 
-                             convert_to_bqm, count_quadratic_couplings, 
-                             get_results, count_linear_fields, get_best_feasible_sample,
-                             save_results, read_process_results, print_results)
+from railway_solvers import (
+    create_linear_problem,
+    annealing,
+    convert_to_bqm,
+    count_quadratic_couplings,
+    get_results,
+    count_linear_fields,
+    get_best_feasible_sample,
+    save_results,
+    read_process_results,
+    print_results
+    )
 
 def compute_all_files(method, pdict=None, real_anneal_var=None, sim_annealing_var=None):
     """Runs the annealing experiment for the files inside the inputs folder
