@@ -2,19 +2,19 @@
 
 from railway_solvers import( 
     occurs_as_pair,
-    update_dictofdicts, 
-    previous_station, 
-    tau, 
-    penalty_weights, 
-    earliest_dep_time, 
+    update_dictofdicts,
+    previous_station,
+    tau,
+    penalty_weights,
+    earliest_dep_time,
     not_the_same_rolling_stock,
     departure_station4switches,
-    get_M, 
-    skip_station, 
+    get_M,
+    skip_station,
     subsequent_station,
-    previous_train_from_Jround, 
+    previous_train_from_Jround,
     subsequent_train_at_Jround,
-    are_two_trains_entering_via_the_same_switches, 
+    are_two_trains_entering_via_the_same_switches,
     can_MO_on_line
     )
 
@@ -47,11 +47,8 @@ def test_trains_paths():
 def test_auxiliary_timetable_functions():
     """test functions o timetable"""
     taus = {
-        "pass": {"0_0_1": 5, "1_0_1": 7, "2_1_0": 10},
-        "headway": {
-            "0_1_0_1": 2,
-            "1_0_0_1": 5,
-        },
+        "pass":{"0_0_1": 5, "1_0_1": 7, "2_1_0": 10},
+        "headway":{"0_1_0_1": 2, "1_0_0_1": 5},
         "stop": {"0_1": 1, "1_1": 2, "2_0": 1},
         "res": 3,
     }

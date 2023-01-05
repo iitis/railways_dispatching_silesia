@@ -3,11 +3,11 @@ import importlib
 import pytest
 
 from railway_solvers import (
-    delay_varibles, 
-    order_variables, 
-    solve_linear_problem, 
-    create_linear_problem, 
-    delay_and_acctual_time, 
+    delay_varibles,
+    order_variables,
+    solve_linear_problem,
+    create_linear_problem,
+    delay_and_acctual_time,
     impact_to_objective
 )
 
@@ -163,8 +163,6 @@ def  test_station_track_and_switches_two_trains():
                                  simplifies swith condition at B
 
     """
-    
-
     taus = {"pass": {"0_A_B": 4, "1_A_B": 4},
             "stop": {"0_B": 1, "1_B": 1}, "res": 2}
     timetable = {"tau": taus,

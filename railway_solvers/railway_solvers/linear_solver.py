@@ -520,7 +520,6 @@ def track_occuparion(problem, timetable, delay_var, y, train_sets, d_max):
                             y,
                             train_sets,
                         )
-                        
                         trains_order_at_s(
                             s,
                             jp,
