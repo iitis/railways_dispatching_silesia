@@ -1,10 +1,7 @@
-from ast import Dict
-from tabnanny import verbose
-import pandas as pd
-import numpy as np
+import itertools as it
 import itertools
-import pickle as pkl
-from sympy import intersection
+import sys
+import numpy as np
 from .utils import (
     common_path,
     flatten,
@@ -15,16 +12,14 @@ from .utils import (
     subsequent_block,
     turn_around_time,
 )
-from .time_table_check import timetable_to_train_dict, train_time_table
+from .time_table_check import train_time_table
 from .utils import get_trains_at_station
 from .utils import subsequent_station
 from .utils import get_blocks_b2win_station4train
-from .utils import get_all_important_station
 from .utils import blocks_list_4station
 from .utils import get_Paths
 from .make_switch_set import z_in
 from .make_switch_set import z_out
-import itertools as it
 
 # get list of train with pairs containing a train number and train number+9
 def get_trains_pair9(train_dict):
@@ -72,7 +67,7 @@ def get_jround(train_dict, important_stations):
             block = train_time_table(train_dict, pair[1])["path"].tolist()[0]
         else:
             print("Something is wrong in get_jround")
-            exit(1)
+            sys.exit
         station = [key for key, value in important_stations.items() if block in value][
             0
         ]
@@ -111,7 +106,9 @@ def josingle_dict_generate(train_dict, j, j_prime, s, s_prime, init_josingle):
             init_josingle[(s, s_prime)] = [[j, j_prime]]
 
     elif len(list(set(path).intersection(path_j_prime))) != 0:
-        assert "partial common path is not supported"
+        print("partial common path is not supported")
+        return []
+    return init_josingle
 
 
 def jtrack_dict_generation(Jtrack_dict):
@@ -217,11 +214,17 @@ def josingle(trains_dict, important_stations, imp_stations=None):
 
 
 def jtrack_subroutine(
-    trains_dict, s, important_stations,trains_at_stations, block_exclusion_list, current_blocks, vs
+    trains_dict,
+    s,
+    important_stations,
+    trains_at_stations,
+    block_exclusion_list,
+    current_blocks,
+    vs,
 ):
 
     for j in trains_at_stations[s]:
-        b = blocks_list_4station(trains_dict[j][1], s,important_stations)
+        b = blocks_list_4station(trains_dict[j][1], s, important_stations)
         if b not in block_exclusion_list:
             if b in current_blocks:
                 i = current_blocks.index(b) + 1
@@ -321,7 +324,8 @@ def jswitch(train_dict, important_stations, data_switch, imp_stations=None):
     for s in imp_stations_list:
         vec_of_pairs = []
         station_block = {
-            j: blocks_list_4station(train_dict[j][1], s,important_stations) for j in trains_at_stations[s]
+            j: blocks_list_4station(train_dict[j][1], s, important_stations)
+            for j in trains_at_stations[s]
         }
         blocks_list = {
             j: train_time_table(train_dict, j)["path"].tolist()
@@ -363,7 +367,7 @@ def jswitch(train_dict, important_stations, data_switch, imp_stations=None):
 
 def jd(time_tables_dict, important_stations, imp_stations=None):
     """
-        function that creates Jd has to be encoded here
+    function that creates Jd has to be encoded here
     """
     imp_stations_list, trains_at_stations = important_trains_and_stations(
         time_tables_dict, important_stations, imp_stations, False
@@ -405,11 +409,11 @@ def jd(time_tables_dict, important_stations, imp_stations=None):
 # taus are from here
 
 
-def get_taus_pass(train_dict, trains=None, r = 1):
+def get_taus_pass(train_dict, trains=None, r=1):
     """Function to generate taus_pass, a dictionary with
     information about passing time for a given train between
     two subsequent stations. It has as key the "train_s1_s2"
-    and value minimal passing time between stations for a 
+    and value minimal passing time between stations for a
     given train.
 
 
@@ -439,9 +443,9 @@ def get_taus_pass(train_dict, trains=None, r = 1):
     return taus_pass
 
 
-def get_taus_stop(train_dict:dict, important_stations:dict,trains=None, r = 1):
-    """Function for getting the mininal stop time for 
-    a train in a station. 
+def get_taus_stop(train_dict: dict, important_stations: dict, trains=None, r=1):
+    """Function for getting the mininal stop time for
+    a train in a station.
 
     Arguments:
         data -- data file containing train time tables
@@ -467,19 +471,26 @@ def get_taus_stop(train_dict:dict, important_stations:dict,trains=None, r = 1):
                 first_station = True
             if (i == len(paths[train]) - 1) and subsequent_block(
                 train_dict[train][1]["path"].tolist(),
-                blocks_list_4station(train_dict[train][1], station,important_stations)[0],
+                blocks_list_4station(train_dict[train][1], station, important_stations)[
+                    0
+                ],
             ) == None:
                 continue
             time_flag, ts_prep = minimal_stay(
-                train, station, train_dict, important_stations , first_station=first_station, r = r
+                train,
+                station,
+                train_dict,
+                important_stations,
+                first_station=first_station,
+                r=r,
             )
             taus_stop[f"{train}_{station}"] = time_flag
             taus_prep.update(ts_prep)
     return taus_stop, taus_prep
 
 
-def get_taus_prep(train_dict:dict,important_stations, r = 1):
-    """ Function that gives the preparation time
+def get_taus_prep(train_dict: dict, important_stations, r=1):
+    """Function that gives the preparation time
     for a given train at station
 
     _extended_summary_
@@ -495,13 +506,13 @@ def get_taus_prep(train_dict:dict,important_stations, r = 1):
     paths = get_Paths(train_dict)
     for train, stations in paths.items():
         s = stations[0]
-        st_prep = turn_around_time(train_dict[train][1], s, important_stations,r=r)
+        st_prep = turn_around_time(train_dict[train][1], s, important_stations, r=r)
         if st_prep != 0:
             taus_prep[f"{train}_{s}"] = st_prep
     return taus_prep
 
 
-def get_taus_headway(train_dict:dict, important_stations:dict, r=1):
+def get_taus_headway(train_dict: dict, important_stations: dict, r=1):
     important_stations_list = list(important_stations.keys())
     jd_dict = jd(train_dict, important_stations)
     taus_headway = {}

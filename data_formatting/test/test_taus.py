@@ -83,7 +83,7 @@ def test_taus_stop(key, output):
     assert taus_stop[key] == output
 
 
-test_stop_not_round = {
+test_stop_not_round_sample = {
     "26103_KO(STM)": pytest.approx(1.7),
     "421009_KO(STM)": pytest.approx(1.7),
     "42100_KO": pytest.approx(3),
@@ -92,8 +92,8 @@ test_stop_not_round = {
 taus_stop_not_round, _ = get_taus_stop(time_tables_dict, important_stations, r=0)
 
 
-@pytest.mark.parametrize("key, output", list(test_stop_not_round.items()))
-def test_taus_stop(key, output):
+@pytest.mark.parametrize("key, output", list(test_stop_not_round_sample.items()))
+def test_stop_not_round(key, output):
     assert taus_stop_not_round[key] == output
 
 
@@ -126,7 +126,7 @@ def test_taus_headway(key, output):
     assert taus_headway[f"{key}"] == output
 
 
-test_headway_not_round = {
+test_headway_not_round_sample = {
     "26103_14006_KZ_KO(STM)": pytest.approx(1.2),
     "26103_40673_KZ_KO(STM)": pytest.approx(1.2),
     "94766_40518_Ty_KL": pytest.approx(2.5),
@@ -139,6 +139,6 @@ test_headway_not_round = {
 taus_headway_not_round = get_taus_headway(time_tables_dict, important_stations, r=0)
 
 
-@pytest.mark.parametrize("key, output", list(test_headway_not_round.items()))
-def test_taus_headway(key, output):
+@pytest.mark.parametrize("key, output", list(test_headway_not_round_sample.items()))
+def test_headway_not_round(key, output):
     assert taus_headway_not_round[f"{key}"] == output

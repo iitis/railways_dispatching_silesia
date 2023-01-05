@@ -8,7 +8,6 @@ from data_formatting import (
 )
 
 from data_formatting import update_all_timetables
-from data_formatting import timetable_to_train_dict
 
 data = pd.read_csv("../data/trains_schedules.csv", sep=";")
 data_paths = pd.read_excel("../data/network_paths.ods", engine="odf")
@@ -21,10 +20,6 @@ train_dict = update_all_timetables(time_tables_dict, data_paths, important_stati
 
 
 def test_timetables():
-
-    t = get_arrdep(
-        train_dict[42100][1]
-    )  # should return arriving and dep times for blocks where they are given
 
     timetable_dict = timetable_to_train_dict(data)
     assert timetable_dict[42100][0] == [

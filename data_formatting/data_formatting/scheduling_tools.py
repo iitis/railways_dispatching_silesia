@@ -8,9 +8,9 @@ from .time_table_check import train_important_stations
 
 
 def get_schedule_per_train(timetable):
-    """ Return a dictionary with initial scheduling for a given train.
-        It take as keys the train important stations. 
-        
+    """Return a dictionary with initial scheduling for a given train.
+        It take as keys the train important stations.
+
     Arguments:
         timetable -- time table of the train (pandas.DataFrame)
 
@@ -27,9 +27,9 @@ def get_schedule_per_train(timetable):
     }
 
 
-def get_schedule(train_dicts:dict, t1:str):
-    """ Returns a dictionary with scheduling for a set of trains. 
-        
+def get_schedule(train_dicts: dict, t1: str):
+    """Returns a dictionary with scheduling for a set of trains.
+
     Arguments:
         train_dicts -- Dict containing all the trains with their timetables
         t1 -- Initial time for comparison.
@@ -38,7 +38,7 @@ def get_schedule(train_dicts:dict, t1:str):
         scheduling -- Dict with keys as train_station and value the time diference between
                       t1 and their scheduled Departure (if exists) or Arpoximate Departure.
     """
-    
+
     t1 = str(t1)
     schedule = {}
 
@@ -95,11 +95,13 @@ def add_delay(initial_conditions, train, delay):
     return new_conditions
 
 
-def make_weights(train_dict, skip_stations, stopping=1, fast=1.5, express=1.75, empty=0):
+def make_weights(
+    train_dict, skip_stations, stopping=1, fast=1.5, express=1.75, empty=0
+):
     trains_weights = {
         "KS - Os": stopping,
         "PR - R": stopping,
-        "KS - OsP": stopping, #TODO we may make it semi fast
+        "KS - OsP": stopping,  # TODO we may make it semi fast
         "IC - TLK": fast,
         "IC - IC": fast,
         "IC - EIP": express,
@@ -115,7 +117,7 @@ def make_weights(train_dict, skip_stations, stopping=1, fast=1.5, express=1.75, 
         station = train_important_stations(train_dict[train][1])[-1]
         if train in skip_stations and station == skip_stations[train]:
             station = train_important_stations(train_dict[train][1])[-2]
-        
+
         penalty_weights.update({f"{train}_{station}": weight})
 
     return penalty_weights

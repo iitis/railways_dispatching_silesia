@@ -51,7 +51,7 @@ def train_time_table(train_dict, train):
 
 
 def get_arrdep(time_table):
-    """ returns arriving, dep, approx dep times for blocks in the form of dict with
+    """returns arriving, dep, approx dep times for blocks in the form of dict with
     keys: 'Arr', 'Dep', 'Approx_enter'
 
     Values are strings, if not given in the timetable file they are NaN
@@ -62,8 +62,8 @@ def get_arrdep(time_table):
 
 
 def get_arr_dep_vals(time_table):
-    """  return vector of [Arr, Dep, Approx_enter] at stations given in  .csv file
-         if filed is empty returns nan
+    """return vector of [Arr, Dep, Approx_enter] at stations given in  .csv file
+    if filed is empty returns nan
     """
     arrdep = get_arrdep(time_table)
     short_list = arrdep.dropna(how="all")
@@ -74,14 +74,14 @@ def get_arr_dep_vals(time_table):
 
 
 def train_important_stations(time_table):
-    """  return the vector of important stations of given train timetable"""
+    """return the vector of important stations of given train timetable"""
 
     filtered_time_table = time_table[time_table["important_station"].notnull()]
     return filtered_time_table["important_station"].values.tolist()
 
 
 def train_important_stations1(time_table, important_stations):
-    """  return the vector of important stations of given train """
+    """return the vector of important stations of given train"""
     # important_stations = np.load("./important_stations.npz", allow_pickle=True)[
     #     "arr_0"
     # ][()]
@@ -96,10 +96,10 @@ def train_important_stations1(time_table, important_stations):
 
 
 def check_path_continuity(paths, data_path_check):
-    """ for given train checks if its path given in data in continious
+    """for given train checks if its path given in data in continious
      with regards to possible paths in data_path_check  if not raise AssertionError
     `not present`
-     """
+    """
     # paths = train_time_table(data, train)["path"]
     for i in range(len(paths) - 1):
         if data_path_check.isin([paths[i], paths[i + 1]]).all(1).any() == False:

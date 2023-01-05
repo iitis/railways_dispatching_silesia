@@ -20,7 +20,7 @@ time_tables_dict = update_all_timetables(
 )
 
 
-test_skip_station = {
+skip_station_sample = {
     94766: "KO(STM)",
     421009: "KO",
     40518: "KO(STM)",
@@ -36,6 +36,6 @@ test_skip_station = {
 skip_station = get_skip_stations(time_tables_dict)
 
 
-@pytest.mark.parametrize("key, output", list(test_skip_station.items()))
+@pytest.mark.parametrize("key, output", list(skip_station_sample.items()))
 def test_skip_station(key, output):
     assert skip_station[key] == output

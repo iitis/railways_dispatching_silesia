@@ -15,7 +15,7 @@ time_tables_dict = timetable_to_train_dict(data)
 train_dict = update_all_timetables(time_tables_dict, data_paths, important_stations)
 
 
-def test_Js():
+def test_js():
 
     #######    particulat Js #####
 
@@ -35,7 +35,7 @@ def test_Js():
 def test_josingle():
 
     # single track occupation
-    assert josingle(train_dict, important_stations, ["CM", "CB"]) == {}
+    assert not josingle(train_dict, important_stations, ["CM", "CB"])
     assert josingle(train_dict, important_stations, ["Mi", "MJ"]) == {
         ("Mi", "MJ"): [[44862, 44717]]
     }
@@ -45,9 +45,9 @@ def test_josingle():
         ("MJ", "Mi"): [[44717, 44862]],
     }
 
-    assert josingle(train_dict, important_stations, ["GLC", "CB"]) == {}
+    assert not josingle(train_dict, important_stations, ["GLC", "CB"])
 
-    assert josingle(train_dict, important_stations, ["CM", "CB"]) == {}
+    assert not josingle(train_dict, important_stations, ["CM", "CB"])
     # specific dict format
 
     trains_same_station_block = jtrack(train_dict, important_stations)
@@ -95,7 +95,7 @@ def test_josingle():
     assert trains_same_station_block["CM"] == [[94317], [64350]]
 
 
-def test_Jswitches():
+def test_jswitches():
 
     switches = jswitch(
         train_dict,
@@ -173,7 +173,7 @@ def test_Jswitches():
     print("trains sets tested")
 
 
-def test_Jd():
+def test_jd():
 
     # testing particular stations = fast
     Jd_s = jd(train_dict, important_stations, ["GLC", "MJ", "KZ"])

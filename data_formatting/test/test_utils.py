@@ -8,7 +8,7 @@ from data_formatting import (
     get_Paths,
     is_train_passing_thru_station,
 )
-from data_formatting import subsequent_station, get_trains_at_station
+from data_formatting import subsequent_station
 from data_formatting import get_J
 
 
@@ -124,10 +124,10 @@ def test_path_reffering_to_stations():
     train = 26103
     assert get_Paths(time_tables_dict)[train] == ["KZ", "KO(STM)", "KO", "CB", "GLC"]
 
-    assert is_train_passing_thru_station(time_tables_dict[train][1], "KO(STM)") == True
-    assert is_train_passing_thru_station(time_tables_dict[train][1], "KL") == False
+    assert is_train_passing_thru_station(time_tables_dict[train][1], "KO(STM)") is True
+    assert is_train_passing_thru_station(time_tables_dict[train][1], "KL") is False
     assert subsequent_station(train_dict[train][1], "KO(STM)") == "KO"
-    assert subsequent_station(train_dict[train][1], "GLC") == None
+    assert subsequent_station(train_dict[train][1], "GLC") is None
     assert get_trains_at_station(train_dict, important_stations)["CB"] == [
         26103,
         5312,
