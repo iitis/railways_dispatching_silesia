@@ -1,10 +1,9 @@
 from ast import List
-import pandas as pd
-import numpy as np
 import functools as ft
 from datetime import datetime
-
 from collections import defaultdict
+import numpy as np
+
 from .time_table_check import train_important_stations
 from .time_table_check import train_time_table
 
@@ -28,7 +27,12 @@ def getSizeOfNestedList(listOfElem):
 
 
 def check_common_specific_elements_lists(list1, list2):
-    common_elements = []
+    """
+    Get itens in common in two lists
+
+    return list with common intens
+    """
+    check_elements = []
     i = 0
     short = []
     while i in range(len(list1)):
@@ -37,12 +41,12 @@ def check_common_specific_elements_lists(list1, list2):
             if sublist(short, list2) and i < len(list1) - 1:
                 i += 1
             else:
-                common_elements.append(short)
+                check_elements.append(short)
                 short = []
                 i += 1
         else:
             i += 1
-    return common_elements
+    return check_elements
 
 
 def reverse_dict_of_lists(d):
@@ -54,18 +58,18 @@ def reverse_dict_of_lists(d):
 
 
 def flatten(t):
-    """ make a single list of lists of lists """
+    """make a single list of lists of lists"""
     return [item for sublist in t for item in sublist]
 
 
 def common_elements(list1, list2):
-    """ get common elements, order such as in list1 """
+    """get common elements, order such as in list1"""
     return [element for element in list1 if element in list2]
 
 
 # get indexes in dataframe
 def get_indexes(dfObj, value):
-    """ Get index positions of value in dataframe i.e. dfObj."""
+    """Get index positions of value in dataframe i.e. dfObj."""
     listOfPos = list()
     # Get bool dataframe with True at positions where the given value exists
     result = dfObj.isin([value])
@@ -105,7 +109,7 @@ def sublist(l1, l2):
 
 
 def check_common_station(train_dict, train1, train2):
-    """ get common stations of two trains, does not check order """
+    """get common stations of two trains, does not check order"""
     paths_dict = get_Paths(train_dict)
     return list(set(paths_dict[train1]).intersection(paths_dict[train2]))
 
@@ -115,7 +119,7 @@ def get_trains_with_same_stations(train_dict):
 
 
 def check_common_blocks_elements(train_dict, train1, train2):
-    """ get common blocks between trains, does not check order """
+    """get common blocks between trains, does not check order"""
     return common_elements(
         list(train_time_table(train_dict, train1)["path"]),
         list(train_time_table(train_dict, train2)["path"]),
@@ -131,7 +135,7 @@ def get_block_station(block, important_stations):
     return station[0]
 
 
-def blocks_list_4station(timetable, station,important_stations):
+def blocks_list_4station(timetable, station, important_stations):
     sts = train_important_stations(timetable)
     if station not in sts:
         print("Warning: this train does not pass through this station!")
@@ -330,20 +334,20 @@ def get_trains_at_station(trains_infor, important_stations, only_departue=False)
 
 
 def get_J(train_dict) -> List:
-    """  return a dictionary of trains """
+    """return a dictionary of trains"""
     # train_dict = timetable_to_train_dict(data)
     return list(train_dict.keys())
 
 
 def get_all_important_station() -> List:
-    """ read important stations from file """
+    """read important stations from file"""
     return list(
         np.load("./important_stations.npz", allow_pickle=True)["arr_0"][()].keys()
     )
 
 
 def get_Paths(train_dict):
-    """ return a dictonary of important stations, keys are trains numbers """
+    """return a dictonary of important stations, keys are trains numbers"""
     trains = get_J(train_dict)
     paths_per_train = {}
     for train in trains:
@@ -364,8 +368,8 @@ def minimal_passing_time(timetable, station1, station2, resolution=1, verbose=Fa
     return time
 
 
-def turn_around_time(time_table, station,important_stations, r=1):
-    st_block = blocks_list_4station(time_table, station,important_stations)
+def turn_around_time(time_table, station, important_stations, r=1):
+    st_block = blocks_list_4station(time_table, station, important_stations)
     id_station_block = get_indexes(time_table, st_block[0])[0][0]
     time = time_table.iloc[id_station_block]["Turnaround_time_minutes"]
     if np.isnan(time):
@@ -377,9 +381,11 @@ def turn_around_time(time_table, station,important_stations, r=1):
     # TODO: mark as deprecable
 
 
-def minimal_stay(train, station, train_dict,important_stations, first_station=False, r=1):
+def minimal_stay(
+    train, station, train_dict, important_stations, first_station=False, r=1
+):
     time_table = train_dict[train][1]
-    st_block = blocks_list_4station(time_table, station,important_stations)
+    st_block = blocks_list_4station(time_table, station, important_stations)
     time = 0
     taus_prep1 = {}
     id_station_block = get_indexes(time_table, st_block[0])[0][0]
@@ -490,7 +496,12 @@ def add_delay(initial_conditions, train, delay):
     new_conditions.update(new_value)
     return new_conditions
 
-def get_skip_stations(train_dict:dict):
-    station = lambda train: train_dict[train][1].iloc[-1,-1]
-    get_skip_stations = {train: station(train) for train in train_dict.keys() if type(station(train))==str}
+
+def get_skip_stations(train_dict: dict):
+    station = lambda train: train_dict[train][1].iloc[-1, -1]
+    get_skip_stations = {
+        train: station(train)
+        for train in train_dict.keys()
+        if type(station(train)) == str
+    }
     return get_skip_stations
