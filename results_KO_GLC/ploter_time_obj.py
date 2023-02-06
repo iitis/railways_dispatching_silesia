@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 
-case = 1
+case = 3
 solver1 = "PULP_CBC_CMD"
 #solver1 = "CPLEX_CMD"
 solver2 = "cqm"
@@ -50,9 +50,13 @@ for i in range(N):
 
 print()
 
+label2 = solver2
+if label2 == "cqm":
+    label2 = "CQM"
+
 fig, ax = plt.subplots(figsize=(6, 2))
 scatter = ax.scatter(instance, y, s=20, c=colors, marker = "x",  alpha=0.5, label = f"{solver1}")
-scatter1 = ax.scatter(instance, y1, s=40, c=colors1, alpha=0.5, label = f"{solver2}")
+scatter1 = ax.scatter(instance, y1, s=40, c=colors1, alpha=0.5, label = f"{label2}")
 fig.subplots_adjust(bottom=0.2, left = 0.2)
 plt.xlabel("instance")
 plt.ylabel("objective  x dmax [min]")
@@ -61,27 +65,27 @@ plt.ylim(bottom=-25)
 
 legend_elements = [Line2D([0], [0], marker='x', color='g', label=f"{solver1}", linewidth = 0.,
                           markerfacecolor='g', markersize=5, alpha=0.5),
-                   Line2D([0], [0], marker='o', color='g', label=f"{solver2}", linewidth = 0.,
+                   Line2D([0], [0], marker='o', color='g', label=f"{label2}", linewidth = 0.,
                           markerfacecolor='g', markersize=5, alpha=0.5)]
 
 legend0 = plt.legend(handles=legend_elements)
 
 col = ['red', 'green']
 lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='--', alpha=0.5) for c in col]
-labels = ['non feasible', 'feasible']
-if case == 2:
-    legend2 = plt.legend(lines, labels, loc = 3, fontsize = 8, ncol = 2)
-else:
-    legend2 = plt.legend(lines, labels, loc = 4, fontsize = 8, ncol = 2)
+#labels = ['non feasible', 'feasible']
+#if case == 2:
+#    legend2 = plt.legend(lines, labels, loc = 3, fontsize = 8, ncol = 2)
+#else:
+#    legend2 = plt.legend(lines, labels, loc = 4, fontsize = 8, ncol = 2)
 ax.add_artist(legend0)
-ax.add_artist(legend2)
+#ax.add_artist(legend2)
 
 plt.savefig(f"{solver1}_{solver2}_obj_case{case}.pdf")
 
 
 fig, ax = plt.subplots(figsize=(6, 2))
 scatter = ax.scatter(instance, x, s=20, c=colors, marker = "x",  alpha=0.5, label = f"{solver1}")
-scatter1 = ax.scatter(instance, x1, s=40, c=colors1, alpha=0.5, label = f"{solver2}")
+scatter1 = ax.scatter(instance, x1, s=40, c=colors1, alpha=0.5, label = f"{label2}")
 fig.subplots_adjust(bottom=0.2, left = 0.2)
 plt.xlabel("instance")
 plt.ylabel("comp. time [min]")
