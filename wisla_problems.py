@@ -113,6 +113,6 @@ if __name__ == "__main__":
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
         sample = solve_on_quantum(args, prob, pdict)
         
-        file = f"solutions_quantum/{args.solve_quantum}_wisla_case1.pkl"
+        file = f"solutions_quantum/wisla/{args.solve_quantum}_wisla_case1.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
