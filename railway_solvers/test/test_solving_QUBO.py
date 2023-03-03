@@ -53,10 +53,12 @@ def compute_single_file(
     globals().update(mdl.__dict__)
     prob = create_linear_problem(train_sets, timetable, d_max, cat = "Integer")
     bqm, _, interpreter = convert_to_bqm(prob, pdict)
-    sampleset = annealing(bqm, interpreter, method, real_anneal_var, sim_annealing_var) 
-    save_results(f"test/annealing_results/{file_name}", sampleset)
+    our_samples, info = annealing(bqm, interpreter, method, real_anneal_var, sim_annealing_var) 
+    assert info['beta_range'] == (0.001, 10)
+
+    save_results(f"test/annealing_results/{file_name}", our_samples)
     dict_list1 = read_process_results(f"test/annealing_results/{file_name}", prob)
-    dict_list = get_results(sampleset, prob=prob)
+    dict_list = get_results(our_samples, prob=prob)
     assert dict_list == dict_list1
     print_results(dict_list)
     sample = get_best_feasible_sample(dict_list1)

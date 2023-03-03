@@ -129,5 +129,5 @@ def annealing(
         )
     elif method == "hyb":
         sampleset = hybrid_anneal(bqm)
-    return interpreter(sampleset)
+    return interpreter(sampleset), sampleset.info
     
