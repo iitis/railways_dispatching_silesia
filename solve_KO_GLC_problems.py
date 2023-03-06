@@ -52,8 +52,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--solve_quantum",
         type=str,
-        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm, 'save_qubo' just save qubo to ./qubos",
+        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
         default="",
+    )
+
+    parser.add_argument(
+        "--min_t",
+        type=int,
+        help="minimal time parameter for cqm solver, lowest value is 5",
+        default=5,
     )
     args = parser.parse_args()
 
@@ -175,28 +182,45 @@ if __name__ == "__main__":
             bqm, qubo, interpreter = convert_to_bqm(prob, pdict)       
             print(f"{args.solve_quantum} annealing")
             start_time = time.time()
-            sampleset = annealing(bqm, interpreter, args.solve_quantum, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)       
+            sampleset, info, properties = annealing(bqm, 
+                                                    interpreter, 
+                                                    args.solve_quantum, 
+                                                    sim_anneal_var_dict=sim_annealing_var, 
+                                                    real_anneal_var_dict=real_anneal_var_dict
+                                                    )       
             result["comp_time_seconds"] = time.time() - start_time
             dict_list = get_results(sampleset, prob=prob)
             sample = get_best_feasible_sample(dict_list)
             result.update(sample)
+            result.update({"info": info})
+            result.update({"properties": properties})
             result["broken_constraints"] = constraints - sample["feas_constraints"][1]
             print("broken constraints", result["broken_constraints"])
 
         elif args.solve_quantum == "cqm":
             cqm, interpreter = convert_to_cqm(prob)
             start_time = time.time()
-            sampleset = constrained_solver(cqm)        
+            sampleset, properties = constrained_solver(cqm, minimum_time_limit = args.min_t)        
             result["comp_time_seconds"] = time.time() - start_time
             dict_list = get_results(sampleset, prob=prob)
             sample = get_best_feasible_sample(dict_list)
             result.update(sample)
+            result.update({"info": sampleset.info})
+            result.update({"properties": properties})
             result["broken_constraints"] = constraints - sample["feas_constraints"][1]
             print("broken constraints", result["broken_constraints"])
 
         results[k] = result 
     results["samples"] = k+1
 
-    file = f"results_KO_GLC/results_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
+    print("save ... ")
+
+    try: 
+        p = result["properties"]["minimum_time_limit_s"]
+        print("minimal time limit", p)
+    except:
+        p = ""
+
+    file = f"results_KO_GLC/results{p}_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
     with open(file, "wb") as f:
         pkl.dump(results, f)

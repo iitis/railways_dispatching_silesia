@@ -4,14 +4,7 @@ import time
 import pulp as pl
 
 from railway_solvers.railway_solvers import (
-    annealing,
-    convert_to_bqm,
     create_linear_problem,
-    get_results,
-    get_best_feasible_sample,
-    convert_to_cqm,
-    constrained_solver
-
 )
 
 from helpers import(
@@ -37,6 +30,14 @@ if __name__ == "__main__":
         help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
         default="",
     )
+
+    parser.add_argument(
+        "--min_t",
+        type=int,
+        help="minimal time parameter for cqm solver",
+        default=5,
+    )
+
     train_set = {
         "skip_station": {
             "Ks1": 10, "Ks3": 10, "Ic1": 10, "Ks2": 1, "Ks4":1, "Ic2":1},
@@ -96,6 +97,7 @@ if __name__ == "__main__":
         print("objective", prob.objective.value())
 
     # QUBO creation an solution
+
     
     pdict = {}
     if args.solve_quantum in ["sim", "real", "hyb"]:
@@ -111,7 +113,7 @@ if __name__ == "__main__":
         }
 
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
-        sample = solve_on_quantum(args, prob, pdict)
+        sample = solve_on_quantum(args, prob, pdict, args.min_t)
         try: 
             p = sample["properties"]["minimum_time_limit_s"]
         except:

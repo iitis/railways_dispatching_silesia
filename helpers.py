@@ -163,7 +163,7 @@ def count_vars(prob):
     constraints = prob.numConstraints()
     return order_vars, int_vars, constraints
 
-def solve_on_quantum(args, prob, pdict):
+def solve_on_quantum(args, prob, pdict, minimum_time_limit = 5):
     """solve givem problem on varous quantum / hybrid algorithms"""
 
     if args.solve_quantum in ["sim", "real", "hyb"]:
@@ -185,7 +185,7 @@ def solve_on_quantum(args, prob, pdict):
     if args.solve_quantum == "cqm":
         cqm, interpreter = convert_to_cqm(prob)
         start_time = time.time()
-        sampleset, properties = constrained_solver(cqm)
+        sampleset, properties = constrained_solver(cqm, minimum_time_limit = minimum_time_limit)
         t = time.time() - start_time
 
         dict_list = get_results(sampleset, prob=prob)

@@ -59,7 +59,7 @@ def real_anneal(
     )
     return sampleset
 
-def constrained_solver(cqm) -> dimod.sampleset.SampleSet:
+def constrained_solver(cqm, minimum_time_limit = 5) -> dimod.sampleset.SampleSet:
     """Runs experiment using constrained solver
 
     :param cqm: Constrained model for the problem
@@ -68,7 +68,7 @@ def constrained_solver(cqm) -> dimod.sampleset.SampleSet:
     :rtype: dimod.SampleSet
     """
     sampler = LeapHybridCQMSampler()
-    sampler.properties["minimum_time_limit_s"]  = 6  # by default it is 5, and can be set
+    sampler.properties["minimum_time_limit_s"]  = minimum_time_limit # by default it is 5, and can be set
     print("parameters", sampler.properties)  
     return sampler.sample_cqm(cqm), sampler.properties
 
