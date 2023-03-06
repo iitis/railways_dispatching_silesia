@@ -172,7 +172,7 @@ def solve_on_quantum(args, prob, pdict):
         real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
         print(f"{args.solve_quantum} annealing")
         start_time = time.time()
-        our_samples, info = annealing(bqm, interpreter, args.solve_quantum, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
+        our_samples, info, properties = annealing(bqm, interpreter, args.solve_quantum, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
         t = time.time() - start_time
 
         print(f"{args.solve_quantum} time = ", t, "seconds")
@@ -180,16 +180,18 @@ def solve_on_quantum(args, prob, pdict):
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
         sample.update({"info": info})
+        sample.update({"properties": properties})
 
     if args.solve_quantum == "cqm":
         cqm, interpreter = convert_to_cqm(prob)
         start_time = time.time()
-        sampleset = constrained_solver(cqm)
+        sampleset, properties = constrained_solver(cqm)
         t = time.time() - start_time
 
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
         sample.update({"comp_time_seconds": t})
         sample.update({"info": sampleset.info})
+        sample.update({"properties": properties})
 
     return sample

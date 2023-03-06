@@ -68,7 +68,9 @@ def constrained_solver(cqm) -> dimod.sampleset.SampleSet:
     :rtype: dimod.SampleSet
     """
     sampler = LeapHybridCQMSampler()
-    return sampler.sample_cqm(cqm)
+    sampler.properties["minimum_time_limit_s"]  = 6  # by default it is 5, and can be set
+    print("parameters", sampler.properties)  
+    return sampler.sample_cqm(cqm), sampler.properties
 
 def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
     """Runs experiment using hybrid solver
@@ -79,7 +81,7 @@ def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
     :rtype: dimod.SampleSet
     """
     sampler = LeapHybridSampler()
-    return sampler.sample(bqm)
+    return sampler.sample(bqm), sampler.properties
 
 def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
     """Extracts/sets parameters for annealing experiment
@@ -115,6 +117,7 @@ def annealing(
     :type real_anneal_var_dict: Dict[str, float]
     """
     assert method in ["sim", "real", "hyb"]
+    properties = ""
     if method == "sim":
         sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
     elif method == "real":
@@ -128,6 +131,6 @@ def annealing(
             chain_strength=chain_strength,
         )
     elif method == "hyb":
-        sampleset = hybrid_anneal(bqm)
-    return interpreter(sampleset), sampleset.info
+        sampleset, properties = hybrid_anneal(bqm)
+    return interpreter(sampleset), sampleset.info, properties
     

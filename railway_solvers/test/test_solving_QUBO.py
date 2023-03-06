@@ -53,7 +53,7 @@ def compute_single_file(
     globals().update(mdl.__dict__)
     prob = create_linear_problem(train_sets, timetable, d_max, cat = "Integer")
     bqm, _, interpreter = convert_to_bqm(prob, pdict)
-    our_samples, info = annealing(bqm, interpreter, method, real_anneal_var, sim_annealing_var) 
+    our_samples, info, _ = annealing(bqm, interpreter, method, real_anneal_var, sim_annealing_var) 
     assert info['beta_range'] == (0.001, 10)
 
     save_results(f"test/annealing_results/{file_name}", our_samples)
