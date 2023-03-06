@@ -76,6 +76,13 @@ if __name__ == "__main__":
         default="",
     )
 
+    parser.add_argument(
+        "--min_t",
+        type=int,
+        help="minimal time parameter for cqm solver, lowest value is 5",
+        default = 5,
+    )  
+
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_build = subparsers.add_parser("build", help="Build dataframes from files")
     parser_build.add_argument(
@@ -211,9 +218,14 @@ if __name__ == "__main__":
 
 
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
-        sample = solve_on_quantum(args, prob, pdict)
+        sample = solve_on_quantum(args, prob, pdict, minimum_time_limit = args.min_t)
+
+        try: 
+            p = sample["properties"]["minimum_time_limit_s"]
+        except:
+            p = ""
         
-        file = f"solutions_quantum/{args.solve_quantum}_case{args.case}_{args.category}.pkl"
+        file = f"solutions_quantum/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
             
