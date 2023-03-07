@@ -153,6 +153,8 @@ python wisla_problems.py --solve_quantum cqm --min_t 5
 ```
 
 
-Output...
+Output
+
+Solutions of quantum approach (i.e. by -solve_quantum) are saved in ```solutions_quantum/wisla``` subdirectory as pikle files. Solutions of linear programming apprach are  printed.
 
 
