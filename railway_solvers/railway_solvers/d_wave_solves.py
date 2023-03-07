@@ -72,7 +72,7 @@ def constrained_solver(cqm, minimum_time_limit = 5) -> dimod.sampleset.SampleSet
     print("parameters", sampler.properties)  
     return sampler.sample_cqm(cqm), sampler.properties
 
-def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
+def hybrid_anneal(bqm, minimum_time_limit) -> dimod.sampleset.SampleSet:
     """Runs experiment using hybrid solver
 
     :param bqm: Binary quadratic model for the problem
@@ -80,6 +80,7 @@ def hybrid_anneal(bqm) -> dimod.sampleset.SampleSet:
     :return: sampleset
     :rtype: dimod.SampleSet
     """
+    sampler.properties["minimum_time_limit_s"]  = minimum_time_limit # by default it is 5, and can be set
     sampler = LeapHybridSampler()
     return sampler.sample(bqm), sampler.properties
 
@@ -102,7 +103,7 @@ def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
     return num_reads, annealing_time, chain_strength
 
 def annealing(
-    bqm, interpreter, method, real_anneal_var_dict=None, sim_anneal_var_dict=None
+    bqm, interpreter, method, real_anneal_var_dict=None, sim_anneal_var_dict=None, time_limit_hyb = 5
 ):
     """Performs the annealing experiment
 
@@ -131,6 +132,6 @@ def annealing(
             chain_strength=chain_strength,
         )
     elif method == "hyb":
-        sampleset, properties = hybrid_anneal(bqm)
+        sampleset, properties = hybrid_anneal(bqm, time_limit_hyb)
     return interpreter(sampleset), sampleset.info, properties
     

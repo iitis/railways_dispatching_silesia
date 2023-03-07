@@ -186,7 +186,8 @@ if __name__ == "__main__":
                                                     interpreter, 
                                                     args.solve_quantum, 
                                                     sim_anneal_var_dict=sim_annealing_var, 
-                                                    real_anneal_var_dict=real_anneal_var_dict
+                                                    real_anneal_var_dict=real_anneal_var_dict,
+                                                    time_limit_hyb = args.min_t
                                                     )       
             result["comp_time_seconds"] = time.time() - start_time
             dict_list = get_results(sampleset, prob=prob)

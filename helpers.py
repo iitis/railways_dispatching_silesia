@@ -163,7 +163,7 @@ def count_vars(prob):
     constraints = prob.numConstraints()
     return order_vars, int_vars, constraints
 
-def solve_on_quantum(args, prob, pdict, minimum_time_limit = 5):
+def solve_on_quantum(args, prob, pdict, minimum_time_limit):
     """solve givem problem on varous quantum / hybrid algorithms"""
 
     if args.solve_quantum in ["sim", "real", "hyb"]:
@@ -172,7 +172,12 @@ def solve_on_quantum(args, prob, pdict, minimum_time_limit = 5):
         real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
         print(f"{args.solve_quantum} annealing")
         start_time = time.time()
-        our_samples, info, properties = annealing(bqm, interpreter, args.solve_quantum, sim_anneal_var_dict=sim_annealing_var, real_anneal_var_dict=real_anneal_var_dict)
+        our_samples, info, properties = annealing(bqm, 
+                                                  interpreter, 
+                                                  args.solve_quantum, 
+                                                  sim_anneal_var_dict=sim_annealing_var, 
+                                                  real_anneal_var_dict=real_anneal_var_dict,
+                                                  time_limit_hyb = minimum_time_limit)
         t = time.time() - start_time
 
         print(f"{args.solve_quantum} time = ", t, "seconds")
