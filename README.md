@@ -63,16 +63,12 @@ There are pickles files containing results of D-Wave solutions via:
 The module ```solve_real_problem.py``` is used to solve real problem of railway dispatching.
 Input:
 ```
---stations path to '''npz''' file of important stations (dict Important_station: list of blocks),
---p path to '''.ods''' file with all paths and passing times that can be realized on the network,
---load path to dataframe dictionary of trains timetable
+
 --case it is particular case of railway dispatching problems
 --category ("Integer" or "Continious") the category of time variables "Integer" yields ILP "Continious" yields MLP
 --solve_lp   chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
 --solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
-    build - subparser used to build the dataframes dictionary of train timetable with argument:
-    -d path to '''.csv''' train dictionary if used without other arguments --load is not required
-    -save - path to location where dataframe dictionary will be saved.
+--min_t minimal time parameter for hybrid solver in seconds (5 be default)
 ```
 Output:
 
@@ -84,38 +80,17 @@ Example use:
 
 - linear programming
 ```
-python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer --solve_lp PULP_CBC_CMD --paths data/network_paths.ods build -d data/trains_schedules.csv
+python solve_real_problem.py --case 0 --category Integer --solve_lp PULP_CBC_CMD 
 ```
 - quantum approach
 ```
-python solve_real_problem.py --stations data/important_stations.npz --case 0 --category Integer --solve_quantum cqm --paths data/network_paths.ods build -d data/trains_schedules.csv
+python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5
 ```
 
-Case ```0``` or case ```6``` means no dosturptions. Then disturtions grow with cases number from case ```1``` to case ```5```. Disturbtions of case ```7``` ```8``` and ```9``` are the same as these of case ```5```.
-
-#### Examples with rerouting
-
-For accident cases, where trains are rerouted on the single track line ```KTC``` -  ```Gt``` - ```CB``` use following initial (conflicted) schedule in input file  ```data/trains_schedules_Gt.csv``` and the altered important station path in ``` data/important_stations_Gt.npz```. 
-Please run:
-
-```
-python solve_real_problem.py --stations data/important_stations_Gt.npz --paths data/network_paths.ods --case 7 --category Integer --solve_lp PULP_CBC_CMD  build -d data/trains_schedules_Gt.csv
-```
+Dificulty grows with cases number. Cases ```1``` to case ```5``` only trains delays without rerouting. Cases ```6``` to ```9``` concers rerouting due to 
+some track failure.
 
 
-For cases with single track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty``` use following (conflicted) schedule in ```data/trains_schedules_1track.csv``` and original important station path ```data/important_stations.npz```
-
-
-```
-python solve_real_problem.py --stations data/important_stations.npz --case 8 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track.csv
-```
-
-The most dificult case is the merge of single track line between ```KZ``` - ```KO``` - ```KL``` - ```Ty``` the single track line ```KTC``` -  ```Gt``` - ```CB```. Then the initial (conflicted) schedule is in ```data/trains_schedules_1track_Gt.csv``` and the important station path is in ``` data/important_stations_Gt.npz```. Please run:
-
-```
-python solve_real_problem.py --stations data/important_stations_Gt.npz --case 9 --category Integer --solve_lp PULP_CBC_CMD  --paths data/network_paths.ods build -d data/trains_schedules_1track_Gt.csv
-
-```
 #### Generic problem
 
 Here the part of the railway line i.e. KO - GLC is analysed. For each case there are '''12''' instances of various delays of trains at the beginning of their routes. 
@@ -131,7 +106,7 @@ Clasical
 
 Quantum (hybrid)
 
-```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer```
+```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5```
 
 #### Simple comparison example.
 
@@ -140,7 +115,8 @@ The module:
 wisla_problems.py 
 ```
 is the test module for the problem in K. Domino, M. Koniorczyk,K. Krawiec, K. Jałowiecki, S. Deffner, B. Gardas
-"Quantum annealing in the NISQ era: railway conflict management" [arXiv preprint arXiv:2112.03674](https://arxiv.org/abs/2112.03674).
+"Quantum Annealing in the NISQ Era: Railway
+Conflict Management" [Entropy 2023, 25, 191.](https://doi.org/10.3390/e25020191).
 We demonstrate implementationf for case ```1``` from this work.
 
 Input:
@@ -160,4 +136,9 @@ python wisla_problems.py --solve_lp PULP_CBC_CMD
 - quantum approach
 ```
 python wisla_problems.py --solve_quantum real
+```
+
+- hybrid approach
+```
+python wisla_problems.py --solve_quantum cqm --t_min 5
 ```

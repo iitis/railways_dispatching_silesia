@@ -79,7 +79,7 @@ def get_results(
         rdict = {}
         sample = data.sample
         rdict["energy"] = data.energy
-        rdict["objective"] = round(get_objective(prob, sample), 2)
+        rdict["objective"] = get_objective(prob, sample)
         rdict["feasible"] = all(analyze_constraints(prob, sample)[0].values())
         rdict["sample"] = sample
         rdict["feas_constraints"] = analyze_constraints(prob, sample)

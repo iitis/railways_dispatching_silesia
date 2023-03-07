@@ -14,7 +14,6 @@ from railway_solvers.railway_solvers import (
 )
 
 from helpers import (
-    load_timetables,
     load_important_stations,
     load_data_paths,
     build_timetables,
@@ -31,22 +30,7 @@ from helpers import (
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser("Make variables to problem from dataframes, parameters of problem and solutions")
-    parser.add_argument(
-        "--stations",
-        required=True,
-        type=str,
-        help="Path to important_station dictionary",
-    )
-    parser.add_argument(
-        "--load", type=str, required=False, help="Path to trains dataframes dictionary"
-    )
-    parser.add_argument(
-        "--paths",
-        type=str,
-        required=True,
-        help="Path for data containing blocks passing times",
-    )
+    parser = argparse.ArgumentParser("cases of the problem, parameters of problem and solutions")
 
     parser.add_argument(
         "--case",
@@ -83,30 +67,29 @@ if __name__ == "__main__":
         default = 5,
     )  
 
-    subparsers = parser.add_subparsers(help="sub-command help")
-    parser_build = subparsers.add_parser("build", help="Build dataframes from files")
-    parser_build.add_argument(
-        "-d", type=str, default=None, help="path for data containing timetables"
-    )
-    parser_build.add_argument(
-        "-save", required=False, action="store_true", help="save built train dictionary"
-    )
     args = parser.parse_args()
-    if (args.load is None) and ("d" not in args):
-        print(
-            "Please provide data.\
-            \n --load the trains dictonary with dataframe or \
-            \n build a new one with the paths to -d timetable data."
-        )
-        exit(1)
 
-    important_stations = load_important_stations(args.stations)
-    data_paths = load_data_paths(args.paths)
+        # paths to files
+    data_paths = load_data_paths("./data/network_paths.ods")    
+    if args.case in [0,1,2,3,4,5]:
+        important_stations_path = "./data/important_stations.npz"  
+        block_schedule = "./data/trains_schedules.csv"
 
-    if args.load:
-        train_dict = load_timetables(args.load)
-    else:
-        train_dict = build_timetables(args.d, args.save, important_stations, data_paths)
+    if args.case in [6,7]:
+        important_stations_path = "./data/important_stations_Gt.npz"
+        block_schedule = "./data/trains_schedules_Gt.csv"
+
+    if args.case == 8:
+        important_stations_path = "./data/important_stations.npz"
+        block_schedule = "./data/trains_schedules_1track.csv"
+
+    if args.case == 9:
+        important_stations_path = "./data/important_stations_Gt.npz"
+        block_schedule = "./data/trains_schedules_1track_Gt.csv"
+    
+
+    important_stations = load_important_stations(important_stations_path)
+    train_dict = build_timetables(block_schedule, True, important_stations, data_paths)
 
     taus = make_taus(train_dict, important_stations, r=0)  # r = 0 no rounding
 
