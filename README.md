@@ -60,6 +60,11 @@ There are pickles files containing results of D-Wave solutions via:
 - hybrid solvers
 
 ## Main directory<a id="sec-2" name="sec-2"></a>
+
+There are following railway dispatching problems.
+
+#### Close to real life problem
+
 The module ```solve_real_problem.py``` is used to solve real problem of railway dispatching.
 Input:
 ```
