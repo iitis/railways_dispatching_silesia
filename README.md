@@ -136,8 +136,6 @@ Input:
 --solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
 ```
 
-Output, as before.
-
 Example use:
 
 - linear programming
@@ -153,3 +151,8 @@ python wisla_problems.py --solve_quantum real
 ```
 python wisla_problems.py --solve_quantum cqm --t_min 5
 ```
+
+
+Output...
+
+
