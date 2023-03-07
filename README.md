@@ -75,10 +75,12 @@ Input:
 --solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
 --min_t minimal time parameter for hybrid solver in seconds (5 be default)
 ```
+
+The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator.
+
 Output:
 
-The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator. Solutions
-of quantum approach (i.e. by -solve_quantum) are saved in ```solutions_quantum``` subdirectory as pikle files. Solutions of linear programming apprach are only printed.
+Solutions of quantum approach (i.e. by -solve_quantum) are saved in ```solutions_quantum``` subdirectory as pikle files. Solutions of linear programming apprach are  printed.
 
 
 Example use:
@@ -113,16 +115,20 @@ Quantum (hybrid)
 
 ```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5```
 
-#### Simple comparison example.
+
+Output:
+
+Solutions of quantum and classical approach (i.e. by -solve_quantum) are saved in ```results_KO_GLC``` subdirectory as pikle files. 
+
+#### Problem from 
+K. Domino, M. Koniorczyk,K. Krawiec, K. Jałowiecki, S. Deffner, B. Gardas "Quantum Annealing in the NISQ Era: Railway
+Conflict Management" [Entropy 2023, 25, 191.](https://doi.org/10.3390/e25020191)
 
 The module:
 ```
 wisla_problems.py 
 ```
-is the test module for the problem in K. Domino, M. Koniorczyk,K. Krawiec, K. Jałowiecki, S. Deffner, B. Gardas
-"Quantum Annealing in the NISQ Era: Railway
-Conflict Management" [Entropy 2023, 25, 191.](https://doi.org/10.3390/e25020191).
-We demonstrate implementationf for case ```1``` from this work.
+is the test module for for case ```1``` problem from mentioned work.
 
 Input:
 ```
