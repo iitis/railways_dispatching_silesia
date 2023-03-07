@@ -149,7 +149,7 @@ python wisla_problems.py --solve_quantum real
 
 - hybrid approach
 ```
-python wisla_problems.py --solve_quantum cqm --t_min 5
+python wisla_problems.py --solve_quantum cqm --min_t 5
 ```
 
 
