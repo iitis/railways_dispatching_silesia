@@ -80,8 +80,8 @@ def hybrid_anneal(bqm, minimum_time_limit) -> dimod.sampleset.SampleSet:
     :return: sampleset
     :rtype: dimod.SampleSet
     """
-    sampler.properties["minimum_time_limit_s"]  = minimum_time_limit # by default it is 5, and can be set
     sampler = LeapHybridSampler()
+    sampler.properties["minimum_time_limit_s"]  = minimum_time_limit # by default it is 5, and can be set
     return sampler.sample(bqm), sampler.properties
 
 def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
