@@ -13,6 +13,7 @@ def load_data(solver,case):
     results = pd.read_pickle(rf'{file}')
     return results
 
+markers = ["d", "v", "s", "*", "^", "d", "v", "s", "*", "^"]
 
 def plotting_comparisons(c_solvers,cases,times):
     q_solver = "cqm"
@@ -20,8 +21,7 @@ def plotting_comparisons(c_solvers,cases,times):
     for case in cases:
         for solver in c_solvers:
             fig, (ax1,ax2,ax3) = plt.subplots(3,figsize=(6, 6),sharex=True, tight_layout= True)
-
-            for t in times:    
+            for t,m in zip(times,markers):    
                 file = f"results{t}__{q_solver}_{case}_Integer.pkl"
                 results1 = pd.read_pickle(rf'{file}')
                 N = results1["samples"]
@@ -32,16 +32,18 @@ def plotting_comparisons(c_solvers,cases,times):
                 instance = [i for i in range(N)]
 
                 colors1 = []
-
+                label2 = q_solver.upper() + f" {t}"
                 for i in range(N):
                     if results1[i]["feasible"] is True:
                         colors1.append("green")
                     else:
                         colors1.append("red")
-                label2 = q_solver.upper() + f" {t}"
-                ax1.scatter(instance, y1, s=40, c=colors1, alpha=0.5, label = f"{label2}")
-                ax2.scatter(instance, x1, s=40, c=colors1, alpha=0.5, label = f"{label2}")
-                ax3.scatter(instance, x2, s=40, c=colors1, alpha=0.5, label = f"{label2}")
+                        # label2 = "_"
+
+                
+                ax1.scatter(instance, y1, s=40, marker = m, c=colors1, alpha=0.5, label = f"{label2}")
+                ax2.scatter(instance, x1, s=40, marker = m, c=colors1, alpha=0.5, label = f"{label2}")
+                ax3.scatter(instance, x2, s=40, marker = m, c=colors1, alpha=0.5, label = f"{label2}")
 
                 
             results = load_data(solver,case)
@@ -102,8 +104,8 @@ def plotting_comparisons(c_solvers,cases,times):
             ax3.set_ylabel("qpu acess time [s]")
 
             # ax2.legend(handles=legend_elements)
-            ax2.legend
-            ax3.legend
+            ax2.legend()
+            ax3.legend()
 
 
             plt.savefig(f"{solver}_{q_solver}_compt_case{case}b.pdf")
@@ -112,5 +114,7 @@ if __name__ == "__main__":
     cases = list(range(1,4))
     # c_solvers = [r"PULP_CBC_CMD",r"CPLEX_CMD"]
     c_solvers = [r"CPLEX_CMD"]
+    times = [5,10]
 
-    plotting_comparisons(c_solvers,cases)
+
+    plotting_comparisons(c_solvers,cases,times)
