@@ -121,22 +121,23 @@ Output:
 
 Solutions of quantum and classical approaches are saved in ```results_KO_GLC``` subdirectory as pickle files. 
 
+In ```results_KO_GLC``` there is the plotting script ```fast_plot.py```
+
 Example use:
 
 - clasical programming
 
 ```python3 solve_KO_GLC_problems.py --solve_lp PULP_CBC_CMD   --case 1 --category Integer```
 
-- - D-Wave quantum or hybrid approach
+- D-Wave quantum or hybrid approach
 
 ```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5```
 
 
 
 
-#### Problem from 
-K. Domino, M. Koniorczyk,K. Krawiec, K. Jałowiecki, S. Deffner, B. Gardas "Quantum Annealing in the NISQ Era: Railway
-Conflict Management" [Entropy 2023, 25, 191.](https://doi.org/10.3390/e25020191)
+#### Problem from "Quantum Annealing in the NISQ Era: Railway Conflict Management"
+K. Domino, M. Koniorczyk,K. Krawiec, K. Jałowiecki, S. Deffner, B. Gardas [Entropy 2023, 25, 191.](https://doi.org/10.3390/e25020191)
 
 The module:
 ```
