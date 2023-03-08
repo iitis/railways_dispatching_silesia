@@ -63,62 +63,76 @@ There are pickles files containing results of D-Wave solutions via:
 
 There are following railway dispatching problems.
 
-#### Close to real life problem
+#### real railway problem
 
-The module ```solve_real_problem.py``` is used to solve real problem of railway dispatching.
+The module ```solve_real_problem.py``` is used to solve real problem of railway dispatching on the core of Silesian railway network.
+The script solves the problem via classical linear programming, D-Wave quantum approach, D-Wave hybrid or simulation approach.
+
 Input:
+
+```
+--case  particular case of railway dispatching problem (0 to 9 is supported, default 1)
+--category the category of time variables "Integer" yields ILP problem "Continious" yields MLP problem (default "Integer")
+--solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
+--solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "hyb" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
+--min_t minimal time parameter for D-Wave hybrid solver in seconds (5 default)
 ```
 
---case it is particular case of railway dispatching problems
---category ("Integer" or "Continious") the category of time variables "Integer" yields ILP "Continious" yields MLP
---solve_lp   chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
---solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
---min_t minimal time parameter for hybrid solver in seconds (5 be default)
-```
-
-The script solves the problem via linear programming, D-Wave quantum, hybrid or simulator.
 
 Output:
 
-Solutions of quantum approach (i.e. by -solve_quantum) are saved in ```solutions_quantum``` subdirectory as pikle files. Solutions of linear programming apprach are  printed.
+Solutions of quantum D-Wave approach (i.e. quantum, hybrid or simulation via ```--solve_quantum```) are saved in ```solutions_quantum``` subdirectory as pickle files. Solutions of linear programming approach are printed.
 
 
 Example use:
 
-- linear programming
-```
-python solve_real_problem.py --case 0 --category Integer --solve_lp PULP_CBC_CMD 
-```
-- quantum approach
-```
-python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5
-```
+- classical programming
 
-Dificulty grows with cases number. Cases ```1``` to case ```5``` only trains delays without rerouting. Cases ```6``` to ```9``` concers rerouting due to 
-some track failure.
+```python solve_real_problem.py --case 0 --category Integer --solve_lp PULP_CBC_CMD ```
+
+- D-Wave quantum or hybrid approach
+
+```python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5```
+
+Difficulty of dispatching problem grows with the case number. Case ```0```, no disturbances. In Cases ```1``` to ```5``` some trains are delayed, but they follow their original routes. Cases ```6``` to ```9``` concerns also a priory changes trains' routes e.g. due to some track failure.
 
 
 #### Generic problem
 
-Here the part of the railway line i.e. KO - GLC is analysed. For each case there are '''12''' instances of various delays of trains at the beginning of their routes. 
+The generic example concerns dense passenger traffic (generic) on the KO-GLC part of the Silesian railway network. For each case there are ```12``` instances of various delays of trains at start.
 
-- In case ```1``` delay_and_acctual_time there are no disruptions inside the line, and we use cyclic timetable of ```3``` hours i.e. with ```60``` trains. 
-- In case ```2``` we assume one track between ```RCB``` and ```ZZ``` is closed, hence the line becomes partially ```1``` track and additional disruptions are as in case ```1``` we use cyclic timetable of ```2``` hours i.e. with ```40``` trains.
-- In case  ```3``` we have a hypothetical single track traffic with feasible timetable of ```3``` hours with ```21`` trains.
+Input:
 
-Clasical 
+```
+--case  particular case of railway dispatching problem (1 to 3 is supported)
+--category the category of time variables "Integer" yields ILP problem "Continious" yields MLP problem (default "Integer")
+--solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
+--solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "hyb" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
+--min_t minimal time parameter for D-Wave hybrid solver in seconds (5 default)
+```
+
+Particular description of cases:
+
+- case ```1```, there are no disruptions inside the analysed (double track) line, and we use cyclic timetable of ```3``` hours i.e. with ```59``` trains, particular instances concern delays of various trains at start;
+- case ```2```, we assume that one track between ```RCB``` and ```ZZ``` is closed, hence the line becomes partially single track and additional  we use cyclic timetable of ```2``` hours i.e. with ```40``` trains, particular instances concern delays of various trains at start;
+- case  ```3```, line is analysed as hypothetical single track line of ```3``` hours and ```21`` trains, particular instances concern delays of various trains at start.
+
+Output:
+
+Solutions of quantum and classical approaches are saved in ```results_KO_GLC``` subdirectory as pickle files. 
+
+Example use:
+
+- clasical programming
 
 ```python3 solve_KO_GLC_problems.py --solve_lp PULP_CBC_CMD   --case 1 --category Integer```
 
-
-Quantum (hybrid)
+- - D-Wave quantum or hybrid approach
 
 ```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5```
 
 
-Output:
 
-Solutions of quantum and classical approach (i.e. by -solve_quantum) are saved in ```results_KO_GLC``` subdirectory as pikle files. 
 
 #### Problem from 
 K. Domino, M. Koniorczyk,K. Krawiec, K. Jałowiecki, S. Deffner, B. Gardas "Quantum Annealing in the NISQ Era: Railway
@@ -132,29 +146,31 @@ is the test module for for case ```1``` problem from mentioned work.
 
 Input:
 ```
---solve_lp   chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
+--solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
 --solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
-```
-
-Example use:
-
-- linear programming
-```
-python wisla_problems.py --solve_lp PULP_CBC_CMD
-```
-- quantum approach
-```
-python wisla_problems.py --solve_quantum real
-```
-
-- hybrid approach
-```
-python wisla_problems.py --solve_quantum cqm --min_t 5
+--min_t minimal time parameter for D-Wave hybrid solver in seconds (5 default)
 ```
 
 
 Output
 
 Solutions of quantum approach (i.e. by -solve_quantum) are saved in ```solutions_quantum/wisla``` subdirectory as pikle files. Solutions of linear programming apprach are  printed.
+
+Example use:
+
+- linear programming
+
+```python wisla_problems.py --solve_lp PULP_CBC_CMD```
+
+- D-Wave quantum approach
+
+```python wisla_problems.py --solve_quantum real```
+
+- D-Wave hybrid (cqm) approach
+
+```python wisla_problems.py --solve_quantum cqm --min_t 5```
+
+
+
 
 

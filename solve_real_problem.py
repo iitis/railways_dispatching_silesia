@@ -68,8 +68,10 @@ if __name__ == "__main__":
     )  
 
     args = parser.parse_args()
+    
+    assert args.case in [0,1,2,3,4,5,6,7,8,9]
 
-        # paths to files
+    # paths to files
     data_paths = load_data_paths("./data/network_paths.ods")    
     if args.case in [0,1,2,3,4,5]:
         important_stations_path = "./data/important_stations.npz"  

@@ -64,6 +64,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    assert args.case in [1,2,3]
     # paths to files
     if args.case == 1:
         important_stations_path = "./data/KO_GLC/important_stations_KO_GLC.npz"
