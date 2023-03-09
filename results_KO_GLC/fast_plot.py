@@ -85,7 +85,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             fig.subplots_adjust(bottom=0.2, left = 0.2)
             ax3.set_xlabel("instance")
             ax2.set_ylabel("comp. time [min]")
-            ax3.set_ylabel("qpu acess time [s]")
+            ax3.set_ylabel("QPU acess time [s]")
 
             ax2.legend(ncol = 2, loc='best')
 
