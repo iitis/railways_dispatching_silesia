@@ -65,7 +65,14 @@ if __name__ == "__main__":
         type=int,
         help="minimal time parameter for cqm solver, lowest value is 5",
         default = 5,
-    )  
+    )
+
+    parser.add_argument(
+        "--runs",
+        type=int,
+        help="number of runs",
+        default = 1,
+    )   
 
     args = parser.parse_args()
     
@@ -73,19 +80,19 @@ if __name__ == "__main__":
 
     # paths to files
     data_paths = load_data_paths("./data/network_paths.ods")    
-    if args.case in [0,1,2,3,4,5]:
+    if args.case in (0,1,2,3):
         important_stations_path = "./data/important_stations.npz"  
         block_schedule = "./data/trains_schedules.csv"
 
-    if args.case in [6,7]:
+    if args.case in (4,5):
         important_stations_path = "./data/important_stations_Gt.npz"
         block_schedule = "./data/trains_schedules_Gt.csv"
 
-    if args.case == 8:
+    if args.case == 6:
         important_stations_path = "./data/important_stations.npz"
         block_schedule = "./data/trains_schedules_1track.csv"
 
-    if args.case == 9:
+    if args.case in (7,8,9):
         important_stations_path = "./data/important_stations_Gt.npz"
         block_schedule = "./data/trains_schedules_1track_Gt.csv"
     
@@ -113,14 +120,8 @@ if __name__ == "__main__":
             timetable["initial_conditions"], train, delay
         )
 
-    if args.case == 2:
-        delay = 15
-        train = 5312
-        timetable["initial_conditions"] = add_delay(
-            timetable["initial_conditions"], train, delay
-        )
 
-    if args.case == 3:
+    if args.case == 2:
         delays = [15, 12, 13, 6, 21]
         trains = [94766, 40518, 41004, 44862, 4120]
         i = 0
@@ -130,17 +131,8 @@ if __name__ == "__main__":
             )
             i = i + 1
 
-    if args.case == 4:
-        delays = [30, 12, 25, 5, 30]
-        trains = [421009, 94611, 94113, 44717, 94717]
-        i = 0
-        for train in trains:
-            timetable["initial_conditions"] = add_delay(
-                timetable["initial_conditions"], train, delays[i]
-            )
-            i = i + 1
 
-    if args.case in (5, 7, 8, 9):
+    if args.case in (3, 5, 6, 7):
         delays = [30, 12, 18, 5, 30, 23, 3, 21, 35, 10, 25, 7, 5, 16]
         trains = [
             94766,
@@ -164,6 +156,66 @@ if __name__ == "__main__":
                 timetable["initial_conditions"], train, delays[i]
             )
             i = i + 1
+    
+    if args.case == 8:
+        delays = [15, 1, 15, 7, 30, 13, 3, 10, 28, 30, 11, 5, 10, 8, 2, 11, 10, 9, 7]
+        trains = [
+            94766,
+            26013,
+            42009,
+            5312,
+            34319,
+            14006,
+            94611,
+            40150,
+            41004,
+            45101,
+            94113,
+            40673,
+            54101,
+            40477,
+            4500,
+            49317,
+            64359,
+            44862,
+            73000,
+        ]
+        i = 0
+        for train in trains:
+            timetable["initial_conditions"] = add_delay(
+                timetable["initial_conditions"], train, delays[i]
+            )
+            i = i + 1
+
+    if args.case == 9:
+        delays = [30, 11, 15, 19, 5, 28, 21, 4, 21, 34, 11, 25, 7, 5, 5]
+        trains = [
+            94766,
+            26013,
+            42009,
+            5312,
+            40518,
+            34319,
+            14006,
+            40150,
+            41004,
+            45101,
+            4500,
+            49317,
+            64359,
+            44862,
+            73000,
+        ]
+        i = 0
+        for train in trains:
+            timetable["initial_conditions"] = add_delay(
+                timetable["initial_conditions"], train, delays[i]
+            )
+     
+            i = i + 1
+
+
+    
 
     prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 
@@ -201,14 +253,21 @@ if __name__ == "__main__":
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
 
-
+   
     if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
-        sample = solve_on_quantum(args, prob, pdict, minimum_time_limit = args.min_t)
 
+        samples = dict()
+        for i in range(args.runs):
+            samples[i+1] = solve_on_quantum(args, prob, pdict, minimum_time_limit = args.min_t)
+
+        sample = samples[1]
         try: 
             p = sample["properties"]["minimum_time_limit_s"]
         except:
             p = ""
+        
+        if args.runs != 1:
+            sample = samples
         
         file = f"solutions_quantum/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:

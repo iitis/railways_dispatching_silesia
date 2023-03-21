@@ -75,7 +75,8 @@ Input:
 --category the category of time variables "Integer" yields ILP problem "Continious" yields MLP problem (default "Integer")
 --solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
 --solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "hyb" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
---min_t minimal time parameter for D-Wave hybrid solver in seconds (5 default)
+--min_t minimal time parameter for D-Wave hybrid solver in (rescalled) seconds (5 default)
+--runs number of experiments (runs in the quantum case)
 ```
 
 
@@ -92,9 +93,9 @@ Example use:
 
 - D-Wave quantum or hybrid approach
 
-```python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5```
+```python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5 -- runs 5```
 
-Difficulty of dispatching problem grows with the case number. Case ```0```, no disturbances. In Cases ```1``` to ```5``` some trains are delayed, but they follow their original routes. Cases ```6``` to ```9``` concerns also a priory changes trains' routes e.g. due to some track failure.
+Difficulty of dispatching problem grows with the case number. Case ```0```, no disturbances. In Cases ```1``` to ```3``` some trains are delayed, but they follow their original routes. Cases ```4``` to ```9``` concerns also a priory changes trains' routes e.g. due to some track failure.
 
 
 #### Generic problem
