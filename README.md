@@ -97,6 +97,7 @@ Example use:
 
 Difficulty of dispatching problem grows with the case number. Case ```0```, no disturbances. In Cases ```1``` to ```3``` some trains are delayed, but they follow their original routes. Cases ```4``` to ```9``` concerns also a priory changes trains' routes e.g. due to some track failure.
 
+In  ```solutions_quantum``` the script ```tmin_plot.py``` plots the sweep over ````t_min``` parameter.
 
 #### Generic problem
 
@@ -133,7 +134,6 @@ Example use:
 - D-Wave quantum or hybrid approach
 
 ```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5```
-
 
 
 
