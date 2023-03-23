@@ -43,27 +43,28 @@ def plotting_objective(solver, case, tmins):
     ax1.legend(ncol = 2, loc='best')
 
     y1 = [np.mean(comp_time[tmin]) for tmin in tmins]
-    ax2.plot(tmins, y1, color = "blue", label = "mean")
+    ax2.plot(tmins, y1, "d--", color = "blue", label = "mean")
     ax2.legend(loc='best')
 
     y2 = [np.min(qpu_acess_time[tmin]) for tmin in tmins]
     y3 = [np.max(qpu_acess_time[tmin]) for tmin in tmins]
     ax3.plot(tmins, y2, "x--", color = "gray", label = "minimum")
     ax3.plot(tmins, y3, "d--", color = "black", label = "maximum")
-    ax3.legend(loc='best')
+    ax3.legend(loc='best', ncol = 2)
             
     ax1.set_ylabel("objective  x dmax [min]")
     ax2.set_ylabel("comp. time [s]")
     ax3.set_ylabel("QPU acess time [s]")
 
     ax3.set_xlabel("t min parameter")
+    ax3.set_ylim(bottom=0, top = 0.04)
 
 
 
     plt.savefig(f"{solver}_{case}_sweep_tmin.pdf")
 
 if __name__ == "__main__":
-    tmins = [5,10,20,30,40,50,60,70,80]
+    tmins = [5,10,15,20,25,30,40,50,60,70,80,100]
     solver = "cqm"
     case = "case7"
 
