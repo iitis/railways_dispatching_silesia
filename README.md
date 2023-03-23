@@ -93,7 +93,7 @@ Example use:
 
 - D-Wave quantum or hybrid approach
 
-```python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5 -- runs 5```
+```python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5 --runs 5```
 
 Difficulty of dispatching problem grows with the case number. Case ```0```, no disturbances. In Cases ```1``` to ```3``` some trains are delayed, but they follow their original routes. Cases ```4``` to ```9``` concerns also a priory changes trains' routes e.g. due to some track failure.
 

@@ -135,7 +135,6 @@ def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max,
 def check_count_vars(prob):
     """
     counts n.o. vars and checks if bool vars are 0 or 1
-    TODO it can be done better, 
     """
     order_vars = 0
     for v in prob.variables():
@@ -183,6 +182,9 @@ def solve_on_quantum(args, prob, pdict, minimum_time_limit):
         print(f"{args.solve_quantum} time = ", t, "seconds")
         dict_list = get_results(our_samples, prob=prob)
         sample = get_best_feasible_sample(dict_list)
+        print("feasible", sample["feasible"])
+        print("objective", sample["objective"])
+        print("...............")
         sample.update({"comp_time_seconds": t})
         sample.update({"info": info})
         sample.update({"properties": properties})
@@ -195,6 +197,9 @@ def solve_on_quantum(args, prob, pdict, minimum_time_limit):
 
         dict_list = get_results(sampleset, prob=prob)
         sample = get_best_feasible_sample(dict_list)
+        print("feasible", sample["feasible"])
+        print("objective", sample["objective"])
+        print("...............")
         sample.update({"comp_time_seconds": t})
         sample.update({"info": sampleset.info})
         sample.update({"properties": properties})

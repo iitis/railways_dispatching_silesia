@@ -69,7 +69,7 @@ def constrained_solver(cqm, minimum_time_limit = 5) -> dimod.sampleset.SampleSet
     """
     sampler = LeapHybridCQMSampler()
     sampler.properties["minimum_time_limit_s"]  = minimum_time_limit # by default it is 5, and can be set
-    print("parameters", sampler.properties)  
+    #print("parameters", sampler.properties)  
     return sampler.sample_cqm(cqm), sampler.properties
 
 def hybrid_anneal(bqm, minimum_time_limit) -> dimod.sampleset.SampleSet:
