@@ -27,6 +27,9 @@ def plotting_objective(solver, case, tmins):
         comp_time[tmin] = [data[i+1]["comp_time_seconds"] for i in range(len(data))]
         qpu_acess_time[tmin] = [data[i+1]["info"]["qpu_access_time"]/1000000 for i in range(len(data))]
 
+        # checks feasibility of all solutions
+        assert np.prod([data[i+1]["feasible"] for i in range(len(data))]) == 1
+
     
 
     fig, (ax1,ax2,ax3) = plt.subplots(3,figsize=(6, 6),sharex=True, tight_layout= True)
