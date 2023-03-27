@@ -108,7 +108,7 @@ Input:
 ```
 --case  particular case of railway dispatching problem (1 to 3 is supported)
 --category the category of time variables "Integer" yields ILP problem "Continious" yields MLP problem (default "Integer")
---solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
+--solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'
 --solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "hyb" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
 --min_t minimal time parameter for D-Wave hybrid solver in seconds (5 default)
 ```
