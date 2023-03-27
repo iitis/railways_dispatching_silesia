@@ -78,7 +78,8 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             # plt.xlabel("instance")
             ax1.set_ylabel("objective  x dmax [min]")
             #ax1.set_ylim(bottom=-25)
-            ax3.set_ylim(bottom=0, top = 0.04)
+            ax3.set_ylim(bottom=-0.005, top = 0.04)
+            ax3.plot(instance, [0. for _ in instance], c="green", marker = "*", linestyle= ":",  alpha=0.25, label = f"{label1}")
 
             ax2.plot(instance, x, c="green", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1}")
             ax2.scatter(instance, x, s=40, c=colors, marker = "*",  alpha=0.25)
@@ -87,7 +88,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             ax2.set_ylabel("comp. time [min]")
             ax3.set_ylabel("QPU acess time [s]")
 
-            ax2.legend(ncol = 2, loc='best')
+            ax3.legend(fontsize = 10, ncol = 3, loc=3)
 
             #ax2.legend(ncol = 2)
             #ax3.legend()
