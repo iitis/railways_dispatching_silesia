@@ -98,7 +98,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
 if __name__ == "__main__":
     cases = list(range(1,4))
     c_solvers = [r"CPLEX_CMD"]
-    dict_times = {1: [5, 10], 2:[5, 20], 3: [5,10]}
+    dict_times = {1: [5, 20], 2:[5, 20], 3: [5,20]}
 
 
     plotting_comparisons(c_solvers,cases,dict_times)
