@@ -148,7 +148,7 @@ is the test module for for case ```1``` problem from mentioned work.
 
 Input:
 ```
---solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'"  
+--solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'
 --solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
 --min_t minimal time parameter for D-Wave hybrid solver in seconds (5 default)
 ```
