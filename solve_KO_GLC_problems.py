@@ -120,7 +120,7 @@ if __name__ == "__main__":
         disturbances[11] = dict({2:92, 4602:70, 4:72, 102:46, 101:45, 6401:33, 6403:20, 5:25, 103:28, 3:59, 4604:12, 10:25})
     
     print("n.o. trains", len(train_set["J"]))
-    p = 2.1
+    p = 2.5
     pdict = {
         "minimal_span": p,
         "single_line": p,

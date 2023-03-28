@@ -72,7 +72,14 @@ if __name__ == "__main__":
         type=int,
         help="number of runs",
         default = 1,
-    )   
+    )
+
+    parser.add_argument(
+        "--penalty",
+        type=float,
+        help="pval for bqm",
+        default = 1.,
+    )     
 
     args = parser.parse_args()
     
@@ -204,12 +211,9 @@ if __name__ == "__main__":
         for train in trains:
             timetable["initial_conditions"] = add_delay(
                 timetable["initial_conditions"], train, delays[i]
-            )
-     
+            )     
             i = i + 1
 
-
-    
 
     prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 
@@ -235,14 +239,15 @@ if __name__ == "__main__":
     # QUBO creation an solution
     pdict = {}
     if args.solve_quantum in ["sim", "real", "hyb"]:
+        penalty = args.penalty
         pdict = {
-            "minimal_span": 2.5,
-            "single_line": 2.5,
-            "minimal_stay": 2.5,
-            "track_occupation": 2.5,
-            "switch": 2.5,
-            "occupation": 2.5,
-            "circulation": 2.5,
+            "minimal_span": penalty,
+            "single_line": penalty,
+            "minimal_stay": penalty,
+            "track_occupation": penalty,
+            "switch": penalty,
+            "occupation": penalty,
+            "circulation": penalty,
             "objective": 1,
         }
         bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
@@ -255,15 +260,18 @@ if __name__ == "__main__":
             samples[i+1] = solve_on_quantum(args, prob, pdict, minimum_time_limit = args.min_t)
 
         sample = samples[1]
-        try: 
+        if args.solve_quantum in ["cqm", "hyb"]:
             p = sample["properties"]["minimum_time_limit_s"]
-        except:
+        else:
             p = ""
         
         if args.runs != 1:
             sample = samples
         
-        file = f"solutions_quantum/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
+        if args.solve_quantum == "cqm":
+            file = f"solutions_quantum/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
+        else:
+            file = f"solutions_quantum/{args.solve_quantum}{p}_{args.penalty}_case{args.case}_{args.category}.pkl"
         with open(file, "wb") as f:
             pkl.dump(sample, f)
             
