@@ -72,17 +72,4 @@ def convert_to_cqm(model: LpProblem) -> Tuple[ConstrainedQuadraticModel, Callabl
         dimod_obj += sum(val * vars_trans[var] for var, val in obj.items())
         cqm.set_objective(dimod_obj)
 
-    def interpreter(sampleset, model):
-        result = []
-        energies = [d.energy for d in sampleset.data()]
-        for sample in sampleset.samples():
-            new_sample = {}
-            for name in sampleset.variables:
-                var = next(i for i in model.variables() if i.name == name)
-                new_sample[name] = var.lowBound + sample[name]
-            result.append(new_sample)
-        return dimod.SampleSet.from_samples(
-            dimod.as_samples(result), "BINARY", energies
-        )
-
-    return cqm, lambda ss: interpreter(ss, model)
+    return cqm

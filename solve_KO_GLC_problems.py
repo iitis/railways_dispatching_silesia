@@ -8,13 +8,8 @@ from data_formatting.data_formatting import (
     get_skip_stations
 )
 from railway_solvers.railway_solvers import (
-    annealing,
-    convert_to_bqm,
     create_linear_problem,
-    get_results,
-    get_best_feasible_sample,
-    convert_to_cqm,
-    constrained_solver
+
 )
 from helpers import (
     load_important_stations,
@@ -25,7 +20,8 @@ from helpers import (
     make_train_set,
     print_optimisation_results,
     check_count_vars,
-    count_vars
+    count_vars,
+    solve_on_quantum
 )
 
 if __name__ == "__main__":
@@ -52,7 +48,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--solve_quantum",
         type=str,
-        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'hyb' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
+        help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'bqm' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
         default="",
     )
 
@@ -87,7 +83,7 @@ if __name__ == "__main__":
         train_dict, important_stations, data_paths, skip_stations
     )
     t_ref = "14:00"
-    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
+    assert args.solve_quantum in ["", "sim", "real", "bqm", "cqm"]
 
     # input
     d_max = 40
@@ -120,20 +116,23 @@ if __name__ == "__main__":
         disturbances[11] = dict({2:92, 4602:70, 4:72, 102:46, 101:45, 6401:33, 6403:20, 5:25, 103:28, 3:59, 4604:12, 10:25})
     
     print("n.o. trains", len(train_set["J"]))
-    p = 2.5
-    pdict = {
-        "minimal_span": p,
-        "single_line": p,
-        "minimal_stay": p,
-        "track_occupation": p,
-        "switch": p,
-        "occupation": p,
-        "circulation": p,
-        "objective": 1,
-    }
 
-    sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 10, "num_reads": 2}
-    real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
+    # QUBO prameters if necessary
+    pdict = {}
+    if args.solve_quantum in ["sim", "real", "bqm"]:
+        p = 2.5
+        pdict = {
+            "minimal_span": p,
+            "single_line": p,
+            "minimal_stay": p,
+            "track_occupation": p,
+            "switch": p,
+            "occupation": p,
+            "circulation": p,
+            "objective": 1,
+        }
+
+
     results = {}
     results["method"] = args.solve_lp
     results["d_max"] = d_max
@@ -180,40 +179,13 @@ if __name__ == "__main__":
             results["brolen_constraints"] = 0
             check_count_vars(prob)
 
-        elif args.solve_quantum in ["sim", "real", "hyb"]:
-            bqm, qubo, interpreter = convert_to_bqm(prob, pdict)       
-            print(f"{args.solve_quantum} annealing")
-            start_time = time.time()
-            sampleset, info, properties = annealing(bqm, 
-                                                    interpreter, 
-                                                    args.solve_quantum, 
-                                                    sim_anneal_var_dict=sim_annealing_var, 
-                                                    real_anneal_var_dict=real_anneal_var_dict,
-                                                    time_limit_hyb = args.min_t
-                                                    )       
-            result["comp_time_seconds"] = time.time() - start_time
-            dict_list = get_results(sampleset, prob=prob)
-            sample = get_best_feasible_sample(dict_list)
+        elif args.solve_quantum in ["sim", "real", "bqm", "cqm"]:
+            sample = solve_on_quantum(prob, args.solve_quantum, pdict, minimum_time_limit= args.min_t)
             result.update(sample)
-            result.update({"info": info})
-            result.update({"properties": properties})
-            result["broken_constraints"] = constraints - sample["feas_constraints"][1]
+            result["broken_constraints"] = constraints - result["feas_constraints"][1]
             print("broken constraints", result["broken_constraints"])
 
-        elif args.solve_quantum == "cqm":
-            cqm, interpreter = convert_to_cqm(prob)
-            start_time = time.time()
-            sampleset, properties = constrained_solver(cqm, minimum_time_limit = args.min_t)        
-            result["comp_time_seconds"] = time.time() - start_time
-            dict_list = get_results(sampleset, prob=prob)
-            sample = get_best_feasible_sample(dict_list)
-            result.update(sample)
-            result.update({"info": sampleset.info})
-            result.update({"properties": properties})
-            result["broken_constraints"] = constraints - sample["feas_constraints"][1]
-            print("broken constraints", result["broken_constraints"])
-
-        results[k] = result 
+        results[k] = sample
     results["samples"] = k+1
 
     print("save ... ")

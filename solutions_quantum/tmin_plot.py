@@ -24,7 +24,7 @@ def plotting_objective(solver, case, tmins):
     for tmin in tmins:
         data = load_data(solver,case, tmin)
         objectives[tmin] = [data[i+1]["objective"]*dmax for i in range(len(data))]
-        comp_time[tmin] = [data[i+1]["comp_time_seconds"] for i in range(len(data))]
+        comp_time[tmin] = [data[i+1]["info"]["run_time"]/1000000 for i in range(len(data))]
         qpu_acess_time[tmin] = [data[i+1]["info"]["qpu_access_time"]/1000000 for i in range(len(data))]
 
         # checks feasibility of all solutions
@@ -43,7 +43,9 @@ def plotting_objective(solver, case, tmins):
     ax1.legend(ncol = 2, loc='best')
 
     y1 = [np.mean(comp_time[tmin]) for tmin in tmins]
-    ax2.plot(tmins, y1, "d--", color = "blue", label = "mean")
+    ax2.plot(tmins, y1, "d--", color = "blue", label = "mean hybrid solver")
+    cplex_t = [7.89 for _ in tmins]
+    ax2.plot(tmins, cplex_t, ":", color = "red", label = "CPLEX solver")
     ax2.legend(loc='best')
 
     y2 = [np.min(qpu_acess_time[tmin]) for tmin in tmins]
@@ -64,7 +66,7 @@ def plotting_objective(solver, case, tmins):
     plt.savefig(f"{solver}_{case}_sweep_tmin.pdf")
 
 if __name__ == "__main__":
-    tmins = [5,10,15,20,25,30,40,50,60,70,80,100]
+    tmins = [5,10,15,20,25,30,40]
     solver = "cqm"
     case = "case7"
 

@@ -78,7 +78,7 @@ if __name__ == "__main__":
     t_ref = "8:00"
     prob = create_linear_problem(train_set, timetable, d_max, cat="Integer")
     args = parser.parse_args()
-    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
+    assert args.solve_quantum in ["", "sim", "real", "bqm", "cqm"]
 
     if args.solve_lp != "":
         if "CPLEX_CMD" == args.solve_lp:
@@ -96,11 +96,9 @@ if __name__ == "__main__":
         check_count_vars(prob)
         print("objective", prob.objective.value())
 
-    # QUBO creation an solution
-
-    
+    # QUBO prameters if necessary   
     pdict = {}
-    if args.solve_quantum in ["sim", "real", "hyb"]:
+    if args.solve_quantum in ["sim", "real", "bqm"]:
         pdict = {
             "minimal_span": 10,
             "single_line": 10,
@@ -112,8 +110,8 @@ if __name__ == "__main__":
             "objective": 1,
         }
 
-    if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
-        sample = solve_on_quantum(args, prob, pdict, args.min_t)
+    if args.solve_quantum in ["sim", "real", "bqm", "cqm"]:
+        sample = solve_on_quantum(prob, args.solve_quantum, pdict, args.min_t)
         try: 
             p = sample["properties"]["minimum_time_limit_s"]
         except:

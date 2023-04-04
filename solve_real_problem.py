@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
     prob = create_linear_problem(train_set, timetable, d_max, cat=args.category)
 
-    assert args.solve_quantum in ["", "sim", "real", "hyb", "cqm"]
+    assert args.solve_quantum in ["", "sim", "real", "bqm", "cqm"]
 
     if args.solve_lp != "":
         if "CPLEX_CMD" == args.solve_lp:
@@ -234,11 +234,12 @@ if __name__ == "__main__":
         print("............ case", args.case, ".......")
         print("optimisation, time = ", end_time - start_time, "seconds")
         check_count_vars(prob)
+        print("objective", prob.objective.value())
         print("objective x d_max  in [min]", prob.objective.value() * d_max)
 
-    # QUBO creation an solution
+    # QUBO paramters if necessary
     pdict = {}
-    if args.solve_quantum in ["sim", "real", "hyb"]:
+    if args.solve_quantum in ["sim", "real", "bqm"]:
         penalty = args.penalty
         pdict = {
             "minimal_span": penalty,
@@ -250,17 +251,16 @@ if __name__ == "__main__":
             "circulation": penalty,
             "objective": 1,
         }
-        bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
+        #bqm, qubo, interpreter = convert_to_bqm(prob, pdict)
 
-   
-    if args.solve_quantum in ["sim", "real", "hyb", "cqm"]:
+    if args.solve_quantum in ["sim", "real", "bqm", "cqm"]:
 
         samples = dict()
         for i in range(args.runs):
-            samples[i+1] = solve_on_quantum(args, prob, pdict, minimum_time_limit = args.min_t)
+            samples[i+1] = solve_on_quantum(prob, args.solve_quantum, pdict, minimum_time_limit = args.min_t)
 
         sample = samples[1]
-        if args.solve_quantum in ["cqm", "hyb"]:
+        if args.solve_quantum in ["cqm", "bqm"]:
             p = sample["properties"]["minimum_time_limit_s"]
         else:
             p = ""

@@ -60,7 +60,7 @@ def real_anneal(
     return sampleset
 
 def constrained_solver(cqm, minimum_time_limit = 5) -> dimod.sampleset.SampleSet:
-    """Runs experiment using constrained solver
+    """Runs experiment using CQM hybrid solver
 
     :param cqm: Constrained model for the problem
     :type cqm: ConstrainedQuadraticModel
@@ -73,7 +73,7 @@ def constrained_solver(cqm, minimum_time_limit = 5) -> dimod.sampleset.SampleSet
     return sampler.sample_cqm(cqm), sampler.properties
 
 def hybrid_anneal(bqm, minimum_time_limit) -> dimod.sampleset.SampleSet:
-    """Runs experiment using hybrid solver
+    """Runs experiment using BQM hybrid solver
 
     :param bqm: Binary quadratic model for the problem
     :type bqm: BinaryQuadraticModel
@@ -83,55 +83,3 @@ def hybrid_anneal(bqm, minimum_time_limit) -> dimod.sampleset.SampleSet:
     sampler = LeapHybridSampler()
     sampler.properties["minimum_time_limit_s"]  = minimum_time_limit # by default it is 5, and can be set
     return sampler.sample(bqm), sampler.properties
-
-def get_parameters(real_anneal_var_dict) -> Tuple[int, int, int]:
-    """Extracts/sets parameters for annealing experiment
-
-    :param real_anneal_var_dict: Parameters for QA experiment
-    :type real_anneal_var_dict: Dict[str, float]
-    :return: Number of reads, annealing_time and chain strength
-    :rtype: Tuple[int, int, int]
-    """
-    if real_anneal_var_dict is None:
-        num_reads = 1000
-        annealing_time = 250
-        chain_strength = 4
-    else:
-        num_reads = real_anneal_var_dict["num_reads"]
-        annealing_time = real_anneal_var_dict["annealing_time"]
-        chain_strength = real_anneal_var_dict["chain_strength"]
-    return num_reads, annealing_time, chain_strength
-
-def annealing(
-    bqm, interpreter, method, real_anneal_var_dict=None, sim_anneal_var_dict=None, time_limit_hyb = 5
-):
-    """Performs the annealing experiment
-
-    :param bqm: The problem instance
-    :type prob: bqm
-    :param interpreter: ....
-    :param method: 'sim', 'real', 'hyb'
-    :type method: str
-    :param input_name: name of the input data
-    :type input_name: str
-    :param real_anneal_var_dict: Parameters for QA
-    :type real_anneal_var_dict: Dict[str, float]
-    """
-    assert method in ["sim", "real", "hyb"]
-    properties = ""
-    if method == "sim":
-        sampleset = sim_anneal(bqm, beta_range=sim_anneal_var_dict["beta_range"], num_sweeps=sim_anneal_var_dict["num_sweeps"], num_reads=sim_anneal_var_dict["num_reads"])
-    elif method == "real":
-        num_reads, annealing_time, chain_strength = get_parameters(
-            real_anneal_var_dict
-        )
-        sampleset = real_anneal(
-            bqm,
-            num_reads=num_reads,
-            annealing_time=annealing_time,
-            chain_strength=chain_strength,
-        )
-    elif method == "hyb":
-        sampleset, properties = hybrid_anneal(bqm, time_limit_hyb)
-    return interpreter(sampleset), sampleset.info, properties
-    

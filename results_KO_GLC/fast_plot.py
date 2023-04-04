@@ -27,7 +27,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
                 file = f"results{t}__{q_solver}_{case}_Integer.pkl"
                 results1 = pd.read_pickle(rf'{file}')
                 N = results1["samples"]
-                x1 = [results1[i]["comp_time_seconds"]/60 for i in range(N)]
+                x1 = [results1[i]["info"]["run_time"]/(1000000*60) for i in range(N)]
                 y1 = [results1[i]["objective"]*results1["d_max"] for i in range(N)]
                 x2 = [results1[i]["info"]["qpu_access_time"]/1000000 for i in range(N)]
                     

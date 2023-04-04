@@ -26,7 +26,9 @@ from data_formatting.data_formatting import (
 from railway_solvers.railway_solvers import (
     delay_and_acctual_time,
     impact_to_objective,
-    annealing,
+    sim_anneal,
+    real_anneal,
+    hybrid_anneal,
     get_results,
     get_best_feasible_sample,
     convert_to_cqm,
@@ -162,46 +164,78 @@ def count_vars(prob):
     constraints = prob.numConstraints()
     return order_vars, int_vars, constraints
 
-def solve_on_quantum(args, prob, pdict, minimum_time_limit):
-    """solve givem problem on varous quantum / hybrid algorithms"""
 
-    if args.solve_quantum in ["sim", "real", "hyb"]:
+# Solving on quantum
+
+def q_process(prob, method, pdict, minimum_time_limit):
+    """actual set of quantum solvers, 
+    
+    input
+
+    prob: linear problem ILP
+    method: string in ["sim", "real", "bqm", "cqm"]
+    pdict: a dict of parameters for QUBO creation for ["sim", "real", "bqm"]
+    minimum_time_limit: parameter for hybrid solvers
+
+    returns set of samples (sampleset)  properties, info  (information from solver)
+
+    """
+
+
+    if method in ["sim", "real", "bqm"]:
         bqm, _, interpreter = convert_to_bqm(prob, pdict)
-        sim_annealing_var = {"beta_range": (0.001, 10), "num_sweeps": 10, "num_reads": 2}
-        real_anneal_var_dict = {"num_reads": 3996, "annealing_time": 250, "chain_strength": 4}
-        print(f"{args.solve_quantum} annealing")
-        start_time = time.time()
-        our_samples, info, properties = annealing(bqm, 
-                                                  interpreter, 
-                                                  args.solve_quantum, 
-                                                  sim_anneal_var_dict=sim_annealing_var, 
-                                                  real_anneal_var_dict=real_anneal_var_dict,
-                                                  time_limit_hyb = minimum_time_limit)
-        t = time.time() - start_time
+    else:
+        cqm = convert_to_cqm(prob)
 
-        print(f"{args.solve_quantum} time = ", t, "seconds")
-        dict_list = get_results(our_samples, prob=prob)
-        sample = get_best_feasible_sample(dict_list)
-        print("feasible", sample["feasible"])
-        print("objective", sample["objective"])
-        print("...............")
-        sample.update({"comp_time_seconds": t})
-        sample.update({"info": info})
-        sample.update({"properties": properties})
+    if method == "sim":
+        sampleset = sim_anneal(bqm, beta_range=(0.001, 10), num_sweeps=10, num_reads=2)  
+        properties = ""
+        interpreted_sampleset = interpreter(sampleset)
 
-    if args.solve_quantum == "cqm":
-        cqm, interpreter = convert_to_cqm(prob)
-        start_time = time.time()
+    elif method  == "real":
+        sampleset = real_anneal(bqm,num_reads=1000, annealing_time=250, chain_strength=4)
+        properties = ""
+        interpreted_sampleset = interpreter(sampleset)
+        
+    elif method  == "bqm":
+        sampleset, properties = hybrid_anneal(bqm, minimum_time_limit = minimum_time_limit)
+        interpreted_sampleset = interpreter(sampleset)
+        
+    elif method == "cqm":
         sampleset, properties = constrained_solver(cqm, minimum_time_limit = minimum_time_limit)
-        t = time.time() - start_time
+        interpreted_sampleset = sampleset
 
-        dict_list = get_results(sampleset, prob=prob)
-        sample = get_best_feasible_sample(dict_list)
-        print("feasible", sample["feasible"])
-        print("objective", sample["objective"])
-        print("...............")
-        sample.update({"comp_time_seconds": t})
-        sample.update({"info": sampleset.info})
-        sample.update({"properties": properties})
+    
+    return interpreted_sampleset, properties, sampleset.info
+
+
+def solve_on_quantum(prob, method, pdict, minimum_time_limit):
+    """solve given problem on various quantum / hybrid algorithms
+    
+        prob: linear problem ILP
+    method: string in ["sim", "real", "bqm", "cqm"]
+    pdict: a dict of parameters for QUBO creation for ["sim", "real", "bqm"]
+    minimum_time_limit: parameter for hybrid solvers
+
+    returns sample dict of solutions with parameters and measured comp times
+    """
+
+    start_time = time.time()
+
+    interpreted_sampleset, properties, info = q_process(prob, method, pdict, minimum_time_limit)
+
+    t = time.time() - start_time
+
+    print("measured comp time",t)
+    dict_list = get_results(interpreted_sampleset, prob=prob)
+    sample = get_best_feasible_sample(dict_list)
+    print("end results analysis")
+    sample.update({"comp_time_seconds": t})
+    sample.update({"info": info})
+    sample.update({"properties": properties})
+    print("feasible", sample["feasible"])
+    print("objective", sample["objective"])
+
+    print("xxxxxxxxxxxxxxxxxxxxxxx")
 
     return sample

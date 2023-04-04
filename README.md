@@ -74,7 +74,7 @@ Input:
 --case  particular case of railway dispatching problem (0 to 9 is supported, default 1)
 --category the category of time variables "Integer" yields ILP problem "Continious" yields MLP problem (default "Integer")
 --solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD' 
---solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "hyb" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
+--solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "bqm" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
 --min_t minimal time parameter for D-Wave hybrid solver in (rescalled) seconds (5 default)
 --runs number of experiments (runs in the quantum case)
 ```
@@ -109,7 +109,7 @@ Input:
 --case  particular case of railway dispatching problem (1 to 3 is supported)
 --category the category of time variables "Integer" yields ILP problem "Continious" yields MLP problem (default "Integer")
 --solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'
---solve_quantum  chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "hyb" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
+--solve_quantum  chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave QPU, "bqm" - D-Wave hybrid bqm solver, "cqm" - D-Wave hybrid cqm solver
 --min_t minimal time parameter for D-Wave hybrid solvers (hyb, cqm) in seconds (5 default)
 -- penalty - the penalty value for QUBO creation, applicable only for bqm (hyb, sim, real), by default 2.5
 ```
@@ -136,6 +136,10 @@ Example use:
 
 ```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5```
 
+In the case if not CQM solver is used, the paenalty for QUBO can be assigned:
+
+```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5, --penalty 2.5```
+
 
 
 #### Problem from "Quantum Annealing in the NISQ Era: Railway Conflict Management"
@@ -150,7 +154,7 @@ is the test module for for case ```1``` problem from mentioned work.
 Input:
 ```
 --solve_lp  chose PuLp solver, e.g. 'PULP_CBC_CMD'  'GUROBI_CMD' 'CPLEX_CMD'
---solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "hyb" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
+--solve_quantum   chose quantum or quantum inspired solver, "sim" - D-Wave simulation, "real" - D-Wave, "bqm" - D-Wave hybrid from QUBO, "cqm" - D-Wave hybrid cqm
 --min_t minimal time parameter for D-Wave hybrid solver in seconds (5 default)
 ```
 
