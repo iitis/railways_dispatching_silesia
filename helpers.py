@@ -188,8 +188,15 @@ def q_process(prob, method, pdict, minimum_time_limit):
         cqm = convert_to_cqm(prob)
 
     if method == "sim":
-        sampleset = sim_anneal(bqm, beta_range=(0.001, 10), num_sweeps=10, num_reads=2)  
-        properties = ""
+        beta_range=(0.001, 10)
+        num_sweeps=10
+        num_reads=2
+        #beta_range=(0.00001, 100)
+        #num_sweeps=1000
+        #num_reads=1000
+
+        sampleset = sim_anneal(bqm, beta_range=beta_range, num_sweeps=num_sweeps, num_reads=num_reads)  
+        properties = {"beta_range":beta_range, "num_sweeps":num_sweeps, "num_reads":num_reads}
         interpreted_sampleset = interpreter(sampleset)
 
     elif method  == "real":
