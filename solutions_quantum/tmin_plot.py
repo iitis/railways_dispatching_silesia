@@ -17,6 +17,8 @@ markers = ["o", "x", "*", "^", "^", "d", "v", "s", "*", "^"]
 
 def plotting_objective(solver, case, tmins):
     dmax = 40
+    cplex_t = 7.89
+    cplex_obj = 188.75
 
     objectives = {}
     comp_time = {}
@@ -40,12 +42,14 @@ def plotting_objective(solver, case, tmins):
     ax1.plot(tmins, y1, "o--", color = "green", label = "mean")
     ax1.plot(tmins, y2, ":", color = "green", label = "envelope")
     ax1.plot(tmins, y3, ":", color = "green")
+    cplex_objs = [cplex_obj for _ in tmins]
+    ax1.plot(tmins, cplex_objs, ":", color = "red", label = "CPLEX solver")
     ax1.legend(ncol = 2, loc='best')
 
     y1 = [np.mean(comp_time[tmin]) for tmin in tmins]
     ax2.plot(tmins, y1, "d--", color = "blue", label = "mean hybrid solver")
-    cplex_t = [7.89 for _ in tmins]
-    ax2.plot(tmins, cplex_t, ":", color = "red", label = "CPLEX solver")
+    cplex_ts = [cplex_t for _ in tmins]
+    ax2.plot(tmins, cplex_ts, ":", color = "red", label = "CPLEX solver")
     ax2.legend(loc='best')
 
     y2 = [np.min(qpu_acess_time[tmin]) for tmin in tmins]
@@ -61,12 +65,14 @@ def plotting_objective(solver, case, tmins):
     ax3.set_xlabel("t min parameter")
     ax3.set_ylim(bottom=0, top = 0.04)
 
+    plt.xscale("log")
+
 
 
     plt.savefig(f"{solver}_{case}_sweep_tmin.pdf")
 
 if __name__ == "__main__":
-    tmins = [5,10,15,20,25,30,40]
+    tmins = [5, 6, 7, 10,15,20,25,30,40, 60]
     solver = "cqm"
     case = "case7"
 
