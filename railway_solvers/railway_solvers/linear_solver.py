@@ -2,6 +2,7 @@
 import itertools
 import time
 import pulp as pus
+import pandas as pd
 
 
 from .helpers_functions import departure_station4switches
@@ -709,24 +710,31 @@ def solve_linear_problem(train_sets, timetable, d_max, cat = "Integer"):
 # auxiliary functions for visualisation
 
 
-def delay_and_acctual_time(train_sets, timetable, prob, j, s):
+def delay_and_acctual_time(train_sets, timetable, prob, j, s, data = []):
     """given the solution of the optimisation problem returns secondary delay
     conflict free time and conflicted time
     """
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
-            delay = v.varValue
+            if data == []:
+                delay = v.varValue
+            else:
+                delay = data[v.name]
             conflicted_tt = earliest_dep_time(train_sets["Paths"], timetable, j, s)
             conflict_free = delay + conflicted_tt
             return delay, conflict_free, conflicted_tt
     return 0,0,0
 
 
-def impact_to_objective(prob, timetable, j, s, d_max):
+def impact_to_objective(prob, timetable, j, s, d_max, data = []):
     """return the impact to the objective of the particular secondary delay
     of particular train at particular station
     """
     for v in prob.variables():
         if v.name == f"Delays_{j}_{s}":
-            return penalty_weights(timetable, j, s) / d_max * v.varValue
+            if data == []:
+                delay = v.varValue
+            else:
+                delay = data[v.name]
+            return penalty_weights(timetable, j, s) / d_max * delay
     return 0.0

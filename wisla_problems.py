@@ -112,6 +112,7 @@ if __name__ == "__main__":
 
     if args.solve_quantum in ["sim", "real", "bqm", "cqm"]:
         sample = solve_on_quantum(prob, args.solve_quantum, pdict, args.min_t)
+        print(sample["sample"])
         try: 
             p = sample["properties"]["minimum_time_limit_s"]
         except:

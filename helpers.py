@@ -91,7 +91,7 @@ def make_train_set(train_dict, important_stations, data_path, skip_stations):
     train_set["Jswitch"] = jswitch(train_dict, important_stations, data_path)
     return train_set
 
-def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref):
+def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref, outside_data = []):
     print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
     print("reference_time", t_ref)
     for j in train_set["J"]:
@@ -101,9 +101,9 @@ def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max,
             if j in skip_stations and s == skip_stations[j]: 
                 0
             else:
-                delta_obj = impact_to_objective(prob, timetable, j, s, d_max)
+                delta_obj = impact_to_objective(prob, timetable, j, s, d_max, outside_data)
                 delay, conflict_free, conflicted_tt = delay_and_acctual_time(
-                    train_set, timetable, prob, j, s
+                    train_set, timetable, prob, j, s, outside_data
                 )
                 try:
                     sched = timetable["schedule"][f"{j}_{s}"]
