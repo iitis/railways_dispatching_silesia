@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-for k in [0, 4, 7]:
+for k in range(10):
     data = pd.read_pickle(rf'cqm5_case{k}_Integer.pkl')
 
     delays = {}
@@ -17,7 +17,6 @@ for k in [0, 4, 7]:
                     current_delay = d[train][s]['secondary delay']
                 except:
                     current_delay = ""
-                
 
 
                 if current_delay != "":
@@ -39,24 +38,40 @@ for k in [0, 4, 7]:
     p2 = 0.75
     y1 = [np.quantile(delays[e], p1) for e in considered_stations]
     y2 = [np.quantile(delays[e], p2) for e in considered_stations]
+    minimum = [np.min(delays[e]) for e in considered_stations]
+    maximum = [np.max(delays[e]) for e in considered_stations]
 
-    fig, ax = plt.subplots(figsize=(3, 3))
-    plt.subplots_adjust(left = 0.2, bottom = 0.2)
 
-    lower_error = [np.mean(delays[e])-np.min(delays[e]) for e in considered_stations]
-    upper_error = [np.max(delays[e])-np.mean(delays[e]) for e in considered_stations]
-    asymmetric_error = [lower_error, upper_error]
 
-    print()
+    print(".............................")
+    print("case", k)
 
-    ax.errorbar(x, y, yerr=asymmetric_error, fmt='o',  markersize=10, label = "mean", color = "blue")
-    plt.plot(x, y1, "_", markersize = 10, color = "blue", label = f"{p1}, {p2} perc.")
-    plt.plot(x, y2, '_', markersize = 10, color = "blue")
-    plt.ylim([-2,60])
+    print("stations", considered_stations)
+    print("max delay", maximum)
+    print("quantile 75", y2)
+    print("mean", y)
+    print("quantile 25", y1)
+    print("min", minimum)
+    
 
-    plt.xlabel("selected stations")
-    plt.ylabel("secondary delays on departure [min]")
-    plt.legend(ncol = 1)
-    ax.set_title(f'case {k}')
-    plt.savefig(f'statistics_case{k}.pdf')
-    plt.clf()
+    if k in [4,7]:
+
+        lower_error = [np.mean(delays[e])-np.min(delays[e]) for e in considered_stations]
+        upper_error = [np.max(delays[e])-np.mean(delays[e]) for e in considered_stations]
+
+        asymmetric_error = [lower_error, upper_error]
+
+        fig, ax = plt.subplots(figsize=(3, 3))
+        plt.subplots_adjust(left = 0.2, bottom = 0.2)
+
+        ax.errorbar(x, y, yerr=asymmetric_error, fmt='o',  markersize=10, label = "mean", color = "blue")
+        plt.plot(x, y1, "_", markersize = 10, color = "blue", label = f"{p1}, {p2} perc.")
+        plt.plot(x, y2, '_', markersize = 10, color = "blue")
+        plt.ylim([-2,60])
+
+        plt.xlabel("selected stations")
+        plt.ylabel("secondary delays on departure [min]")
+        plt.legend(ncol = 1)
+        ax.set_title(f'case {k}')
+        plt.savefig(f'statistics_case{k}.pdf')
+        plt.clf()
