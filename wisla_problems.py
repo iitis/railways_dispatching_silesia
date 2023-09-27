@@ -2,6 +2,8 @@
 import pickle as pkl
 import time
 import pulp as pl
+import pandas as pd
+from datetime import datetime, timedelta
 
 from railway_solvers.railway_solvers import (
     create_linear_problem,
@@ -36,6 +38,13 @@ if __name__ == "__main__":
         type=int,
         help="minimal time parameter for cqm solver",
         default=5,
+    )
+
+    parser.add_argument(
+        "--show_timetable",
+        type=int,
+        help="show timetable of the solution",
+        default=False,
     )
 
     train_set = {
@@ -75,7 +84,8 @@ if __name__ == "__main__":
                  "schedule": {"Ks1_1": 0, "Ks3_1": 60, "Ic1_1": 10, "Ks2_10": 40, "Ks4_10": 100, "Ic2_10": 95}
                 }
 
-    t_ref = "8:00"
+    t_ref = datetime(year = 2020, month = 1, day = 1, hour = 8, minute =0)
+
     prob = create_linear_problem(train_set, timetable, d_max, cat="Integer")
     args = parser.parse_args()
     assert args.solve_quantum in ["", "sim", "real", "bqm", "cqm"]
@@ -91,7 +101,11 @@ if __name__ == "__main__":
         start_time = time.time()
         prob.solve(solver = solver)
         end_time = time.time()
-        print_optimisation_results(prob, timetable, train_set, train_set["skip_station"], d_max, t_ref)
+        if args.show_timetable:
+            data4diagrams = print_optimisation_results(prob, timetable, train_set, taus, train_set["skip_station"], d_max, t_ref)
+            file_sched = f"solutions_quantum/wisla/data4diagrams/{args.solve_lp}_wisla_case1.pkl"
+            with open(file_sched, "wb") as f:
+                pkl.dump(data4diagrams, f)
         print("optimisation, time = ", end_time - start_time, "seconds")
         check_count_vars(prob)
         print("objective", prob.objective.value())
@@ -111,13 +125,26 @@ if __name__ == "__main__":
         }
 
     if args.solve_quantum in ["sim", "real", "bqm", "cqm"]:
-        sample = solve_on_quantum(prob, args.solve_quantum, pdict, args.min_t)
-        print(sample["sample"])
-        try: 
-            p = sample["properties"]["minimum_time_limit_s"]
-        except:
+
+        if args.solve_quantum in ["bqm", "cqm"]:
+            p = args.min_t
+        else:
             p = ""
-        
         file = f"solutions_quantum/wisla/{args.solve_quantum}_wisla{p}_case1.pkl"
-        with open(file, "wb") as f:
-            pkl.dump(sample, f)
+        
+        if args.show_timetable:
+            data = pd.read_pickle(file)
+            data4diagrams = print_optimisation_results(prob, timetable, train_set, taus, train_set["skip_station"], d_max, t_ref, data["sample"])
+            file_sched = f"solutions_quantum/wisla/data4diagrams/{args.solve_quantum}_wisla{p}_case1.pkl"
+            with open(file_sched, "wb") as f:
+                pkl.dump(data4diagrams, f)
+        else:
+            sample = solve_on_quantum(prob, args.solve_quantum, pdict, args.min_t)
+            print(sample["sample"])
+            #try: 
+            #    p = sample["properties"]["minimum_time_limit_s"]
+            #except:
+            #    p = ""
+            
+            with open(file, "wb") as f:
+                pkl.dump(sample, f)

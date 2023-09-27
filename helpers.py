@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import time
+from datetime import timedelta
 
 from data_formatting.data_formatting import (
     get_initial_conditions,
@@ -91,48 +92,46 @@ def make_train_set(train_dict, important_stations, data_path, skip_stations):
     train_set["Jswitch"] = jswitch(train_dict, important_stations, data_path)
     return train_set
 
-def print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref, outside_data = []):
-    print("xxxxxxxxxxx  OUTPUT TIMETABLE  xxxxxxxxxxxxxxxxx")
+def print_optimisation_results(prob, timetable, train_set, taus, skip_stations, d_max, t_ref, outside_data = []):
     print("reference_time", t_ref)
+
+    sched_dict = {}
     for j in train_set["J"]:
-        print("..............")
-        print("train", j)
+        s_prev = 0
+        departure_prev = 0
+
+        train_sched = {}
         for s in train_set["Paths"][j]:
+            s_dict = {}
+            try:
+                dt = timedelta(minutes = int(taus["pass"][f"{j}_{s_prev}_{s}"])+int(departure_prev))
+                s_dict["arrive"] = t_ref + dt
+            except:
+                0
             if j in skip_stations and s == skip_stations[j]: 
                 0
             else:
                 delta_obj = impact_to_objective(prob, timetable, j, s, d_max, outside_data)
-                delay, conflict_free, conflicted_tt = delay_and_acctual_time(
+                delay, departure, conflicted_departure = delay_and_acctual_time(
                     train_set, timetable, prob, j, s, outside_data
                 )
-                try:
-                    sched = timetable["schedule"][f"{j}_{s}"]
-                    print("s",
-                        s,
-                        "v", 
-                        int(conflicted_tt),
-                        "d",
-                        int(delay),
-                        "t",
-                        int(conflict_free),
-                        "delta f(t)",
-                        delta_obj,
-                        "||",
-                        "schedule",
-                        sched,
-                    )
-                except:
-                    print("s",
-                        s,
-                        "v", 
-                        int(conflicted_tt),
-                        "d",
-                        int(delay),
-                        "t",
-                        int(conflict_free),
-                        "delta f(t)",
-                        delta_obj,
-                    )
+                s_dict["departure"] = t_ref + timedelta(minutes = int(departure))
+                s_dict["secondary delay"] = int(delay)
+                s_dict["conflicted departure"] = t_ref + timedelta(minutes = int(conflicted_departure))
+                s_dict["impact_to_objective"] = delta_obj
+
+                s_prev = s
+                departure_prev = departure
+
+            train_sched[s] = s_dict
+        
+        sched_dict[j] = train_sched
+
+    return sched_dict
+        
+
+
+
 
 def check_count_vars(prob):
     """

@@ -2,6 +2,8 @@
 import pickle as pkl
 import time
 import pulp as pl
+from datetime import datetime
+import pandas as pd
 
 
 from data_formatting.data_formatting import (
@@ -79,6 +81,13 @@ if __name__ == "__main__":
         type=float,
         help="pval for bqm",
         default = 1.,
+    )
+
+    parser.add_argument(
+        "--show_timetable",
+        type=int,
+        help="show timetable of the solution",
+        default=False,
     )     
 
     args = parser.parse_args()
@@ -116,6 +125,7 @@ if __name__ == "__main__":
     )
     t_ref = "16:00"
     timetable = make_timetable(train_dict, important_stations, skip_stations, t_ref)
+    reference_time = datetime(year = 2020, month = 1, day = 1, hour = int(t_ref[0:2]), minute = int(t_ref[3:5]))
 
     # args.case == 0 no distrubrance
 
@@ -230,7 +240,12 @@ if __name__ == "__main__":
         start_time = time.time()
         prob.solve(solver = solver)
         end_time = time.time()
-        print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref)
+        if args.show_timetable:
+            data4diagrams = print_optimisation_results(prob, timetable, train_set, taus, skip_stations, d_max, reference_time)
+            file_sched = f"solutions_quantum/data4diagrams/{args.solve_lp}_case{args.case}_{args.category}.pkl"
+            with open(file_sched, "wb") as f:
+                pkl.dump(data4diagrams, f)
+
         print("............ case", args.case, ".......")
         print("optimisation, time = ", end_time - start_time, "seconds")
         check_count_vars(prob)
@@ -255,23 +270,34 @@ if __name__ == "__main__":
 
     if args.solve_quantum in ["sim", "real", "bqm", "cqm"]:
 
-        samples = dict()
-        for i in range(args.runs):
-            samples[i+1] = solve_on_quantum(prob, args.solve_quantum, pdict, minimum_time_limit = args.min_t)
-
-        sample = samples[1]
         if args.solve_quantum in ["cqm", "bqm"]:
-            p = sample["properties"]["minimum_time_limit_s"]
+            p = args.min_t
         else:
             p = ""
-        
-        if args.runs != 1:
-            sample = samples
-        
         if args.solve_quantum == "cqm":
             file = f"solutions_quantum/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
         else:
             file = f"solutions_quantum/{args.solve_quantum}{p}_{args.penalty}_case{args.case}_{args.category}.pkl"
-        with open(file, "wb") as f:
-            pkl.dump(sample, f)
+
+        if args.show_timetable:
+            data = pd.read_pickle(file)
+            data4diagrams = {}
+            for i in range(args.runs):
+                data4diagrams[i] = print_optimisation_results(prob, timetable, train_set, taus, train_set["skip_station"], d_max, reference_time, data[i]["sample"])
+                if args.solve_quantum == "cqm":
+                    file = f"solutions_quantum/data4diagrams/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
+                else:
+                    file = f"solutions_quantum/data4diagrams/{args.solve_quantum}{p}_{args.penalty}_case{args.case}_{args.category}.pkl"
+
+                with open(file_sched, "wb") as f:
+                    pkl.dump(data4diagrams, f)
+        
+        else:
+            samples = dict()
+            for i in range(args.runs):
+                samples[i+1] = solve_on_quantum(prob, args.solve_quantum, pdict, minimum_time_limit = args.min_t)
+            
+
+            with open(file, "wb") as f:
+                pkl.dump(samples, f)
             

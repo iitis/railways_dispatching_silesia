@@ -2,6 +2,7 @@
 import pickle as pkl
 import time
 import pulp as pl
+from time import datetime
 
 from data_formatting.data_formatting import (
     add_delay,
@@ -171,7 +172,9 @@ if __name__ == "__main__":
             visualize = False
 
             if visualize:
-                print_optimisation_results(prob, timetable, train_set, skip_stations, d_max, t_ref)
+                reference_time = datetime(year = 2020, month = 1, day = 1, hour = int(t_ref[0:2]), minute = int(t_ref[3:5]))
+                data4diagrams = print_optimisation_results(prob, timetable, train_set, taus, skip_stations, d_max, reference_time)
+                print(data4diagrams)
 
             result["objective"] = prob.objective.value() * d_max
             result["comp_time_seconds"] = end_time - start_time

@@ -720,6 +720,7 @@ def delay_and_acctual_time(train_sets, timetable, prob, j, s, data = []):
                 delay = v.varValue
             else:
                 delay = data[v.name]
+
             conflicted_tt = earliest_dep_time(train_sets["Paths"], timetable, j, s)
             conflict_free = delay + conflicted_tt
             return delay, conflict_free, conflicted_tt

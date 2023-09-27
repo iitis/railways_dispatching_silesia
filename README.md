@@ -102,6 +102,14 @@ Difficulty of dispatching problem grows with the case number. Case ```0```, no d
 
 In  ```solutions_quantum``` the script ```tmin_plot.py``` plots the sweep over ```t_min``` parameter.
 
+To save / display result timetable use optional parameter ```--show_timetable 1``` , e.g.:
+
+```python solve_real_problem.py --case 0 --category Integer --solve_lp PULP_CBC_CMD  --show_timetable 1```.
+
+In the case of quantum computiong it will read data from file, i.e.:
+
+```python solve_real_problem.py --case 0 --category Integer --solve_quantum cqm --min_t 5 --runs 5 --show_timetable 1 ```
+
 #### Generic problem
 
 The generic example concerns dense passenger traffic (generic) on the KO-GLC part of the Silesian railway network. For each case there are ```12``` instances of various delays of trains at start.
@@ -180,6 +188,14 @@ Example use:
 
 ```python wisla_problems.py --solve_quantum cqm --min_t 5```
 
+
+To save / display result timetable use optional parameter ```--show_timetable 1``` , e.g.:
+
+```python wisla_problems.py --solve_lp PULP_CBC_CMD --show_timetable 1```.
+
+In the case of quantum computiong it will read data from file, i.e.:
+
+```python wisla_problems.py --solve_quantum sim --show_timetable 1 ```
 
 
 
