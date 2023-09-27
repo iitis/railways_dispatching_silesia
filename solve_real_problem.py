@@ -283,11 +283,11 @@ if __name__ == "__main__":
             data = pd.read_pickle(file)
             data4diagrams = {}
             for i in range(args.runs):
-                data4diagrams[i] = print_optimisation_results(prob, timetable, train_set, taus, train_set["skip_station"], d_max, reference_time, data[i]["sample"])
+                data4diagrams[i+1] = print_optimisation_results(prob, timetable, train_set, taus, train_set["skip_station"], d_max, reference_time, data[i+1]["sample"])
                 if args.solve_quantum == "cqm":
-                    file = f"solutions_quantum/data4diagrams/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
+                    file_sched = f"solutions_quantum/data4diagrams/{args.solve_quantum}{p}_case{args.case}_{args.category}.pkl"
                 else:
-                    file = f"solutions_quantum/data4diagrams/{args.solve_quantum}{p}_{args.penalty}_case{args.case}_{args.category}.pkl"
+                    file_sched = f"solutions_quantum/data4diagrams/{args.solve_quantum}{p}_{args.penalty}_case{args.case}_{args.category}.pkl"
 
                 with open(file_sched, "wb") as f:
                     pkl.dump(data4diagrams, f)
