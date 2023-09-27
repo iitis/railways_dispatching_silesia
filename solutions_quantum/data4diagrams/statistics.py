@@ -53,7 +53,7 @@ for k in [0, 4, 7]:
     plt.ylim([-2,60])
 
     plt.xlabel("selected stations")
-    plt.ylabel("secondary delays on departure [m]")
+    plt.ylabel("secondary delays on departure [min]")
     plt.legend(ncol = 1)
     ax.set_title(f'case {k}')
     plt.savefig(f'statistics_case{k}.pdf')
