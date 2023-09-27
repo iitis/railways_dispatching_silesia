@@ -47,6 +47,8 @@ for k in [0, 4, 7]:
     upper_error = [np.max(delays[e])-np.mean(delays[e]) for e in considered_stations]
     asymmetric_error = [lower_error, upper_error]
 
+    print()
+
     ax.errorbar(x, y, yerr=asymmetric_error, fmt='o',  markersize=10, label = "mean", color = "blue")
     plt.plot(x, y1, "_", markersize = 10, color = "blue", label = f"{p1}, {p2} perc.")
     plt.plot(x, y2, '_', markersize = 10, color = "blue")
