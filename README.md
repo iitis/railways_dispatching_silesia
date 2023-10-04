@@ -129,7 +129,7 @@ Particular description of cases:
 
 - case ```1```, there are no disruptions inside the analysed (double track) line, and we use cyclic timetable of ```3``` hours i.e. with ```59``` trains, particular instances concern delays of various trains at start;
 - case ```2```, we assume that one track between ```RCB``` and ```ZZ``` is closed, hence the line becomes partially single track and additional  we use cyclic timetable of ```2``` hours i.e. with ```40``` trains, particular instances concern delays of various trains at start;
-- case  ```3```, line is analysed as hypothetical single track line of ```3``` hours and ```21`` trains, particular instances concern delays of various trains at start.
+- case  ```3```, line is analysed as hypothetical single track line of ```3``` hours and ```21``` trains, particular instances concern delays of various trains at start.
 
 Output:
 
@@ -196,6 +196,17 @@ To save / display result timetable use optional parameter ```--show_timetable 1`
 In the case of quantum computiong it will read data from file, i.e.:
 
 ```python wisla_problems.py --solve_quantum sim --show_timetable 1 ```
+
+
+### Citing this work
+
+The code was partially supported by:
+- National Research, Development, and Innovation Office of Hungary under project numbers K133882
+and K124351, the Ministry of Innovation and Technology and the National
+Research, Development and Innovation Office within the Quantum Information National Laboratory of Hungary;
+- Polish National Science Center under grant agreements number 2019/33/B/ST6/0201 and 2023/07/X/ST6/00396. 
+
+
 
 
 
