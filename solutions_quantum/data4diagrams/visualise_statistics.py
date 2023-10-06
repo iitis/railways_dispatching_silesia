@@ -74,7 +74,7 @@ if __name__ == "__main__":
         
 
     print(".............  clasical .................")
-    for k in [0,4,7,8,9]:
+    for k in range(10):
         data = pd.read_pickle(rf'PULP_CBC_CMD_case{k}_Integer.pkl')
         delays = {}
         add_delays_one_realisation(delays, data)
