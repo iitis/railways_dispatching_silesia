@@ -4,74 +4,82 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-for k in range(10):
-    data = pd.read_pickle(rf'cqm5_case{k}_Integer.pkl')
+def add_delays_one_realisation(delays, d):
+    """ append delays to dict indexed by station """
+    for train in d:
+        for s in d[train]:
+            try:
+                current_delay = d[train][s]['secondary delay']
+            except:
+                current_delay = ""
 
-    delays = {}
-    for i in range(5):
-        d = data[i+1]
+            if current_delay != "":
+                if s in delays:
+                    v = delays[s]
+                    v.append(current_delay)
+                    delays[s] = v
+                else:
+                    delays[s] = list([current_delay])
 
-        for train in d:
-            for s in d[train]:
-                try:
-                    current_delay = d[train][s]['secondary delay']
-                except:
-                    current_delay = ""
-
-
-                if current_delay != "":
-                    if s in delays:
-                        v = delays[s]
-                        v.append(current_delay)
-                        delays[s] = v
-                    else:
-                        delays[s] = list([current_delay])
-
-
-    considered_stations = ["KO(STM)", "KO", "CB", "KL", "MJ"]
-
-    # example data
-    x = considered_stations
-    y = [np.mean(delays[e]) for e in considered_stations]
-
-    p1 = 0.25
-    p2 = 0.75
-    y1 = [np.quantile(delays[e], p1) for e in considered_stations]
-    y2 = [np.quantile(delays[e], p2) for e in considered_stations]
+def get_print_statistics(delays, considered_stations):
+    """ computes returns and pronts statistics of delays """
+    means = [np.mean(delays[e]) for e in considered_stations]
+    q25 = [np.quantile(delays[e], 0.25) for e in considered_stations]
+    q75 = [np.quantile(delays[e], 0.75) for e in considered_stations]
     minimum = [np.min(delays[e]) for e in considered_stations]
     maximum = [np.max(delays[e]) for e in considered_stations]
 
 
-
-    print(".............................")
-    print("case", k)
-
     print("stations", considered_stations)
     print("max delay", maximum)
-    print("quantile 75", y2)
-    print("mean", y)
-    print("quantile 25", y1)
+    print("quantile 75", q75)
+    print("mean", means)
+    print("quantile 25", q25)
     print("min", minimum)
-    
 
-    if k in [4,7]:
+    return q25, means, q75
+
+def plot_stats(delays, q25, means, q75, name, color):
+    if k in [0, 4,7]:
 
         lower_error = [np.mean(delays[e])-np.min(delays[e]) for e in considered_stations]
         upper_error = [np.max(delays[e])-np.mean(delays[e]) for e in considered_stations]
-
         asymmetric_error = [lower_error, upper_error]
-
-        fig, ax = plt.subplots(figsize=(3, 3))
+        _, ax = plt.subplots(figsize=(3, 3))
         plt.subplots_adjust(left = 0.2, bottom = 0.2)
-
-        ax.errorbar(x, y, yerr=asymmetric_error, fmt='o',  markersize=10, label = "mean", color = "blue")
-        plt.plot(x, y1, "_", markersize = 10, color = "blue", label = f"{p1}, {p2} perc.")
-        plt.plot(x, y2, '_', markersize = 10, color = "blue")
+        ax.errorbar(considered_stations, means, yerr=asymmetric_error, fmt='o',  markersize=10, label = "mean", color = color)
+        plt.plot(considered_stations, q25, "_", markersize = 10, color = color, label = "0.25, 0.75 perc.")
+        plt.plot(considered_stations, q75, '_', markersize = 10, color = color)
         plt.ylim([-2,60])
-
         plt.xlabel("selected stations")
         plt.ylabel("secondary delays on departure [min]")
         plt.legend(ncol = 1)
         ax.set_title(f'case {k}')
-        plt.savefig(f'statistics_case{k}.pdf')
+        plt.savefig(f'{name}_case{k}.pdf')
         plt.clf()
+
+if __name__ == "__main__":
+    print("........... hybrid  ..............")
+    for k in range(10):
+        data = pd.read_pickle(rf'cqm5_case{k}_Integer.pkl')
+        delays = {}
+        for keys in data:
+            add_delays_one_realisation(delays, data[keys])
+        considered_stations = ["KO(STM)", "KO", "CB", "KL", "MJ"]
+
+
+        print("case", k)
+        q25, means, q75 = get_print_statistics(delays, considered_stations)   
+        plot_stats(delays, q25, means, q75, "statistics", "blue")
+        
+
+    print(".............  clasical .................")
+    for k in [0,4,7,8,9]:
+        data = pd.read_pickle(rf'PULP_CBC_CMD_case{k}_Integer.pkl')
+        delays = {}
+        add_delays_one_realisation(delays, data)
+        considered_stations = ["KO(STM)", "KO", "CB", "KL", "MJ"]
+
+        print("case", k)
+        q25, means, q75 = get_print_statistics(delays, considered_stations)  
+        plot_stats(delays, q25, means, q75, "classical_statistics", "red")
