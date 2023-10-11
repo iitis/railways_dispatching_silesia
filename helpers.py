@@ -120,7 +120,7 @@ def print_optimisation_results(prob, timetable, train_set, taus, skip_stations, 
                 )
                 s_dict["departure"] = t_ref + timedelta(minutes = int(departure))
                 s_dict["secondary delay"] = int(delay)
-                s_dict["conflicted departure"] = t_ref + timedelta(minutes = int(conflicted_departure))
+                s_dict["conflicted_departure"] = t_ref + timedelta(minutes = int(conflicted_departure))
                 s_dict["impact_to_objective"] = delta_obj
 
                 s_prev = s

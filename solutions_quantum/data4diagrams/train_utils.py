@@ -44,6 +44,6 @@ def kdtrain2trainpath(trainNumber, kdtrain, status='resolved'):
         prefix = ''
     train.path = [{'station':k,\
                        'arrival':none_if_not(kdtrain[k], prefix+ 'arrive'),\
-                       'departure':none_if_not(kdtrain[k], 'departure')}\
+                       'departure':none_if_not(kdtrain[k], prefix+ 'departure')}\
                       for k in train.route]
     return train
