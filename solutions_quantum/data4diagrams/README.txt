@@ -15,7 +15,7 @@ Table of Contents
 4 Next step
 
 
-• WORK IN PROGRESS
+• WORK IN PROGRESS, v 0.2
 
 • DO NOT EDIT README.txt, it is for compatibility.  The README is
   README.org
@@ -37,13 +37,11 @@ Table of Contents
 
   *Krzysziek, please verify if this is correct!*
 
-  • The `arrive' and `departure' fields reflect the *modified* train
+  • The `arrive' and `departure' fields reflect the *resolved* train
     paths from the optimization.
-  • The *original*, i.e. originally planned train paths are obtained by
-    substracting the `secondary_delay' field values in minutes from the
-    `arrive' and `departure' fields' contents.
   • The *conflicted* train paths come from the `conflicted_arrive' and
     `conflicted_departure' fields.
+  • The original timetables are still to be added
 
 
 2 Demonstrate space (horizontal) axis
@@ -95,4 +93,5 @@ Table of Contents
 4 Next step
 ═══════════
 
-  • Do the first figures
+  • Do the first figures, conflicted-resolved
+  • Add orignal timetables

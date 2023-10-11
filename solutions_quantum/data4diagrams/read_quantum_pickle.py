@@ -20,7 +20,7 @@ def quantum_train_route(train):
 kdtraindata = data[int(sys.argv[2])]
 
 for trainno in kdtraindata.keys():
-    for status in ('original', 'conflcted', 'modified'):
+    for status in ('conflcted', 'resolved'):
         t = tu.kdtrain2trainpath(trainno, kdtraindata[trainno], status=status)
         print(t)
     print('----------------------------------------')
