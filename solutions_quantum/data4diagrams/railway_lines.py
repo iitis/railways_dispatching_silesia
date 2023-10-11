@@ -1,6 +1,9 @@
 # source: https://www.atlaskolejowy.net/infra/?id=linia&poz=200
 #    and links therein
 #  station format:   {'name':'','callsign':'','type':'','km':},
+
+import sys
+
 RAILWAYLINES = {
     '131':({'name':'Chorzów Batory', 'callsign':'CB', 'type':'st', 'km':6.16},
          {'name':'Chorzów Miasto', 'callsign':'CM', 'type':'st', 'km':8.98}),
@@ -54,10 +57,10 @@ RAILWAYSEGMENTS={
                     {'name': 'Chorzów Batory', 'callsign': 'CB', 'type': 'st', 'km': 20.94},
                     {'name': 'Katowice Towarowa KTC', 'callsign': 'KTC', 'type': 'podg', 'km': 24.19},
                     {'name': 'Katowice', 'callsign': 'KO', 'type': 'st', 'km': 26.71},
-                    {'name':'Katowice Stacja Manewrowa', 'callsign':'KO(STM)', 'type':'st', 'km':28.0},
+                    {'name':'Katowice Stacja Manewrowa', 'callsign':'KO(STM)', 'type':'st', 'km':27.21},
                     {'name':'Katowice Zawodzie', 'callsign':'KZ', 'type':'st', 'km':29.43}),
     '138139KZTY': ({'name':'Katowice Zawodzie', 'callsign':'KZ', 'type':'st', 'km':0.0},
-                   {'name':'Katowice Stacja Manewrowa', 'callsign':'KO(STM)', 'type':'st', 'km':1.43},
+                   {'name':'Katowice Stacja Manewrowa', 'callsign':'KO(STM)', 'type':'st', 'km':2.21},
                    {'name': 'Katowice', 'callsign': 'KO', 'type': 'st', 'km': 2.71},
                    {'name': 'Katowice Brynów', 'callsign': 'Bry', 'type': 'po', 'km': 6.6},
                    {'name': 'Katowice Ligota', 'callsign': 'KL', 'type': 'st', 'km': 8.8},
@@ -68,7 +71,7 @@ RAILWAYSEGMENTS={
 }
 
 
-def station_on_line(station):
+def station_on_lines(station):
     """Gives lines on which the station is located, along with the ordnal number"""
     result = []
     for line in RAILWAYLINES.keys():
@@ -86,3 +89,21 @@ def route_on_lines(route, lines):
     for station in route:
         result.append(tuple(filter(lambda x: x[0] in lines, station_on_line(station))))
     return [s for s in result if s!=()]
+
+def station2km(station, segment):
+    try:
+        return list(filter(
+            lambda x: x['callsign'].upper() == station.upper() or x['name'].upper() == station.upper(),
+            RAILWAYSEGMENTS[segment]))[0]['km']
+    except:
+        raise ValueError
+
+def station_on_segment(station, segment, exceptions=set([])):
+    return len(list(filter(
+        lambda x: ((x['callsign'].upper() == station.upper() or x['name'].upper() == station.upper())\
+                    and station.upper() not in set([s.upper() for s in list(exceptions)])),
+                    RAILWAYSEGMENTS[segment]))) > 0
+            
+def train_on_segment(train, segment, exceptions=set([])):
+    return len(list(filter(lambda s: station_on_segment(s, segment, exceptions=exceptions), train.route)))
+

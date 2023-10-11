@@ -17,8 +17,11 @@ routes = sorted(list(set(lists)))
 def quantum_train_route(train):
     return list(train.keys())
 
-kdtraindata = data[int(sys.argv[2])]
-
+if 'cqm' in sys.argv[1]:
+    kdtraindata = data[int(sys.argv[2])]
+else:
+    kdtraindata = data
+    
 for trainno in kdtraindata.keys():
     for status in ('conflcted', 'resolved'):
         t = tu.kdtrain2trainpath(trainno, kdtraindata[trainno], status=status)
