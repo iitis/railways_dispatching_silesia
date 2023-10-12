@@ -5,6 +5,8 @@ import pickle
 import railway_lines as rl
 import train_utils as tu
 
+FIXEDTRAINS={'44862', '44717'}
+
 with open(sys.argv[1], 'rb') as ifi:
     data = pickle.load(ifi)
 
@@ -72,7 +74,7 @@ for trainno in kdtraindata.keys():
         else:
             ls = 1
         train = tu.kdtrain2trainpath(trainno, kdtraindata[trainno], status=status)
-        if rl.train_on_segment(train, segment, exceptions=EXCEPTIONS)>=2:
+        if rl.train_on_segment(train, segment, exceptions=EXCEPTIONS)>=2 or str(trainno) in FIXEDTRAINS:
             print('$trainpath%d << EOD'%lineno)
             echo_gnuplot_train(train, segment)
             print('EOD')
