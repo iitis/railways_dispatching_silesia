@@ -50,11 +50,27 @@ def echo_gnuplot_train(train, segment):
         try:
             km = rl.station2km(s['station'], segment)
             if s['arrival'] is not None:
-                print("%f %s %s"%(km,s['arrival'].strftime('%H:%M'), train.number))
+                print("%f %s"%(km,s['arrival'].strftime('%H:%M')))
             if s['departure'] is not None:
-                print("%f %s %s"%(km,s['departure'].strftime('%H:%M'), train.number))
+                print("%f %s"%(km,s['departure'].strftime('%H:%M')))
         except ValueError:
             pass
+
+def echo_gnuplot_train_labels(train, segment):
+    prev_km = None
+    for s in train.path:
+        try:
+            km = rl.station2km(s['station'], segment)
+            if s['arrival'] is not None and prev_km is not None:
+                label_km = prev_km + ((km - prev_km) /2)
+                label_t = (prev_t +(s['arrival'] - prev_t) / 2).strftime('%H:%M')
+                print("%f %s %s"%(label_km,label_t, train.number))
+            if s['departure'] is not None:
+                prev_km = km
+                prev_t = s['departure']
+        except ValueError:
+            pass
+
         
 if 'cqm' in ARGS.infile:
     try:
@@ -98,8 +114,13 @@ for trainno in kdtraindata.keys():
             print('$trainpath%d << EOD'%lineno)
             echo_gnuplot_train(train, ARGS.segment)
             print('EOD')
-            print('%s $trainpath%d using 1:2 with lines notitle ls %d, $trainpath%d u 1:2:3 with labels font "Times,8" notitle'%(plotstring, lineno, ls, lineno))
+            print('$trainpathlabels%d << EOD'%lineno)
+            echo_gnuplot_train_labels(train, ARGS.segment)
+            print('EOD')
+            #print('%s $trainpath%d using 1:2 with lines notitle ls %d, $trainpath%d u 1:2:3 with labels font "Times,8" notitle'%(plotstring, lineno, ls, lineno))
+            print('%s $trainpath%d using 1:2 with lines notitle ls %d'%(plotstring, lineno, ls))
             plotstring = 'replot'
+            print('%s $trainpathlabels%d using 1:2:3 with labels font "Times,8" notitle'%(plotstring, lineno))
             lineno += 1
 
         #print('pause 2')
