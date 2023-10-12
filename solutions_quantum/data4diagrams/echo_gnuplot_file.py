@@ -22,9 +22,9 @@ def echo_gnuplot_train(train, segment):
         try:
             km = rl.station2km(s['station'], segment)
             if s['arrival'] is not None:
-                print("%f %s"%(km,s['arrival'].strftime('%H:%M')))
+                print("%f %s %s"%(km,s['arrival'].strftime('%H:%M'), train.number))
             if s['departure'] is not None:
-                print("%f %s"%(km,s['departure'].strftime('%H:%M')))
+                print("%f %s %s"%(km,s['departure'].strftime('%H:%M'), train.number))
         except ValueError:
             pass
         
@@ -48,7 +48,7 @@ print('set ydata time')
 print('set timefmt "%H:%M"')
 print('set format y "%H:%M"')
 lineno = 0
-#print('set yrange ["00:00":"23:59"]')
+print('set yrange [*:*] reverse')
 #segment = '138139KZTY'
 segment = '137138GLYKZ'
 print("set title '%s %s'"%(segment, sys.argv[1].replace('_','-')))
@@ -77,7 +77,7 @@ for trainno in kdtraindata.keys():
             print('$trainpath%d << EOD'%lineno)
             echo_gnuplot_train(train, segment)
             print('EOD')
-            print("%s $trainpath%d using 1:2 with lines notitle ls %d"%(plotstring, lineno, ls))
+            print('%s $trainpath%d using 1:2 with lines notitle ls %d, $trainpath%d u 1:2:3 with labels font "Times,8" notitle'%(plotstring, lineno, ls, lineno))
             plotstring = 'replot'
             lineno += 1
 
