@@ -8,24 +8,22 @@
 Table of Contents
 ─────────────────
 
-1 What I have so far
-.. 1.1 List all train path in a quantum solution
-2 Line segments
-3 Figures
-4 Next step
+1. List all train path in a quantum solution
+2. Line segments
+3. Figures
+4. Vector figure file generation
+5. Figures for the manuscript
+6. Next step
 
 
-• WORK IN PROGRESS, v 0.3
+• WORK IN PROGRESS, v 0.4
 
 • DO NOT EDIT README.txt, it is for compatibility.  The README is
   README.org
 
 
-1 What I have so far
-════════════════════
-
-1.1 List all train path in a quantum solution
-─────────────────────────────────────────────
+1 List all train path in a quantum solution
+═══════════════════════════════════════════
 
   e.g. realisation 1 in `cqm5_case3_Integer.pkl'
 
@@ -118,11 +116,40 @@ Table of Contents
   producing publication-quality vector pdfs.
 
 
-4 Next step
+4 Vector figure file generation
+═══════════════════════════════
+
+  The script `echo_gnuplot_file.py' can produce encapsulated PostScript
+  files for publication. The output file name is to be specified with
+  the `--epsfile' option. Warning: the specified file will be
+  overwritten. If the `--epsbw' option is set, the eps file will be
+  black and white.
+
+  Important:
+
+  • When setting the `--epsfile' option, the generated script is still
+    to be executed with gnuplot to produce a figure.
+  • The eps files can be converted to pdf with `epspdf'. Alternatively,
+    set `\usepackage{epspdf}' in the LaTeX file to use them
+    directly. The conversion is a better choice.
+
+
+5 Figures for the manuscript
+════════════════════════════
+
+  The figures are to be found in the subdirectory `figures_for_paper'.
+  All figures are there in 4 versions: eps vs. pdf, color vs. bw.
+
+  They were generated with the script `generate_figures_for_paper.sh',
+  which requires `epspdf' to create pdf- figures from eps figures.
+
+
+6 Next step
 ═══════════
 
-  • Add train numbers to paths (in progress, to be improved)
-  • Fine-tune conflicted-resolved figures (bw version to be made)
-  • Choose the right figures (in progress)
-  • Create vector pdf figures.
+  • Check figures, see if these are the ones we need. (Other data can be
+    explored interactively now.)
+  • If necessary, modify `generate_figures_for_paper.sh' to really
+    generate what we need.
+  • Fine tune figures if needed (size, fonts, etc.)
   • Add orignal timetables (postponed)
