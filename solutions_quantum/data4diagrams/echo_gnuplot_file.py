@@ -49,8 +49,7 @@ print('set timefmt "%H:%M"')
 print('set format y "%H:%M"')
 lineno = 0
 print('set yrange [*:*] reverse')
-#segment = '138139KZTY'
-segment = '137138GLYKZ'
+
 print("set title '%s %s'"%(segment, sys.argv[1].replace('_','-')))
 stations = [(s['callsign'], s['km']) for s in rl.RAILWAYSEGMENTS[segment] if s['callsign'] != '']
 xrange = (stations[0][1], stations[-1][1])
