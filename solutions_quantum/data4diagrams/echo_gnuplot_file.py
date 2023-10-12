@@ -2,12 +2,38 @@
 
 import sys
 import pickle
+import argparse
 import railway_lines as rl
 import train_utils as tu
 
-FIXEDTRAINS={'44862', '44717'}
+parser = argparse.ArgumentParser("Echo a train path diagram gnuplot script") 
 
-with open(sys.argv[1], 'rb') as ifi:
+parser.add_argument('--segment',
+                    choices=list(rl.RAILWAYSEGMENTS.keys()),
+                    help="Railway segment to display, default: '137138GLYKZ'",
+                    default='137138GLYKZ')
+
+parser.add_argument('--fixedtrains',
+                    type=str,
+                    help='A comma-separated list of train numbers to include anyway, e.g. 44862,44717')
+
+parser.add_argument('--realisation',
+                    type=int,
+                    help='Realisation number of quantum instances, defaults to 1',
+                    default=1)
+
+parser.add_argument('infile',
+                    type=str,
+                    help='Input file')
+
+ARGS = parser.parse_args()
+
+if ARGS.fixedtrains:
+    FIXEDTRAINS = set(ARGS.fixedtrains.strip().split(','))
+else:
+    FIXEDTRAINS=set([])
+
+with open(ARGS.infile, 'rb') as ifi:
     data = pickle.load(ifi)
 
 lists = []
@@ -30,21 +56,15 @@ def echo_gnuplot_train(train, segment):
         except ValueError:
             pass
         
-if 'cqm' in sys.argv[1]:
+if 'cqm' in ARGS.infile:
     try:
-        kdtraindata = data[int(sys.argv[3])]
+        kdtraindata = data[ARGS.realisation]
     except:
         kdtraindata = data[int(1)]
 else:
     kdtraindata = data
-try:
-    segment = sys.argv[2]
-except:
-    #segment = '138139KZTY'
-    segment = '137138GLYKZ'
 
-if segment not in set(rl.RAILWAYSEGMENTS.keys()):
-    raise ValueError('Invalid railway network segment specified')
+
 
 print('set ydata time')
 print('set timefmt "%H:%M"')
@@ -52,8 +72,8 @@ print('set format y "%H:%M"')
 lineno = 0
 print('set yrange [*:*] reverse')
 
-print("set title '%s %s'"%(segment, sys.argv[1].replace('_','-')))
-stations = [(s['callsign'], s['km']) for s in rl.RAILWAYSEGMENTS[segment] if s['callsign'] != '']
+print("set title '%s %s'"%(ARGS.segment, sys.argv[1].replace('_','-')))
+stations = [(s['callsign'], s['km']) for s in rl.RAILWAYSEGMENTS[ARGS.segment] if s['callsign'] != '']
 xrange = (stations[0][1], stations[-1][1])
 print("set xrange [%f:%f]"%xrange)
 ticsstring = 'set xtics ('
@@ -74,9 +94,9 @@ for trainno in kdtraindata.keys():
         else:
             ls = 1
         train = tu.kdtrain2trainpath(trainno, kdtraindata[trainno], status=status)
-        if rl.train_on_segment(train, segment, exceptions=EXCEPTIONS)>=2 or str(trainno) in FIXEDTRAINS:
+        if rl.train_on_segment(train, ARGS.segment, exceptions=EXCEPTIONS)>=2 or str(trainno) in FIXEDTRAINS:
             print('$trainpath%d << EOD'%lineno)
-            echo_gnuplot_train(train, segment)
+            echo_gnuplot_train(train, ARGS.segment)
             print('EOD')
             print('%s $trainpath%d using 1:2 with lines notitle ls %d, $trainpath%d u 1:2:3 with labels font "Times,8" notitle'%(plotstring, lineno, ls, lineno))
             plotstring = 'replot'

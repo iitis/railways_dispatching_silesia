@@ -89,17 +89,31 @@ Table of Contents
 
   Figures can be produced as follows:
   ┌────
-  │ ./echo_gnuplot_file.py cqm5_case3_Integer.pkl 138139KZTY 2 > script.gnuplot
+  │ ./echo_gnuplot_file.py cqm5_case5_Integer.pkl --segment 138139KZTY --realisation 2 > tmp.gnuplot
   └────
-  The first argument is the input file (classical or quantum), the
-  second one of the line segment (the currently meaningful ones are:
+  The positional argument is the input file (classical or quantum),
+  `--segment' is line segment (the currently meaningful ones are:
   `137138GLYKZ' (default), and `138139KZTY'.  In case of quantum files,
-  the third positional argument is the sample number, defaults to 1 if
-  not specified. The script outputs a gnuplot script, which can be
-  displayed with gnuplot like this:
+  `--realisation' is the sample number, defaults to 1 if not
+  specified. The script outputs a gnuplot script, which can be displayed
+  with gnuplot like this:
   ┌────
   │ gnuplot script.gnuplot
   └────
+
+  The trains are filtered for the segment (to be documented). It is
+  possible to provide a list of trains that are displayed even if the
+  filter would not select them with the `--fixedtrains' option, e.g.
+
+  ┌────
+  │ ./echo_gnuplot_file.py PULP_CBC_CMD_case3_Integer.pkl --segment 138139KZTY --fixedtrains="44862,44717" > script.gnuplot
+  └────
+
+  See also
+  ┌────
+  │ ./echo_gnuplot_file.py --help
+  └────
+
   The current version is for displaying; there will be a version
   producing publication-quality vector pdfs.
 
@@ -107,8 +121,8 @@ Table of Contents
 4 Next step
 ═══════════
 
-  • Add train numbers to paths
-  • Fine-tune conflicted-resolved figures
-  • Choose the right figures
+  • Add train numbers to paths (in progress, to be improved)
+  • Fine-tune conflicted-resolved figures (bw version to be made)
+  • Choose the right figures (in progress)
   • Create vector pdf figures.
   • Add orignal timetables (postponed)
