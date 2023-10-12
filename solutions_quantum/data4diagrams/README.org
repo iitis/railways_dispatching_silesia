@@ -89,6 +89,20 @@ See also
 The current version is for displaying; there will be a version
 producing publication-quality vector pdfs.
 
+* Vector figure files
+The script ~echo_gnuplot_file.py~ can produce encapsulated PostScript
+files for publication. The output file name is to be specified with
+the ~--epsfile~ option. Warning: the specified file will be
+overwritten. If the ~--epsbw~ option is set, the eps file will be
+black and white.
+
+Important:
+
+- When setting the ~--epsfile~ option, the generated script is still
+  to be executed with gnuplot to produce a figure.
+- The eps files can be converted to pdf with ~epspdf~. Alternatively,
+  set ~\usepackage{epspdf}~ in the LaTeX file to use them
+  directly. The conversion is a better choice.
 
 * Next step
 - Add train numbers to paths (in progress, to be improved)

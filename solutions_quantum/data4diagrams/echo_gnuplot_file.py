@@ -22,6 +22,14 @@ parser.add_argument('--realisation',
                     help='Realisation number of quantum instances, defaults to 1',
                     default=1)
 
+parser.add_argument('--epsfile',
+                    type=str,
+                    help='eps output file name, will produce eps output into this file if set')
+
+parser.add_argument('--epsbw',
+                    action='store_true',
+                    help='If set, the eps output will be black and white')
+
 parser.add_argument('infile',
                     type=str,
                     help='Input file')
@@ -80,15 +88,21 @@ if 'cqm' in ARGS.infile:
 else:
     kdtraindata = data
 
-
-
+if ARGS.epsfile is not None:
+    print('set output "%s"'%ARGS.epsfile)
+    if ARGS.epsbw:
+        print('set term postscript eps dashed size 5,7.5 font "Times, 12"')
+    else:
+        print('set term postscript eps color dashed size 5,7.5 font "Times, 12"')
+else:
+    print("set title '%s %s'"%(ARGS.segment, sys.argv[1].replace('_','-')))
+    
 print('set ydata time')
 print('set timefmt "%H:%M"')
 print('set format y "%H:%M"')
-lineno = 0
 print('set yrange [*:*] reverse')
 
-print("set title '%s %s'"%(ARGS.segment, sys.argv[1].replace('_','-')))
+
 stations = [(s['callsign'], s['km']) for s in rl.RAILWAYSEGMENTS[ARGS.segment] if s['callsign'] != '']
 xrange = (stations[0][1], stations[-1][1])
 print("set xrange [%f:%f]"%xrange)
@@ -99,16 +113,13 @@ ticsstring = ticsstring[:-1]+')'
 print(ticsstring)
 print("set grid")
 print('set style line 1 lt rgb "green" lw 3')
-print('set style line 2 lt rgb "red" lw 1')
+print('set style line 2 lt rgb "red" lw 1 dt 2')
 
-plotstring = 'plot'
 EXCEPTIONS = ['KO','KO(STM)']
+
+lineno = 0
 for trainno in kdtraindata.keys():
     for status in ('resolved', 'conflicted'):
-        if status == 'conflicted':
-            ls = 2
-        else:
-            ls = 1
         train = tu.kdtrain2trainpath(trainno, kdtraindata[trainno], status=status)
         if rl.train_on_segment(train, ARGS.segment, exceptions=EXCEPTIONS)>=2 or str(trainno) in FIXEDTRAINS:
             print('$trainpath%d << EOD'%lineno)
@@ -117,11 +128,23 @@ for trainno in kdtraindata.keys():
             print('$trainpathlabels%d << EOD'%lineno)
             echo_gnuplot_train_labels(train, ARGS.segment)
             print('EOD')
-            #print('%s $trainpath%d using 1:2 with lines notitle ls %d, $trainpath%d u 1:2:3 with labels font "Times,8" notitle'%(plotstring, lineno, ls, lineno))
-            print('%s $trainpath%d using 1:2 with lines notitle ls %d'%(plotstring, lineno, ls))
-            plotstring = 'replot'
-            print('%s $trainpathlabels%d using 1:2:3 with labels font "Times,8" notitle'%(plotstring, lineno))
             lineno += 1
 
-        #print('pause 2')
-print('pause -1')
+comma = ''
+lineno = 0
+sys.stdout.write('\n plot ')
+for trainno in kdtraindata.keys():
+    for status in ('resolved', 'conflicted'):
+        if status == 'conflicted':
+            ls = 2
+        else:
+            ls = 1
+        train = tu.kdtrain2trainpath(trainno, kdtraindata[trainno], status=status)
+        if rl.train_on_segment(train, ARGS.segment, exceptions=EXCEPTIONS)>=2 or str(trainno) in FIXEDTRAINS:
+            sys.stdout.write('%s $trainpath%d using 1:2 with lines notitle ls %d'%(comma, lineno, ls))
+            comma = ','
+            sys.stdout.write(', $trainpathlabels%d using 1:2:3 with labels font "Times,8" notitle'%(lineno))
+            lineno += 1
+
+if ARGS.epsfile is None:
+    print('\n\npause -1')
