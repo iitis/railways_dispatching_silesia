@@ -73,7 +73,7 @@ for trainno in kdtraindata.keys():
         else:
             ls = 1
         train = tu.kdtrain2trainpath(trainno, kdtraindata[trainno], status=status)
-        if rl.train_on_segment(train, segment, exceptions=EXCEPTIONS)>2:
+        if rl.train_on_segment(train, segment, exceptions=EXCEPTIONS)>=2:
             print('$trainpath%d << EOD'%lineno)
             echo_gnuplot_train(train, segment)
             print('EOD')
