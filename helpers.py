@@ -105,9 +105,9 @@ def print_optimisation_results(prob, timetable, train_set, taus, skip_stations, 
         for s in train_set["Paths"][j]:
             s_dict = {}
             try:
-                dt = timedelta(minutes = int(taus["pass"][f"{j}_{s_prev}_{s}"])+int(departure_prev))
+                dt = timedelta(minutes = round(taus["pass"][f"{j}_{s_prev}_{s}"])+int(departure_prev))
                 s_dict["arrive"] = t_ref + dt
-                conflicted_dt = timedelta(minutes = int(taus["pass"][f"{j}_{s_prev}_{s}"])+int(departure_conflict_prev))
+                conflicted_dt = timedelta(minutes = round(taus["pass"][f"{j}_{s_prev}_{s}"])+int(departure_conflict_prev))
                 s_dict["conflicted_arrive"] = t_ref + conflicted_dt
             except:
                 0
