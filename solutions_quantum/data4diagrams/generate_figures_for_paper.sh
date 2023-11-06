@@ -25,7 +25,7 @@ rm tmp.gnuplot
 ./echo_gnuplot_file.py PULP_CBC_CMD_case4_Integer.pkl \
 		       --segment 138139KZTY \
 		       --epsfile figures_for_paper/case4_138139KZTY_ILP_color.eps \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -34,7 +34,7 @@ rm tmp.gnuplot
 		       --segment 138139KZTY \
 		       --epsfile figures_for_paper/case4_138139KZTY_ILP_bw.eps \
 		       --epsbw \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -45,7 +45,7 @@ rm tmp.gnuplot
 		       --realisation 1 \
 		       --segment 138139KZTY \
 		       --epsfile figures_for_paper/case4_138139KZTY_cqm5_realisation1_color.eps \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -55,7 +55,7 @@ rm tmp.gnuplot
 		       --segment 138139KZTY \
 		       --epsfile figures_for_paper/case4_138139KZTY_cqm5_realisation_1_bw.eps \
 		       --epsbw \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -65,7 +65,7 @@ rm tmp.gnuplot
 		       --realisation 2 \
 		       --segment 138139KZTY \
 		       --epsfile figures_for_paper/case4_138139KZTY_cqm5_realisation2_color.eps \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -75,7 +75,7 @@ rm tmp.gnuplot
 		       --segment 138139KZTY \
 		       --epsfile figures_for_paper/case4_138139KZTY_cqm5_realisation_2_bw.eps \
 		       --epsbw \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -93,7 +93,7 @@ rm tmp.gnuplot
 		       --segment 137138GLYKZ \
 		       --epsfile figures_for_paper/case7_137138GLYKZ_ILP_bw.eps \
 		       --epsbw \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -104,7 +104,7 @@ rm tmp.gnuplot
 		       --realisation 1 \
 		       --segment 137138GLYKZ \
 		       --epsfile figures_for_paper/case7_137138GLYKZ_cqm5_realisation1_color.eps \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -114,7 +114,7 @@ rm tmp.gnuplot
 		       --segment 137138GLYKZ \
 		       --epsfile figures_for_paper/case7_137138GLYKZ_cqm5_realisation_1_bw.eps \
 		       --epsbw \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -124,7 +124,7 @@ rm tmp.gnuplot
 		       --realisation 2 \
 		       --segment 137138GLYKZ \
 		       --epsfile figures_for_paper/case7_137138GLYKZ_cqm5_realisation2_color.eps \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot
@@ -134,7 +134,7 @@ rm tmp.gnuplot
 		       --segment 137138GLYKZ \
 		       --epsfile figures_for_paper/case7_137138GLYKZ_cqm5_realisation_2_bw.eps \
 		       --epsbw \
-		       > tmp.gnuplot
+		        > tmp.gnuplot
 gnuplot ./tmp.gnuplot
 touch tmp.gnuplot
 rm tmp.gnuplot

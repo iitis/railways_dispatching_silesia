@@ -51,7 +51,7 @@ RAILWAYSEGMENTS={
                   {'name': 'Tychy', 'callsign': 'Ty', 'type': 'st', 'km': 86.78}),
     '137138GLYKZ': ({'name': 'Gliwice', 'callsign': 'GLC', 'type': 'st', 'km': 0.0},
                     {'name': 'Zabrze', 'callsign': 'ZZ', 'type': 'st', 'km': 8.18},
-                    {'name': 'Ruda Śląska', 'callsign': 'RŚl', 'type': 'po', 'km': 12.5},
+                    {'name': 'Ruda Śląska', 'callsign': 'RSl', 'type': 'po', 'km': 12.5},
                     {'name': 'Ruda Chebzie', 'callsign': 'RCB', 'type': 'st', 'km': 15.36},
                     {'name': 'Świętochłowice', 'callsign': '', 'type': 'po', 'km': 18.69},
                     {'name': 'Chorzów Batory', 'callsign': 'CB', 'type': 'st', 'km': 20.94},

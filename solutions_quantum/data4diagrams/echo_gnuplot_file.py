@@ -89,6 +89,7 @@ else:
     kdtraindata = data
 
 if ARGS.epsfile is not None:
+    print('set encoding utf8')
     print('set output "%s"'%ARGS.epsfile)
     if ARGS.epsbw:
         print('set term postscript eps dashed size 5,7.5 font "Times, 12"')
