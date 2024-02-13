@@ -54,7 +54,7 @@ def plot_stats(delays, q25, means, q75, name, color):
         plt.xlabel("selected stations")
         plt.ylabel("secondary delays on departure [min]")
         plt.legend(ncol = 1)
-        ax.set_title(f'case {k}')
+        ax.set_title(f'network {k}')
         plt.savefig(f'{name}_case{k}.pdf')
         plt.clf()
 
