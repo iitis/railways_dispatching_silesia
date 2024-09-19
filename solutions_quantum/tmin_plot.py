@@ -40,31 +40,42 @@ def plotting_objective(solver, case, tmins):
 
     
 
-    _, (ax1,ax2,ax3) = plt.subplots(3,figsize=(6, 6),sharex=True, tight_layout= True)
+    _, (ax1,ax2,ax3) = plt.subplots(3,figsize=(3, 4.5),sharex=True, tight_layout= True)
 
     y1 = [np.mean(objectives[tmin]) for tmin in tmins]
     y2 = [np.min(objectives[tmin]) for tmin in tmins]
     y3 = [np.max(objectives[tmin]) for tmin in tmins]
     ax1.plot(tmins, y1, "o", color = "green", label = "mean")
-    ax1.plot(tmins, y2, ":", color = "green", label = "envelope")
+    ax1.plot(tmins, y2, ":", color = "green", label = "env.")
     ax1.plot(tmins, y3, ":", color = "green")
     a, b = np.polyfit(np.log(tmins), y1, 1)
-    ax1.plot(tmins, a*np.log(tmins)+b, "--", color = "green", label = "log linear fit")
+
+    c = case.replace("case", "")
+    ax1.set_title(f"network {c}")
+
+    if case == "case7":
+        ax1.text(55,330, "a)", fontsize = 14)
+    elif case == "case9":
+        ax1.text(55,330, "b)", fontsize = 14)
+
+    ax1.plot(tmins, a*np.log(tmins)+b, "--", color = "green", label = "log lin. fit")
 
     cplex_objs = [cplex_obj for _ in tmins]
-    ax1.plot(tmins, cplex_objs, ":", color = "red", label = "CPLEX solver")
-    ax1.legend(ncol = 2, loc=1)
+    ax1.plot(tmins, cplex_objs, ":", color = "blue", label = "CPLEX")
+    ax1.set_ylim(bottom = 0, top = 300)
+    
+    ax1.legend(ncol = 2, loc=3, fontsize = 9)
 
     y1 = [np.mean(comp_time[tmin]) for tmin in tmins]
-    ax2.plot(tmins, y1, "d--", color = "blue", label = "mean hybrid solver")
+    ax2.plot(tmins, y1, "d--", color = "green", label = "mean CQM")
 
     cplex_ts = [cplex_t for _ in tmins]
-    ax2.plot(tmins, cplex_ts, ":", color = "red", label = "CPLEX solver")
+    ax2.plot(tmins, cplex_ts, ":", color = "blue", label = "CPLEX")
     ax2.legend(loc='best')
 
     y2 = [np.min(qpu_acess_time[tmin]) for tmin in tmins]
     y3 = [np.max(qpu_acess_time[tmin]) for tmin in tmins]
-    ax3.plot(tmins, y2, "x--", color = "gray", label = "envelope")
+    ax3.plot(tmins, y2, "x--", color = "gray", label = "CQM env.")
     ax3.plot(tmins, y3, "x--", color = "gray")
     ax3.legend(loc='best', ncol = 2)
             

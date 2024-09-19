@@ -51,10 +51,13 @@ def plot_stats(delays, q25, means, q75, name, color):
         plt.plot(considered_stations, q25, "_", markersize = 10, color = color, label = "0.25, 0.75 perc.")
         plt.plot(considered_stations, q75, '_', markersize = 10, color = color)
         plt.ylim([-2,60])
-        plt.xlabel("selected stations")
-        plt.ylabel("secondary delays on departure [min]")
-        plt.legend(ncol = 1)
-        ax.set_title(f'network {k}')
+        plt.xlabel("selected stations", fontsize = 14)
+        plt.ylabel("secondary delays dep. [min]", fontsize = 13)
+        plt.legend(ncol = 1, fontsize = 12)
+        if "classical" in name:
+            ax.set_title(f'CPLEX network {k}', fontsize = 14)
+        else:
+            ax.set_title(f'CQM network {k}', fontsize = 14)
         plt.savefig(f'{name}_case{k}.pdf')
         plt.clf()
 

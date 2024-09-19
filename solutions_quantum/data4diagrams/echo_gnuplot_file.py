@@ -92,11 +92,18 @@ if ARGS.epsfile is not None:
     print('set encoding utf8')
     print('set output "%s"'%ARGS.epsfile)
     if ARGS.epsbw:
-        print('set term postscript eps dashed size 5,7.5 font "Times, 12"')
+        print('set term postscript eps dashed size 2.5,7 font "Times, 12"')
     else:
-        print('set term postscript eps color dashed size 5,7.5 font "Times, 12"')
-else:
-    print("set title '%s %s'"%(ARGS.segment, sys.argv[1].replace('_','-')))
+        print('set term postscript eps color dashed size 2.5,7 font "Times, 12"')
+#else:
+tit = sys.argv[1].replace('_',' ')
+tit = tit.replace('Integer.pkl', '')
+tit = tit.replace('case', 'network ')
+tit = tit.replace('cqm5', ' CQM ')
+tit = tit.replace("PULP CBC CMD", "CPLEX")
+if "CQM" in tit:
+    tit = tit+f"       realization {ARGS.realisation}"
+print("set title ' %s'"%(tit))
     
 print('set ydata time')
 print('set timefmt "%H:%M"')
