@@ -27,7 +27,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
                 file = f"results{t}__{q_solver}_{case}_Integer.pkl"
                 results1 = pd.read_pickle(rf'{file}')
                 N = results1["samples"]
-                x1 = [results1[i]["info"]["run_time"]/(1000000*60) for i in range(N)]
+                x1 = [results1[i]["info"]["run_time"]/(1000000) for i in range(N)]
                 y1 = [results1[i]["objective"]*results1["d_max"] for i in range(N)]
                 x2 = [results1[i]["info"]["qpu_access_time"]/1000000 for i in range(N)]
                     
@@ -59,7 +59,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             print("mean n.o. order vars", np.mean(order_vars))
             print("mean n.o. constraints", np.mean(constraints))
             
-            x = [results[i]["comp_time_seconds"]/60 for i in range(N)]
+            x = [results[i]["comp_time_seconds"] for i in range(N)]
             y = [results[i]["objective"] for i in range(N)]
 
             colors = []
@@ -84,7 +84,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             
             fig.subplots_adjust(bottom=0.2, left = 0.2)
             # plt.xlabel("instance")
-            ax1.set_ylabel("objective  $\\times$ dmax [min]")
+            ax1.set_ylabel("objective [min]")
             #ax1.set_ylim(bottom=-25)
             ax3.set_ylim(bottom=-0.005, top = 0.1)
             ax3.plot(instance, [0. for _ in instance], c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1}")
@@ -93,7 +93,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             ax2.scatter(instance, x, s=40, c=colors, marker = "*",  alpha=0.25)
             fig.subplots_adjust(bottom=0.2, left = 0.2)
             ax3.set_xlabel("instance")
-            ax2.set_ylabel("comp. time [min]")
+            ax2.set_ylabel("comp. time [s]")
             ax3.set_ylabel("QPU acess time [s]")
 
             ax3.legend(ncol = 1, loc=2, fontsize=10)

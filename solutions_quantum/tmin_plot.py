@@ -79,7 +79,7 @@ def plotting_objective(solver, case, tmins):
     ax3.plot(tmins, y3, "x--", color = "gray")
     ax3.legend(loc='best', ncol = 2)
             
-    ax1.set_ylabel("objective  x dmax [min]")
+    ax1.set_ylabel("objective [min]")
     ax2.set_ylabel("comp. time [s]")
     ax3.set_ylabel("QPU acess time [s]")
 
