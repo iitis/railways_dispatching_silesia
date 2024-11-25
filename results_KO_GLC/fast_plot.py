@@ -71,7 +71,7 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             
             label1 = solver.replace("_CMD"," ")
 
-            ax1.set_title(f"Line {case}")
+            ax1.set_title(f"line {case}")
             
             ax1.plot(instance, y, c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1}")
             ax1.scatter(instance, y, s=40, c=colors, marker = "*",  alpha=0.25)
