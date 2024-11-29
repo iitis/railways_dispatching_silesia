@@ -47,6 +47,13 @@ if __name__ == "__main__":
         default=False,
     )
 
+    parser.add_argument(
+        "--time_limit",
+        type=float,
+        help="time limit for linear solver",
+        default=0,
+    )
+
     train_set = {
         "skip_station": {
             "Ks1": 10, "Ks3": 10, "Ic1": 10, "Ks2": 1, "Ks4":1, "Ic2":1},
@@ -94,9 +101,15 @@ if __name__ == "__main__":
         if "CPLEX_CMD" == args.solve_lp:
             print("cplex")
             path_to_cplex = r'/opt/ibm/ILOG/CPLEX_Studio_Community221/cplex/bin/x86-64_linux/cplex'
-            solver =  pl.CPLEX_CMD(path=path_to_cplex)
-        else:    
-            solver = pl.getSolver(args.solve_lp)
+            if args.time_limit != 0:
+                solver =  pl.CPLEX_CMD(path=path_to_cplex, timeLimit = args.time_limit)
+            else:
+                solver =  pl.CPLEX_CMD(path=path_to_cplex)
+        else:
+            if args.time_limit != 0:
+                solver = pl.getSolver(args.solve_lp, timeLimit = args.time_limit)
+            else:
+                solver = pl.getSolver(args.solve_lp)
 
         start_time = time.time()
         prob.solve(solver = solver)

@@ -2,7 +2,7 @@
 import pickle as pkl
 import time
 import pulp as pl
-from time import datetime
+#from time import datetime
 
 from data_formatting.data_formatting import (
     add_delay,
@@ -47,6 +47,12 @@ if __name__ == "__main__":
         default="",
     )
     parser.add_argument(
+        "--time_limit",
+        type=float,
+        help="time limit for linear solver",
+        default=0,
+    )
+    parser.add_argument(
         "--solve_quantum",
         type=str,
         help="quantum or quantum inspired solver: 'sim' - D-Wave simulation, 'real' - D-Wave, 'bqm' - D-Wave hybrid via QUBO,  'cqm' - D-Wave hybrid cqm",
@@ -78,11 +84,15 @@ if __name__ == "__main__":
 
     important_stations = load_important_stations(important_stations_path)
     train_dict = build_timetables(d, False, important_stations, data_paths)
+    #print(train_dict)
     taus = make_taus(train_dict, important_stations, r=0)  # r = 0 no rounding
     skip_stations = get_skip_stations(train_dict)
     train_set = make_train_set(
         train_dict, important_stations, data_paths, skip_stations
     )
+    print(train_set.keys())
+    #print(train_set["Paths"])
+    print(train_set["J"])
     t_ref = "14:00"
     assert args.solve_quantum in ["", "sim", "real", "bqm", "cqm"]
 
@@ -143,6 +153,9 @@ if __name__ == "__main__":
         print("n.o. problem", k)
         dist = disturbances[k]
         timetable = make_timetable(train_dict, important_stations, skip_stations, t_ref)
+        print(timetable["initial_conditions"])
+        print("..............")
+        print(timetable["schedule"])
         for i in dist:
             if i not in train_set["J"]:
                 print(i)
@@ -163,9 +176,16 @@ if __name__ == "__main__":
                 print("cplex")
                 # TODO user can add custom path
                 path_to_cplex = r'/home/ludmila/CPLEX_Studio221/cplex/bin/x86-64_linux/cplex'
-                solver =  pl.CPLEX_CMD(path=path_to_cplex)
-            else:    
-                solver = pl.getSolver(args.solve_lp)
+                if args.time_limit == 0:
+                    solver =  pl.CPLEX_CMD(path=path_to_cplex)
+                else:
+                    solver = pl.CPLEX_CMD(path=path_to_cplex, timeLimit = args.time_limit)
+            else: 
+                if args.time_limit == 0:   
+                    solver = pl.getSolver(args.solve_lp)
+                else:
+                    solver = pl.getSolver(args.solve_lp, timeLimit = args.time_limit)
+
             start_time = time.time()
             prob.solve(solver = solver)
             end_time = time.time()
@@ -187,8 +207,8 @@ if __name__ == "__main__":
             result.update(sample)
             result["broken_constraints"] = constraints - result["feas_constraints"][1]
             print("broken constraints", result["broken_constraints"])
+            results[k] = sample
 
-        results[k] = sample
     results["samples"] = k+1
 
     print("save ... ")
@@ -198,7 +218,9 @@ if __name__ == "__main__":
         print("minimal time limit", p)
     except:
         p = ""
-
-    file = f"results_KO_GLC/results{p}_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
+    if args.time_limit == 0:
+        file = f"results_KO_GLC/results{p}_{args.solve_lp}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
+    else:
+        file = f"results_KO_GLC/results{p}_{args.solve_lp}_ilp_t_lim{args.time_limit}_{args.solve_quantum}_{args.case}_{args.category}.pkl"
     with open(file, "wb") as f:
         pkl.dump(results, f)

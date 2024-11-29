@@ -143,6 +143,10 @@ Example use:
 
 ```python3 solve_KO_GLC_problems.py --solve_lp PULP_CBC_CMD   --case 1 --category Integer```
 
+- classical with computaitonal time limit (```time_limit``` in seconds):
+
+```python3 solve_KO_GLC_problems.py --case 2 --solve_lp "CPLEX_CMD" --time_limit 5```
+
 - D-Wave quantum or hybrid approach
 
 ```python3 solve_KO_GLC_problems.py --solve_quantum cqm   --case 1 --category Integer --min_t 5```
