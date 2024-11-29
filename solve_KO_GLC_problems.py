@@ -207,9 +207,14 @@ if __name__ == "__main__":
             result.update(sample)
             result["broken_constraints"] = constraints - result["feas_constraints"][1]
             print("broken constraints", result["broken_constraints"])
-            results[k] = sample
 
+        print(".............")
+        print(k)
+        print(result)
+        results[k] = result
     results["samples"] = k+1
+
+    print(results)
 
     print("save ... ")
 
