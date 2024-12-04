@@ -83,11 +83,11 @@ def plotting_comparisons(c_solvers,cases, dict_times):
 
             ax1.set_title(f"line {case}")
             
-            ax1.plot(instance, y, c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1}")
+            ax1.plot(instance, y, c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1} exact")
             ax1.scatter(instance, y, s=40, c=colors, marker = "*",  alpha=0.25)
 
 
-            ax1.plot(instance, y_l, c="black", marker = "s", linestyle= ":",  alpha=0.3, label = f"{label1}_lim")
+            ax1.plot(instance, y_l, c="black", marker = "s", linestyle= ":",  alpha=0.3, label = f"{label1} time limit $ = 5$s")
 
 
             if case == 1:
@@ -102,11 +102,11 @@ def plotting_comparisons(c_solvers,cases, dict_times):
             ax1.set_ylabel("objective [min]")
             #ax1.set_ylim(bottom=-25)
             ax3.set_ylim(bottom=-0.005, top = 0.1)
-            ax3.plot(instance, [0. for _ in instance], c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1}")
-            ax3.plot(instance, [0. for _ in instance], c="black", marker = "s", linestyle= ":",  alpha=0.2, label = f"{label1}_lim")
+            ax3.plot(instance, [0. for _ in instance], c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1} exact")
+            ax3.plot(instance, [0. for _ in instance], c="black", marker = "s", linestyle= ":",  alpha=0.2, label = f"{label1} time limit $ = 5$s")
 
-            ax2.plot(instance, x_l, c="black", marker = "s", linestyle= ":",  alpha=0.3, label = f"{label1}_lim")
-            ax2.plot(instance, x, c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1}")
+            ax2.plot(instance, x_l, c="black", marker = "s", linestyle= ":",  alpha=0.3, label = f"{label1} time limit $ = 5$s")
+            ax2.plot(instance, x, c="blue", marker = "*", linestyle= ":",  alpha=0.5, label = f"{label1} exact")
             ax2.scatter(instance, x, s=40, c=colors, marker = "*",  alpha=0.25)
             fig.subplots_adjust(bottom=0.2, left = 0.2)
             ax3.set_xlabel("instance")
