@@ -43,7 +43,7 @@ def plotting_objective(solver, case, tmins):
 
     
 
-    _, (ax1) = plt.subplots(1,figsize=(3.1, 2.8),sharex=True, tight_layout= True)
+    _, (ax1) = plt.subplots(1,figsize=(3.1, 2.),sharex=True, tight_layout= True)
 
     y1 = [np.mean(objectives[tmin]) for tmin in tmins]
     y2 = [np.min(objectives[tmin]) for tmin in tmins]
@@ -58,12 +58,20 @@ def plotting_objective(solver, case, tmins):
     a, b = np.polyfit(np.log(ct), y1, 1)
 
     c = case.replace("case", "")
+
+    replace = False
     
 
     if case == "case7":
-        ax1.set_title("disturbence 1")
+        if replace:
+            ax1.set_title("disturbence 1")
+        else:
+            ax1.set_title("network 7")
     elif case == "case9":
-        ax1.set_title("disturbance 2")
+        if replace:
+            ax1.set_title("disturbance 2")
+        else:
+            ax1.set_title("network 9")
 
     ax1.plot(ct, a*np.log(ct)+b, "--", color = "green", label = "log lin. fit")
 
@@ -78,11 +86,13 @@ def plotting_objective(solver, case, tmins):
     ax1.plot([cplex_t], [cplex_obj], "o", color = "black", label = "CPLEX")
     ax1.plot(tmins, cplex_objs, ":", color = "black", label = "Optimum")
 
-    ax1.legend(ncol = 2, loc=3, fontsize = 9)
+    ax1.legend(ncol = 2, loc=3, fontsize = 7)
 
     ax1.set_ylabel("objective [min]")
-
-    ax1.set_xlabel("comp time [s]")
+    if replace:
+        ax1.set_xlabel("comp time [s]")
+    else:
+        ax1.set_xlabel("t min parameter, comp time [s]")
 
 
     plt.xscale("log")
