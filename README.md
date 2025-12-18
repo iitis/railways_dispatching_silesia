@@ -204,6 +204,10 @@ In the case of quantum computiong it will read data from file, i.e.:
 
 ### Citing this work
 
+When using the code, please cite:
+Koniorczyk, M., K. Krawiec, L. Botelho, N. Bešinović, and K. Domino, "Solving rescheduling problems in heterogeneous urban railway networks using hybrid quantum-classical approach", Journal of Rail Transport Planning & Management, vol. 34, issue 100521, 05/2025, https://doi.org/10.1016/j.jrtpm.2025.100521
+
+
 The code was partially supported by:
 - National Research, Development, and Innovation Office of Hungary under project numbers K133882
 and K124351, the Ministry of Innovation and Technology and the National
